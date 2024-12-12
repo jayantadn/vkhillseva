@@ -1,9 +1,10 @@
 // Define two themes
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // color scheme
 const Color primaryColor = Colors.blue;
-const Color outlineColor = Colors.blueAccent;
+const Color accentColor = Colors.blueAccent;
 const Color textColor = Colors.black;
 const Color backgroundColor = Colors.white;
 
@@ -16,22 +17,24 @@ ThemeData themeDefault = ThemeData(
   // appbar theme
   appBarTheme: AppBarTheme(
     backgroundColor: backgroundColor,
-    foregroundColor: outlineColor,
-    titleTextStyle: TextStyle(
-      color: outlineColor,
-      fontSize: 20.0,
-      fontWeight: FontWeight.bold,
+    foregroundColor: accentColor,
+    titleTextStyle: GoogleFonts.pacifico(
+      textStyle: TextStyle(
+        color: accentColor,
+        fontSize: 24.0,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     centerTitle: true,
     elevation: 0,
     toolbarHeight: 70.0,
     shape: Border(
       top: BorderSide(
-        color: outlineColor,
+        color: accentColor,
         width: 4.0,
       ),
       bottom: BorderSide(
-        color: outlineColor,
+        color: accentColor,
         width: 4.0,
       ),
     ),
@@ -43,12 +46,12 @@ ThemeData themeDefault = ThemeData(
     bodyMedium: TextStyle(color: textColor, fontSize: 14.0),
     bodySmall: TextStyle(color: textColor, fontSize: 12.0),
     headlineLarge: TextStyle(
-      color: textColor,
+      color: accentColor,
       fontSize: 24.0,
       fontWeight: FontWeight.bold,
     ),
     headlineMedium: TextStyle(
-      color: textColor,
+      color: accentColor,
       fontSize: 20.0,
       fontWeight: FontWeight.bold,
     ),
@@ -71,7 +74,7 @@ ThemeData themeDefault = ThemeData(
 
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
-      side: BorderSide(color: outlineColor, width: 2.0),
+      side: BorderSide(color: accentColor, width: 2.0),
       textStyle: TextStyle(
         color: primaryColor,
         fontWeight: FontWeight.bold,
@@ -96,7 +99,7 @@ ThemeData themeDefault = ThemeData(
   // Input Fields
   inputDecorationTheme: InputDecorationTheme(
     enabledBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: outlineColor, width: 1.5),
+      borderSide: BorderSide(color: accentColor, width: 1.5),
       borderRadius: BorderRadius.circular(8.0),
     ),
     focusedBorder: OutlineInputBorder(
@@ -111,7 +114,7 @@ ThemeData themeDefault = ThemeData(
       borderSide: BorderSide(color: Colors.redAccent, width: 2.0),
       borderRadius: BorderRadius.circular(8.0),
     ),
-    labelStyle: TextStyle(color: outlineColor),
+    labelStyle: TextStyle(color: accentColor),
     hintStyle: TextStyle(color: Colors.grey),
   ),
 
@@ -122,17 +125,15 @@ ThemeData themeDefault = ThemeData(
     elevation: 4,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12.0),
-      side: BorderSide(color: outlineColor, width: 1.0),
+      side: BorderSide(color: accentColor, width: 1.0),
     ),
   ),
 
   // Floating Action Button
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: backgroundColor,
-    foregroundColor: primaryColor,
-    shape: CircleBorder(
-      side: BorderSide(color: primaryColor, width: 2.0),
-    ),
+    backgroundColor: primaryColor,
+    foregroundColor: backgroundColor,
+    shape: CircleBorder(),
   ),
 
   // Icon Theme

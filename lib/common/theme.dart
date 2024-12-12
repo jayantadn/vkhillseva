@@ -8,17 +8,32 @@ const Color textColor = Colors.black;
 const Color backgroundColor = Colors.white;
 
 ThemeData themeDefault = ThemeData(
-// General Colors
+  // General Colors
   brightness: Brightness.light,
   primaryColor: primaryColor,
   scaffoldBackgroundColor: backgroundColor,
+
+  // appbar theme
   appBarTheme: AppBarTheme(
-    backgroundColor: primaryColor,
-    foregroundColor: textColor,
+    backgroundColor: backgroundColor,
+    foregroundColor: outlineColor,
     titleTextStyle: TextStyle(
-      color: textColor,
+      color: outlineColor,
       fontSize: 20.0,
       fontWeight: FontWeight.bold,
+    ),
+    centerTitle: true,
+    elevation: 0,
+    toolbarHeight: 70.0,
+    shape: Border(
+      top: BorderSide(
+        color: outlineColor,
+        width: 4.0,
+      ),
+      bottom: BorderSide(
+        color: outlineColor,
+        width: 4.0,
+      ),
     ),
   ),
 

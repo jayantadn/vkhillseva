@@ -3,14 +3,22 @@ import 'package:flutter/material.dart';
 class LauncherTile extends StatelessWidget {
   final String image;
   final String title;
+  final LauncherTileCallback? callback;
 
-  const LauncherTile({super.key, required this.image, required this.title});
+  const LauncherTile(
+      {super.key, required this.image, required this.title, this.callback});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        width: 150,
-        height: 200,
+      width: 150,
+      height: 200,
+      child: GestureDetector(
+        onTap: () {
+          if (callback != null) {
+            callback!.onClick();
+          }
+        },
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
@@ -35,6 +43,14 @@ class LauncherTile extends StatelessWidget {
               ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
+}
+
+class LauncherTileCallback {
+  final Function() onClick;
+
+  LauncherTileCallback({required this.onClick});
 }

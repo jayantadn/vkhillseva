@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
 import 'package:vkhillseva/widgets/launcher_tile.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -64,9 +65,15 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Row(
               children: [
                 LauncherTile(
-                  image: 'assets/images/LauncherIcons/NityaSeva.png',
-                  title: "Nitya Seva",
-                ),
+                    image: 'assets/images/LauncherIcons/NityaSeva.png',
+                    title: "Nitya Seva",
+                    callback: LauncherTileCallback(onClick: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const NityaSeva()),
+                      );
+                    })),
                 LauncherTile(
                   image: 'assets/images/LauncherIcons/Harinaam.png',
                   title: "Harinaam",

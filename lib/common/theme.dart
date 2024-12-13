@@ -21,7 +21,7 @@ ThemeData themeDefault = ThemeData(
     titleTextStyle: GoogleFonts.pacifico(
       textStyle: TextStyle(
         color: accentColor,
-        fontSize: 24.0,
+        fontSize: 30.0,
         fontWeight: FontWeight.bold,
       ),
     ),

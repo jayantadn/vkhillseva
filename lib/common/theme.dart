@@ -27,7 +27,7 @@ ThemeData themeDefault = ThemeData(
     ),
     centerTitle: true,
     elevation: 0,
-    toolbarHeight: 70.0,
+    toolbarHeight: 50.0,
     shape: Border(
       top: BorderSide(
         color: accentColor,

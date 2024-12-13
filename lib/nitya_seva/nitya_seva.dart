@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
+import 'package:vkhillseva/widgets/date_header.dart';
 
 class NityaSeva extends StatefulWidget {
-  const NityaSeva({super.key});
+  final String title;
+
+  const NityaSeva({super.key, required this.title});
 
   @override
   _NityaSevaState createState() => _NityaSevaState();
@@ -20,7 +23,6 @@ class _NityaSevaState extends State<NityaSeva> {
   }
 
   Future<void> refresh() async {
-    await Future.delayed(const Duration(seconds: 2));
     setState(() {
       _isLoading = false;
     });
@@ -32,7 +34,7 @@ class _NityaSevaState extends State<NityaSeva> {
       data: themeDefault,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Title'),
+          title: Text(widget.title),
         ),
         body: Stack(
           children: [
@@ -40,7 +42,9 @@ class _NityaSevaState extends State<NityaSeva> {
               onRefresh: refresh,
               child: ListView(
                 children: [
-                  const Placeholder(),
+                  DateHeader(
+                      callbacks:
+                          DateHeaderCallbacks(onChange: (DateTime date) {})),
                 ],
               ),
             ),

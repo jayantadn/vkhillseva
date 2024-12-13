@@ -71,7 +71,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const NityaSeva()),
+                            builder: (context) =>
+                                const NityaSeva(title: "Nitya Seva")),
                       );
                     })),
                 LauncherTile(

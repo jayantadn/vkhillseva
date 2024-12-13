@@ -10,7 +10,6 @@ class DateHeader extends StatefulWidget {
   State<DateHeader> createState() => _DateHeaderState();
 }
 
-// hint: templateKey.currentState!.refresh();
 final GlobalKey<_DateHeaderState> HistoryHeaderKey =
     GlobalKey<_DateHeaderState>();
 
@@ -20,13 +19,51 @@ class _DateHeaderState extends State<DateHeader> {
   @override
   initState() {
     super.initState();
-
     refresh();
   }
 
   Future<void> refresh() async {
     if (!mounted) return;
     setState(() {});
+  }
+
+  void _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget? child) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              child: child,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  _date = DateTime.now();
+                });
+                if (widget.callbacks != null) {
+                  widget.callbacks!.onChange(_date);
+                }
+              },
+              child: Text('Today'),
+            ),
+          ],
+        );
+      },
+    );
+    if (picked != null && picked != _date) {
+      setState(() {
+        _date = picked;
+      });
+      if (widget.callbacks != null) {
+        widget.callbacks!.onChange(_date);
+      }
+    }
   }
 
   @override
@@ -55,18 +92,47 @@ class _DateHeaderState extends State<DateHeader> {
           ),
 
           // date
-          GestureDetector(
-            onTap: () {
-              if (widget.callbacks == null) {
-                return;
-              }
-
-              setState(() {
-                _date = DateTime.now();
-              });
-
-              widget.callbacks!.onChange(_date);
-            },
+          PopupMenuButton<void>(
+            onSelected: (_) {},
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem<void>(
+                enabled: false,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: 300,
+                      height: 300,
+                      child: CalendarDatePicker(
+                        initialDate: _date,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101),
+                        onDateChanged: (DateTime picked) {
+                          setState(() {
+                            _date = picked;
+                          });
+                          if (widget.callbacks != null) {
+                            widget.callbacks!.onChange(_date);
+                          }
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _date = DateTime.now();
+                        });
+                        if (widget.callbacks != null) {
+                          widget.callbacks!.onChange(_date);
+                        }
+                        Navigator.pop(context);
+                      },
+                      child: Text('Today'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             child: Container(
               width: 150.0,
               alignment: Alignment.center,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vkhillseva/widgets/launcher_tile.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -57,6 +58,26 @@ class _MyHomePageState extends State<MyHomePage> {
             style: Theme.of(context).textTheme.headlineMedium,
           ),
           Text('Seva App', style: Theme.of(context).textTheme.headlineMedium),
+          SizedBox(height: 50),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                LauncherTile(
+                  image: 'assets/images/LauncherIcons/NityaSeva.png',
+                  title: "Nitya Seva",
+                ),
+                LauncherTile(
+                  image: 'assets/images/LauncherIcons/Harinaam.png',
+                  title: "Harinaam",
+                ),
+                LauncherTile(
+                  image: 'assets/images/LauncherIcons/Deepotsava.png',
+                  title: "Deepotsava",
+                ),
+              ],
+            ),
+          )
         ],
       )),
     );

@@ -55,6 +55,11 @@ ThemeData themeDefault = ThemeData(
       fontSize: 18.0,
       fontWeight: FontWeight.bold,
     ),
+    headlineSmall: GoogleFonts.nunito(
+      color: textColor,
+      fontSize: 14.0,
+      fontWeight: FontWeight.bold,
+    ),
   ),
 
   // Buttons

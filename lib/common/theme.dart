@@ -45,14 +45,14 @@ ThemeData themeDefault = ThemeData(
     bodyLarge: TextStyle(color: textColor, fontSize: 16.0),
     bodyMedium: TextStyle(color: textColor, fontSize: 14.0),
     bodySmall: TextStyle(color: textColor, fontSize: 12.0),
-    headlineLarge: TextStyle(
+    headlineLarge: GoogleFonts.nunito(
       color: accentColor,
       fontSize: 24.0,
       fontWeight: FontWeight.bold,
     ),
-    headlineMedium: TextStyle(
+    headlineMedium: GoogleFonts.nunito(
       color: primaryColor,
-      fontSize: 20.0,
+      fontSize: 18.0,
       fontWeight: FontWeight.bold,
     ),
   ),

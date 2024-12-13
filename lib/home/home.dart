@@ -26,11 +26,27 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-                height: 200,
-                width: 200,
+            child: Container(
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: ClipOval(
                 child: Image.asset(
-                    'assets/images/Logo/KrishnaLilaPark_circle.png')),
+                  'assets/images/Logo/KrishnaLilaPark_circle.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           ),
           Text(
             'Welcome Guest',

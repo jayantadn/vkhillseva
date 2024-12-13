@@ -51,7 +51,7 @@ ThemeData themeDefault = ThemeData(
       fontWeight: FontWeight.bold,
     ),
     headlineMedium: TextStyle(
-      color: accentColor,
+      color: primaryColor,
       fontSize: 20.0,
       fontWeight: FontWeight.bold,
     ),
@@ -131,7 +131,7 @@ ThemeData themeDefault = ThemeData(
 
   // Floating Action Button
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: primaryColor,
+    backgroundColor: accentColor,
     foregroundColor: backgroundColor,
     shape: CircleBorder(),
   ),

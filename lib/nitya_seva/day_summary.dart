@@ -32,6 +32,21 @@ class _DaySummaryState extends State<DaySummary> {
     ["Amount", "18900", "0"]
   ];
 
+  // pie chart data
+  Map<String, int> countMode = {
+    // {mode: count}
+    'UPI': 16,
+    'Cash': 19,
+    'Card': 6,
+    'Gift': 0,
+  };
+  Map<String, int> countModePercentage = {
+    // {mode: percentage}
+    'UPI': 40,
+    'Cash': 45,
+    'Card': 15,
+  };
+
   @override
   void initState() {
     super.initState();
@@ -265,76 +280,102 @@ class _DaySummaryState extends State<DaySummary> {
     );
   }
 
-  Widget _createModeChart(BuildContext context) {
-    return BarChart(
-      BarChartData(
-        alignment: BarChartAlignment.spaceAround,
-        maxY: 20,
-        barTouchData: BarTouchData(enabled: false),
-        titlesData: FlTitlesData(
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: false), // Hide left titles
-          ),
-          rightTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize:
-                  40, // Reserve some fixed space for the labels on the right
-              getTitlesWidget: (value, meta) {
-                return Padding(
-                  padding: const EdgeInsets.only(
-                      left: 8.0), // Add padding to the left
-                  child: Text(
-                    value.toString(),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                );
-              },
-            ),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 22, // Add some reserved size for padding
-              getTitlesWidget: (value, meta) {
-                return Padding(
-                  padding:
-                      const EdgeInsets.only(top: 8.0), // Add padding to the top
-                  child: Text(
-                    value.toString(),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                );
-              },
-            ),
-          ),
-          topTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: false), // Hide top titles
-          ),
+  Widget _wLegends() {
+    if (countModePercentage['UPI'] == 0 &&
+        countModePercentage['Cash'] == 0 &&
+        countModePercentage['Card'] == 0) {
+      return const Text("");
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _wLegendItem(Colors.orange, 'UPI'),
+        _wLegendItem(Colors.green, 'Cash'),
+        _wLegendItem(Colors.blue, 'Card'),
+      ],
+    );
+  }
+
+  Widget _wLegendItem(Color color, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          color: color,
         ),
-        borderData: FlBorderData(show: false),
-        barGroups: [
-          BarChartGroupData(
-            x: 0,
-            barRods: [BarChartRodData(toY: 8, color: Colors.lightBlueAccent)],
-            showingTooltipIndicators: [0],
+        const SizedBox(width: 4),
+        Text(text),
+      ],
+    );
+  }
+
+  Widget _createModeChart(BuildContext context) {
+    double radius = 40;
+
+    if (countModePercentage['UPI'] == 0 &&
+        countModePercentage['Cash'] == 0 &&
+        countModePercentage['Card'] == 0) {
+      return const Text("");
+    }
+
+    return PieChart(
+      PieChartData(
+        sections: [
+          // UPI
+          PieChartSectionData(
+            color: Colors.orange,
+            value: countModePercentage['UPI']!.toDouble(),
+            title: '${countMode['UPI']}',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: countModePercentage['UPI']! > 9
+                  ? Colors.white
+                  : Theme.of(context).textTheme.bodyLarge!.color,
+            ),
+            titlePositionPercentageOffset:
+                countModePercentage['UPI']! > 9 ? 0.5 : 1.2,
           ),
-          BarChartGroupData(
-            x: 1,
-            barRods: [BarChartRodData(toY: 10, color: Colors.lightBlueAccent)],
-            showingTooltipIndicators: [0],
+
+          // cash
+          PieChartSectionData(
+            color: Colors.green,
+            value: countModePercentage['Cash']!.toDouble(),
+            title: '${countMode['Cash']}',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: countModePercentage['Cash']! > 9
+                  ? Colors.white
+                  : Theme.of(context).textTheme.bodyLarge!.color,
+            ),
+            titlePositionPercentageOffset:
+                countModePercentage['Cash']! > 9 ? 0.5 : 1.2,
           ),
-          BarChartGroupData(
-            x: 2,
-            barRods: [BarChartRodData(toY: 14, color: Colors.lightBlueAccent)],
-            showingTooltipIndicators: [0],
-          ),
-          BarChartGroupData(
-            x: 3,
-            barRods: [BarChartRodData(toY: 15, color: Colors.lightBlueAccent)],
-            showingTooltipIndicators: [0],
+
+          // card
+          PieChartSectionData(
+            color: Colors.blue,
+            value: countModePercentage['Card']!.toDouble(),
+            title: '${countMode['Card']}',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: countModePercentage['Card']! > 9
+                  ? Colors.white
+                  : Theme.of(context).textTheme.bodyLarge!.color,
+            ),
+            titlePositionPercentageOffset:
+                countModePercentage['Card']! > 9 ? 0.5 : 1.2,
           ),
         ],
+        sectionsSpace: 2,
+        centerSpaceRadius: 8,
       ),
     );
   }
@@ -356,12 +397,19 @@ class _DaySummaryState extends State<DaySummary> {
             child: Column(
               children: [
                 // create chart for payment mode
-                SizedBox(
-                    height: 200,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 100, // Reduced width
+                      height: 100, // Reduced height
                       child: _createModeChart(context),
-                    )),
+                    ),
+                    const SizedBox(
+                        width: 30), // Increased width for more padding
+                    _wLegends(),
+                  ],
+                ),
 
                 SizedBox(height: 8),
 

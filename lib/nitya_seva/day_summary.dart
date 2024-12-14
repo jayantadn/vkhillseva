@@ -280,8 +280,12 @@ class _DaySummaryState extends State<DaySummary> {
             padding: EdgeInsets.all(8.0),
             child: Column(
               children: [
+                // tiles for total
                 _createGrandTotal(context),
+
                 SizedBox(height: 8),
+
+                // table for tickets
                 _createTicketTable(context),
               ],
             ),

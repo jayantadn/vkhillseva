@@ -65,7 +65,7 @@ class _DaySummaryState extends State<DaySummary> {
           topRight: Radius.circular(10.0),
         ),
       ),
-      padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
 
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -79,9 +79,9 @@ class _DaySummaryState extends State<DaySummary> {
           ),
 
           // Share Button
-          IconButton(
-            icon: Icon(Icons.share, color: Colors.white),
-            onPressed: () {
+          GestureDetector(
+            child: Icon(Icons.share, color: Colors.white),
+            onTap: () {
               // Add your share functionality here
             },
           ),

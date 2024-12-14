@@ -45,17 +45,16 @@ ThemeData themeDefault = ThemeData(
     bodyLarge: TextStyle(color: textColor, fontSize: 16.0),
     bodyMedium: TextStyle(color: textColor, fontSize: 14.0),
     bodySmall: TextStyle(color: textColor, fontSize: 12.0),
-    headlineLarge: GoogleFonts.nunito(
+    headlineLarge: GoogleFonts.mogra(
       color: accentColor,
       fontSize: 24.0,
       fontWeight: FontWeight.bold,
     ),
-    headlineMedium: GoogleFonts.nunito(
+    headlineMedium: GoogleFonts.mogra(
       color: primaryColor,
       fontSize: 18.0,
-      fontWeight: FontWeight.bold,
     ),
-    headlineSmall: GoogleFonts.nunito(
+    headlineSmall: GoogleFonts.mogra(
       color: textColor,
       fontSize: 14.0,
       fontWeight: FontWeight.bold,
@@ -145,6 +144,14 @@ ThemeData themeDefault = ThemeData(
   iconTheme: IconThemeData(
     color: primaryColor,
     size: 24.0,
+  ),
+
+  // Icon Button Theme
+  iconButtonTheme: IconButtonThemeData(
+    style: ButtonStyle(
+      iconColor: WidgetStateProperty.all(accentColor),
+      iconSize: WidgetStateProperty.all(24.0),
+    ),
   ),
 
   // Checkboxes, Radios, Switches

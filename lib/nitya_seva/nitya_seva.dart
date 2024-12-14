@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
+import 'package:vkhillseva/nitya_seva/day_summary.dart';
 import 'package:vkhillseva/widgets/date_header.dart';
 
 class NityaSeva extends StatefulWidget {
@@ -45,6 +46,7 @@ class _NityaSevaState extends State<NityaSeva> {
                   DateHeader(
                       callbacks:
                           DateHeaderCallbacks(onChange: (DateTime date) {})),
+                  DaySummary(),
                 ],
               ),
             ),

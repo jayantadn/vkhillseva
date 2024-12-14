@@ -105,7 +105,7 @@ class _DateHeaderState extends State<DateHeader> {
                       child: CalendarDatePicker(
                         initialDate: _date,
                         firstDate: DateTime(2000),
-                        lastDate: DateTime(2101),
+                        lastDate: DateTime.now(),
                         onDateChanged: (DateTime picked) {
                           setState(() {
                             _date = picked;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:vkhillseva/common/utils.dart';
 
 class DaySummary extends StatefulWidget {
   const DaySummary({super.key});
@@ -29,7 +30,11 @@ class _DaySummaryState extends State<DaySummary> {
   ];
   List<List<String>> amountTableTotalRow = [
     ["Total", "37", "0"],
-    ["Amount", "₹ 18900", "₹ 0"]
+    [
+      "Amount",
+      Utils().formatIndianCurrency("18900"),
+      Utils().formatIndianCurrency("0")
+    ]
   ];
 
   // pie chart data
@@ -172,7 +177,7 @@ class _DaySummaryState extends State<DaySummary> {
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: Text(
-                        '₹ 18900',
+                        Utils().formatIndianCurrency('18900'),
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

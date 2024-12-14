@@ -46,12 +46,23 @@ class _DaySummaryState extends State<DaySummary> {
                 topRight: Radius.circular(10.0),
               ),
             ),
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              "Summary",
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: Colors.white,
-                  ),
+            padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Summary",
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Colors.white,
+                      ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.share, color: Colors.white),
+                  onPressed: () {
+                    // Add your share functionality here
+                  },
+                ),
+              ],
             ),
           ),
           Padding(

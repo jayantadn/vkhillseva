@@ -42,7 +42,7 @@ ThemeData themeDefault = ThemeData(
 
   // Text Styles
   textTheme: TextTheme(
-    bodyLarge: TextStyle(color: textColor, fontSize: 16.0),
+    bodyLarge: TextStyle(color: textColor, fontSize: 18.0),
     bodyMedium: TextStyle(color: textColor, fontSize: 14.0),
     bodySmall: TextStyle(color: textColor, fontSize: 12.0),
     headlineLarge: GoogleFonts.mogra(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vkhillseva/common/config.dart';
 import 'package:vkhillseva/common/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/nitya_seva/day_summary.dart';
@@ -17,11 +18,33 @@ class NityaSeva extends StatefulWidget {
 class _NityaSevaState extends State<NityaSeva> {
   bool _isLoading = true;
 
+  // seva dropdown
+  late List<String> _sevaList;
+  String _selectedSeva = '';
+
   @override
   initState() {
     super.initState();
 
+    // initialize seva list
+    _sevaList = Config().nityaSeva['sevaList'].keys.toList();
+
+    // select default seva
+    DateTime now = DateTime.now();
+    if (now.hour < 14) {
+      _selectedSeva = _sevaList.first;
+    } else {
+      _selectedSeva = _sevaList[1];
+    }
+
     refresh();
+  }
+
+  @override
+  dispose() {
+    _sevaList.clear();
+
+    super.dispose();
   }
 
   Future<void> refresh() async {
@@ -46,9 +69,9 @@ class _NityaSevaState extends State<NityaSeva> {
               children: [
                 // drop down for seva
                 DropdownButtonFormField<String>(
-                  decoration: InputDecoration(labelText: 'Sample Data'),
-                  items:
-                      ['Option 1', 'Option 2', 'Option 3'].map((String value) {
+                  value: _selectedSeva, // Set the default value here
+                  decoration: InputDecoration(labelText: 'Seva'),
+                  items: _sevaList.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(
@@ -56,7 +79,11 @@ class _NityaSevaState extends State<NityaSeva> {
                       ),
                     );
                   }).toList(),
-                  onChanged: (newValue) {},
+                  onChanged: (newValue) {
+                    setState(() {
+                      if (newValue != null) _selectedSeva = newValue;
+                    });
+                  },
                 ),
 
                 SizedBox(height: padding),

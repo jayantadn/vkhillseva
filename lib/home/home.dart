@@ -51,7 +51,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Text(
-            'Welcome Guest',
+            'Welcome',
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
+          Text(
+            'Guest',
             style: Theme.of(context).textTheme.headlineLarge,
           ),
           Text(

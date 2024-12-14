@@ -66,6 +66,8 @@ class LauncherTile2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double size = 40;
+
     return SizedBox(
       width: 150,
       height: 200,
@@ -76,29 +78,40 @@ class LauncherTile2 extends StatelessWidget {
           }
         },
         child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               // title
-
-              // image
-              ClipRRect(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10.0),
-                  topRight: Radius.circular(10.0),
-                ),
-                child: Image.asset(image),
-              ),
-
-              // text
-              Expanded(
+              SizedBox(
+                height: size,
                 child: Center(
                   child: Text(
                     title,
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+              ),
+
+              Divider(),
+
+              // image
+              Center(
+                child: CircleAvatar(
+                  radius: size,
+                  backgroundImage: AssetImage(image),
+                ),
+              ),
+
+              Divider(),
+
+              // text
+              SizedBox(
+                height: size,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Text(
+                    text,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
               ),

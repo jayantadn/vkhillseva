@@ -60,7 +60,7 @@ class _NityaSevaState extends State<NityaSeva> {
                         // slot 1
                         LauncherTile2(
                           image: 'assets/images/Common/morning.png',
-                          title: 'Nitya Seva',
+                          title: 'Sat Morning',
                           text: "Sumitra Krishna Dasa, 14-12-2024 10:15",
                           callback: LauncherTileCallback(onClick: () {}),
                         ),
@@ -68,8 +68,16 @@ class _NityaSevaState extends State<NityaSeva> {
                         // slot 2
                         LauncherTile2(
                           image: 'assets/images/Common/evening.png',
-                          title: 'Nitya Seva',
+                          title: 'Sat Evening',
                           text: "Jayanta Debnath, 14-12-2024 16:15",
+                          callback: LauncherTileCallback(onClick: () {}),
+                        ),
+
+                        // add slot
+                        LauncherTile2(
+                          image: 'assets/images/Common/add.png',
+                          title: 'New Session',
+                          text: "Add a new session",
                           callback: LauncherTileCallback(onClick: () {}),
                         ),
                       ],

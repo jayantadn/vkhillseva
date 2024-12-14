@@ -29,7 +29,7 @@ class _DaySummaryState extends State<DaySummary> {
   ];
   List<List<String>> amountTableTotalRow = [
     ["Total", "37", "0"],
-    ["Amount", "18900", "0"]
+    ["Amount", "₹ 18900", "₹ 0"]
   ];
 
   // pie chart data
@@ -128,7 +128,7 @@ class _DaySummaryState extends State<DaySummary> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
-                      child: Text('1000',
+                      child: Text('37',
                           style:
                               Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     color: Colors.white,
@@ -172,7 +172,7 @@ class _DaySummaryState extends State<DaySummary> {
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: Text(
-                        '₹ 10000',
+                        '₹ 18900',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

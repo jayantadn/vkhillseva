@@ -50,9 +50,10 @@ ThemeData themeDefault = ThemeData(
       fontSize: 24.0,
       fontWeight: FontWeight.bold,
     ),
-    headlineMedium: GoogleFonts.mogra(
+    headlineMedium: GoogleFonts.delius(
       color: primaryColor,
       fontSize: 18.0,
+      fontWeight: FontWeight.bold,
     ),
     headlineSmall: GoogleFonts.lexend(
       color: textColor,

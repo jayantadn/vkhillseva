@@ -44,21 +44,66 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
     });
   }
 
+  Widget _createSettingsCard(
+      {required String title,
+      required String icon,
+      required FestivalSettingsCallback callback}) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+        child: ListTile(
+          title: Text(title, style: Theme.of(context).textTheme.headlineMedium),
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: Image.asset(
+              icon,
+            ),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: callback.onEdit as void Function()?,
+              ),
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: callback.onDelete as void Function()?,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
       data: themeDefault,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
+        appBar: AppBar(title: Text(widget.title), actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              // Add your onPressed code here!
+            },
+          ),
+        ]),
         body: Stack(
           children: [
             RefreshIndicator(
               onRefresh: refresh,
               child: ListView(
                 children: [
-                  const Placeholder(),
+                  for (var seva in _sevaList.entries)
+                    _createSettingsCard(
+                        title: seva.key,
+                        icon: seva.value,
+                        callback: FestivalSettingsCallback(
+                          onEdit: () {},
+                          onDelete: () {},
+                        ))
                 ],
               ),
             ),
@@ -71,4 +116,11 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
       ),
     );
   }
+}
+
+class FestivalSettingsCallback {
+  final Function onEdit;
+  final Function onDelete;
+
+  FestivalSettingsCallback({required this.onEdit, required this.onDelete});
 }

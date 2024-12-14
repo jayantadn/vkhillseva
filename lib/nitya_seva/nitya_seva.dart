@@ -30,6 +30,95 @@ class _NityaSevaState extends State<NityaSeva> {
     });
   }
 
+  Future<void> _addSession() async {
+    final double padding = 8.0;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController sessionNameController = TextEditingController();
+
+        return AlertDialog(
+          title: Text('Add New Session',
+              style: Theme.of(context).textTheme.headlineMedium),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                // drop down for seva
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(labelText: 'Sample Data'),
+                  items:
+                      ['Option 1', 'Option 2', 'Option 3'].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {},
+                ),
+
+                SizedBox(height: padding),
+
+                // session name
+                TextField(
+                  controller: sessionNameController,
+                  decoration: InputDecoration(labelText: 'Session Name'),
+                ),
+
+                SizedBox(height: padding),
+
+                // default amount
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(labelText: 'Sample Data'),
+                  items:
+                      ['Option 1', 'Option 2', 'Option 3'].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {},
+                ),
+
+                SizedBox(height: padding),
+
+                // default payment mode
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(labelText: 'Sample Data'),
+                  items:
+                      ['Option 1', 'Option 2', 'Option 3'].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {},
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Add'),
+              onPressed: () {
+                // Handle the add session logic here
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -77,7 +166,9 @@ class _NityaSevaState extends State<NityaSeva> {
                             image: 'assets/images/Common/add.png',
                             title: 'New Session',
                             text: "Add a new session",
-                            callback: LauncherTileCallback(onClick: () {}),
+                            callback: LauncherTileCallback(onClick: () {
+                              _addSession();
+                            }),
                           ),
                         ],
                       ),

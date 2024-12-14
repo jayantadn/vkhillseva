@@ -223,6 +223,13 @@ class _DaySummaryState extends State<DaySummary> {
         // row for total
         ...amountTableTotalRow.map((row) {
           return TableRow(
+            decoration: amountTableTotalRow.indexOf(row) == 0
+                ? const BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: Colors.grey),
+                    ),
+                  )
+                : null,
             children: row.map((cell) {
               return Padding(
                 padding: const EdgeInsets.symmetric(

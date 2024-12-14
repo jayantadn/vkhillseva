@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class DaySummary extends StatefulWidget {
   const DaySummary({super.key});
@@ -264,6 +265,80 @@ class _DaySummaryState extends State<DaySummary> {
     );
   }
 
+  Widget _createModeChart(BuildContext context) {
+    return BarChart(
+      BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        maxY: 20,
+        barTouchData: BarTouchData(enabled: false),
+        titlesData: FlTitlesData(
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false), // Hide left titles
+          ),
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize:
+                  40, // Reserve some fixed space for the labels on the right
+              getTitlesWidget: (value, meta) {
+                return Padding(
+                  padding: const EdgeInsets.only(
+                      left: 8.0), // Add padding to the left
+                  child: Text(
+                    value.toString(),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                );
+              },
+            ),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 22, // Add some reserved size for padding
+              getTitlesWidget: (value, meta) {
+                return Padding(
+                  padding:
+                      const EdgeInsets.only(top: 8.0), // Add padding to the top
+                  child: Text(
+                    value.toString(),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                );
+              },
+            ),
+          ),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false), // Hide top titles
+          ),
+        ),
+        borderData: FlBorderData(show: false),
+        barGroups: [
+          BarChartGroupData(
+            x: 0,
+            barRods: [BarChartRodData(toY: 8, color: Colors.lightBlueAccent)],
+            showingTooltipIndicators: [0],
+          ),
+          BarChartGroupData(
+            x: 1,
+            barRods: [BarChartRodData(toY: 10, color: Colors.lightBlueAccent)],
+            showingTooltipIndicators: [0],
+          ),
+          BarChartGroupData(
+            x: 2,
+            barRods: [BarChartRodData(toY: 14, color: Colors.lightBlueAccent)],
+            showingTooltipIndicators: [0],
+          ),
+          BarChartGroupData(
+            x: 3,
+            barRods: [BarChartRodData(toY: 15, color: Colors.lightBlueAccent)],
+            showingTooltipIndicators: [0],
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -280,13 +355,23 @@ class _DaySummaryState extends State<DaySummary> {
             padding: EdgeInsets.all(8.0),
             child: Column(
               children: [
-                // tiles for total
-                _createGrandTotal(context),
+                // create chart for payment mode
+                SizedBox(
+                    height: 200,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: _createModeChart(context),
+                    )),
 
                 SizedBox(height: 8),
 
                 // table for tickets
                 _createTicketTable(context),
+
+                SizedBox(height: 8),
+
+                // tiles for total
+                _createGrandTotal(context),
               ],
             ),
           ),

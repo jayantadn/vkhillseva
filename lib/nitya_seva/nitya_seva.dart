@@ -38,60 +38,63 @@ class _NityaSevaState extends State<NityaSeva> {
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: Stack(
-          children: [
-            RefreshIndicator(
-              onRefresh: refresh,
-              child: ListView(
-                children: [
-                  // date header
-                  DateHeader(
-                      callbacks:
-                          DateHeaderCallbacks(onChange: (DateTime date) {})),
+        body: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Stack(
+            children: [
+              RefreshIndicator(
+                onRefresh: refresh,
+                child: ListView(
+                  children: [
+                    // date header
+                    DateHeader(
+                        callbacks:
+                            DateHeaderCallbacks(onChange: (DateTime date) {})),
 
-                  // summary
-                  DaySummary(),
+                    // slot tiles
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          // slot 1
+                          LauncherTile2(
+                            image: 'assets/images/Common/morning.png',
+                            title: 'Sat Morning',
+                            text: "Sumitra Krishna Dasa, 14-12-2024 10:15",
+                            callback: LauncherTileCallback(onClick: () {}),
+                          ),
 
-                  // slot tiles
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        // slot 1
-                        LauncherTile2(
-                          image: 'assets/images/Common/morning.png',
-                          title: 'Sat Morning',
-                          text: "Sumitra Krishna Dasa, 14-12-2024 10:15",
-                          callback: LauncherTileCallback(onClick: () {}),
-                        ),
+                          // slot 2
+                          LauncherTile2(
+                            image: 'assets/images/Common/evening.png',
+                            title: 'Sat Evening',
+                            text: "Jayanta Debnath, 14-12-2024 16:15",
+                            callback: LauncherTileCallback(onClick: () {}),
+                          ),
 
-                        // slot 2
-                        LauncherTile2(
-                          image: 'assets/images/Common/evening.png',
-                          title: 'Sat Evening',
-                          text: "Jayanta Debnath, 14-12-2024 16:15",
-                          callback: LauncherTileCallback(onClick: () {}),
-                        ),
-
-                        // add slot
-                        LauncherTile2(
-                          image: 'assets/images/Common/add.png',
-                          title: 'New Session',
-                          text: "Add a new session",
-                          callback: LauncherTileCallback(onClick: () {}),
-                        ),
-                      ],
+                          // add slot
+                          LauncherTile2(
+                            image: 'assets/images/Common/add.png',
+                            title: 'New Session',
+                            text: "Add a new session",
+                            callback: LauncherTileCallback(onClick: () {}),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
 
-            // circular progress indicator
-            if (_isLoading)
-              LoadingOverlay(
-                  image: 'assets/images/LauncherIcons/NityaSeva.png'),
-          ],
+                    // summary
+                    DaySummary(),
+                  ],
+                ),
+              ),
+
+              // circular progress indicator
+              if (_isLoading)
+                LoadingOverlay(
+                    image: 'assets/images/LauncherIcons/NityaSeva.png'),
+            ],
+          ),
         ),
       ),
     );

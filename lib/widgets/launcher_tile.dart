@@ -109,9 +109,12 @@ class LauncherTile2 extends StatelessWidget {
                 height: size,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  child: Text(
-                    text,
-                    style: Theme.of(context).textTheme.bodySmall,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text(
+                      text,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ),
                 ),
               ),

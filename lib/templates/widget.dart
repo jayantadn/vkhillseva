@@ -20,6 +20,15 @@ class _SummaryState extends State<Summary> {
     refresh();
   }
 
+  @override
+  dispose() {
+    // clear all lists
+
+    // clear all controllers
+
+    super.dispose();
+  }
+
   void refresh() async {
     await _lock.synchronized(() async {
       // all you need to do

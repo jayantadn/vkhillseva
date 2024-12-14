@@ -16,14 +16,14 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
   bool _isLoading = true;
 
   // Map<name, icon>
-  List<Map<String, String>> _sevaList = [];
+  Map<String, String> _sevaList = {};
 
   @override
   initState() {
     super.initState();
 
     // synchronous init
-    Config().getFestivalIcons();
+    _sevaList = Config().getFestivalIcons();
 
     refresh();
   }

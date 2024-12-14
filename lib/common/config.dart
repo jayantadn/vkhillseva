@@ -37,7 +37,11 @@ class Config {
 
   // Map<name, icon>
   Map<String, String> getFestivalIcons() {
-    print(_festivalConfig);
-    return {};
+    Map<String, String> icons = {};
+    _festivalConfig.forEach((key, value) {
+      icons[key] = value['icon'];
+    });
+
+    return icons;
   }
 }

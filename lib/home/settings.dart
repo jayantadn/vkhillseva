@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
+import 'package:vkhillseva/home/settings_festivals.dart';
 
 class Settings extends StatefulWidget {
   final String title;
@@ -32,19 +33,26 @@ class _SettingsState extends State<Settings> {
       required String icon,
       required SettingsCallback callback}) {
     return Card(
-        child: Padding(
-      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-      child: ListTile(
-        title: Text(title, style: Theme.of(context).textTheme.headlineMedium),
-        leading: ClipRRect(
-          borderRadius:
-              BorderRadius.circular(8.0), // Adjust the radius as needed
-          child: Image.asset(
-            icon,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+        child: InkWell(
+          onTap: () {
+            callback.onClick();
+          },
+          child: ListTile(
+            title:
+                Text(title, style: Theme.of(context).textTheme.headlineMedium),
+            leading: ClipRRect(
+              borderRadius:
+                  BorderRadius.circular(8.0), // Adjust the radius as needed
+              child: Image.asset(
+                icon,
+              ),
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   @override
@@ -65,8 +73,13 @@ class _SettingsState extends State<Settings> {
                   _createSettingsCard(
                     title: 'Nitya Seva Festival',
                     icon: "assets/images/LauncherIcons/NityaSeva.png",
-                    callback: SettingsCallback(callback: () {
-                      // Navigator.pushNamed(context, '/nitya_seva_festival');
+                    callback: SettingsCallback(onClick: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SettingsFestivals(
+                                title: "Festival Settings")),
+                      );
                     }),
                   ),
                 ],
@@ -85,7 +98,7 @@ class _SettingsState extends State<Settings> {
 }
 
 class SettingsCallback {
-  final Function callback;
+  final Function onClick;
 
-  SettingsCallback({required this.callback});
+  SettingsCallback({required this.onClick});
 }

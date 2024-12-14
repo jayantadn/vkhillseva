@@ -187,64 +187,80 @@ class _DaySummaryState extends State<DaySummary> {
       return const Text("no data");
     }
 
-    return Table(
-      children: [
-        // table header
-        TableRow(
-          children: amountTableHeaderRow.map((header) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0), // Adjust the padding as needed
-              child: Center(
-                child: Text(
-                  header,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-
-        // row for entries
-        ...amountTableTicketRow.map((row) {
-          return TableRow(
-            children: row.map((cell) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0), // Adjust the padding as needed
-                child: Center(
-                  child: Text(cell.toString()),
-                ),
-              );
-            }).toList(),
-          );
-        }),
-
-        // row for total
-        ...amountTableTotalRow.map((row) {
-          return TableRow(
-            decoration: amountTableTotalRow.indexOf(row) == 0
-                ? const BoxDecoration(
-                    border: Border(
-                      top: BorderSide(color: Colors.grey),
-                    ),
-                  )
-                : null,
-            children: row.map((cell) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius:
+            BorderRadius.circular(12.0), // Adjust the radius as needed
+      ),
+      child: Table(
+        border: TableBorder(
+          top: BorderSide.none,
+          bottom: BorderSide.none,
+          left: BorderSide.none,
+          right: BorderSide.none,
+        ), // Remove internal borders
+        children: [
+          // table header
+          TableRow(
+            children: amountTableHeaderRow.map((header) {
               return Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 8.0), // Adjust the padding as needed
                 child: Center(
                   child: Text(
-                    cell.toString(),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    header,
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ),
               );
             }).toList(),
-          );
-        })
-      ],
+          ),
+
+          // row for entries
+          ...amountTableTicketRow.map((row) {
+            return TableRow(
+              children: row.map((cell) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0), // Adjust the padding as needed
+                  child: Center(
+                    child: Text(
+                      cell.toString(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
+          }),
+
+          // row for total
+          ...amountTableTotalRow.map((row) {
+            return TableRow(
+              decoration: amountTableTotalRow.indexOf(row) == 0
+                  ? const BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: Colors.grey),
+                      ),
+                    )
+                  : null,
+              children: row.map((cell) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0), // Adjust the padding as needed
+                  child: Center(
+                    child: Text(
+                      cell.toString(),
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
+          })
+        ],
+      ),
     );
   }
 

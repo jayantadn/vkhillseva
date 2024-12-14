@@ -54,7 +54,7 @@ ThemeData themeDefault = ThemeData(
       color: primaryColor,
       fontSize: 18.0,
     ),
-    headlineSmall: GoogleFonts.mogra(
+    headlineSmall: GoogleFonts.lexend(
       color: textColor,
       fontSize: 14.0,
       fontWeight: FontWeight.bold,

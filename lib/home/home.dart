@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vkhillseva/home/settings.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
 import 'package:vkhillseva/widgets/launcher_tile.dart';
 
@@ -22,6 +23,18 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Settings(title: 'Settings')),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
           child: Column(

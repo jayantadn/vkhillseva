@@ -8,4 +8,6 @@ class Const {
   Const._internal() {
     // init
   }
+
+  final String dbroot = "DB01";
 }

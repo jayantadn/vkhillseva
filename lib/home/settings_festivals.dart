@@ -1,24 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:vkhillseva/common/config.dart';
 import 'package:vkhillseva/common/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 
-class SettingsFestivals extends StatefulWidget {
+class FestivalSettingsPage extends StatefulWidget {
   final String title;
 
-  const SettingsFestivals({super.key, required this.title});
+  const FestivalSettingsPage({super.key, required this.title});
 
   @override
-  _SettingsFestivalsState createState() => _SettingsFestivalsState();
+  _FestivalSettingsPageState createState() => _FestivalSettingsPageState();
 }
 
-class _SettingsFestivalsState extends State<SettingsFestivals> {
+class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
   bool _isLoading = true;
+
+  // Map<name, icon>
+  List<Map<String, String>> _sevaList = [];
 
   @override
   initState() {
     super.initState();
 
+    // synchronous init
+    Config().getFestivalIcons();
+
     refresh();
+  }
+
+  @override
+  dispose() {
+    // clear all lists
+    _sevaList.clear();
+
+    // clear all controllers
+
+    super.dispose();
   }
 
   Future<void> refresh() async {

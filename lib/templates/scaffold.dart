@@ -21,6 +21,15 @@ class _NityaSevaState extends State<NityaSeva> {
     refresh();
   }
 
+  @override
+  dispose() {
+    // clear all lists
+
+    // clear all controllers
+
+    super.dispose();
+  }
+
   Future<void> refresh() async {
     setState(() {
       _isLoading = false;

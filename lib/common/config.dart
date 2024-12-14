@@ -1,3 +1,6 @@
+import 'package:firebase_database/firebase_database.dart';
+import 'package:vkhillseva/common/const.dart';
+
 class Config {
   static final Config _instance = Config._internal();
 
@@ -9,39 +12,32 @@ class Config {
     // init
   }
 
-  Map nityaSeva = {
-    'sevaList': {
-      'Nitya Seva morning': {'icon': "assets/images/Common/morning.png"},
-      'Nitya Seva evening': {'icon': "assets/images/Common/evening.png"},
-      'Ram Navami': {'icon': "assets/images/Festivals/RamNavami.png"},
-      'Brahmotsava': {'icon': "assets/images/Logo/KrishnaLilaPark_square.png"},
-      'Hanuman Jayanti': {'icon': "assets/images/VKHillDieties/Hanuman.png"},
-      'Akshaya Tritiya': {'icon': "assets/images/Festivals/AkshayaTritiya.png"},
-      'Narasimha Chaturdashi': {
-        'icon': "assets/images/VKHillDieties/Narasimha.png"
-      },
-      'Garuda Panchami': {'icon': "assets/images/Festivals/Garuda.png"},
-      'Balarama Jayanti': {'icon': "assets/images/Festivals/Balarama.png"},
-      'Sri Krishna Janmastami': {
-        'icon': "assets/images/VKHillDieties/RadhaKrishna.png"
-      },
-      'Sri Vyasa Puja': {'icon': "assets/images/VKHillDieties/Prabhupada.png"},
-      'Radhastami': {'icon': "assets/images/VKHillDieties/Padmavati.png"},
-      'Vamana Jayanti': {'icon': "assets/images/Festivals/Vamana.png"},
-      'Govardhana Puja': {'icon': "assets/images/Festivals/Govardhana.png"},
-      'Vaikuntha Ekadashi': {'icon': "assets/images/VKHillDieties/Govinda.png"},
-      'Nityananda Trayodashi': {
-        'icon': "assets/images/VKHillDieties/NitaiGauranga.png"
-      },
-      'Sri Gaura Poornima': {
-        'icon': "assets/images/VKHillDieties/NitaiGauranga.png"
-      },
-      'Ratha Yatra': {'icon': "assets/images/VKHillDieties/Jagannatha.png"},
-      'Jhulan Utsava': {'icon': "assets/images/VKHillDieties/RadhaKrishna.png"},
-      'Sudarshana Jayanti': {
-        'icon': "assets/images/VKHillDieties/Sudarshana.png"
-      },
-      'Other festival': {'icon': "assets/images/LauncherIcons/NityaSeva.png"},
+  // private variables
+
+  // Map<festival_name, Map<key, value>>
+  Map<String, Map<String, dynamic>> _festivalConfig = {};
+
+  Future<void> parse() async {
+    final DatabaseReference dbref =
+        FirebaseDatabase.instance.ref(Const().dbroot);
+
+    DataSnapshot snapshot =
+        await dbref.child('Config/NityaSeva/Festivals').get();
+    if (snapshot.value != null) {
+      // print(snapshot.value);
+      Map<dynamic, dynamic> values = snapshot.value as Map;
+      values.forEach((key, value) {
+        Map<String, dynamic> v = Map<String, dynamic>.from(value as Map);
+        _festivalConfig[key] = v;
+        // DeepamStock stock = DeepamStock.fromJson(v);
+        // stocks.add(stock);
+      });
     }
-  };
+  }
+
+  // Map<name, icon>
+  Map<String, String> getFestivalIcons() {
+    print(_festivalConfig);
+    return {};
+  }
 }

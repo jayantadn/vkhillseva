@@ -27,7 +27,7 @@ class _NityaSevaState extends State<NityaSeva> {
     super.initState();
 
     // initialize seva list
-    _sevaList = Config().nityaSeva['sevaList'].keys.toList();
+    _sevaList = Config().getFestivalIcons().keys.toList();
 
     // select default seva
     DateTime now = DateTime.now();

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:vkhillseva/common/config.dart';
+import 'package:vkhillseva/common/loading_overlay.dart';
 import 'package:vkhillseva/home/settings.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
 import 'package:vkhillseva/widgets/launcher_tile.dart';
@@ -13,9 +15,30 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
+
+    refresh();
+  }
+
+  @override
+  dispose() {
+    // clear all lists
+
+    // clear all controllers
+
+    super.dispose();
+  }
+
+  Future<void> refresh() async {
+    await Config().parse();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -36,75 +59,81 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: Center(
-          child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              height: 200,
-              width: 200,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: Offset(0, 3),
+      body: Stack(children: [
+        Center(
+            child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                height: 200,
+                width: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/Logo/KrishnaLilaPark_circle.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+            Text(
+              'Welcome',
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            Text(
+              'Guest',
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            Text(
+              'ISKCON Vaikuntha Hill',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            Text('Seva App', style: Theme.of(context).textTheme.headlineMedium),
+            SizedBox(height: 50),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  LauncherTile(
+                      image: 'assets/images/LauncherIcons/NityaSeva.png',
+                      title: "Nitya Seva",
+                      callback: LauncherTileCallback(onClick: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const NityaSeva(title: "Nitya Seva")),
+                        );
+                      })),
+                  LauncherTile(
+                    image: 'assets/images/LauncherIcons/Harinaam.png',
+                    title: "Harinaam",
+                  ),
+                  LauncherTile(
+                    image: 'assets/images/LauncherIcons/Deepotsava.png',
+                    title: "Deepotsava",
                   ),
                 ],
               ),
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/images/Logo/KrishnaLilaPark_circle.png',
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-          Text(
-            'Welcome',
-            style: Theme.of(context).textTheme.headlineLarge,
-          ),
-          Text(
-            'Guest',
-            style: Theme.of(context).textTheme.headlineLarge,
-          ),
-          Text(
-            'ISKCON Vaikuntha Hill',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          Text('Seva App', style: Theme.of(context).textTheme.headlineMedium),
-          SizedBox(height: 50),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                LauncherTile(
-                    image: 'assets/images/LauncherIcons/NityaSeva.png',
-                    title: "Nitya Seva",
-                    callback: LauncherTileCallback(onClick: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const NityaSeva(title: "Nitya Seva")),
-                      );
-                    })),
-                LauncherTile(
-                  image: 'assets/images/LauncherIcons/Harinaam.png',
-                  title: "Harinaam",
-                ),
-                LauncherTile(
-                  image: 'assets/images/LauncherIcons/Deepotsava.png',
-                  title: "Deepotsava",
-                ),
-              ],
-            ),
-          )
-        ],
-      )),
+            )
+          ],
+        )),
+
+        // circular progress indicator
+        if (_isLoading)
+          LoadingOverlay(image: 'assets/images/Logo/KrishnaLilaPark_square.png')
+      ]),
     );
   }
 }

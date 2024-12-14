@@ -77,7 +77,7 @@ class _SettingsState extends State<Settings> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const SettingsFestivals(
+                            builder: (context) => const FestivalSettingsPage(
                                 title: "Festival Settings")),
                       );
                     }),

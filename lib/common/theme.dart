@@ -143,7 +143,7 @@ ThemeData themeDefault = ThemeData(
 
   // Icon Theme
   iconTheme: IconThemeData(
-    color: primaryColor,
+    color: accentColor,
     size: 24.0,
   ),
 

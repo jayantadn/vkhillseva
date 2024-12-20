@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/config.dart';
-import 'package:vkhillseva/common/loading_overlay.dart';
+import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/home/settings.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
 import 'package:vkhillseva/widgets/launcher_tile.dart';

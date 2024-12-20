@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/config.dart';
-import 'package:vkhillseva/common/loading_overlay.dart';
+import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 
 class FestivalSettingsPage extends StatefulWidget {
@@ -63,11 +63,13 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: Icon(Icons.edit),
+                icon:
+                    Icon(Icons.edit, color: Theme.of(context).iconTheme.color),
                 onPressed: callback.onEdit as void Function()?,
               ),
               IconButton(
-                icon: Icon(Icons.delete),
+                icon: Icon(Icons.delete,
+                    color: Theme.of(context).iconTheme.color),
                 onPressed: callback.onDelete as void Function()?,
               ),
             ],
@@ -81,18 +83,18 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
   Widget build(BuildContext context) {
     return Theme(
       data: themeDefault,
-      child: Scaffold(
-        appBar: AppBar(title: Text(widget.title), actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              // Add your onPressed code here!
-            },
-          ),
-        ]),
-        body: Stack(
-          children: [
-            RefreshIndicator(
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(title: Text(widget.title), actions: [
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  // Add your onPressed code here!
+                },
+              ),
+            ]),
+            body: RefreshIndicator(
               onRefresh: refresh,
               child: ListView(
                 children: [
@@ -107,12 +109,12 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                 ],
               ),
             ),
+          ),
 
-            // circular progress indicator
-            if (_isLoading)
-              LoadingOverlay(image: 'assets/images/LauncherIcons/NityaSeva.png')
-          ],
-        ),
+          // circular progress indicator
+          if (_isLoading)
+            LoadingOverlay(image: 'assets/images/LauncherIcons/NityaSeva.png')
+        ],
       ),
     );
   }

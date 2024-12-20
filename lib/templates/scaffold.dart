@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/loading_overlay.dart';
+import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 
 class NityaSeva extends StatefulWidget {
@@ -40,13 +40,13 @@ class _NityaSevaState extends State<NityaSeva> {
   Widget build(BuildContext context) {
     return Theme(
       data: themeDefault,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: Stack(
-          children: [
-            RefreshIndicator(
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(
+              title: Text(widget.title),
+            ),
+            body: RefreshIndicator(
               onRefresh: refresh,
               child: ListView(
                 children: [
@@ -54,13 +54,13 @@ class _NityaSevaState extends State<NityaSeva> {
                 ],
               ),
             ),
+          ),
 
-            // circular progress indicator
-            if (_isLoading)
-              LoadingOverlay(
-                  image: 'assets/images/Logo/KrishnaLilaPark_square.png')
-          ],
-        ),
+          // circular progress indicator
+          if (_isLoading)
+            LoadingOverlay(
+                image: 'assets/images/Logo/KrishnaLilaPark_square.png')
+        ],
       ),
     );
   }

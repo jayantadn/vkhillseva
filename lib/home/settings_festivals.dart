@@ -118,74 +118,47 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                 ),
 
                 // icon
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 4.0,
-                    mainAxisSpacing: 4.0,
-                  ),
-                  itemCount: Const().icons.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedIcon = Const().icons[index];
-                        });
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: _selectedIcon == Const().icons[index]
-                                ? Colors.blue
-                                : Colors.transparent,
-                            width: 2,
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: 150,
+                        child: GridView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 4.0,
+                            mainAxisSpacing: 4.0,
                           ),
-                        ),
-                        child: SizedBox(
-                          width: 50, // Set the width of the thumbnail
-                          height: 50, // Set the height of the thumbnail
-                          child: Image.asset(Const().icons[index]),
+                          itemCount: Const().icons.length,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  // _selectedIcon = Const().icons[index];
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    // color: _selectedIcon == Const().icons[index]
+                                    //     ? Colors.blue
+                                    //     : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Image.asset(Const().icons[index]),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    );
-                  },
+                      // ...other widgets...
+                    ],
+                  ),
                 )
-                // GridView.builder(
-                //   shrinkWrap: true,
-                //   physics: NeverScrollableScrollPhysics(),
-                //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                //     crossAxisCount: 3,
-                //     crossAxisSpacing: 4.0,
-                //     mainAxisSpacing: 4.0,
-                //   ),
-                //   itemCount: Const().icons.length,
-                //   itemBuilder: (context, index) {
-                //     return GestureDetector(
-                //       onTap: () {
-                //         setState(() {
-                //           _selectedIcon = Const().icons[index];
-                //         });
-                //       },
-                //       child: Container(
-                //         decoration: BoxDecoration(
-                //           border: Border.all(
-                //             color: _selectedIcon == Const().icons[index]
-                //                 ? Colors.blue
-                //                 : Colors.transparent,
-                //             width: 2,
-                //           ),
-                //         ),
-                //         child: SizedBox(
-                //           width: 50, // Set the width of the thumbnail
-                //           height: 50, // Set the height of the thumbnail
-                //           child: Image.asset(Const().icons[index]),
-                //         ),
-                //       ),
-                //     );
-                //   },
-                // ),
               ],
             ),
           ),

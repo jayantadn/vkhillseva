@@ -176,9 +176,16 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
               onPressed: () {
                 // edit the festival
                 setState(() {
-                  _festivals.remove(old);
-                  // _festivals.add(FestivalSettings(
-                  //     name: festivalNameController.text, icon: selectedIcon));
+                  int index = _festivals.indexWhere((element) =>
+                      element.name == old.name && element.icon == old.icon);
+                  if (index >= 0) {
+                    _festivals.removeAt(index);
+                    _festivals.insert(
+                        index,
+                        FestivalSettings(
+                            name: festivalNameController.text,
+                            icon: selectedIcon));
+                  }
                 });
 
                 Navigator.of(context).pop();

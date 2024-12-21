@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 class FestivalSettingsPage extends StatefulWidget {
   final String title;
@@ -41,11 +41,9 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
     });
 
     // fetch seva list from db
-    DatabaseReference dbref =
-        FirebaseDatabase.instance.ref("${Const().dbroot}/Config/Festivals");
-    DataSnapshot snapshot = await dbref.get();
-    if (snapshot.value != null) {
-      List<dynamic> values = snapshot.value as List;
+    var data = await FB().get("Config/Festivals");
+    if (data != null) {
+      List<dynamic> values = data as List;
       _festivals.clear();
       for (var element in values) {
         if (element != null) {
@@ -187,6 +185,8 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                             icon: selectedIcon));
                   }
                 });
+                FB().set("Config/Festivals",
+                    _festivals.map((e) => e.toJson()).toList());
 
                 Navigator.of(context).pop();
               },

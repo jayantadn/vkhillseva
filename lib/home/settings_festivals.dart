@@ -130,9 +130,16 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                             });
                           },
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
+                            padding: const EdgeInsets.all(4.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: _selectedIcon == icon
+                                      ? Colors.blue
+                                      : Colors.transparent,
+                                  width: 4.0,
+                                ),
+                              ),
                               child: Image.asset(
                                 icon,
                                 width: 50,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/widgets/image_selector.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 
@@ -121,39 +122,12 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                 ),
 
                 // icon
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      for (String icon in Const().icons)
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedIcon = icon;
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: selectedIcon == icon
-                                      ? Colors.blue
-                                      : Colors.transparent,
-                                  width: 4.0,
-                                ),
-                              ),
-                              child: Image.asset(
-                                icon,
-                                width: 50,
-                                height: 50,
-                              ),
-                            ),
-                          ),
-                        )
-                    ],
-                  ),
-                )
+                ImageSelector(
+                    selectedImage: old.icon,
+                    callback:
+                        ImageSelectorCallback(onImageSelected: (String icon) {
+                      selectedIcon = icon;
+                    })),
               ],
             ),
           ),

@@ -8,6 +8,7 @@ class Summary extends StatefulWidget {
   State<Summary> createState() => _SummaryState();
 }
 
+// ignore: library_private_types_in_public_api
 GlobalKey<_SummaryState> summaryKey = GlobalKey<_SummaryState>();
 
 class _SummaryState extends State<Summary> {

@@ -16,7 +16,7 @@ class FestivalSettingsPage extends StatefulWidget {
 class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
   bool _isLoading = true;
 
-  List<FestivalSettings> _sevaList = [];
+  final List<FestivalSettings> _sevaList = [];
 
   //controllers for editing festival
 
@@ -48,9 +48,12 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
     DataSnapshot snapshot = await dbref.get();
     if (snapshot.value != null) {
       List<dynamic> values = snapshot.value as List;
+      _sevaList.clear();
       for (var element in values) {
-        _sevaList
-            .add(FestivalSettings.fromJson(Map<String, String>.from(element)));
+        if (element != null) {
+          _sevaList.add(
+              FestivalSettings.fromJson(Map<String, String>.from(element)));
+        }
       }
     }
 
@@ -100,7 +103,11 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
   void _onEdit(FestivalSettings old) async {
     final TextEditingController festivalNameController =
         TextEditingController(text: old.name);
-    String _selectedIcon = old.icon;
+    String selectedIcon = old.icon;
+
+    // move the selected icon to front
+    Const().icons.remove(selectedIcon);
+    Const().icons.insert(0, selectedIcon);
 
     showDialog(
       context: context,
@@ -126,7 +133,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                         GestureDetector(
                           onTap: () {
                             setState(() {
-                              _selectedIcon = icon;
+                              selectedIcon = icon;
                             });
                           },
                           child: Padding(
@@ -134,7 +141,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                             child: Container(
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: _selectedIcon == icon
+                                  color: selectedIcon == icon
                                       ? Colors.blue
                                       : Colors.transparent,
                                   width: 4.0,
@@ -154,13 +161,18 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
               ],
             ),
           ),
+
+          // buttons
           actions: [
+            // cancel button
             TextButton(
               child: Text("Cancel"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
+
+            // ok button
             TextButton(
               child: Text("OK"),
               onPressed: () {

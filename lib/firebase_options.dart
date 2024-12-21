@@ -28,16 +28,20 @@ class DefaultFirebaseOptions {
     messagingSenderId: '129760746257',
     projectId: 'vkhillseva',
     authDomain: 'vkhillseva.firebaseapp.com',
-    databaseURL: 'https://vkhillseva-default-rtdb.asia-southeast1.firebasedatabase.app/',
+    databaseURL:
+        'https://vkhillseva-default-rtdb.asia-southeast1.firebasedatabase.app/',
     storageBucket: 'vkhillseva.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR_ANDROID_API_KEY',
-    appId: 'YOUR_ANDROID_APP_ID',
-    messagingSenderId: 'YOUR_ANDROID_MESSAGING_SENDER_ID',
-    projectId: 'YOUR_ANDROID_PROJECT_ID',
-    storageBucket: 'YOUR_ANDROID_STORAGE_BUCKET',
+    apiKey: 'AIzaSyAs9y6fW9qc29_rLg8Uhhgj03WesQsy4U0',
+    appId: '1:129760746257:web:ea4a401bcf3ee82beb8ab0',
+    messagingSenderId: '129760746257',
+    projectId: 'vkhillseva',
+    authDomain: 'vkhillseva.firebaseapp.com',
+    databaseURL:
+        'https://vkhillseva-default-rtdb.asia-southeast1.firebasedatabase.app/',
+    storageBucket: 'vkhillseva.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

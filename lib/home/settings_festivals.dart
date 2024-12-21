@@ -119,43 +119,28 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
 
                 // icon
                 SingleChildScrollView(
-                  child: Column(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
                     children: [
-                      SizedBox(
-                        width: 150,
-                        child: GridView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 4.0,
-                            mainAxisSpacing: 4.0,
-                          ),
-                          itemCount: Const().icons.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  // _selectedIcon = Const().icons[index];
-                                });
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    // color: _selectedIcon == Const().icons[index]
-                                    //     ? Colors.blue
-                                    //     : Colors.transparent,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Image.asset(Const().icons[index]),
-                              ),
-                            );
+                      for (String icon in Const().icons)
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedIcon = icon;
+                            });
                           },
-                        ),
-                      ),
-                      // ...other widgets...
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.asset(
+                                icon,
+                                width: 50,
+                                height: 50,
+                              ),
+                            ),
+                          ),
+                        )
                     ],
                   ),
                 )

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/config.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/nitya_seva/day_summary.dart';
@@ -27,7 +26,6 @@ class _NityaSevaState extends State<NityaSeva> {
     super.initState();
 
     // initialize seva list
-    _sevaList = Config().getFestivalIcons().keys.toList();
     _sevaList.insert(0, 'Morning Nitya Seva');
     _sevaList.insert(1, 'Evening Nitya Seva');
 

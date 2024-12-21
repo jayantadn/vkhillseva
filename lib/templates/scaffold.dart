@@ -32,6 +32,10 @@ class _NityaSevaState extends State<NityaSeva> {
 
   Future<void> refresh() async {
     setState(() {
+      _isLoading = true;
+    });
+
+    setState(() {
       _isLoading = false;
     });
   }

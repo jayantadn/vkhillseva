@@ -78,7 +78,7 @@ class _SettingsState extends State<Settings> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => const FestivalSettingsPage(
-                                title: "Festival Settings")),
+                                title: "Festival List")),
                       );
                     }),
                   ),

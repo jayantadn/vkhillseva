@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/config.dart';
+import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class FestivalSettingsPage extends StatefulWidget {
   final String title;
@@ -35,6 +36,22 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
   }
 
   Future<void> refresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // fetch seva list from db
+    DatabaseReference dbref =
+        FirebaseDatabase.instance.ref("${Const().dbroot}/Config/Festivals");
+    DataSnapshot snapshot = await dbref.get();
+    if (snapshot.value != null) {
+      List<dynamic> values = snapshot.value as List;
+      for (var element in values) {
+        _sevaList
+            .add(FestivalSettings.fromJson(Map<String, String>.from(element)));
+      }
+    }
+
     setState(() {
       _isLoading = false;
     });

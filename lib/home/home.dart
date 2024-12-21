@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/config.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/home/settings.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
@@ -34,8 +33,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> refresh() async {
-    await Config().parse();
-
     setState(() {
       _isLoading = false;
     });

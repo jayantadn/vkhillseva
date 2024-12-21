@@ -182,7 +182,43 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
     );
   }
 
-  void _onDelete(FestivalSettings festival) async {}
+  void _onDelete(FestivalSettings festival) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Delete Festival"),
+          content: Text("Are you sure you want to delete:\n${festival.name}?"),
+          actions: [
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Delete"),
+              onPressed: () async {
+                setState(() {
+                  int index = _festivals.indexWhere((element) =>
+                      element.name == festival.name &&
+                      element.icon == festival.icon);
+                  if (index >= 0) {
+                    _festivals.removeAt(index);
+                  }
+                });
+                await FB().set("Config/Festivals",
+                    _festivals.map((e) => e.toJson()).toList());
+
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -97,10 +97,10 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
     );
   }
 
-  void _onEdit(FestivalSettings old) async {
+  void _onAddEdit(FestivalSettings? old) async {
     final TextEditingController festivalNameController =
-        TextEditingController(text: old.name);
-    String selectedIcon = old.icon;
+        TextEditingController(text: old == null ? "" : old.name);
+    String selectedIcon = old == null ? "" : old.icon;
 
     // move the selected icon to front
     Const().icons.remove(selectedIcon);
@@ -110,7 +110,9 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Edit Festival: ${old.name}"),
+          title: old == null
+              ? Text("Add new festival")
+              : Text("Edit Festival: ${old.name}"),
           content: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
@@ -123,7 +125,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
 
                 // icon
                 ImageSelector(
-                    selectedImage: old.icon,
+                    selectedImage: old == null ? "" : old.icon,
                     callback:
                         ImageSelectorCallback(onImageSelected: (String icon) {
                       selectedIcon = icon;
@@ -146,19 +148,26 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
             TextButton(
               child: Text("OK"),
               onPressed: () {
-                // edit the festival
                 setState(() {
-                  int index = _festivals.indexWhere((element) =>
-                      element.name == old.name && element.icon == old.icon);
-                  if (index >= 0) {
-                    _festivals.removeAt(index);
-                    _festivals.insert(
-                        index,
-                        FestivalSettings(
-                            name: festivalNameController.text,
-                            icon: selectedIcon));
+                  if (old == null) {
+                    // add new festival
+                    _festivals.add(FestivalSettings(
+                        name: festivalNameController.text, icon: selectedIcon));
+                  } else {
+                    // edit the festival
+                    int index = _festivals.indexWhere((element) =>
+                        element.name == old.name && element.icon == old.icon);
+                    if (index >= 0) {
+                      _festivals.removeAt(index);
+                      _festivals.insert(
+                          index,
+                          FestivalSettings(
+                              name: festivalNameController.text,
+                              icon: selectedIcon));
+                    }
                   }
                 });
+                _festivals.sort((a, b) => a.name.compareTo(b.name));
                 FB().set("Config/Festivals",
                     _festivals.map((e) => e.toJson()).toList());
 
@@ -197,7 +206,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                         title: seva.name,
                         icon: seva.icon,
                         callback: FestivalSettingsCallback(
-                          onEdit: _onEdit,
+                          onEdit: _onAddEdit,
                           onDelete: _onDelete,
                         ))
                 ],

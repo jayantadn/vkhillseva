@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/home/home.dart';
+import 'package:vkhillseva/home/settings_festivals.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -23,7 +24,8 @@ class MyApp extends StatelessWidget {
       title: 'ISKCON VK Hill Seva',
       theme: themeDefault,
       // home:          const FestivalSettingsPage(title: "Festival Settings"), // for testing
-      home: const MyHomePage(title: 'Hare Krishna'),
+      home: const FestivalSettingsPage(title: 'Hare Krishna'),
+      // home: const MyHomePage(title: 'Hare Krishna'),
     );
   }
 }

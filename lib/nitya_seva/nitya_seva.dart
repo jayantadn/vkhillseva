@@ -65,6 +65,7 @@ class _NityaSevaState extends State<NityaSeva> {
           title: Text('Add New Session',
               style: Theme.of(context).textTheme.headlineMedium),
           content: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
             child: Column(
               children: [
                 // drop down for seva

@@ -18,6 +18,8 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
 
   List<FestivalSettings> _sevaList = [];
 
+  //controllers for editing festival
+
   @override
   initState() {
     super.initState();
@@ -95,12 +97,116 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
     );
   }
 
-  void _onEdit(FestivalSettings old, FestivalSettings updated) async {
-    // update the seva list
-    int index = _sevaList.indexWhere((element) => element == old);
-    if (index != -1) {
-      _sevaList[index] = updated;
-    }
+  void _onEdit(FestivalSettings old) async {
+    final TextEditingController festivalNameController =
+        TextEditingController(text: old.name);
+    String _selectedIcon = old.icon;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Edit Festival: ${old.name}"),
+          content: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              children: [
+                // festival name
+                TextField(
+                  controller: festivalNameController,
+                  decoration: InputDecoration(labelText: "Name"),
+                ),
+
+                // icon
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 4.0,
+                    mainAxisSpacing: 4.0,
+                  ),
+                  itemCount: Const().icons.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedIcon = Const().icons[index];
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: _selectedIcon == Const().icons[index]
+                                ? Colors.blue
+                                : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
+                        child: SizedBox(
+                          width: 50, // Set the width of the thumbnail
+                          height: 50, // Set the height of the thumbnail
+                          child: Image.asset(Const().icons[index]),
+                        ),
+                      ),
+                    );
+                  },
+                )
+                // GridView.builder(
+                //   shrinkWrap: true,
+                //   physics: NeverScrollableScrollPhysics(),
+                //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                //     crossAxisCount: 3,
+                //     crossAxisSpacing: 4.0,
+                //     mainAxisSpacing: 4.0,
+                //   ),
+                //   itemCount: Const().icons.length,
+                //   itemBuilder: (context, index) {
+                //     return GestureDetector(
+                //       onTap: () {
+                //         setState(() {
+                //           _selectedIcon = Const().icons[index];
+                //         });
+                //       },
+                //       child: Container(
+                //         decoration: BoxDecoration(
+                //           border: Border.all(
+                //             color: _selectedIcon == Const().icons[index]
+                //                 ? Colors.blue
+                //                 : Colors.transparent,
+                //             width: 2,
+                //           ),
+                //         ),
+                //         child: SizedBox(
+                //           width: 50, // Set the width of the thumbnail
+                //           height: 50, // Set the height of the thumbnail
+                //           child: Image.asset(Const().icons[index]),
+                //         ),
+                //       ),
+                //     );
+                //   },
+                // ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                // Perform edit operation here
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _onDelete(FestivalSettings festival) async {}
@@ -129,8 +235,8 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                         title: seva.name,
                         icon: seva.icon,
                         callback: FestivalSettingsCallback(
-                          onEdit: (FestivalSettings old) {},
-                          onDelete: (FestivalSettings festival) {},
+                          onEdit: _onEdit,
+                          onDelete: _onDelete,
                         ))
                 ],
               ),

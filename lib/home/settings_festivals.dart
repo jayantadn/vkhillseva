@@ -15,15 +15,11 @@ class FestivalSettingsPage extends StatefulWidget {
 class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
   bool _isLoading = true;
 
-  // Map<name, icon>
-  Map<String, String> _sevaList = {};
+  List<FestivalSettings> _sevaList = [];
 
   @override
   initState() {
     super.initState();
-
-    // synchronous init
-    _sevaList = Config().getFestivalIcons();
 
     refresh();
   }
@@ -98,10 +94,10 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
               onRefresh: refresh,
               child: ListView(
                 children: [
-                  for (var seva in _sevaList.entries)
+                  for (FestivalSettings seva in _sevaList)
                     _createSettingsCard(
-                        title: seva.key,
-                        icon: seva.value,
+                        title: seva.name,
+                        icon: seva.icon,
                         callback: FestivalSettingsCallback(
                           onEdit: () {},
                           onDelete: () {},
@@ -121,8 +117,29 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
 }
 
 class FestivalSettingsCallback {
-  final Function onEdit;
+  final Function() onEdit;
   final Function onDelete;
 
   FestivalSettingsCallback({required this.onEdit, required this.onDelete});
+}
+
+class FestivalSettings {
+  final String name;
+  final String icon;
+
+  FestivalSettings({required this.name, required this.icon});
+
+  factory FestivalSettings.fromJson(Map<String, dynamic> json) {
+    return FestivalSettings(
+      name: json['name'],
+      icon: json['icon'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'icon': icon,
+    };
+  }
 }

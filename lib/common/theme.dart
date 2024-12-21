@@ -22,7 +22,7 @@ ThemeData themeDefault = ThemeData(
       textStyle: TextStyle(
         color: accentColor,
         fontSize: 30.0,
-        fontWeight: FontWeight.bold,
+        // fontWeight: FontWeight.bold,
       ),
     ),
     centerTitle: true,
@@ -31,11 +31,11 @@ ThemeData themeDefault = ThemeData(
     shape: Border(
       top: BorderSide(
         color: accentColor,
-        width: 4.0,
+        width: 2.0,
       ),
       bottom: BorderSide(
         color: accentColor,
-        width: 4.0,
+        width: 2.0,
       ),
     ),
   ),
@@ -48,7 +48,6 @@ ThemeData themeDefault = ThemeData(
     headlineLarge: GoogleFonts.mogra(
       color: accentColor,
       fontSize: 24.0,
-      fontWeight: FontWeight.bold,
     ),
     headlineMedium: GoogleFonts.delius(
       color: primaryColor,

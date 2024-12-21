@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhillseva/common/const.dart';
 
+// ignore: must_be_immutable
 class ImageSelector extends StatefulWidget {
-  final String selectedImage;
+  String? selectedImage;
   final ImageSelectorCallback callback;
 
-  const ImageSelector(
-      {super.key, required this.selectedImage, required this.callback});
+  ImageSelector({super.key, this.selectedImage, required this.callback});
 
   @override
   State<ImageSelector> createState() => _ImageSelectorState();
@@ -25,7 +25,8 @@ class _ImageSelectorState extends State<ImageSelector> {
   void initState() {
     super.initState();
 
-    _selectedImage = widget.selectedImage;
+    _selectedImage =
+        widget.selectedImage ?? "assets/images/Logo/KrishnaLilaPark_square.png";
 
     refresh();
   }

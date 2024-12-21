@@ -103,8 +103,10 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
     String selectedIcon = old == null ? "" : old.icon;
 
     // move the selected icon to front
-    Const().icons.remove(selectedIcon);
-    Const().icons.insert(0, selectedIcon);
+    if (old != null) {
+      Const().icons.remove(selectedIcon);
+      Const().icons.insert(0, selectedIcon);
+    }
 
     showDialog(
       context: context,
@@ -193,7 +195,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
               IconButton(
                 icon: Icon(Icons.add),
                 onPressed: () {
-                  // Add your onPressed code here!
+                  _onAddEdit(null);
                 },
               ),
             ]),

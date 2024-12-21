@@ -16,9 +16,7 @@ class FestivalSettingsPage extends StatefulWidget {
 class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
   bool _isLoading = true;
 
-  final List<FestivalSettings> _sevaList = [];
-
-  //controllers for editing festival
+  final List<FestivalSettings> _festivals = [];
 
   @override
   initState() {
@@ -30,7 +28,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
   @override
   dispose() {
     // clear all lists
-    _sevaList.clear();
+    _festivals.clear();
 
     // clear all controllers
 
@@ -48,10 +46,10 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
     DataSnapshot snapshot = await dbref.get();
     if (snapshot.value != null) {
       List<dynamic> values = snapshot.value as List;
-      _sevaList.clear();
+      _festivals.clear();
       for (var element in values) {
         if (element != null) {
-          _sevaList.add(
+          _festivals.add(
               FestivalSettings.fromJson(Map<String, String>.from(element)));
         }
       }
@@ -176,7 +174,13 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
             TextButton(
               child: Text("OK"),
               onPressed: () {
-                // Perform edit operation here
+                // edit the festival
+                setState(() {
+                  _festivals.remove(old);
+                  // _festivals.add(FestivalSettings(
+                  //     name: festivalNameController.text, icon: selectedIcon));
+                });
+
                 Navigator.of(context).pop();
               },
             ),
@@ -207,7 +211,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
               onRefresh: refresh,
               child: ListView(
                 children: [
-                  for (FestivalSettings seva in _sevaList)
+                  for (FestivalSettings seva in _festivals)
                     _createSettingsCard(
                         title: seva.name,
                         icon: seva.icon,

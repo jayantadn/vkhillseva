@@ -2,6 +2,7 @@ import subprocess
 import sys
 
 def run_command(command):
+    print(f"Running command: {command}")
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if result.returncode != 0:
         print(f"Command '{command}' failed with error:\n{result.stderr}")
@@ -34,6 +35,18 @@ def main():
         file.write('\n')  
         file.write(existing_contents)
 
+    print("Undo main patch for testing")
+    main_file = 'lib/main.dart'
+    search_string = '(title: "Hare Krishna")'
+    replacement_string = 'home: const MyHomePage(title: "Hare Krishna"),\n'
+    with open(main_file, 'r') as file:
+        lines = file.readlines()
+    with open(main_file, 'w') as file:
+        for line in lines:
+            if search_string in line:
+                file.write(replacement_string)
+            else:
+                file.write(line)
 
     print("commit all changes and push to git")
     if run_command('git status --porcelain'):

@@ -10,6 +10,13 @@ def create_or_switch_branch(new_branch):
     subprocess.check_output(["git", "checkout", "-b", new_branch, "main"])
     print(f"Created and switched to new branch: {new_branch}")
 
+def run_command(command):
+    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if result.returncode != 0:
+        print(f"Command '{command}' failed with error:\n{result.stderr}")
+        sys.exit(1)
+    return result.stdout.strip()
+
 def main():
     # Prompt for version type
     version_type = input("Enter version type (1. major, 2. minor, 3. bugfix): ")
@@ -103,6 +110,8 @@ def main():
         print("Remote set for new branch")
     except subprocess.CalledProcessError:
         print("Failed to set remote for new branch")
+
+    print("all operations completed")
 
 
 if __name__ == "__main__":

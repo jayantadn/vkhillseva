@@ -12,7 +12,7 @@ class Const {
   }
 
   final String dbroot = "VKHILLSEVA_01";
-  final String version = "0.1.0";
+  final String version = "0.2.0";
 
   final List<String> icons = [
     "assets/images/Logo/KrishnaLilaPark_square.png",

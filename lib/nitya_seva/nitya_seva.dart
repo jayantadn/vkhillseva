@@ -132,6 +132,7 @@ class _NityaSevaState extends State<NityaSeva> {
     }
 
     // fetch festival sevas from db
+    _sevaList.clear();
     dynamic data = await FB().getValue(path: "Settings/Festivals");
     if (data != null) {
       for (var element in List<dynamic>.from(data)) {
@@ -141,6 +142,7 @@ class _NityaSevaState extends State<NityaSeva> {
     }
 
     // fetch session details from db
+    _sessions.clear();
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
     List<dynamic> sessions = await FB().getList(path: "NityaSeva/$dbDate");
     for (var element in sessions) {

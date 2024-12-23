@@ -64,7 +64,7 @@ class _NityaSevaState extends State<NityaSeva> {
   }
 
   Future<void> _createSession() async {
-    final double padding = 8.0;
+    final double padding = 10.0;
 
     // select default seva
     String selectedSeva = '';

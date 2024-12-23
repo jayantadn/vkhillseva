@@ -1,5 +1,5 @@
 class Session {
-  final String seva;
+  final String name;
   final String defaultAmount;
   final String defaultPaymentMode;
   final String icon;
@@ -7,7 +7,7 @@ class Session {
   DateTime timestamp;
 
   Session(
-      {required this.seva,
+      {required this.name,
       required this.defaultAmount,
       required this.defaultPaymentMode,
       required this.icon,
@@ -16,7 +16,7 @@ class Session {
 
   Map<String, dynamic> toJson() {
     return {
-      'seva': seva,
+      'name': name,
       'defaultAmount': defaultAmount,
       'defaultPaymentMode': defaultPaymentMode,
       'icon': icon,
@@ -27,7 +27,7 @@ class Session {
 
   factory Session.fromJson(Map<String, dynamic> json) {
     return Session(
-      seva: json['seva'],
+      name: json['name'],
       defaultAmount: json['defaultAmount'],
       defaultPaymentMode: json['defaultPaymentMode'],
       icon: json['icon'],

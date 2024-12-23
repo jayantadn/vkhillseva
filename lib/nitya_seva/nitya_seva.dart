@@ -22,6 +22,7 @@ class NityaSeva extends StatefulWidget {
 
 class _NityaSevaState extends State<NityaSeva> {
   bool _isLoading = true;
+  DateTime _selectedDate = DateTime.now();
 
   // lists
   final List<FestivalSettings> _sevaList = [];
@@ -76,6 +77,8 @@ class _NityaSevaState extends State<NityaSeva> {
     }
 
     // fetch session details from db
+    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+    // await FB().get("NityaSeva/$dbDate/Settings");
 
     setState(() {
       _isLoading = false;
@@ -202,7 +205,7 @@ class _NityaSevaState extends State<NityaSeva> {
 
                 // create a new session
                 Session session = Session(
-                  seva: selectedSeva,
+                  name: selectedSeva,
                   defaultAmount: sevaAmount,
                   defaultPaymentMode: paymentMode,
                   icon: icon,
@@ -217,7 +220,7 @@ class _NityaSevaState extends State<NityaSeva> {
 
                 // push to db
                 String date = DateFormat('yyyy-MM-dd').format(now);
-                FB().setJson("NityaSeva/$date/Settings", session.toJson());
+                FB().addToList("NityaSeva/$date", session.toJson());
 
                 // clear all local lists
 
@@ -250,9 +253,10 @@ class _NityaSevaState extends State<NityaSeva> {
                 child: ListView(
                   children: [
                     // date header
-                    DateHeader(
-                        callbacks:
-                            DateHeaderCallbacks(onChange: (DateTime date) {})),
+                    DateHeader(callbacks:
+                        DateHeaderCallbacks(onChange: (DateTime date) {
+                      _selectedDate = date;
+                    })),
 
                     // slot tiles
                     SingleChildScrollView(
@@ -262,7 +266,7 @@ class _NityaSevaState extends State<NityaSeva> {
                           ..._sessions.map((Session session) {
                             return LauncherTile2(
                               image: session.icon,
-                              title: session.seva,
+                              title: session.name,
                               text:
                                   "${session.sevakarta}, ${DateFormat('dd MMM, HH:mm').format(session.timestamp)}",
                               callback: LauncherTileCallback(onClick: () {

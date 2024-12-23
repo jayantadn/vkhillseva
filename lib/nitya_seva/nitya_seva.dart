@@ -124,10 +124,12 @@ class _NityaSevaState extends State<NityaSeva> {
     super.dispose();
   }
 
-  Future<void> refresh() async {
-    setState(() {
-      _isLoading = true;
-    });
+  Future<void> refresh({bool spinner = true}) async {
+    if (!spinner) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
 
     // fetch festival sevas from db
     dynamic data = await FB().getValue(path: "Settings/Festivals");
@@ -151,6 +153,78 @@ class _NityaSevaState extends State<NityaSeva> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _createErrorDialog(List<String> errors) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.error, color: Colors.red),
+              Text('ERROR',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineMedium!
+                      .copyWith(color: Colors.red)),
+            ],
+          ),
+          content: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text("The following errors are detected:"),
+                for (var error in errors) Text(error),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Ignore'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Create'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  List<String> _validateSessionCreation(Session session) {
+    List<String> errors = [];
+
+    // validate duplicate session name
+    for (var element in _sessions) {
+      if (element.name == session.name) {
+        errors.add("Session already exists");
+        break;
+      }
+    }
+
+    // check if last session was created recently
+    if (_sessions.isNotEmpty) {
+      DateTime lastSession = _sessions.last.timestamp;
+      if (lastSession.isAfter(DateTime.now().subtract(Duration(hours: 3)))) {
+        errors.add("Last session was created recently");
+      }
+    }
+
+    // check if session is created during service time
+    DateTime now = DateTime.now();
+    if (now.hour < 9 || now.hour > 21) {
+      errors.add("Session cannot be created now");
+    }
+
+    return errors;
   }
 
   Future<void> _createSession() async {
@@ -252,6 +326,8 @@ class _NityaSevaState extends State<NityaSeva> {
               child: Text('Cancel'),
               onPressed: () {
                 // clear all local lists
+                sevaAmounts.clear();
+                paymentModes.clear();
 
                 // clear all local controllers and focus nodes
 
@@ -282,9 +358,10 @@ class _NityaSevaState extends State<NityaSeva> {
                 );
 
                 // Handle the add session logic here
-                setState(() {
-                  _sessions.add(session);
-                });
+                List<String> errors = _validateSessionCreation(session);
+                if (errors.isNotEmpty) {
+                  _createErrorDialog(errors);
+                }
 
                 // push to db
                 String dbDate = DateFormat('yyyy-MM-dd').format(now);
@@ -294,7 +371,13 @@ class _NityaSevaState extends State<NityaSeva> {
                   data: session.toJson(),
                 );
 
+                setState(() {
+                  _sessions.add(session);
+                });
+
                 // clear all local lists
+                sevaAmounts.clear();
+                paymentModes.clear();
 
                 // clear all local controllers and focus nodes
 

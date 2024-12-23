@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ISKCON VK Hill Seva',
       theme: themeDefault,
-      home: const NityaSeva(title: "Hare Krishna"),
+      home: const MyHomePage(title: "Hare Krishna"),
     );
   }
 }

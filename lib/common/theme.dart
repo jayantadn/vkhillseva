@@ -16,25 +16,27 @@ ThemeData themeDefault = ThemeData(
 
   // appbar theme
   appBarTheme: AppBarTheme(
-    backgroundColor: backgroundColor,
-    foregroundColor: accentColor,
+    backgroundColor: accentColor,
+    foregroundColor: backgroundColor,
     titleTextStyle: GoogleFonts.pacifico(
       textStyle: TextStyle(
-        color: accentColor,
+        color: backgroundColor,
         fontSize: 30.0,
       ),
     ),
-    elevation: 0,
+    elevation: 10, // Increase elevation for a more pronounced shadow
     toolbarHeight: 50.0,
-    shape: Border(
-      top: BorderSide(
-        color: accentColor,
-        width: 2.0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(
+        Radius.circular(20.0), // Make both top and bottom rounded
       ),
-      bottom: BorderSide(
-        color: accentColor,
-        width: 2.0,
-      ),
+    ),
+    shadowColor: Colors.black.withOpacity(0.5), // Add shadow color
+    iconTheme: IconThemeData(
+      color: backgroundColor, // Set leading icon color
+    ),
+    actionsIconTheme: IconThemeData(
+      color: backgroundColor, // Set action icons color
     ),
   ),
 
@@ -150,7 +152,7 @@ ThemeData themeDefault = ThemeData(
       side: BorderSide(color: accentColor, width: 1.0),
     ),
   ),
-  
+
   // Icon Theme
   iconTheme: IconThemeData(
     color: accentColor,

@@ -82,6 +82,13 @@ class _NityaSevaState extends State<NityaSeva> {
       });
     });
 
+    List<String> paymentModes = [];
+    Const().paymentModes.forEach(
+      (key, value) {
+        paymentModes.add(key);
+      },
+    );
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -134,9 +141,10 @@ class _NityaSevaState extends State<NityaSeva> {
 
                 // default payment mode
                 DropdownButtonFormField<String>(
-                  decoration: InputDecoration(labelText: 'Sample Data'),
-                  items:
-                      ['Option 1', 'Option 2', 'Option 3'].map((String value) {
+                  value: paymentModes.first,
+                  decoration:
+                      InputDecoration(labelText: 'Default payment mode'),
+                  items: paymentModes.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -151,6 +159,11 @@ class _NityaSevaState extends State<NityaSeva> {
             TextButton(
               child: Text('Cancel'),
               onPressed: () {
+                // clear all lists
+
+                // clear all controllers and focus nodes
+
+                // close the dialog
                 Navigator.of(context).pop();
               },
             ),
@@ -158,6 +171,12 @@ class _NityaSevaState extends State<NityaSeva> {
               child: Text('Add'),
               onPressed: () {
                 // Handle the add session logic here
+
+                // clear all lists
+
+                // clear all controllers and focus nodes
+
+                // close the dialog
                 Navigator.of(context).pop();
               },
             ),

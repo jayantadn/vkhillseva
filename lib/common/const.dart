@@ -58,9 +58,9 @@ class Const {
   };
 
   final paymentModes = {
-    'Cash': {'icon': Icons.money},
-    'UPI': {'icon': Icons.account_balance},
-    'Card': {'icon': Icons.credit_card},
-    'Gift': {'icon': Icons.card_giftcard},
+    'Cash': {'icon': "assets/images/PaymentModes/icon_cash.png"},
+    'UPI': {'icon': "assets/images/PaymentModes/icon_upi.png"},
+    'Card': {'icon': "assets/images/PaymentModes/icon_card.png"},
+    'Gift': {'icon': "assets/images/PaymentModes/icon_gift.png"},
   };
 }

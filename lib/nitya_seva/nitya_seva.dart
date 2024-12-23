@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/datatypes.dart';
 import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
@@ -22,7 +23,7 @@ class _NityaSevaState extends State<NityaSeva> {
   bool _isLoading = true;
 
   // lists
-  final List<String> _sevaList = [];
+  final List<FestivalSettings> _sevaList = [];
   final List<Session> _sessions = [];
 
   // controllers
@@ -32,8 +33,18 @@ class _NityaSevaState extends State<NityaSeva> {
     super.initState();
 
     // initialize seva list
-    _sevaList.insert(0, 'Morning Nitya Seva');
-    _sevaList.insert(1, 'Evening Nitya Seva');
+    _sevaList.insert(
+        0,
+        FestivalSettings(
+            id: 999, // dummy id
+            name: 'Morning Nitya Seva',
+            icon: "assets/images/Common/morning.png"));
+    _sevaList.insert(
+        1,
+        FestivalSettings(
+            id: 998,
+            name: 'Evening Nitya Seva',
+            icon: "assets/images/Common/morning.png"));
 
     refresh();
   }
@@ -56,9 +67,11 @@ class _NityaSevaState extends State<NityaSeva> {
 
     // fetch festival sevas from db
     dynamic data = await FB().get("Config/Festivals");
-    for (var element in List<dynamic>.from(data)) {
-      Map map = Map<String, dynamic>.from(element);
-      _sevaList.add(map['name']);
+    if (data != null) {
+      for (var element in List<dynamic>.from(data)) {
+        Map<String, dynamic> map = Map<String, dynamic>.from(element);
+        _sevaList.add(FestivalSettings.fromJson(map));
+      }
     }
 
     setState(() {
@@ -73,9 +86,9 @@ class _NityaSevaState extends State<NityaSeva> {
     String selectedSeva = '';
     DateTime now = DateTime.now();
     if (now.hour < 14) {
-      selectedSeva = _sevaList.first;
+      selectedSeva = _sevaList.first.name;
     } else {
-      selectedSeva = _sevaList[1];
+      selectedSeva = _sevaList[1].name;
     }
 
     // seva amount
@@ -110,12 +123,18 @@ class _NityaSevaState extends State<NityaSeva> {
                 DropdownButtonFormField<String>(
                   value: selectedSeva, // Set the default value here
                   decoration: InputDecoration(labelText: 'Seva'),
-                  items: _sevaList.map((String value) {
+                  // items: _sevaList.map((String value) {
+                  //   return DropdownMenuItem<String>(
+                  //     value: value,
+                  //     child: Text(
+                  //       value,
+                  //     ),
+                  //   );
+                  // }).toList(),
+                  items: _sevaList.map((FestivalSettings value) {
                     return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        value,
-                      ),
+                      value: value.name,
+                      child: Text(value.name),
                     );
                   }).toList(),
                   onChanged: (newValue) {
@@ -177,13 +196,22 @@ class _NityaSevaState extends State<NityaSeva> {
             TextButton(
               child: Text('Add'),
               onPressed: () {
+                // find the icon for the selected seva
+                String icon = '';
+                for (var element in _sevaList) {
+                  if (element.name == selectedSeva) {
+                    icon = element.icon;
+                    break;
+                  }
+                }
+
                 // Handle the add session logic here
                 _sessions.add(
                   Session(
                     seva: selectedSeva,
                     defaultAmount: sevaAmount,
                     defaultPaymentMode: paymentMode,
-                    icon: 'assets/images/Common/morning.png', // TODO
+                    icon: icon,
                     sevakarta: 'Unknown',
                     timestamp: now,
                   ),

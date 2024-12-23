@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/datatypes.dart';
 import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/widgets/image_selector.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
@@ -89,14 +90,14 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                       color: Theme.of(context).iconTheme.color),
                   onPressed: () {
                     callback.onEdit(
-                        FestivalSettings(id: 0, name: title, icon: icon));
+                        FestivalSettings(id: 999, name: title, icon: icon));
                   }),
               IconButton(
                   icon: Icon(Icons.delete,
                       color: Theme.of(context).iconTheme.color),
                   onPressed: () {
                     callback.onDelete(
-                        FestivalSettings(id: 0, name: title, icon: icon));
+                        FestivalSettings(id: 998, name: title, icon: icon));
                   }),
             ],
           ),
@@ -280,28 +281,4 @@ class FestivalSettingsCallback {
   final void Function(FestivalSettings festival) onDelete;
 
   FestivalSettingsCallback({required this.onEdit, required this.onDelete});
-}
-
-class FestivalSettings {
-  final int id;
-  final String name;
-  final String icon;
-
-  FestivalSettings({required this.id, required this.name, required this.icon});
-
-  factory FestivalSettings.fromJson(Map<String, dynamic> json) {
-    return FestivalSettings(
-      id: json['id'] ?? 0,
-      name: json['name'],
-      icon: json['icon'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'icon': icon,
-    };
-  }
 }

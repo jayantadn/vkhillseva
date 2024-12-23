@@ -62,8 +62,24 @@ class _NityaSevaState extends State<NityaSeva> {
           add: (data) {
             if (_lastCallbackInvoked.isBefore(DateTime.now()
                 .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              print("data added: $data");
               _lastCallbackInvoked = DateTime.now();
+
+              Map<String, dynamic> map = Map<String, dynamic>.from(data);
+              Map<String, dynamic> json =
+                  Map<String, dynamic>.from(map['Settings']);
+              Session session = Session.fromJson(json);
+              bool exists = false;
+              for (var element in _sessions) {
+                if (element.name == session.name) {
+                  exists = true;
+                  break;
+                }
+              }
+              if (!exists) {
+                setState(() {
+                  _sessions.add(session);
+                });
+              }
             }
           },
 

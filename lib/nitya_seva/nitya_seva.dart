@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/datatypes.dart';
 import 'package:vkhillseva/common/fb.dart';
@@ -44,7 +45,7 @@ class _NityaSevaState extends State<NityaSeva> {
         FestivalSettings(
             id: 998,
             name: 'Evening Nitya Seva',
-            icon: "assets/images/Common/morning.png"));
+            icon: "assets/images/Common/evening.png"));
 
     refresh();
   }
@@ -123,14 +124,6 @@ class _NityaSevaState extends State<NityaSeva> {
                 DropdownButtonFormField<String>(
                   value: selectedSeva, // Set the default value here
                   decoration: InputDecoration(labelText: 'Seva'),
-                  // items: _sevaList.map((String value) {
-                  //   return DropdownMenuItem<String>(
-                  //     value: value,
-                  //     child: Text(
-                  //       value,
-                  //     ),
-                  //   );
-                  // }).toList(),
                   items: _sevaList.map((FestivalSettings value) {
                     return DropdownMenuItem<String>(
                       value: value.name,
@@ -206,16 +199,18 @@ class _NityaSevaState extends State<NityaSeva> {
                 }
 
                 // Handle the add session logic here
-                _sessions.add(
-                  Session(
-                    seva: selectedSeva,
-                    defaultAmount: sevaAmount,
-                    defaultPaymentMode: paymentMode,
-                    icon: icon,
-                    sevakarta: 'Unknown',
-                    timestamp: now,
-                  ),
-                );
+                setState(() {
+                  _sessions.add(
+                    Session(
+                      seva: selectedSeva,
+                      defaultAmount: sevaAmount,
+                      defaultPaymentMode: paymentMode,
+                      icon: icon,
+                      sevakarta: 'Unknown',
+                      timestamp: now,
+                    ),
+                  );
+                });
 
                 // clear all local lists
 
@@ -257,21 +252,17 @@ class _NityaSevaState extends State<NityaSeva> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          // slot 1
-                          LauncherTile2(
-                            image: 'assets/images/Common/morning.png',
-                            title: 'Sat Morning',
-                            text: "Sumitra Krishna Dasa, 14-12-2024 10:15",
-                            callback: LauncherTileCallback(onClick: () {}),
-                          ),
-
-                          // slot 2
-                          LauncherTile2(
-                            image: 'assets/images/Common/evening.png',
-                            title: 'Sat Evening',
-                            text: "Jayanta Debnath, 14-12-2024 16:15",
-                            callback: LauncherTileCallback(onClick: () {}),
-                          ),
+                          ..._sessions.map((Session session) {
+                            return LauncherTile2(
+                              image: session.icon,
+                              title: session.seva,
+                              text:
+                                  "${session.sevakarta}, ${DateFormat('dd MMM, HH:mm').format(session.timestamp)}",
+                              callback: LauncherTileCallback(onClick: () {
+                                // open session details
+                              }),
+                            );
+                          }),
 
                           // add slot
                           LauncherTile2(

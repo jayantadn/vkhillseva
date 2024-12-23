@@ -66,8 +66,6 @@ class LauncherTile2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double size = 40;
-
     return SizedBox(
       width: 150,
       height: 200,
@@ -83,11 +81,14 @@ class LauncherTile2 extends StatelessWidget {
             children: <Widget>[
               // title
               SizedBox(
-                height: size,
-                child: Center(
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.headlineSmall,
+                height: 50,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      title,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
                   ),
                 ),
               ),
@@ -97,25 +98,19 @@ class LauncherTile2 extends StatelessWidget {
               // image
               Center(
                 child: CircleAvatar(
-                  radius: size,
+                  radius: 35,
                   backgroundImage: AssetImage(image),
                 ),
               ),
 
               Divider(),
 
-              // text
-              SizedBox(
-                height: size,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text(
-                      text,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
+              // footer
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  text,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
             ],

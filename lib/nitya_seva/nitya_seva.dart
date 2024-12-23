@@ -11,6 +11,7 @@ class NityaSeva extends StatefulWidget {
   const NityaSeva({super.key, required this.title});
 
   @override
+  // ignore: library_private_types_in_public_api
   _NityaSevaState createState() => _NityaSevaState();
 }
 
@@ -18,7 +19,7 @@ class _NityaSevaState extends State<NityaSeva> {
   bool _isLoading = true;
 
   // seva dropdown
-  late List<String> _sevaList;
+  final List<String> _sevaList = [];
   String _selectedSeva = '';
 
   @override
@@ -53,14 +54,12 @@ class _NityaSevaState extends State<NityaSeva> {
     });
   }
 
-  Future<void> _addSession() async {
+  Future<void> _createSession() async {
     final double padding = 8.0;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        TextEditingController sessionNameController = TextEditingController();
-
         return AlertDialog(
           title: Text('Add New Session',
               style: Theme.of(context).textTheme.headlineMedium),
@@ -88,12 +87,6 @@ class _NityaSevaState extends State<NityaSeva> {
                 ),
 
                 SizedBox(height: padding),
-
-                // session name
-                TextField(
-                  controller: sessionNameController,
-                  decoration: InputDecoration(labelText: 'Session Name'),
-                ),
 
                 SizedBox(height: padding),
 
@@ -195,7 +188,7 @@ class _NityaSevaState extends State<NityaSeva> {
                             title: 'New Session',
                             text: "Add a new session",
                             callback: LauncherTileCallback(onClick: () {
-                              _addSession();
+                              _createSession();
                             }),
                           ),
                         ],

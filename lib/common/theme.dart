@@ -22,7 +22,6 @@ ThemeData themeDefault = ThemeData(
       textStyle: TextStyle(
         color: accentColor,
         fontSize: 30.0,
-        // fontWeight: FontWeight.bold,
       ),
     ),
     elevation: 0,

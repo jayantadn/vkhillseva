@@ -155,7 +155,10 @@ class _NityaSevaState extends State<NityaSeva> {
     });
   }
 
-  Future<void> _createErrorDialog(List<String> errors) async {
+  Future<String?> _createErrorDialog(
+      {required List<String> errors, bool post = false}) async {
+    Completer<String?> completer = Completer<String?>();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -163,6 +166,7 @@ class _NityaSevaState extends State<NityaSeva> {
           title: Row(
             children: [
               Icon(Icons.error, color: Colors.red),
+              SizedBox(width: 10),
               Text('ERROR',
                   style: Theme.of(context)
                       .textTheme
@@ -174,57 +178,125 @@ class _NityaSevaState extends State<NityaSeva> {
             scrollDirection: Axis.vertical,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start, // Add this line
               children: [
-                Text("The following errors are detected:"),
-                for (var error in errors) Text(error),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("The following errors are detected:"),
+                ),
+                for (var error in errors)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(" - $error"),
+                  ),
               ],
             ),
           ),
           actions: [
+            // cancel button
             TextButton(
-              child: Text('Ignore'),
+              child: Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
+                completer.complete('Cancel');
               },
             ),
-            TextButton(
-              child: Text('Create'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
+
+            // create button
+            if (post == false)
+              TextButton(
+                child: Text('Create'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  completer.complete('Create');
+                },
+              ),
+
+            // Edit button
+            if (post == true)
+              TextButton(
+                child: Text('Edit'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  completer.complete('Edit');
+                },
+              ),
+
+            // delete button
+            if (post == true)
+              TextButton(
+                child: Text('Delete'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  completer.complete('Delete');
+                },
+              ),
           ],
         );
       },
     );
+
+    return completer.future;
   }
 
-  List<String> _validateSessionCreation(Session session) {
+  List<String> _preValidation(Session session) {
     List<String> errors = [];
+
+    // check if session is created during service time
+    DateTime now = DateTime.now();
+    if (now.hour < 9 || now.hour > 21) {
+      errors.add("Outside service hours");
+    }
 
     // validate duplicate session name
     for (var element in _sessions) {
       if (element.name == session.name) {
-        errors.add("Session already exists");
+        errors.add("Duplicate session name");
         break;
       }
     }
 
     // check if last session was created recently
     if (_sessions.isNotEmpty) {
-      DateTime lastSession = _sessions.last.timestamp;
-      if (lastSession.isAfter(DateTime.now().subtract(Duration(hours: 3)))) {
-        errors.add("Last session was created recently");
+      Session lastSession = _sessions.last;
+      if (lastSession.timestamp.difference(now).inHours < 3) {
+        errors.add("Session created too recently");
       }
     }
 
-    // check if session is created during service time
-    DateTime now = DateTime.now();
-    if (now.hour < 9 || now.hour > 21) {
-      errors.add("Session cannot be created now");
-    }
-
     return errors;
+  }
+
+  void _postValidation() {
+    List<String> errors = [];
+
+    refresh(spinner: false).then((_) async {
+      Session lastSession = _sessions.last;
+      Session secondLastSession = _sessions[_sessions.length - 2];
+
+      // validate duplicate session name
+      if (lastSession.name == secondLastSession.name) {
+        errors.add("Duplicate session name");
+      }
+
+      // check if last session was created recently
+      lastSession.timestamp;
+      if (lastSession.timestamp
+              .difference(secondLastSession.timestamp)
+              .inHours <
+          3) {
+        errors.add("Session created too recently");
+      }
+
+      if (errors.isNotEmpty) {
+        String? ret = await _createErrorDialog(errors: errors, post: true);
+        if (ret == 'Edit') {
+          // TODO: edit the last session
+        } else if (ret == 'Delete') {
+          // TODO: delete the last session
+        }
+      }
+    });
   }
 
   Future<void> _createSession() async {
@@ -337,7 +409,7 @@ class _NityaSevaState extends State<NityaSeva> {
             ),
             TextButton(
               child: Text('Add'),
-              onPressed: () {
+              onPressed: () async {
                 // find the icon for the selected seva
                 String icon = '';
                 for (var element in _sevaList) {
@@ -358,22 +430,28 @@ class _NityaSevaState extends State<NityaSeva> {
                 );
 
                 // Handle the add session logic here
-                List<String> errors = _validateSessionCreation(session);
+                List<String> errors = _preValidation(session);
+                String? ret = 'Create';
                 if (errors.isNotEmpty) {
-                  _createErrorDialog(errors);
+                  ret = await _createErrorDialog(errors: errors);
                 }
 
-                // push to db
-                String dbDate = DateFormat('yyyy-MM-dd').format(now);
-                FB().addToList(
-                  path: "NityaSeva/$dbDate",
-                  key: "Settings",
-                  data: session.toJson(),
-                );
+                if (errors.isEmpty || ret == 'Create') {
+                  // push to db
+                  String dbDate = DateFormat('yyyy-MM-dd').format(now);
+                  FB().addToList(
+                    path: "NityaSeva/$dbDate",
+                    key: "Settings",
+                    data: session.toJson(),
+                  );
 
-                setState(() {
-                  _sessions.add(session);
-                });
+                  setState(() {
+                    _sessions.add(session);
+                  });
+                }
+
+                // post validation
+                _postValidation();
 
                 // clear all local lists
                 sevaAmounts.clear();

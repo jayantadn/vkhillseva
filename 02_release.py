@@ -47,13 +47,14 @@ def main():
     else:
         print("No changes to commit")
 
-    print("run the commands to build")
-    
+    print("run the commands to build")   
     run_command("flutter clean")
     run_command("flutter pub get")
     run_command("flutter build web")
     run_command("firebase deploy --only hosting")
     run_command("git checkout *.cache")
+
+    print("all operations completed")
     
 if __name__ == '__main__':
     main()

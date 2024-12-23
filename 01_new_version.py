@@ -56,12 +56,10 @@ def main():
         major, minor, bugfix = latest_branch.split(".")
         # Increment the bugfix version
         bugfix = str(int(bugfix) + 1)
-
-    # Create the new branch name
     new_branch = f"{major}.{minor}.{bugfix}"
 
     print("Read the value of the 'version' key from Const")
-    version_file = 'lib/const.dart'
+    version_file = 'lib/common/const.dart'
     search_string = "  final String version = "
     with open(version_file, 'r') as file:
         lines = file.readlines()

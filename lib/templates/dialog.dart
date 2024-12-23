@@ -17,9 +17,9 @@ Future<void> _createSomeDialog(BuildContext context) async {
           TextButton(
             child: Text('Cancel'),
             onPressed: () {
-              // clear all lists
+              // clear all local lists
 
-              // clear all controllers and focus nodes
+              // clear all local controllers and focus nodes
 
               // close the dialog
               Navigator.of(context).pop();
@@ -30,9 +30,9 @@ Future<void> _createSomeDialog(BuildContext context) async {
             onPressed: () {
               // Handle the add session logic here
 
-              // clear all lists
+              // clear all local lists
 
-              // clear all controllers and focus nodes
+              // clear all local controllers and focus nodes
 
               // close the dialog
               Navigator.of(context).pop();

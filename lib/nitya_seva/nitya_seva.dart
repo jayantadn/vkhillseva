@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/nitya_seva/day_summary.dart';
@@ -20,8 +21,9 @@ class NityaSeva extends StatefulWidget {
 class _NityaSevaState extends State<NityaSeva> {
   bool _isLoading = true;
 
-  // seva dropdown
+  // lists
   final List<String> _sevaList = [];
+  final List<Session> _sessions = [];
 
   // controllers
 
@@ -40,6 +42,7 @@ class _NityaSevaState extends State<NityaSeva> {
   dispose() {
     // clear all lists
     _sevaList.clear();
+    _sessions.clear();
 
     // clear all controllers and focus nodes
 
@@ -163,9 +166,9 @@ class _NityaSevaState extends State<NityaSeva> {
             TextButton(
               child: Text('Cancel'),
               onPressed: () {
-                // clear all lists
+                // clear all local lists
 
-                // clear all controllers and focus nodes
+                // clear all local controllers and focus nodes
 
                 // close the dialog
                 Navigator.of(context).pop();
@@ -175,12 +178,20 @@ class _NityaSevaState extends State<NityaSeva> {
               child: Text('Add'),
               onPressed: () {
                 // Handle the add session logic here
-                print(
-                    "Seva: ${selectedSeva}, Amount: $sevaAmount, Mode: $paymentMode");
+                _sessions.add(
+                  Session(
+                    seva: selectedSeva,
+                    defaultAmount: sevaAmount,
+                    defaultPaymentMode: paymentMode,
+                    icon: 'assets/images/Common/morning.png', // TODO
+                    sevakarta: 'Unknown',
+                    timestamp: now,
+                  ),
+                );
 
-                // clear all lists
+                // clear all local lists
 
-                // clear all controllers and focus nodes
+                // clear all local controllers and focus nodes
 
                 // close the dialog
                 Navigator.of(context).pop();

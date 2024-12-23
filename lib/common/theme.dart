@@ -32,12 +32,6 @@ ThemeData themeDefault = ThemeData(
       ),
     ),
     shadowColor: Colors.black.withOpacity(0.5), // Add shadow color
-    iconTheme: IconThemeData(
-      color: backgroundColor, // Set leading icon color
-    ),
-    actionsIconTheme: IconThemeData(
-      color: backgroundColor, // Set action icons color
-    ),
   ),
 
   // Text Styles
@@ -155,14 +149,14 @@ ThemeData themeDefault = ThemeData(
 
   // Icon Theme
   iconTheme: IconThemeData(
-    color: accentColor,
+    color: backgroundColor,
     size: 24.0,
   ),
 
   // Icon Button Theme
   iconButtonTheme: IconButtonThemeData(
     style: ButtonStyle(
-      iconColor: WidgetStateProperty.all(accentColor),
+      iconColor: WidgetStateProperty.all(backgroundColor),
       iconSize: WidgetStateProperty.all(24.0),
     ),
   ),

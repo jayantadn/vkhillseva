@@ -14,6 +14,8 @@ class Const {
   final String dbroot = "VKHILLSEVA_01";
   final String version = "0.2.0";
 
+  final int fbListenerDelay = 2; // seconds
+
   final List<String> icons = [
     "assets/images/Logo/KrishnaLilaPark_square.png",
     "assets/images/LauncherIcons/NityaSeva.png",

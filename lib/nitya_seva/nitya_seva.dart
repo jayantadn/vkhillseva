@@ -26,6 +26,7 @@ class NityaSeva extends StatefulWidget {
 class _NityaSevaState extends State<NityaSeva> {
   bool _isLoading = true;
   DateTime _selectedDate = DateTime.now();
+  DateTime _lastCallbackInvoked = DateTime.now();
 
   // lists
   final List<FestivalSettings> _sevaList = [];
@@ -59,17 +60,29 @@ class _NityaSevaState extends State<NityaSeva> {
         FBCallbacks(
           // add
           add: (data) {
-            print("data added: $data");
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              print("data added: $data");
+              _lastCallbackInvoked = DateTime.now();
+            }
           },
 
           // edit
           edit: () {
-            refresh();
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              print("data edited");
+              _lastCallbackInvoked = DateTime.now();
+            }
           },
 
           // delete
           delete: (data) {
-            print("data deleted: $data");
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              print("data deleted: $data");
+              _lastCallbackInvoked = DateTime.now();
+            }
           },
 
           // get listeners

@@ -22,7 +22,6 @@ class _NityaSevaState extends State<NityaSeva> {
 
   // seva dropdown
   final List<String> _sevaList = [];
-  String _selectedSeva = '';
 
   // controllers
 
@@ -33,14 +32,6 @@ class _NityaSevaState extends State<NityaSeva> {
     // initialize seva list
     _sevaList.insert(0, 'Morning Nitya Seva');
     _sevaList.insert(1, 'Evening Nitya Seva');
-
-    // select default seva
-    DateTime now = DateTime.now();
-    if (now.hour < 14) {
-      _selectedSeva = _sevaList.first;
-    } else {
-      _selectedSeva = _sevaList[1];
-    }
 
     refresh();
   }
@@ -75,19 +66,32 @@ class _NityaSevaState extends State<NityaSeva> {
   Future<void> _createSession() async {
     final double padding = 8.0;
 
+    // select default seva
+    String selectedSeva = '';
+    DateTime now = DateTime.now();
+    if (now.hour < 14) {
+      selectedSeva = _sevaList.first;
+    } else {
+      selectedSeva = _sevaList[1];
+    }
+
+    // seva amount
     List<String> sevaAmounts = [];
     Const().nityaSeva['amounts']?.forEach((element) {
       element.forEach((key, value) {
         sevaAmounts.add(key);
       });
     });
+    String sevaAmount = sevaAmounts.first;
 
+    // payment mode
     List<String> paymentModes = [];
     Const().paymentModes.forEach(
       (key, value) {
         paymentModes.add(key);
       },
     );
+    String paymentMode = paymentModes.first;
 
     showDialog(
       context: context,
@@ -101,7 +105,7 @@ class _NityaSevaState extends State<NityaSeva> {
               children: [
                 // drop down for seva
                 DropdownButtonFormField<String>(
-                  value: _selectedSeva, // Set the default value here
+                  value: selectedSeva, // Set the default value here
                   decoration: InputDecoration(labelText: 'Seva'),
                   items: _sevaList.map((String value) {
                     return DropdownMenuItem<String>(
@@ -114,19 +118,16 @@ class _NityaSevaState extends State<NityaSeva> {
                   onChanged: (newValue) {
                     setState(() {
                       if (newValue != null) {
-                        _selectedSeva = newValue;
+                        selectedSeva = newValue;
                       }
                     });
                   },
                 ),
 
-                SizedBox(height: padding),
-
-                SizedBox(height: padding),
-
                 // default amount
+                SizedBox(height: padding),
                 DropdownButtonFormField<String>(
-                  value: sevaAmounts.first, // Set the default value here
+                  value: sevaAmount, // Set the default value here
                   decoration: InputDecoration(labelText: 'Default seva amount'),
                   items: sevaAmounts.map((String value) {
                     return DropdownMenuItem<String>(
@@ -134,14 +135,15 @@ class _NityaSevaState extends State<NityaSeva> {
                       child: Text(value),
                     );
                   }).toList(),
-                  onChanged: (newValue) {},
+                  onChanged: (newValue) {
+                    sevaAmount = newValue ?? sevaAmounts.first;
+                  },
                 ),
 
-                SizedBox(height: padding),
-
                 // default payment mode
+                SizedBox(height: padding),
                 DropdownButtonFormField<String>(
-                  value: paymentModes.first,
+                  value: paymentMode,
                   decoration:
                       InputDecoration(labelText: 'Default payment mode'),
                   items: paymentModes.map((String value) {
@@ -150,7 +152,9 @@ class _NityaSevaState extends State<NityaSeva> {
                       child: Text(value),
                     );
                   }).toList(),
-                  onChanged: (newValue) {},
+                  onChanged: (newValue) {
+                    paymentMode = newValue ?? paymentModes.first;
+                  },
                 ),
               ],
             ),
@@ -171,6 +175,8 @@ class _NityaSevaState extends State<NityaSeva> {
               child: Text('Add'),
               onPressed: () {
                 // Handle the add session logic here
+                print(
+                    "Seva: ${selectedSeva}, Amount: $sevaAmount, Mode: $paymentMode");
 
                 // clear all lists
 

@@ -68,7 +68,7 @@ class LauncherTile2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 150,
-      height: 200,
+      height: 210,
       child: GestureDetector(
         onTap: () {
           if (callback != null) {
@@ -81,7 +81,7 @@ class LauncherTile2 extends StatelessWidget {
             children: <Widget>[
               // title
               SizedBox(
-                height: 50,
+                height: 55,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Center(

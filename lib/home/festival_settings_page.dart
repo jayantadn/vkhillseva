@@ -49,7 +49,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
       for (var element in values) {
         if (element != null) {
           _festivals.add(
-              FestivalSettings.fromJson(Map<String, String>.from(element)));
+              FestivalSettings.fromJson(Map<String, dynamic>.from(element)));
         }
       }
     }

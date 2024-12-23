@@ -25,7 +25,6 @@ ThemeData themeDefault = ThemeData(
         // fontWeight: FontWeight.bold,
       ),
     ),
-    centerTitle: true,
     elevation: 0,
     toolbarHeight: 50.0,
     shape: Border(

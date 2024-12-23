@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/toaster.dart';
@@ -11,6 +13,52 @@ class FB {
 
   FB._internal() {
     // init
+  }
+
+  Future<void> listenForChange(String path, FBCallbacks callbacks) async {
+    final dbRef = FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
+
+    bool initialLoad = true;
+
+    // Check if the path exists
+    try {
+      await dbRef.get();
+    } catch (e) {
+      Toaster().error("Database path doesn't exist or no access");
+      return;
+    }
+
+    List<StreamSubscription<DatabaseEvent>> listeners = [];
+
+    var listener = dbRef.onChildAdded.listen((event) {
+      if (!initialLoad) {
+        callbacks.add(event.snapshot.value);
+      }
+    });
+    listeners.add(listener);
+
+    listener = dbRef.onChildChanged.listen((event) {
+      if (!initialLoad) {
+        callbacks.edit();
+      }
+    });
+    listeners.add(listener);
+
+    listener = dbRef.onChildRemoved.listen((event) {
+      if (!initialLoad) {
+        callbacks.delete(event.snapshot.value);
+      }
+    });
+    listeners.add(listener);
+
+    if (callbacks.getListeners != null) {
+      callbacks.getListeners!(listeners);
+    }
+
+    // Set initialLoad to false after the first set of events
+    dbRef.once().then((_) {
+      initialLoad = false;
+    });
   }
 
   Future<dynamic> getValue({required String path}) async {
@@ -93,4 +141,18 @@ class FB {
       Toaster().error("Error adding data to list: $e");
     }
   }
+}
+
+class FBCallbacks {
+  void Function(dynamic data) add;
+  void Function() edit; // full refresh required on edit
+  void Function(dynamic data) delete;
+  void Function(List<StreamSubscription<DatabaseEvent>>)? getListeners;
+
+  FBCallbacks({
+    required this.add,
+    required this.edit,
+    required this.delete,
+    this.getListeners,
+  });
 }

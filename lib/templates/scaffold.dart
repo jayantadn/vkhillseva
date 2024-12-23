@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
@@ -13,6 +16,12 @@ class NityaSeva extends StatefulWidget {
 
 class _NityaSevaState extends State<NityaSeva> {
   bool _isLoading = true;
+  DateTime _selectedDate = DateTime.now();
+
+  // lists
+
+  // controllers, listeners and focus nodes
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {
@@ -26,6 +35,9 @@ class _NityaSevaState extends State<NityaSeva> {
     // clear all lists
 
     // clear all controllers and focus nodes
+    for (var listener in _listeners) {
+      listener.cancel();
+    }
 
     super.dispose();
   }

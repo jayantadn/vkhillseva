@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhillseva/common/const.dart';
@@ -28,7 +31,8 @@ class _NityaSevaState extends State<NityaSeva> {
   final List<FestivalSettings> _sevaList = [];
   final List<Session> _sessions = [];
 
-  // controllers
+  // controllers, listeners and focus nodes
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {
@@ -48,6 +52,32 @@ class _NityaSevaState extends State<NityaSeva> {
             name: 'Evening Nitya Seva',
             icon: "assets/images/Common/evening.png"));
 
+    // listed to database events
+    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+    FB().listenForChange(
+        "NityaSeva/$dbDate",
+        FBCallbacks(
+          // add
+          add: (data) {
+            print("data added: $data");
+          },
+
+          // edit
+          edit: () {
+            refresh();
+          },
+
+          // delete
+          delete: (data) {
+            print("data deleted: $data");
+          },
+
+          // get listeners
+          getListeners: (listeners) {
+            _listeners = listeners;
+          },
+        ));
+
     refresh();
   }
 
@@ -58,6 +88,9 @@ class _NityaSevaState extends State<NityaSeva> {
     _sessions.clear();
 
     // clear all controllers and focus nodes
+    for (var listener in _listeners) {
+      listener.cancel();
+    }
 
     super.dispose();
   }

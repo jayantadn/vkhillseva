@@ -43,7 +43,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
     });
 
     // fetch festival list from db
-    var data = await FB().get("Config/Festivals");
+    var data = await FB().get("Settings/Festivals");
     if (data != null) {
       List<dynamic> values = data as List;
       _festivals.clear();
@@ -60,7 +60,8 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
       _festivals[i] = FestivalSettings(
           id: i, name: _festivals[i].name, icon: _festivals[i].icon);
     }
-    FB().set("Config/Festivals", _festivals.map((e) => e.toJson()).toList());
+    FB().setValue(
+        "Settings/Festivals", _festivals.map((e) => e.toJson()).toList());
 
     setState(() {
       _isLoading = false;
@@ -185,7 +186,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                   }
                 });
                 _festivals.sort((a, b) => a.name.compareTo(b.name));
-                FB().set("Config/Festivals",
+                FB().setValue("Settings/Festivals",
                     _festivals.map((e) => e.toJson()).toList());
 
                 Navigator.of(context).pop();
@@ -222,7 +223,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                     _festivals.removeAt(index);
                   }
                 });
-                await FB().set("Config/Festivals",
+                await FB().setValue("Settings/Festivals",
                     _festivals.map((e) => e.toJson()).toList());
 
                 // ignore: use_build_context_synchronously

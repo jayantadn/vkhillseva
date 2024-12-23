@@ -48,19 +48,12 @@ def main():
         print("No changes to commit")
 
     print("run the commands to build")
-    commands = [
-        "flutter clean",
-        "flutter pub get",
-        "flutter build web",
-        "firebase deploy --only hosting",
-        "git checkout *.cache"
-    ]
-    try:
-        for command in commands:
-            subprocess.run(command, shell=True, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"An error occurred while executing: {e.cmd}")
-        sys.exit(1)
-
+    
+    run_command("flutter clean")
+    run_command("flutter pub get")
+    run_command("flutter build web")
+    run_command("firebase deploy --only hosting")
+    run_command("git checkout *.cache")
+    
 if __name__ == '__main__':
     main()

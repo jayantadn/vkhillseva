@@ -67,13 +67,15 @@ class _NityaSevaState extends State<NityaSeva> {
     });
 
     // fetch festival sevas from db
-    dynamic data = await FB().get("Config/Festivals");
+    dynamic data = await FB().get("Settings/Festivals");
     if (data != null) {
       for (var element in List<dynamic>.from(data)) {
         Map<String, dynamic> map = Map<String, dynamic>.from(element);
         _sevaList.add(FestivalSettings.fromJson(map));
       }
     }
+
+    // fetch session details from db
 
     setState(() {
       _isLoading = false;
@@ -198,19 +200,24 @@ class _NityaSevaState extends State<NityaSeva> {
                   }
                 }
 
+                // create a new session
+                Session session = Session(
+                  seva: selectedSeva,
+                  defaultAmount: sevaAmount,
+                  defaultPaymentMode: paymentMode,
+                  icon: icon,
+                  sevakarta: 'Guest',
+                  timestamp: now,
+                );
+
                 // Handle the add session logic here
                 setState(() {
-                  _sessions.add(
-                    Session(
-                      seva: selectedSeva,
-                      defaultAmount: sevaAmount,
-                      defaultPaymentMode: paymentMode,
-                      icon: icon,
-                      sevakarta: 'Unknown',
-                      timestamp: now,
-                    ),
-                  );
+                  _sessions.add(session);
                 });
+
+                // push to db
+                String date = DateFormat('yyyy-MM-dd').format(now);
+                FB().setJson("NityaSeva/$date/Settings", session.toJson());
 
                 // clear all local lists
 

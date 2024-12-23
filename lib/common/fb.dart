@@ -1,6 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/toaster.dart';
 
 class FB {
   static final FB _instance = FB._internal();
@@ -17,9 +16,7 @@ class FB {
     DatabaseReference dbref =
         FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
     DataSnapshot snapshot = await dbref.get();
-    if (snapshot.value == null) {
-      Toaster().error("database read error");
-    }
+    
 
     return snapshot.value;
   }

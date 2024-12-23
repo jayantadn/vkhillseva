@@ -25,7 +25,7 @@ class _NityaSevaState extends State<NityaSeva> {
   dispose() {
     // clear all lists
 
-    // clear all controllers
+    // clear all controllers and focus nodes
 
     super.dispose();
   }

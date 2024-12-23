@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Const {
   static final Const _instance = Const._internal();
 
@@ -10,6 +12,7 @@ class Const {
   }
 
   final String dbroot = "VKHILLSEVA_01";
+  final String version = "0.1.0";
 
   final List<String> icons = [
     "assets/images/Logo/KrishnaLilaPark_square.png",
@@ -36,4 +39,28 @@ class Const {
     "assets/images/VKHillDieties/RadhaKrishna.png",
     "assets/images/VKHillDieties/Sudarshana.png",
   ];
+
+  final nityaSeva = {
+    'amounts': [
+      {
+        "400": {'color': Colors.blue}
+      },
+      {
+        "500": {'color': Colors.green}
+      },
+      {
+        "1000": {'color': Colors.yellow}
+      },
+      {
+        "2500": {'color': Colors.pink}
+      },
+    ]
+  };
+
+  final paymentModes = {
+    'Cash': {'icon': Icons.money},
+    'UPI': {'icon': Icons.account_balance},
+    'Card': {'icon': Icons.credit_card},
+    'Gift': {'icon': Icons.card_giftcard},
+  };
 }

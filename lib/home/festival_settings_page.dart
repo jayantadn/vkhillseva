@@ -41,7 +41,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
       _isLoading = true;
     });
 
-    // fetch seva list from db
+    // fetch festival list from db
     var data = await FB().get("Config/Festivals");
     if (data != null) {
       List<dynamic> values = data as List;
@@ -53,6 +53,13 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
         }
       }
     }
+
+    // write ids for each festival
+    for (int i = 0; i < _festivals.length; i++) {
+      _festivals[i] = FestivalSettings(
+          id: i, name: _festivals[i].name, icon: _festivals[i].icon);
+    }
+    FB().set("Config/Festivals", _festivals.map((e) => e.toJson()).toList());
 
     setState(() {
       _isLoading = false;
@@ -81,14 +88,15 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                   icon: Icon(Icons.edit,
                       color: Theme.of(context).iconTheme.color),
                   onPressed: () {
-                    callback.onEdit(FestivalSettings(name: title, icon: icon));
+                    callback.onEdit(
+                        FestivalSettings(id: 0, name: title, icon: icon));
                   }),
               IconButton(
                   icon: Icon(Icons.delete,
                       color: Theme.of(context).iconTheme.color),
                   onPressed: () {
-                    callback
-                        .onDelete(FestivalSettings(name: title, icon: icon));
+                    callback.onDelete(
+                        FestivalSettings(id: 0, name: title, icon: icon));
                   }),
             ],
           ),
@@ -153,17 +161,23 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                 setState(() {
                   if (old == null) {
                     // add new festival
+                    int id = _festivals.length;
                     _festivals.add(FestivalSettings(
-                        name: festivalNameController.text, icon: selectedIcon));
+                        id: id,
+                        name: festivalNameController.text,
+                        icon: selectedIcon));
+                    _festivals.sort((a, b) => a.name.compareTo(b.name));
                   } else {
                     // edit the festival
                     int index = _festivals.indexWhere((element) =>
                         element.name == old.name && element.icon == old.icon);
                     if (index >= 0) {
+                      int id = _festivals[index].id;
                       _festivals.removeAt(index);
                       _festivals.insert(
                           index,
                           FestivalSettings(
+                              id: id,
                               name: festivalNameController.text,
                               icon: selectedIcon));
                     }
@@ -269,13 +283,15 @@ class FestivalSettingsCallback {
 }
 
 class FestivalSettings {
+  final int id;
   final String name;
   final String icon;
 
-  FestivalSettings({required this.name, required this.icon});
+  FestivalSettings({required this.id, required this.name, required this.icon});
 
   factory FestivalSettings.fromJson(Map<String, dynamic> json) {
     return FestivalSettings(
+      id: json['id'] ?? 0,
       name: json['name'],
       icon: json['icon'],
     );
@@ -283,6 +299,7 @@ class FestivalSettings {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'icon': icon,
     };

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/home/settings.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
@@ -96,7 +97,8 @@ class _MyHomePageState extends State<MyHomePage> {
               'ISKCON Vaikuntha Hill',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            Text('Seva App', style: Theme.of(context).textTheme.headlineMedium),
+            Text('Seva App v${Const().version}',
+                style: Theme.of(context).textTheme.headlineSmall),
             SizedBox(height: 50),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,

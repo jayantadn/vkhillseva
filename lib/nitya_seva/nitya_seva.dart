@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/nitya_seva/day_summary.dart';
@@ -22,6 +24,8 @@ class _NityaSevaState extends State<NityaSeva> {
   final List<String> _sevaList = [];
   String _selectedSeva = '';
 
+  // controllers
+
   @override
   initState() {
     super.initState();
@@ -43,12 +47,26 @@ class _NityaSevaState extends State<NityaSeva> {
 
   @override
   dispose() {
+    // clear all lists
     _sevaList.clear();
+
+    // clear all controllers and focus nodes
 
     super.dispose();
   }
 
   Future<void> refresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // fetch festival sevas from db
+    dynamic data = await FB().get("Config/Festivals");
+    for (var element in List<dynamic>.from(data)) {
+      Map map = Map<String, dynamic>.from(element);
+      _sevaList.add(map['name']);
+    }
+
     setState(() {
       _isLoading = false;
     });
@@ -56,6 +74,13 @@ class _NityaSevaState extends State<NityaSeva> {
 
   Future<void> _createSession() async {
     final double padding = 8.0;
+
+    List<String> sevaAmounts = [];
+    Const().nityaSeva['amounts']?.forEach((element) {
+      element.forEach((key, value) {
+        sevaAmounts.add(key);
+      });
+    });
 
     showDialog(
       context: context,
@@ -81,7 +106,9 @@ class _NityaSevaState extends State<NityaSeva> {
                   }).toList(),
                   onChanged: (newValue) {
                     setState(() {
-                      if (newValue != null) _selectedSeva = newValue;
+                      if (newValue != null) {
+                        _selectedSeva = newValue;
+                      }
                     });
                   },
                 ),
@@ -92,9 +119,9 @@ class _NityaSevaState extends State<NityaSeva> {
 
                 // default amount
                 DropdownButtonFormField<String>(
-                  decoration: InputDecoration(labelText: 'Sample Data'),
-                  items:
-                      ['Option 1', 'Option 2', 'Option 3'].map((String value) {
+                  value: sevaAmounts.first, // Set the default value here
+                  decoration: InputDecoration(labelText: 'Default seva amount'),
+                  items: sevaAmounts.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),

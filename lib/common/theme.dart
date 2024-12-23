@@ -138,6 +138,19 @@ ThemeData themeDefault = ThemeData(
     shape: CircleBorder(),
   ),
 
+  // Popup Menu Theme
+  popupMenuTheme: PopupMenuThemeData(
+    color: backgroundColor,
+    textStyle: TextStyle(
+      color: textColor,
+      fontSize: 16.0,
+    ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8.0),
+      side: BorderSide(color: accentColor, width: 1.0),
+    ),
+  ),
+  
   // Icon Theme
   iconTheme: IconThemeData(
     color: accentColor,

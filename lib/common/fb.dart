@@ -13,7 +13,7 @@ class FB {
     // init
   }
 
-  Future<dynamic> get(String path) async {
+  Future<dynamic> getValue({required String path}) async {
     try {
       DatabaseReference dbref =
           FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
@@ -25,31 +25,70 @@ class FB {
     }
   }
 
-  Future<void> setValue(String path, dynamic data) async {
+  Future<Map<String, dynamic>> getJson({required String path}) async {
     try {
       DatabaseReference dbref =
           FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
-      await dbref.set(data);
+      DataSnapshot snapshot = await dbref.get();
+      return Map<String, dynamic>.from(snapshot.value as Map);
+    } catch (e) {
+      Toaster().error("Error getting data: $e");
+      return {};
+    }
+  }
+
+  Future<List<dynamic>> getList({required String path}) async {
+    try {
+      DatabaseReference dbref =
+          FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
+      DataSnapshot snapshot = await dbref.get();
+      if (snapshot.value is List) {
+        return List<dynamic>.from(snapshot.value as List);
+      } else if (snapshot.value is Map) {
+        return List<dynamic>.from((snapshot.value as Map).values);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      Toaster().error("Error getting data: $e");
+      return [];
+    }
+  }
+
+  Future<void> setValue({required String path, required dynamic value}) async {
+    try {
+      DatabaseReference dbref =
+          FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
+      await dbref.set(value);
     } catch (e) {
       Toaster().error("Error setting data: $e");
     }
   }
 
-  Future<void> setJson(String path, Map<String, dynamic> data) async {
+  Future<void> setJson(
+      {required String path, required Map<String, dynamic> json}) async {
     try {
       DatabaseReference dbref =
           FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
-      await dbref.set(data);
+      await dbref.set(json);
     } catch (e) {
       Toaster().error("Error setting data: $e");
     }
   }
 
-  Future<void> addToList(String path, Map<String, dynamic> data) async {
+  Future<void> addToList({
+    required String path,
+    String? key,
+    required Map<String, dynamic> data,
+  }) async {
     try {
       DatabaseReference dbref =
           FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
-      await dbref.push().set(data);
+      if (key != null) {
+        await dbref.push().child(key).set(data);
+      } else {
+        await dbref.push().set(data);
+      }
     } catch (e) {
       Toaster().error("Error adding data to list: $e");
     }

@@ -68,7 +68,7 @@ class _NityaSevaState extends State<NityaSeva> {
     });
 
     // fetch festival sevas from db
-    dynamic data = await FB().get("Settings/Festivals");
+    dynamic data = await FB().getValue(path: "Settings/Festivals");
     if (data != null) {
       for (var element in List<dynamic>.from(data)) {
         Map<String, dynamic> map = Map<String, dynamic>.from(element);
@@ -78,7 +78,13 @@ class _NityaSevaState extends State<NityaSeva> {
 
     // fetch session details from db
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
-    // await FB().get("NityaSeva/$dbDate/Settings");
+    List<dynamic> sessions = await FB().getList(path: "NityaSeva/$dbDate");
+    for (var element in sessions) {
+      Map<String, dynamic> map = Map<String, dynamic>.from(element as Map);
+      Map<String, dynamic> json =
+          Map<String, dynamic>.from(map['Settings'] as Map);
+      _sessions.add(Session.fromJson(json));
+    }
 
     setState(() {
       _isLoading = false;
@@ -206,7 +212,7 @@ class _NityaSevaState extends State<NityaSeva> {
                 // create a new session
                 Session session = Session(
                   name: selectedSeva,
-                  defaultAmount: sevaAmount,
+                  defaultAmount: int.parse(sevaAmount),
                   defaultPaymentMode: paymentMode,
                   icon: icon,
                   sevakarta: 'Guest',
@@ -219,8 +225,12 @@ class _NityaSevaState extends State<NityaSeva> {
                 });
 
                 // push to db
-                String date = DateFormat('yyyy-MM-dd').format(now);
-                FB().addToList("NityaSeva/$date", session.toJson());
+                String dbDate = DateFormat('yyyy-MM-dd').format(now);
+                FB().addToList(
+                  path: "NityaSeva/$dbDate",
+                  key: "Settings",
+                  data: session.toJson(),
+                );
 
                 // clear all local lists
 
@@ -256,6 +266,7 @@ class _NityaSevaState extends State<NityaSeva> {
                     DateHeader(callbacks:
                         DateHeaderCallbacks(onChange: (DateTime date) {
                       _selectedDate = date;
+                      refresh();
                     })),
 
                     // slot tiles

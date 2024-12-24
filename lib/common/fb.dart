@@ -126,16 +126,24 @@ class FB {
 
   Future<void> addToList({
     required String path,
-    String? key,
+    String? child,
     required Map<String, dynamic> data,
   }) async {
     try {
       DatabaseReference dbref =
           FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
-      if (key != null) {
-        await dbref.push().child(key).set(data);
+      if (child != null) {
+        if (data['name'] != null) {
+          await dbref.child(data['name']).child(child).set(data);
+        } else {
+          await dbref.push().child(child).set(data);
+        }
       } else {
-        await dbref.push().set(data);
+        if (data['name'] != null) {
+          await dbref.child(data['name']).set(data);
+        } else {
+          await dbref.push().set(data);
+        }
       }
     } catch (e) {
       Toaster().error("Error adding data to list: $e");

@@ -93,7 +93,8 @@ class _NityaSevaState extends State<NityaSeva> {
               Session session = Session.fromJson(json);
 
               setState(() {
-                int index = _sessions.indexWhere((s) => s.name == session.name);
+                int index = _sessions
+                    .indexWhere((s) => s.timestamp == session.timestamp);
                 if (index != -1) {
                   _sessions.removeAt(index);
                 }
@@ -303,7 +304,7 @@ class _NityaSevaState extends State<NityaSeva> {
       if (errors.isNotEmpty) {
         String? ret = await _createErrorDialog(errors: errors, post: true);
         if (ret == 'Edit') {
-          // TODO: edit the last session
+          _createEditSession(session: session);
         } else if (ret == 'Delete') {
           // delete locally
           setState(() {
@@ -319,16 +320,21 @@ class _NityaSevaState extends State<NityaSeva> {
     });
   }
 
-  Future<void> _createSession() async {
+  Future<void> _createEditSession({Session? session}) async {
     final double padding = 10.0;
+    DateTime now = DateTime.now();
+    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
 
     // select default seva
     String selectedSeva = '';
-    DateTime now = DateTime.now();
-    if (now.hour < 14) {
-      selectedSeva = _sevaList.first.name;
+    if (session == null) {
+      if (now.hour < 14) {
+        selectedSeva = _sevaList.first.name;
+      } else {
+        selectedSeva = _sevaList[1].name;
+      }
     } else {
-      selectedSeva = _sevaList[1].name;
+      selectedSeva = session.name;
     }
 
     // seva amount
@@ -339,6 +345,9 @@ class _NityaSevaState extends State<NityaSeva> {
       });
     });
     String sevaAmount = sevaAmounts.first;
+    if (session != null) {
+      sevaAmount = session.defaultAmount.toString();
+    }
 
     // payment mode
     List<String> paymentModes = [];
@@ -348,12 +357,15 @@ class _NityaSevaState extends State<NityaSeva> {
       },
     );
     String paymentMode = paymentModes.first;
+    if (session != null) {
+      paymentMode = session.defaultPaymentMode;
+    }
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add New Session',
+          title: Text(session == null ? 'Add New Session' : 'Edit Session',
               style: Theme.of(context).textTheme.headlineMedium),
           content: SingleChildScrollView(
             scrollDirection: Axis.vertical,
@@ -428,7 +440,7 @@ class _NityaSevaState extends State<NityaSeva> {
               },
             ),
             TextButton(
-              child: Text('Add'),
+              child: Text(session == null ? 'Add' : 'Edit'),
               onPressed: () async {
                 // find the icon for the selected seva
                 String icon = '';
@@ -440,38 +452,59 @@ class _NityaSevaState extends State<NityaSeva> {
                 }
 
                 // create a new session
-                Session session = Session(
+                Session newSession = Session(
                   name: selectedSeva,
                   defaultAmount: int.parse(sevaAmount),
                   defaultPaymentMode: paymentMode,
                   icon: icon,
                   sevakarta: 'Guest',
-                  timestamp: now,
+                  timestamp: session == null ? now : session.timestamp,
                 );
 
-                // do validations, update state variable, push to db
-                List<String> errors = _preValidation(session);
-                String? ret = 'Create';
-                if (errors.isNotEmpty) {
-                  ret = await _createErrorDialog(errors: errors);
-                }
-                if (errors.isEmpty || ret == 'Create') {
-                  // push to db
-                  String dbDate = DateFormat('yyyy-MM-dd').format(now);
-                  FB().addToList(
-                    path: "NityaSeva/$dbDate",
-                    child: "Settings",
-                    data: session.toJson(),
-                  );
+                // add session
+                if (session == null) {
+                  List<String> errors = _preValidation(newSession);
+                  String? ret = 'Create';
+                  if (errors.isNotEmpty) {
+                    ret = await _createErrorDialog(errors: errors);
+                  }
+                  if (errors.isEmpty || ret == 'Create') {
+                    // push to db
+                    FB().addToList(
+                      path: "NityaSeva/$dbDate",
+                      child: "Settings",
+                      data: newSession.toJson(),
+                    );
 
+                    setState(() {
+                      _sessions.add(newSession);
+                    });
+                  }
+                  // if (errors.isEmpty)
+                  {
+                    _postValidation(newSession);
+                  }
+                } else {
+                  // edit session
+
+                  // doing no validation for edit,
+                  // as it may give false positive against the session being edited
+
+                  // local edit
                   setState(() {
-                    _sessions.add(session);
+                    int index = _sessions
+                        .indexWhere((s) => s.timestamp == session.timestamp);
+                    if (index != -1) {
+                      _sessions[index] = newSession;
+                    }
                   });
-                }
 
-                // post validation
-                if (errors.isEmpty) {
-                  _postValidation(session);
+                  // server edit
+                  String dbTimestamp =
+                      session.timestamp.toIso8601String().replaceAll(".", "^");
+                  FB().editJson(
+                      path: "NityaSeva/$dbDate/$dbTimestamp/Settings",
+                      json: newSession.toJson());
                 }
 
                 // clear all local lists
@@ -503,7 +536,7 @@ class _NityaSevaState extends State<NityaSeva> {
               title: Text('Edit'),
               onTap: () {
                 Navigator.of(context).pop();
-                // TODO: Implement edit functionality
+                _createEditSession(session: session);
               },
             ),
             ListTile(
@@ -514,7 +547,7 @@ class _NityaSevaState extends State<NityaSeva> {
                 Confirmation().show(
                     context: context,
                     callbacks: ConfirmationCallbacks(onConfirm: () {
-                      // TODO: pre validations
+                      // TODO: pre validations e.g. for admin only
 
                       // delete locally
                       setState(() {
@@ -522,8 +555,10 @@ class _NityaSevaState extends State<NityaSeva> {
                       });
 
                       // delete in server
-                      FB().deleteValue(
-                          path: "NityaSeva/$dbDate/${session.name}");
+                      String dbTimestamp = session.timestamp
+                          .toIso8601String()
+                          .replaceAll(".", "^");
+                      FB().deleteValue(path: "NityaSeva/$dbDate/$dbTimestamp");
 
                       // close the dialog
                       Navigator.of(context).pop();
@@ -588,7 +623,7 @@ class _NityaSevaState extends State<NityaSeva> {
                             title: 'New Session',
                             text: "Add a new session",
                             callback: LauncherTileCallback(onClick: () {
-                              _createSession();
+                              _createEditSession();
                             }),
                           ),
                         ],

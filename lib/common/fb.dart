@@ -133,14 +133,16 @@ class FB {
       DatabaseReference dbref =
           FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
       if (child != null) {
-        if (data['name'] != null) {
-          await dbref.child(data['name']).child(child).set(data);
+        if (data['timestamp'] != null) {
+          String key = data['timestamp'].toString().replaceAll(".", "^");
+          await dbref.child(key).child(child).set(data);
         } else {
           await dbref.push().child(child).set(data);
         }
       } else {
-        if (data['name'] != null) {
-          await dbref.child(data['name']).set(data);
+        if (data['timestamp'] != null) {
+          String key = data['timestamp'].toString().replaceAll(".", "^");
+          await dbref.child(key).set(data);
         } else {
           await dbref.push().set(data);
         }
@@ -157,6 +159,17 @@ class FB {
       await dbref.remove();
     } catch (e) {
       Toaster().error("Error deleting data: $e");
+    }
+  }
+
+  Future<void> editJson(
+      {required String path, required Map<String, dynamic> json}) async {
+    try {
+      DatabaseReference dbref =
+          FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
+      await dbref.update(json);
+    } catch (e) {
+      Toaster().error("Error updating data: $e");
     }
   }
 }

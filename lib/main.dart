@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/home/home.dart';
-import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
+import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/nitya_seva/ticket_page.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -23,7 +24,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ISKCON VK Hill Seva',
       theme: themeDefault,
-      home: const HomePage(title: "Hare Krishna"),
+      home: TicketPage(
+          session: Session(
+              name: "Morning Nitya Seva",
+              defaultAmount: 400,
+              defaultPaymentMode: "UPI",
+              icon: "assets/images/Common/morning.png",
+              sevakarta: "Guest",
+              timestamp: DateTime.parse("2024-12-24T12:21:18.348"))),
     );
   }
 }

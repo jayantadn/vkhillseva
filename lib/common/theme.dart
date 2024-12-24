@@ -27,8 +27,9 @@ ThemeData themeDefault = ThemeData(
     elevation: 10,
     toolbarHeight: 50.0,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(
-        Radius.circular(20.0), // Make both top and bottom rounded
+      borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(20.0),
+        bottomRight: Radius.circular(20.0),
       ),
     ),
     shadowColor: Colors.black.withOpacity(0.5), // Add shadow color

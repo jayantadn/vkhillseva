@@ -16,12 +16,12 @@ class NityaSeva extends StatefulWidget {
 
 class _NityaSevaState extends State<NityaSeva> {
   bool _isLoading = true;
-  DateTime _selectedDate = DateTime.now();
+  final DateTime _selectedDate = DateTime.now();
 
   // lists
 
   // controllers, listeners and focus nodes
-  List<StreamSubscription<DatabaseEvent>> _listeners = [];
+  final List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {

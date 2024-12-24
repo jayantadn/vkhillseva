@@ -9,6 +9,7 @@ import 'package:vkhillseva/common/datatypes.dart';
 import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/common/toaster.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/nitya_seva/ticket_page.dart';
 import 'package:vkhillseva/widgets/confirmation.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
@@ -594,7 +595,7 @@ class _NityaSevaState extends State<NityaSeva> {
                       refresh();
                     })),
 
-                    // slot tiles
+                    // Session tiles
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
@@ -611,7 +612,14 @@ class _NityaSevaState extends State<NityaSeva> {
                                 text:
                                     "${session.sevakarta}, ${DateFormat('dd MMM, HH:mm').format(session.timestamp)}",
                                 callback: LauncherTileCallback(onClick: () {
-                                  // open session details
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TicketPage(
+                                        session: session,
+                                      ),
+                                    ),
+                                  );
                                 }),
                               ),
                             );

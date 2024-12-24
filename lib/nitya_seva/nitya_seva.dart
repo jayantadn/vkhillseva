@@ -10,7 +10,7 @@ import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/common/toaster.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/nitya_seva/ticket_page.dart';
-import 'package:vkhillseva/widgets/confirmation.dart';
+import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/nitya_seva/day_summary.dart';
@@ -545,7 +545,7 @@ class _NityaSevaState extends State<NityaSeva> {
               title: Text('Delete'),
               onTap: () {
                 // confirmation dialog
-                Confirmation().show(
+                CommonWidgets().confirm(
                     context: context,
                     callbacks: ConfirmationCallbacks(onConfirm: () {
                       // TODO: pre validations e.g. for admin only

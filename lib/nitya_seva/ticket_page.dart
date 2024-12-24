@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 
@@ -52,30 +53,6 @@ class _TicketPageState extends State<TicketPage> {
     });
   }
 
-  PopupMenuButton<String> _createPopupMenu(List<MyPopupMenuItem> items) {
-    return PopupMenuButton<String>(
-      icon: Icon(Icons.more_vert),
-      onSelected: (String value) {
-        final selectedItem = items.firstWhere((item) => item.text == value);
-        selectedItem.onPressed();
-      },
-      itemBuilder: (BuildContext context) {
-        return items
-            .map((item) => PopupMenuItem<String>(
-                  value: item.text,
-                  child: Row(
-                    children: <Widget>[
-                      Icon(item.icon, color: Theme.of(context).iconTheme.color),
-                      const SizedBox(width: 8),
-                      Text(item.text),
-                    ],
-                  ),
-                ))
-            .toList();
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -110,7 +87,7 @@ class _TicketPageState extends State<TicketPage> {
                 ),
 
                 // menu button
-                _createPopupMenu([
+                CommonWidgets().createPopupMenu([
                   // tally cash button
                   MyPopupMenuItem(
                       text: "Tally cash",
@@ -157,13 +134,4 @@ class _TicketPageState extends State<TicketPage> {
       ),
     );
   }
-}
-
-class MyPopupMenuItem {
-  final String text;
-  final IconData icon;
-  final Function() onPressed;
-
-  MyPopupMenuItem(
-      {required this.text, required this.icon, required this.onPressed});
 }

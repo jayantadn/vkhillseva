@@ -123,7 +123,7 @@ class _TicketPageState extends State<TicketPage> {
                             color: primaryColor,
                             child: SizedBox(
                               height: sizeOfContainer,
-                              width: sizeOfContainer,
+                              width: sizeOfContainer * 0.75,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -157,24 +157,28 @@ class _TicketPageState extends State<TicketPage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // seva name headline
-                                        Text("Pushpanjali Seva",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineMedium!
-                                                .copyWith(color: primaryColor)),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // seva name headline
+                                          Text("Pushpanjali Seva",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall!
+                                                  .copyWith(
+                                                      color: primaryColor)),
 
-                                        // other details
-                                        Text(
-                                            "User: Guest, Time: 12:00, Amount: 400, Mode: UPI",
+                                          // other details
+                                          Text(
+                                            "Guest Sevakarta, Time: 10:00, Amt: ₹400, UPI",
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .bodySmall),
-                                      ],
+                                                .bodySmall,
+                                          )
+                                        ],
+                                      ),
                                     ),
 
                                     // right side image

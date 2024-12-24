@@ -1,3 +1,9 @@
+# 0.2.0
+- feature: edit session
+- feature: delete session
+- feature: date scroller
+- feature: validation
+
 # 0.1.0
 - feature: add Session model and enhance Nitya Seva state management
 - feature: add Nitya Seva configuration and improve festival settings management

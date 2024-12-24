@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/datatypes.dart';
 import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/common/toaster.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/widgets/confirmation.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
@@ -277,24 +278,25 @@ class _NityaSevaState extends State<NityaSeva> {
     return errors;
   }
 
-  void _postValidation() {
+  void _postValidation(Session session) {
+    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
     List<String> errors = [];
 
     refresh(spinner: false).then((_) async {
       Session lastSession = _sessions.last;
-      Session secondLastSession = _sessions[_sessions.length - 2];
+      if (lastSession.name == session.name &&
+          lastSession.sevakarta == session.sevakarta) {
+        lastSession = _sessions[_sessions.length - 2];
+      }
 
       // validate duplicate session name
-      if (lastSession.name == secondLastSession.name) {
+      if (session.name == lastSession.name) {
         errors.add("Duplicate session name");
       }
 
       // check if last session was created recently
       lastSession.timestamp;
-      if (lastSession.timestamp
-              .difference(secondLastSession.timestamp)
-              .inHours <
-          3) {
+      if (lastSession.timestamp.difference(lastSession.timestamp).inHours < 3) {
         errors.add("Session created too recently");
       }
 
@@ -303,7 +305,15 @@ class _NityaSevaState extends State<NityaSeva> {
         if (ret == 'Edit') {
           // TODO: edit the last session
         } else if (ret == 'Delete') {
-          // TODO: delete the last session
+          // delete locally
+          setState(() {
+            _sessions.remove(session);
+          });
+
+          // delete in server
+          FB().deleteValue(path: "NityaSeva/$dbDate/${session.name}");
+
+          Toaster().info("Session deleted");
         }
       }
     });
@@ -460,7 +470,9 @@ class _NityaSevaState extends State<NityaSeva> {
                 }
 
                 // post validation
-                _postValidation();
+                if (errors.isEmpty) {
+                  _postValidation(session);
+                }
 
                 // clear all local lists
                 sevaAmounts.clear();

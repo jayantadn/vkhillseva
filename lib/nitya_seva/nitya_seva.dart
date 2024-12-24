@@ -438,7 +438,7 @@ class _NityaSevaState extends State<NityaSeva> {
                   String dbDate = DateFormat('yyyy-MM-dd').format(now);
                   FB().addToList(
                     path: "NityaSeva/$dbDate",
-                    key: "Settings",
+                    child: "Settings",
                     data: session.toJson(),
                   );
 

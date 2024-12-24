@@ -112,7 +112,34 @@ class _TicketPageState extends State<TicketPage> {
               onRefresh: refresh,
               child: ListView(
                 children: [
-                  const Placeholder(),
+                  Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            color: primaryColor,
+                            child: SizedBox(
+                              height: 75,
+                              width: 75,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("1",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineLarge!
+                                          .copyWith(color: backgroundColor)),
+                                  Text("#2143",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(color: backgroundColor)),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      )),
                 ],
               ),
             ),

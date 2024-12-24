@@ -116,90 +116,120 @@ class _TicketPageState extends State<TicketPage> {
                 children: [
                   Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          // left badge
-                          Container(
-                            color: primaryColor,
-                            child: SizedBox(
-                              height: sizeOfContainer,
-                              width: sizeOfContainer * 0.75,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // serial number
-                                  Text("1",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineLarge!
-                                          .copyWith(color: backgroundColor)),
-
-                                  // ticket number
-                                  Text("#2143",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium!
-                                          .copyWith(color: backgroundColor)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            // right side container
-                            child: Container(
-                              height: sizeOfContainer,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: primaryColor),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                      child: Dismissible(
+                        key: Key(
+                            'dismissible_row_1'), // Ensure each Dismissible has a unique key
+                        confirmDismiss: (direction) async {
+                          if (direction == DismissDirection.startToEnd) {
+                            // Handle left to right swipe (edit action)
+                            print('Edit action');
+                            // Add your edit action code here
+                            return false; // Return false to prevent automatic dismissal
+                          } else if (direction == DismissDirection.endToStart) {
+                            // Handle right to left swipe (delete action)
+                            print('Delete action');
+                            // Add your delete action code here
+                            return false; // Return false to prevent automatic dismissal
+                          }
+                          return false;
+                        },
+                        background: Container(
+                          color: Colors.blue,
+                          alignment: Alignment.centerLeft,
+                          padding: EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Icon(Icons.edit, color: Colors.white),
+                        ),
+                        secondaryBackground: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          padding: EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Icon(Icons.delete, color: Colors.white),
+                        ),
+                        child: Row(
+                          children: [
+                            // left badge
+                            Container(
+                              color: primaryColor,
+                              child: SizedBox(
+                                height: sizeOfContainer,
+                                width: sizeOfContainer * 0.75,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          // seva name headline
-                                          Text("Pushpanjali Seva",
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headlineSmall!
-                                                  .copyWith(
-                                                      color: primaryColor)),
+                                    // serial number
+                                    Text("1",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineLarge!
+                                            .copyWith(color: backgroundColor)),
 
-                                          // other details
-                                          Text(
-                                            "Guest Sevakarta, Time: 10:00, Amt: ₹400, UPI",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall,
-                                          )
-                                        ],
-                                      ),
-                                    ),
-
-                                    // right side image
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color: primaryColor, width: 2),
-                                      ),
-                                      child: CircleAvatar(
-                                        backgroundImage: AssetImage(
-                                            'assets/images/LauncherIcons/NityaSeva.png'),
-                                        radius: sizeOfContainer / 2,
-                                      ),
-                                    ),
+                                    // ticket number
+                                    Text("#2143",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium!
+                                            .copyWith(color: backgroundColor)),
                                   ],
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                            Expanded(
+                              // right side container
+                              child: Container(
+                                height: sizeOfContainer,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: primaryColor),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // seva name headline
+                                            Text("Pushpanjali Seva",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headlineSmall!
+                                                    .copyWith(
+                                                        color: primaryColor)),
+
+                                            // other details
+                                            Text(
+                                              "Guest Sevakarta, Time: 10:00, Amt: ₹400, UPI",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall,
+                                            )
+                                          ],
+                                        ),
+                                      ),
+
+                                      // right side image
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                              color: primaryColor, width: 2),
+                                        ),
+                                        child: CircleAvatar(
+                                          backgroundImage: AssetImage(
+                                              'assets/images/LauncherIcons/NityaSeva.png'),
+                                          radius: sizeOfContainer / 2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       )),
                 ],
               ),

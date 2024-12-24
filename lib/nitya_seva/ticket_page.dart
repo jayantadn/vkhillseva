@@ -55,6 +55,8 @@ class _TicketPageState extends State<TicketPage> {
 
   @override
   Widget build(BuildContext context) {
+    double sizeOfContainer = 75;
+
     return Theme(
       data: themeDefault,
       child: Stack(
@@ -116,19 +118,23 @@ class _TicketPageState extends State<TicketPage> {
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
+                          // left badge
                           Container(
                             color: primaryColor,
                             child: SizedBox(
-                              height: 75,
-                              width: 75,
+                              height: sizeOfContainer,
+                              width: sizeOfContainer,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  // serial number
                                   Text("1",
                                       style: Theme.of(context)
                                           .textTheme
                                           .headlineLarge!
                                           .copyWith(color: backgroundColor)),
+
+                                  // ticket number
                                   Text("#2143",
                                       style: Theme.of(context)
                                           .textTheme
@@ -137,7 +143,58 @@ class _TicketPageState extends State<TicketPage> {
                                 ],
                               ),
                             ),
-                          )
+                          ),
+                          Expanded(
+                            // right side container
+                            child: Container(
+                              height: sizeOfContainer,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: primaryColor),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // seva name headline
+                                        Text("Pushpanjali Seva",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headlineMedium!
+                                                .copyWith(color: primaryColor)),
+
+                                        // other details
+                                        Text(
+                                            "User: Guest, Time: 12:00, Amount: 400, Mode: UPI",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall),
+                                      ],
+                                    ),
+
+                                    // right side image
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            color: primaryColor, width: 2),
+                                      ),
+                                      child: CircleAvatar(
+                                        backgroundImage: AssetImage(
+                                            'assets/images/LauncherIcons/NityaSeva.png'),
+                                        radius: sizeOfContainer / 2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       )),
                 ],

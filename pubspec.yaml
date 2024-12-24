@@ -102,6 +102,16 @@ flutter:
     - assets/images/PaymentModes/icon_cash.png
     - assets/images/PaymentModes/icon_gift.png
     - assets/images/PaymentModes/icon_upi.png
+    - assets/images/NityaSeva/flower_garland.png
+    - assets/images/NityaSeva/gita.png
+    - assets/images/NityaSeva/sadhu_bhojana.png
+    - assets/images/NityaSeva/ShodashopacharaSeva.png
+    - assets/images/NityaSeva/tulasi_garland.png
+    - assets/images/NityaSeva/vishnu_pushpanjali.png
+    - assets/images/NityaSeva/tas.png
+    - assets/images/NityaSeva/JalaDana.png
+    - assets/images/NityaSeva/laddu.png
+    - assets/images/NityaSeva/sadhu_seva.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

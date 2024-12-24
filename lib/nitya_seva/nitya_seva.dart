@@ -39,20 +39,6 @@ class _NityaSevaState extends State<NityaSeva> {
   initState() {
     super.initState();
 
-    // initialize seva list
-    _sevaList.insert(
-        0,
-        FestivalSettings(
-            id: 999, // dummy id
-            name: 'Morning Nitya Seva',
-            icon: "assets/images/Common/morning.png"));
-    _sevaList.insert(
-        1,
-        FestivalSettings(
-            id: 998,
-            name: 'Evening Nitya Seva',
-            icon: "assets/images/Common/evening.png"));
-
     // listed to database events
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
     FB().listenForChange(
@@ -133,13 +119,22 @@ class _NityaSevaState extends State<NityaSeva> {
 
     // fetch festival sevas from db
     _sevaList.clear();
-    dynamic data = await FB().getValue(path: "Settings/Festivals");
+    dynamic data = await FB().getValue(path: "Settings/NityaSevaList");
     if (data != null) {
       for (var element in List<dynamic>.from(data)) {
         Map<String, dynamic> map = Map<String, dynamic>.from(element);
         _sevaList.add(FestivalSettings.fromJson(map));
       }
     }
+
+    // put Nitya Seva at the top
+    _sevaList.sort((a, b) {
+      if (a.name == 'Morning Nitya Seva') return -1;
+      if (b.name == 'Morning Nitya Seva') return 1;
+      if (a.name == 'Evening Nitya Seva') return -1;
+      if (b.name == 'Evening Nitya Seva') return 1;
+      return 0;
+    });
 
     // fetch session details from db
     _sessions.clear();

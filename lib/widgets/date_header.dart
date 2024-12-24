@@ -76,7 +76,10 @@ class _DateHeaderState extends State<DateHeader> {
           IconButton(
             icon: Transform.rotate(
               angle: 3.14, // Rotate 180 degrees to point left
-              child: Icon(Icons.play_arrow),
+              child: Icon(
+                Icons.play_arrow,
+                color: Theme.of(context).iconTheme.color,
+              ),
             ),
             onPressed: () {
               if (widget.callbacks == null) {
@@ -145,7 +148,10 @@ class _DateHeaderState extends State<DateHeader> {
 
           // next day button
           IconButton(
-            icon: Icon(Icons.play_arrow), // Default points right
+            icon: Icon(
+              Icons.play_arrow,
+              color: Theme.of(context).iconTheme.color,
+            ), // Default points right
             onPressed: () {
               if (widget.callbacks == null) {
                 return;

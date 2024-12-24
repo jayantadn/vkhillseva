@@ -43,7 +43,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
     });
 
     // fetch festival list from db
-    var data = await FB().getValue(path: "Settings/Festivals");
+    var data = await FB().getValue(path: "Settings/NityaSevaList");
     if (data != null) {
       List<dynamic> values = data as List;
       _festivals.clear();
@@ -57,11 +57,11 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
 
     // write ids for each festival
     for (int i = 0; i < _festivals.length; i++) {
-      _festivals[i] = FestivalSettings(
-          id: i, name: _festivals[i].name, icon: _festivals[i].icon);
+      _festivals[i] =
+          FestivalSettings(name: _festivals[i].name, icon: _festivals[i].icon);
     }
     FB().setValue(
-        path: "Settings/Festivals",
+        path: "Settings/NityaSevaList",
         value: _festivals.map((e) => e.toJson()).toList());
 
     setState(() {
@@ -90,14 +90,13 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
               IconButton(
                   icon: Icon(Icons.edit),
                   onPressed: () {
-                    callback.onEdit(
-                        FestivalSettings(id: 999, name: title, icon: icon));
+                    callback.onEdit(FestivalSettings(name: title, icon: icon));
                   }),
               IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
-                    callback.onDelete(
-                        FestivalSettings(id: 998, name: title, icon: icon));
+                    callback
+                        .onDelete(FestivalSettings(name: title, icon: icon));
                   }),
             ],
           ),
@@ -162,23 +161,18 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                 setState(() {
                   if (old == null) {
                     // add new festival
-                    int id = _festivals.length;
                     _festivals.add(FestivalSettings(
-                        id: id,
-                        name: festivalNameController.text,
-                        icon: selectedIcon));
+                        name: festivalNameController.text, icon: selectedIcon));
                     _festivals.sort((a, b) => a.name.compareTo(b.name));
                   } else {
                     // edit the festival
                     int index = _festivals.indexWhere((element) =>
                         element.name == old.name && element.icon == old.icon);
                     if (index >= 0) {
-                      int id = _festivals[index].id;
                       _festivals.removeAt(index);
                       _festivals.insert(
                           index,
                           FestivalSettings(
-                              id: id,
                               name: festivalNameController.text,
                               icon: selectedIcon));
                     }
@@ -186,7 +180,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                 });
                 _festivals.sort((a, b) => a.name.compareTo(b.name));
                 FB().setValue(
-                    path: "Settings/Festivals",
+                    path: "Settings/NityaSevaList",
                     value: _festivals.map((e) => e.toJson()).toList());
 
                 Navigator.of(context).pop();
@@ -224,7 +218,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                   }
                 });
                 await FB().setValue(
-                    path: "Settings/Festivals",
+                    path: "Settings/NityaSevaList",
                     value: _festivals.map((e) => e.toJson()).toList());
 
                 // ignore: use_build_context_synchronously

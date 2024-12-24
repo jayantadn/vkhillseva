@@ -56,7 +56,8 @@ class _TicketPageState extends State<TicketPage> {
     return PopupMenuButton<String>(
       icon: Icon(Icons.more_vert),
       onSelected: (String value) {
-        // onPressed();
+        final selectedItem = items.firstWhere((item) => item.text == value);
+        selectedItem.onPressed();
       },
       itemBuilder: (BuildContext context) {
         return items
@@ -66,8 +67,7 @@ class _TicketPageState extends State<TicketPage> {
                     children: <Widget>[
                       Icon(item.icon, color: Theme.of(context).iconTheme.color),
                       const SizedBox(width: 8),
-                      Text(item.text,
-                          style: Theme.of(context).textTheme.headlineMedium),
+                      Text(item.text),
                     ],
                   ),
                 ))
@@ -111,10 +111,21 @@ class _TicketPageState extends State<TicketPage> {
 
                 // menu button
                 _createPopupMenu([
+                  // tally cash button
                   MyPopupMenuItem(
                       text: "Tally cash",
-                      icon: Icons.attach_money,
-                      onPressed: () {})
+                      icon: Icons.money,
+                      onPressed: () {
+                        print("Tally cash");
+                      }),
+
+                  // tally UPI button
+                  MyPopupMenuItem(
+                      text: "Tally UPI",
+                      icon: Icons.payment,
+                      onPressed: () {
+                        print("Tally UPI");
+                      }),
                 ]),
               ],
             ),

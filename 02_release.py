@@ -38,7 +38,7 @@ def main():
     print("Undo main patch for testing")
     main_file = 'lib/main.dart'
     search_string = '(title: "Hare Krishna")'
-    replacement_string = 'home: const MyHomePage(title: "Hare Krishna"),\n'
+    replacement_string = '      home: const HomePage(title: "Hare Krishna"),\n'
     with open(main_file, 'r') as file:
         lines = file.readlines()
     with open(main_file, 'w') as file:

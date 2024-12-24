@@ -149,6 +149,16 @@ class FB {
       Toaster().error("Error adding data to list: $e");
     }
   }
+
+  Future<void> deleteValue({required String path}) async {
+    try {
+      DatabaseReference dbref =
+          FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
+      await dbref.remove();
+    } catch (e) {
+      Toaster().error("Error deleting data: $e");
+    }
+  }
 }
 
 class FBCallbacks {

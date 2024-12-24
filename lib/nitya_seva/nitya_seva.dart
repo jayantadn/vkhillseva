@@ -8,6 +8,7 @@ import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/datatypes.dart';
 import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/widgets/confirmation.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/nitya_seva/day_summary.dart';
@@ -467,6 +468,8 @@ class _NityaSevaState extends State<NityaSeva> {
   }
 
   void _createContextMenu(Session session) {
+    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -484,14 +487,24 @@ class _NityaSevaState extends State<NityaSeva> {
               leading: Icon(Icons.delete),
               title: Text('Delete'),
               onTap: () {
-                // delete locally
-                setState(() {
-                  _sessions.remove(session);
-                });
+                // // confirmation dialog
+                // Confirmation().show(
+                //     callbacks: ConfirmationCallbacks(onConfirm: () {
+                //   // pre validations
 
-                // delete in server
+                //   // delete locally
+                //   setState(() {
+                //     _sessions.remove(session);
+                //   });
 
-                Navigator.of(context).pop();
+                //   // delete in server
+                //   FB().deleteValue(path: "NityaSeva/$dbDate/${session.name}");
+
+                //   // post validations
+
+                //   // close the dialog
+                //   // Navigator.of(context).pop();
+                // }));
               },
             ),
           ],

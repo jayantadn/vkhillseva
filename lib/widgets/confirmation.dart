@@ -1,80 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:synchronized/synchronized.dart';
 
-class Confirmation extends StatefulWidget {
-  final String? msg;
-  final ConfirmationCallbacks callbacks;
+class Confirmation {
+  static final Confirmation _instance = Confirmation._internal();
 
-  const Confirmation({super.key, this.msg, required this.callbacks});
-
-  @override
-  State<Confirmation> createState() => _ConfirmationState();
-}
-
-// ignore: library_private_types_in_public_api
-GlobalKey<_ConfirmationState> summaryKey = GlobalKey<_ConfirmationState>();
-
-class _ConfirmationState extends State<Confirmation> {
-  final Lock _lock = Lock();
-
-  @override
-  void initState() {
-    super.initState();
-
-    refresh();
+  factory Confirmation() {
+    return _instance;
   }
 
-  @override
-  dispose() {
-    // clear all lists
-
-    // clear all controllers
-
-    super.dispose();
+  Confirmation._internal() {
+    // init
   }
 
-  void refresh() async {
-    await _lock.synchronized(() async {
-      showDialog(
-        context: context!,
-        builder: (context) {
-          return AlertDialog(
-            title: Row(
-              children: [
-                Icon(Icons.warning, color: Colors.orange),
-                Text('Confirm'),
-              ],
-            ),
-            content: Text(widget.msg ?? 'Are you sure?'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  if (widget.callbacks.onCancel != null) {
-                    widget.callbacks.onCancel!();
-                  }
-                },
-              ),
-              TextButton(
-                child: Text('Confirm'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  widget.callbacks.onConfirm();
-                },
-              ),
+  void show(
+      {required BuildContext context,
+      String? msg,
+      required ConfirmationCallbacks callbacks}) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.warning, color: Colors.orange),
+              SizedBox(width: 10),
+              Text('Confirm'),
             ],
-          );
-        },
-      );
-    });
-
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
+          ),
+          content: Text(msg ?? 'Are you sure?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (callbacks.onCancel != null) {
+                  callbacks.onCancel!();
+                }
+              },
+            ),
+            TextButton(
+              child: Text('Confirm'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                callbacks.onConfirm();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 

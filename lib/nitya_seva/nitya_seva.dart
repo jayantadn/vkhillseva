@@ -75,7 +75,6 @@ class _NityaSevaState extends State<NityaSeva> {
           edit: () {
             if (_lastCallbackInvoked.isBefore(DateTime.now()
                 .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              print("data edited");
               _lastCallbackInvoked = DateTime.now();
             }
           },
@@ -84,8 +83,20 @@ class _NityaSevaState extends State<NityaSeva> {
           delete: (data) {
             if (_lastCallbackInvoked.isBefore(DateTime.now()
                 .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              print("data deleted: $data");
               _lastCallbackInvoked = DateTime.now();
+
+              // process the received data
+              Map<String, dynamic> map = Map<String, dynamic>.from(data);
+              Map<String, dynamic> json =
+                  Map<String, dynamic>.from(map['Settings']);
+              Session session = Session.fromJson(json);
+
+              setState(() {
+                int index = _sessions.indexWhere((s) => s.name == session.name);
+                if (index != -1) {
+                  _sessions.removeAt(index);
+                }
+              });
             }
           },
 
@@ -487,24 +498,24 @@ class _NityaSevaState extends State<NityaSeva> {
               leading: Icon(Icons.delete),
               title: Text('Delete'),
               onTap: () {
-                // // confirmation dialog
-                // Confirmation().show(
-                //     callbacks: ConfirmationCallbacks(onConfirm: () {
-                //   // pre validations
+                // confirmation dialog
+                Confirmation().show(
+                    context: context,
+                    callbacks: ConfirmationCallbacks(onConfirm: () {
+                      // TODO: pre validations
 
-                //   // delete locally
-                //   setState(() {
-                //     _sessions.remove(session);
-                //   });
+                      // delete locally
+                      setState(() {
+                        _sessions.remove(session);
+                      });
 
-                //   // delete in server
-                //   FB().deleteValue(path: "NityaSeva/$dbDate/${session.name}");
+                      // delete in server
+                      FB().deleteValue(
+                          path: "NityaSeva/$dbDate/${session.name}");
 
-                //   // post validations
-
-                //   // close the dialog
-                //   // Navigator.of(context).pop();
-                // }));
+                      // close the dialog
+                      Navigator.of(context).pop();
+                    }));
               },
             ),
           ],

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/datatypes.dart';
@@ -426,13 +427,12 @@ class _NityaSevaState extends State<NityaSeva> {
                   timestamp: now,
                 );
 
-                // Handle the add session logic here
+                // do validations, update state variable, push to db
                 List<String> errors = _preValidation(session);
                 String? ret = 'Create';
                 if (errors.isNotEmpty) {
                   ret = await _createErrorDialog(errors: errors);
                 }
-
                 if (errors.isEmpty || ret == 'Create') {
                   // push to db
                   String dbDate = DateFormat('yyyy-MM-dd').format(now);
@@ -457,6 +457,40 @@ class _NityaSevaState extends State<NityaSeva> {
                 // clear all local controllers and focus nodes
 
                 // close the dialog
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _createContextMenu(Session session) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: <Widget>[
+            ListTile(
+              leading: Icon(Icons.edit),
+              title: Text('Edit'),
+              onTap: () {
+                Navigator.of(context).pop();
+                // TODO: Implement edit functionality
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.delete),
+              title: Text('Delete'),
+              onTap: () {
+                // delete locally
+                setState(() {
+                  _sessions.remove(session);
+                });
+
+                // delete in server
+
                 Navigator.of(context).pop();
               },
             ),
@@ -495,14 +529,20 @@ class _NityaSevaState extends State<NityaSeva> {
                       child: Row(
                         children: [
                           ..._sessions.map((Session session) {
-                            return LauncherTile2(
-                              image: session.icon,
-                              title: session.name,
-                              text:
-                                  "${session.sevakarta}, ${DateFormat('dd MMM, HH:mm').format(session.timestamp)}",
-                              callback: LauncherTileCallback(onClick: () {
-                                // open session details
-                              }),
+                            return GestureDetector(
+                              onLongPress: () {
+                                HapticFeedback.mediumImpact();
+                                _createContextMenu(session);
+                              },
+                              child: LauncherTile2(
+                                image: session.icon,
+                                title: session.name,
+                                text:
+                                    "${session.sevakarta}, ${DateFormat('dd MMM, HH:mm').format(session.timestamp)}",
+                                callback: LauncherTileCallback(onClick: () {
+                                  // open session details
+                                }),
+                              ),
                             );
                           }),
 

@@ -5,16 +5,16 @@ import 'package:vkhillseva/home/settings.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
 import 'package:vkhillseva/widgets/launcher_tile.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<HomePage> {
   bool _isLoading = true;
 
   @override

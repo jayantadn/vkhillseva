@@ -88,15 +88,13 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                  icon: Icon(Icons.edit,
-                      color: Theme.of(context).iconTheme.color),
+                  icon: Icon(Icons.edit),
                   onPressed: () {
                     callback.onEdit(
                         FestivalSettings(id: 999, name: title, icon: icon));
                   }),
               IconButton(
-                  icon: Icon(Icons.delete,
-                      color: Theme.of(context).iconTheme.color),
+                  icon: Icon(Icons.delete),
                   onPressed: () {
                     callback.onDelete(
                         FestivalSettings(id: 998, name: title, icon: icon));

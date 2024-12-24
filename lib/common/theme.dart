@@ -24,7 +24,7 @@ ThemeData themeDefault = ThemeData(
         fontSize: 30.0,
       ),
     ),
-    elevation: 10, // Increase elevation for a more pronounced shadow
+    elevation: 10,
     toolbarHeight: 50.0,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(

@@ -71,14 +71,14 @@ class _SettingsState extends State<Settings> {
                 children: [
                   // Nitya Seva Festival settings
                   _createSettingsCard(
-                    title: 'Festival List',
+                    title: 'Nitya seva list',
                     icon: "assets/images/LauncherIcons/NityaSeva.png",
                     callback: SettingsCallback(onClick: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const FestivalSettingsPage(
-                                title: "Festival List")),
+                                title: "Nitya seva list")),
                       );
                     }),
                   ),

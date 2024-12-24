@@ -80,6 +80,13 @@ flutter:
     - assets/images/Festivals/Garuda.png
     - assets/images/Festivals/Govardhana.png
     - assets/images/Festivals/Vamana.png
+    - assets/images/Festivals/GaurNitai.png
+    - assets/images/Festivals/HanumanJayanti.png
+    - assets/images/Festivals/JhulanUtsava.png
+    - assets/images/Festivals/NarasimhaChaturdashi.png
+    - assets/images/Festivals/NityanandaTrayodashi.png
+    - assets/images/Festivals/RathaYatra.png
+    - assets/images/Festivals/VyasaPuja.png
     - assets/images/VKHillDieties/Garuda.png
     - assets/images/VKHillDieties/Govinda.png
     - assets/images/VKHillDieties/Hanuman.png
@@ -95,7 +102,6 @@ flutter:
     - assets/images/PaymentModes/icon_cash.png
     - assets/images/PaymentModes/icon_gift.png
     - assets/images/PaymentModes/icon_upi.png
-
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -7,8 +7,9 @@ import 'package:vkhillseva/common/theme.dart';
 
 class NityaSeva extends StatefulWidget {
   final String title;
+  final String icon;
 
-  const NityaSeva({super.key, required this.title});
+  const NityaSeva({super.key, required this.title, required this.icon});
 
   @override
   _NityaSevaState createState() => _NityaSevaState();
@@ -73,9 +74,7 @@ class _NityaSevaState extends State<NityaSeva> {
           ),
 
           // circular progress indicator
-          if (_isLoading)
-            LoadingOverlay(
-                image: 'assets/images/Logo/KrishnaLilaPark_square.png')
+          if (_isLoading) LoadingOverlay(image: widget.icon)
         ],
       ),
     );

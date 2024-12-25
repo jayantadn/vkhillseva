@@ -66,22 +66,6 @@ class _TicketPageState extends State<TicketPage> {
             appBar: AppBar(
               title: Text(widget.session.name),
               actions: [
-                // TAS
-                IconButton(
-                  icon: Icon(Icons.eco),
-                  onPressed: () {
-                    // navigate to add ticket page
-                  },
-                ),
-
-                // laddu seva
-                IconButton(
-                  icon: Icon(Icons.circle),
-                  onPressed: () {
-                    // navigate to add ticket page
-                  },
-                ),
-
                 // summary button
                 IconButton(
                   icon: Icon(Icons.summarize),

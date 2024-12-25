@@ -75,7 +75,7 @@ ThemeData themeDefault = ThemeData(
     style: OutlinedButton.styleFrom(
       side: BorderSide(color: accentColor, width: 2.0),
       textStyle: TextStyle(
-        color: primaryColor,
+        color: accentColor,
         fontWeight: FontWeight.bold,
         fontSize: 16.0,
       ),
@@ -87,7 +87,7 @@ ThemeData themeDefault = ThemeData(
 
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: primaryColor,
+      foregroundColor: accentColor,
       textStyle: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 16.0,
@@ -98,11 +98,11 @@ ThemeData themeDefault = ThemeData(
   // Input Fields
   inputDecorationTheme: InputDecorationTheme(
     enabledBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: accentColor, width: 1.5),
+      borderSide: BorderSide(color: primaryColor, width: 1.5),
       borderRadius: BorderRadius.circular(8.0),
     ),
     focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: primaryColor, width: 2.0),
+      borderSide: BorderSide(color: accentColor, width: 2.0),
       borderRadius: BorderRadius.circular(8.0),
     ),
     errorBorder: OutlineInputBorder(
@@ -165,28 +165,14 @@ ThemeData themeDefault = ThemeData(
   // Checkboxes, Radios, Switches
   checkboxTheme: CheckboxThemeData(
     fillColor: WidgetStateProperty.resolveWith((states) =>
-        states.contains(WidgetState.selected) ? primaryColor : Colors.grey),
+        states.contains(WidgetState.selected) ? accentColor : Colors.grey),
   ),
   radioTheme: RadioThemeData(
     fillColor: WidgetStateProperty.resolveWith((states) =>
-        states.contains(WidgetState.selected) ? primaryColor : Colors.grey),
+        states.contains(WidgetState.selected) ? accentColor : Colors.grey),
   ),
   switchTheme: SwitchThemeData(
-    thumbColor: WidgetStateProperty.all(primaryColor),
-    trackColor: WidgetStateProperty.all(primaryColor.withOpacity(0.5)),
-  ),
-
-  // Bottom Sheet Theme
-  bottomSheetTheme: BottomSheetThemeData(
-    backgroundColor: backgroundColor,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(20.0),
-      ),
-    ),
-    clipBehavior: Clip.antiAliasWithSaveLayer,
-    elevation: 10,
-    modalElevation: 10,
-    modalBackgroundColor: backgroundColor,
+    thumbColor: WidgetStateProperty.all(accentColor),
+    trackColor: WidgetStateProperty.all(accentColor.withOpacity(0.5)),
   ),
 );

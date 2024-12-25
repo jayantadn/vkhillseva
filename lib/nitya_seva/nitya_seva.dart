@@ -46,7 +46,35 @@ class _NityaSevaState extends State<NityaSeva> {
     // Get the FCM token for the device
     String? token = await messaging.getToken();
     if (token != null) {
-      print("FCM Token: $token");
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('FCM Token'),
+            content: SingleChildScrollView(
+              child: Text(token),
+            ),
+            actions: [
+              TextButton(
+                child: Text('Copy'),
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: token));
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('FCM Token copied to clipboard')),
+                  );
+                },
+              ),
+              TextButton(
+                child: Text('Close'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     } else {
       print("Failed to retrieve FCM Token");
     }

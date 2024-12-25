@@ -5,8 +5,6 @@ import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/common/toaster.dart';
 import 'package:vkhillseva/home/home.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
-import 'package:vkhillseva/nitya_seva/session.dart';
-import 'package:vkhillseva/nitya_seva/ticket_page.dart';
 import 'firebase_options.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {

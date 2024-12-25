@@ -16,7 +16,7 @@ ThemeData themeDefault = ThemeData(
 
   // appbar theme
   appBarTheme: AppBarTheme(
-    backgroundColor: accentColor,
+    backgroundColor: primaryColor,
     foregroundColor: backgroundColor,
     titleTextStyle: GoogleFonts.pacifico(
       textStyle: TextStyle(
@@ -174,5 +174,19 @@ ThemeData themeDefault = ThemeData(
   switchTheme: SwitchThemeData(
     thumbColor: WidgetStateProperty.all(primaryColor),
     trackColor: WidgetStateProperty.all(primaryColor.withOpacity(0.5)),
+  ),
+
+  // Bottom Sheet Theme
+  bottomSheetTheme: BottomSheetThemeData(
+    backgroundColor: backgroundColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(20.0),
+      ),
+    ),
+    clipBehavior: Clip.antiAliasWithSaveLayer,
+    elevation: 10,
+    modalElevation: 10,
+    modalBackgroundColor: backgroundColor,
   ),
 );

@@ -12,26 +12,26 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+
+  final Widget home = const HomePage(title: "Hare Krishna");
+  final Widget test = TicketPage(
+      session: Session(
+          name: "Morning Nitya Seva",
+          defaultAmount: 400,
+          defaultPaymentMode: "UPI",
+          icon: "assets/images/Common/morning.png",
+          sevakarta: "Guest",
+          timestamp: DateTime.parse("2024-12-24T12:21:18.348")));
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ISKCON VK Hill Seva',
-      theme: themeDefault,
-      home: TicketPage(
-          session: Session(
-              name: "Morning Nitya Seva",
-              defaultAmount: 400,
-              defaultPaymentMode: "UPI",
-              icon: "assets/images/Common/morning.png",
-              sevakarta: "Guest",
-              timestamp: DateTime.parse("2024-12-24T12:21:18.348"))),
-    );
+        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);
   }
 }

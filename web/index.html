@@ -34,13 +34,13 @@
   </head>
   <body>
     <script src="flutter_bootstrap.js" async></script>
-    <!-- <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging.js"></script> -->
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-messaging.js"></script>
     <script>
-      importScripts("https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js");
-      importScripts(
-        "https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging.js"
-      );
+      // importScripts("https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js");
+      // importScripts(
+      //   "https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging.js"
+      // );
 
       // Firebase configuration
       const firebaseConfig = {
@@ -57,12 +57,6 @@
 
       // initialize firebase
       firebase.initializeApp(firebaseConfig);
-
-      // Firebase messaging instance
-      const messaging = firebase.messaging();
-      messaging.onMessage((payload) => {
-        console.log("Message received. ", payload);
-      });
     </script>
   </body>
 </html>

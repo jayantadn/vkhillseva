@@ -1,5 +1,7 @@
 import subprocess
 import sys
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 
 def run_command(command):
     print(f"Running command: {command}")
@@ -8,6 +10,21 @@ def run_command(command):
         print(f"Command '{command}' failed with error:\n{result.stderr}")
         sys.exit(1)
     return result.stdout.strip()
+
+def upload_to_drive(file_path):
+    # Authenticate the client
+    gauth = GoogleAuth()
+    gauth.LocalWebserverAuth()  # Creates local webserver and automatically handles authentication.
+
+    drive = GoogleDrive(gauth)
+
+    # Create a file and upload it
+    folder_id = '1JsXDKh_vuvP1P-Ulsea_HAzFyMJTt7n7'
+    file = drive.CreateFile({'title': file_path.split('/')[-1], 'parents': [{'id': folder_id}]})
+    file.SetContentFile(file_path)
+    file.Upload()
+
+    print(f'File {file_path} uploaded to Google Drive.')
 
 def main():
     print("get the version number")
@@ -94,12 +111,16 @@ def main():
     else:
         print("No changes to commit")
 
-    print("run the commands to build")   
+    print("building for web")
     run_command("flutter clean")
     run_command("flutter pub get")
     run_command("flutter build web")
     run_command("firebase deploy --only hosting")
     run_command("git checkout *.cache")
+
+    print("building for android")
+    run_command("flutter build apk")
+    
 
     print("all operations completed")
     

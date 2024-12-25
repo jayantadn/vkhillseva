@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -39,9 +40,23 @@ class _NityaSevaState extends State<NityaSeva> {
   // controllers, listeners and focus nodes
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
+  void _getFCMToken() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    // Get the FCM token for the device
+    String? token = await messaging.getToken();
+    if (token != null) {
+      print("FCM Token: $token");
+    } else {
+      print("Failed to retrieve FCM Token");
+    }
+  }
+
   @override
   initState() {
     super.initState();
+
+    _getFCMToken();
 
     // listed to database events
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);

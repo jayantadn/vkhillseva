@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:vkhillseva/common/notification.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/common/toaster.dart';
 import 'package:vkhillseva/home/home.dart';
@@ -27,7 +26,7 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   final Widget home = const HomePage(title: "Hare Krishna");
-  final Widget test = NotificationHomePage();
+  // final Widget test = NotificationHomePage();
   // final Widget test = TicketPage(
   //     session: Session(
   //         name: "Morning Nitya Seva",

@@ -40,51 +40,9 @@ class _NityaSevaState extends State<NityaSeva> {
   // controllers, listeners and focus nodes
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
-  void _getFCMToken() async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-    // Get the FCM token for the device
-    String? token = await messaging.getToken();
-    if (token != null) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('FCM Token'),
-            content: SingleChildScrollView(
-              child: Text(token),
-            ),
-            actions: [
-              TextButton(
-                child: Text('Copy'),
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: token));
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('FCM Token copied to clipboard')),
-                  );
-                },
-              ),
-              TextButton(
-                child: Text('Close'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      print("Failed to retrieve FCM Token");
-    }
-  }
-
   @override
   initState() {
     super.initState();
-
-    _getFCMToken();
 
     // listed to database events
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);

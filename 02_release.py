@@ -1,5 +1,8 @@
 import subprocess
 import sys
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+import os
 
 def run_command(command):
     print(f"Running command: {command}")
@@ -8,6 +11,21 @@ def run_command(command):
         print(f"Command '{command}' failed with error:\n{result.stderr}")
         sys.exit(1)
     return result.stdout.strip()
+
+def upload_to_drive(file_path):
+    # Authenticate the client
+    gauth = GoogleAuth()
+    gauth.LocalWebserverAuth()  # Creates local webserver and automatically handles authentication.
+
+    drive = GoogleDrive(gauth)
+
+    # Create a file and upload it
+    folder_id = '1ra0VLNqqjNj5G8dekh3xgwl-sKFFZix_'
+    file = drive.CreateFile({'title': file_path.split('/')[-1], 'parents': [{'id': folder_id}]})
+    file.SetContentFile(file_path)
+    file.Upload()
+
+    print(f'File {file_path} uploaded to Google Drive.')
 
 def main():
     print("get the version number")
@@ -94,12 +112,20 @@ def main():
     else:
         print("No changes to commit")
 
-    print("run the commands to build")   
+    print("building for web")
     run_command("flutter clean")
     run_command("flutter pub get")
     run_command("flutter build web")
     run_command("firebase deploy --only hosting")
     run_command("git checkout *.cache")
+
+    print("building for android")
+    run_command("flutter build apk")
+    apk_path = "build/app/outputs/flutter-apk/app-release.apk"
+    new_apk_path = f"build/app/outputs/flutter-apk/vkhillseva_v{branch_name}.apk"
+    if os.path.exists(apk_path):
+        os.rename(apk_path, new_apk_path)
+        upload_to_drive(new_apk_path)
 
     print("all operations completed")
     

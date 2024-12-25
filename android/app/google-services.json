@@ -13,7 +13,12 @@
           "package_name": "com.example.vkhillseva"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "129760746257-del18qd77h6k9mne3catms3d5r8i5ctv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAcKPvG97ruORaBB0Qc8sVe4et9mjxe_V4"
@@ -21,7 +26,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "129760746257-del18qd77h6k9mne3catms3d5r8i5ctv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -1,8 +1,7 @@
 import subprocess
 import sys
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
 import os
+import shutil
 
 def run_command(command):
     print(f"Running command: {command}")
@@ -12,20 +11,7 @@ def run_command(command):
         sys.exit(1)
     return result.stdout.strip()
 
-def upload_to_drive(file_path):
-    # Authenticate the client
-    gauth = GoogleAuth()
-    gauth.LocalWebserverAuth()  # Creates local webserver and automatically handles authentication.
 
-    drive = GoogleDrive(gauth)
-
-    # Create a file and upload it
-    folder_id = '1ra0VLNqqjNj5G8dekh3xgwl-sKFFZix_'
-    file = drive.CreateFile({'title': file_path.split('/')[-1], 'parents': [{'id': folder_id}]})
-    file.SetContentFile(file_path)
-    file.Upload()
-
-    print(f'File {file_path} uploaded to Google Drive.')
 
 def main():
     print("get the version number")
@@ -124,8 +110,20 @@ def main():
     apk_path = "build/app/outputs/flutter-apk/app-release.apk"
     new_apk_path = f"build/app/outputs/flutter-apk/vkhillseva_v{branch_name}.apk"
     if os.path.exists(apk_path):
+        if os.path.exists(new_apk_path):
+            os.remove(new_apk_path)
         os.rename(apk_path, new_apk_path)
-        upload_to_drive(new_apk_path)
+    else:
+        print("ERROR: APK not found")
+
+    print("upload apk to my google drive")
+    drive_path = "X:/GoogleDrive/PublicRO/Garuda"
+    if os.path.exists(drive_path):
+        shutil.copy(new_apk_path, drive_path)
+        shutil.copy(os.path.join(drive_path, f'vkhillseva_v{branch_name}.apk'), os.path.join(drive_path, 'vkhillseva_latest.apk'))
+    else:
+        print("ERROR: Google Drive not found in your local system")
+
 
     print("all operations completed")
     

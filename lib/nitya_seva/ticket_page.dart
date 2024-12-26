@@ -21,6 +21,26 @@ class _TicketPageState extends State<TicketPage> {
   final DateTime _selectedDate = DateTime.now();
 
   // lists
+  final List<Ticket> _tickets = [
+    Ticket(
+        timestamp: DateTime.now(),
+        amount: 400,
+        mode: "UPI",
+        ticketNumber: 2143,
+        user: "Guest",
+        seva: "Pushpanjali Seva",
+        remarks: "",
+        image: 'assets/images/LauncherIcons/NityaSeva.png'),
+    Ticket(
+        timestamp: DateTime.now(),
+        amount: 400,
+        mode: "UPI",
+        ticketNumber: 2143,
+        user: "Guest",
+        seva: "Pushpanjali Seva",
+        remarks: "",
+        image: 'assets/images/LauncherIcons/NityaSeva.png'),
+  ];
 
   // controllers, listeners and focus nodes
   final List<StreamSubscription<DatabaseEvent>> _listeners = [];
@@ -54,7 +74,7 @@ class _TicketPageState extends State<TicketPage> {
     });
   }
 
-  Widget _createTicketTile(int count, Ticket ticket) {
+  Widget _createTicketTile(int sl, Ticket ticket) {
     double sizeOfContainer = 75;
     String time = DateFormat("HH:mm").format(ticket.timestamp);
 
@@ -70,14 +90,14 @@ class _TicketPageState extends State<TicketPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // serial number
-                Text(count.toString(),
+                Text(sl.toString(),
                     style: Theme.of(context)
                         .textTheme
                         .headlineLarge!
                         .copyWith(color: backgroundColor)),
 
                 // ticket number
-                Text(ticket.ticketNumber.toString(),
+                Text("#${ticket.ticketNumber}",
                     style: Theme.of(context)
                         .textTheme
                         .bodyMedium!
@@ -185,23 +205,15 @@ class _TicketPageState extends State<TicketPage> {
             // body
             body: RefreshIndicator(
               onRefresh: refresh,
-              child: ListView(
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: _createTicketTile(
-                          1,
-                          Ticket(
-                              timestamp: DateTime.now(),
-                              amount: 400,
-                              mode: "UPI",
-                              ticketNumber: 2143,
-                              user: "Guest",
-                              seva: "Pushpanjali Seva",
-                              remarks: "",
-                              image:
-                                  'assets/images/LauncherIcons/NityaSeva.png'))),
-                ],
+              child: ListView.builder(
+                itemCount: _tickets.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: _createTicketTile(
+                        _tickets.length - index, _tickets[index]),
+                  );
+                },
               ),
             ),
 

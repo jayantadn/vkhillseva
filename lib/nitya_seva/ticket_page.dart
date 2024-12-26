@@ -210,7 +210,9 @@ class _TicketPageState extends State<TicketPage> {
     return errors;
   }
 
-  void _createAddEditDialog(context) {
+  void _deleteTicket(Ticket ticket) {}
+
+  void _addEditTicket(context) {
     // locals
     int amount = widget.session.defaultAmount;
     int ticketNumber = 0;
@@ -504,6 +506,12 @@ class _TicketPageState extends State<TicketPage> {
                                       context: context,
                                       errors: errors,
                                       post: true);
+
+                              if (action == "Delete") {
+                                _deleteTicket(ticket);
+                              } else if (action == "Edit") {
+                                _addEditTicket(ticket);
+                              }
                             }
                           }
 
@@ -586,7 +594,7 @@ class _TicketPageState extends State<TicketPage> {
             floatingActionButton: FloatingActionButton(
               child: Icon(Icons.add),
               onPressed: () {
-                _createAddEditDialog(context);
+                _addEditTicket(context);
               },
             ),
           ),

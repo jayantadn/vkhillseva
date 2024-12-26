@@ -1,3 +1,6 @@
+# 0.8.0
+- fix: improve error handling and streamline git operations in release script
+
 # main
 
 # 0.7.0

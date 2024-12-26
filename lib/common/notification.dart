@@ -13,9 +13,9 @@ class MyNotification {
     // init
   }
 
-  Future<void> sendNotification(String token, String title, String body) async {
+  Future<void> send(String token, String title, String body) async {
     const String functionUrl =
-        "YOUR_CLOUD_FUNCTION_URL"; // Replace with your Firebase function URL
+        "https://sendnotification-eqsv4pot7q-uc.a.run.app"; // Replace with your Firebase function URL
 
     try {
       final response = await http.post(

@@ -23,6 +23,7 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 exports.sendNotification = functions.https.onRequest(async (req, res) => {
+  console.log("Sending notification...");
   const {token, title, body} = req.body;
 
   if (!token || !title || !body) {

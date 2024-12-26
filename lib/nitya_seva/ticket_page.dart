@@ -97,24 +97,29 @@ class _TicketPageState extends State<TicketPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // seva name headline
-                      Text(ticket.seva,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall!
-                              .copyWith(color: primaryColor)),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // seva name headline
+                          Text(ticket.seva,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall!
+                                  .copyWith(color: primaryColor)),
 
-                      // other details
-                      SizedBox(height: 2),
-                      Text(
-                        "${ticket.user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
-                        style: Theme.of(context).textTheme.bodySmall,
-                        softWrap: true,
+                          // other details
+                          SizedBox(height: 2),
+                          Text(
+                            "${ticket.user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
+                            style: Theme.of(context).textTheme.bodySmall,
+                            softWrap: true,
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
 
                   // right side image

@@ -22,8 +22,8 @@ class MyApp extends StatelessWidget {
   final Widget test = TicketPage(
       session: Session(
           name: "Morning Nitya Seva",
-          defaultAmount: 1000,
-          defaultPaymentMode: "UPI",
+          defaultAmount: 400,
+          defaultPaymentMode: "Cash",
           icon: "assets/images/Common/morning.png",
           sevakarta: "Guest",
           timestamp: DateTime.now()));

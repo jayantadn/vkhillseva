@@ -182,22 +182,25 @@ class _TicketPageState extends State<TicketPage> {
   }
 
   void _createAddEditDialog(context) {
+    // locals
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
-    List<String> sevaNames = ["Pushpanjali Seva", "Tulasi Archana Seva"];
+    int amount = widget.session.defaultAmount;
+    int ticketNumber = 0;
+    String mode = widget.session.defaultPaymentMode;
+
+    // lists
+    List<String> sevaNames = [];
+    List<Ticket> filteredTickets =
+        _tickets.where((ticket) => ticket.amount == amount).toList();
 
     // controllers
     TextEditingController ticketNumberController = TextEditingController();
 
     // field values
-    int amount = widget.session.defaultAmount;
-    int ticketNumber = 0;
-    List<Ticket> filteredTickets =
-        _tickets.where((ticket) => ticket.amount == amount).toList();
     if (filteredTickets.isNotEmpty) {
       ticketNumber = filteredTickets.first.ticketNumber + 1;
     }
     ticketNumberController.text = ticketNumber.toString();
-    String mode = widget.session.defaultPaymentMode;
     sevaNames = _getSevaNames(amount);
 
     showModalBottomSheet(
@@ -233,27 +236,43 @@ class _TicketPageState extends State<TicketPage> {
                     ...Const().nityaSeva['amounts']!.map((seva) {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: amount.toString() == seva.keys.first
-                                ? seva.values.first['color']! as Color
-                                : Colors.transparent,
-                            border: Border.all(
-                                color: seva.values.first['color']! as Color),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              seva.keys.first,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge!
-                                  .copyWith(
-                                      color:
-                                          amount.toString() == seva.keys.first
-                                              ? Colors.white
-                                              : primaryColor),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              amount = int.parse(seva.keys.first);
+                              filteredTickets = _tickets
+                                  .where((ticket) => ticket.amount == amount)
+                                  .toList();
+                              ticketNumberController.text = (filteredTickets
+                                          .isNotEmpty
+                                      ? filteredTickets.first.ticketNumber + 1
+                                      : 0)
+                                  .toString();
+                              sevaNames = _getSevaNames(amount);
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: amount.toString() == seva.keys.first
+                                  ? seva.values.first['color']! as Color
+                                  : Colors.transparent,
+                              border: Border.all(
+                                  color: seva.values.first['color']! as Color),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                seva.keys.first,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                        color:
+                                            amount.toString() == seva.keys.first
+                                                ? Colors.white
+                                                : primaryColor),
+                              ),
                             ),
                           ),
                         ),
@@ -363,6 +382,7 @@ class _TicketPageState extends State<TicketPage> {
 
                       // clear all lists
                       sevaNames.clear();
+                      filteredTickets.clear();
 
                       // dispose all controllers and focus nodes
                       ticketNumberController.dispose();
@@ -375,6 +395,7 @@ class _TicketPageState extends State<TicketPage> {
 
                       // clear all lists
                       sevaNames.clear();
+                      filteredTickets.clear();
 
                       // dispose all controllers and focus nodes
                     },

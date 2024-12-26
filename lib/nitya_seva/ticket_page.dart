@@ -183,10 +183,10 @@ class _TicketPageState extends State<TicketPage> {
 
   void _createAddEditDialog(context) {
     // locals
-    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
     int amount = widget.session.defaultAmount;
     int ticketNumber = 0;
     String mode = widget.session.defaultPaymentMode;
+    String sevaName = "";
 
     // lists
     List<String> sevaNames = [];
@@ -206,205 +206,218 @@ class _TicketPageState extends State<TicketPage> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              // Ticket number
-              SizedBox(height: 10),
-              TextField(
-                controller: ticketNumberController,
-                decoration: InputDecoration(labelText: "Ticket Number"),
-              ),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  // Ticket number
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: ticketNumberController,
+                    decoration: InputDecoration(labelText: "Ticket Number"),
+                  ),
 
-              // Seva amount
-              SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Seva Amount",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(color: accentColor),
-                ),
-              ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    ...Const().nityaSeva['amounts']!.map((seva) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              amount = int.parse(seva.keys.first);
-                              filteredTickets = _tickets
-                                  .where((ticket) => ticket.amount == amount)
-                                  .toList();
-                              ticketNumberController.text = (filteredTickets
-                                          .isNotEmpty
-                                      ? filteredTickets.first.ticketNumber + 1
-                                      : 0)
-                                  .toString();
-                              sevaNames = _getSevaNames(amount);
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: amount.toString() == seva.keys.first
-                                  ? seva.values.first['color']! as Color
-                                  : Colors.transparent,
-                              border: Border.all(
-                                  color: seva.values.first['color']! as Color),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                seva.keys.first,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .copyWith(
-                                        color:
-                                            amount.toString() == seva.keys.first
+                  // Seva amount
+                  SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Seva Amount",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: accentColor),
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        ...Const().nityaSeva['amounts']!.map((seva) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                setModalState(() {
+                                  amount = int.parse(seva.keys.first);
+                                  filteredTickets = _tickets
+                                      .where(
+                                          (ticket) => ticket.amount == amount)
+                                      .toList();
+                                  ticketNumberController.text = (filteredTickets
+                                              .isNotEmpty
+                                          ? filteredTickets.first.ticketNumber +
+                                              1
+                                          : 0)
+                                      .toString();
+                                  sevaNames = _getSevaNames(amount);
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: amount.toString() == seva.keys.first
+                                      ? seva.values.first['color']! as Color
+                                      : Colors.transparent,
+                                  border: Border.all(
+                                      color:
+                                          seva.values.first['color']! as Color),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    seva.keys.first,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                            color: amount.toString() ==
+                                                    seva.keys.first
                                                 ? Colors.white
                                                 : primaryColor),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-
-              // Payment mode
-              SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Payment Mode",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(color: accentColor),
-                ),
-              ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    ...Const().paymentModes.keys.map((m) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: primaryColor),
-                            color:
-                                mode == m ? primaryColor : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: Image.asset(
-                                      Const().paymentModes[m]!['icon']!),
-                                ),
-                                Text(
-                                  m,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .copyWith(
-                                        color: mode == m
-                                            ? Colors.white
-                                            : primaryColor,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-
-              // seva name
-              SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Seva Name",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(color: accentColor),
-                ),
-              ),
-              DropdownButton<String>(
-                isExpanded: true,
-                value: sevaNames.isNotEmpty ? sevaNames[0] : null,
-                items: sevaNames.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    // Handle the selected value
-                  });
-                },
-                hint: Text(
-                  "Select Seva",
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ),
-
-              // buttons
-              SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-
-                      // clear all lists
-                      sevaNames.clear();
-                      filteredTickets.clear();
-
-                      // dispose all controllers and focus nodes
-                      ticketNumberController.dispose();
-                    },
-                    child: Text("Cancel"),
+                          );
+                        }),
+                      ],
+                    ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
 
-                      // clear all lists
-                      sevaNames.clear();
-                      filteredTickets.clear();
+                  // Payment mode
+                  SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Payment Mode",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: accentColor),
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        ...Const().paymentModes.keys.map((m) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                setModalState(() {
+                                  mode = m;
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: primaryColor),
+                                  color: mode == m
+                                      ? primaryColor
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: Image.asset(
+                                            Const().paymentModes[m]!['icon']!),
+                                      ),
+                                      Text(
+                                        m,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge!
+                                            .copyWith(
+                                              color: mode == m
+                                                  ? Colors.white
+                                                  : primaryColor,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
 
-                      // dispose all controllers and focus nodes
+                  // seva name
+                  SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Seva Name",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: accentColor),
+                    ),
+                  ),
+                  DropdownButton<String>(
+                    isExpanded: true,
+                    value: sevaNames.isNotEmpty ? sevaNames[0] : null,
+                    items: sevaNames.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      sevaName = newValue!;
                     },
-                    child: Text("Add"),
+                    hint: Text(
+                      "Select Seva",
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+
+                  // buttons
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+
+                          // clear all lists
+                          sevaNames.clear();
+                          filteredTickets.clear();
+
+                          // dispose all controllers and focus nodes
+                          ticketNumberController.dispose();
+                        },
+                        child: Text("Cancel"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+
+                          // clear all lists
+                          sevaNames.clear();
+                          filteredTickets.clear();
+
+                          // dispose all controllers and focus nodes
+                        },
+                        child: Text("Add"),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

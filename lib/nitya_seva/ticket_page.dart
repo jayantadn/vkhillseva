@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
@@ -29,7 +30,7 @@ class _TicketPageState extends State<TicketPage> {
         ticketNumber: 2143,
         user: "Guest",
         seva: "Pushpanjali Seva",
-        remarks: "",
+        note: "",
         image: 'assets/images/LauncherIcons/NityaSeva.png'),
     Ticket(
         timestamp: DateTime.now(),
@@ -38,7 +39,7 @@ class _TicketPageState extends State<TicketPage> {
         ticketNumber: 2143,
         user: "Guest",
         seva: "Pushpanjali Seva",
-        remarks: "",
+        note: "",
         image: 'assets/images/LauncherIcons/NityaSeva.png'),
   ];
 
@@ -164,6 +165,168 @@ class _TicketPageState extends State<TicketPage> {
     );
   }
 
+  void _createAddEditDialog(context) {
+    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+    List<String> sevaNames = ["Pushpanjali Seva", "Tulasi Archana Seva"];
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              // Ticket number
+              SizedBox(height: 10),
+              TextField(
+                decoration: InputDecoration(labelText: "Ticket Number"),
+              ),
+
+              // Seva amount
+              SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Seva Amount",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: accentColor),
+                ),
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    ...Const().nityaSeva['amounts']!.map((seva) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: seva.values.first['color']! as Color),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              seva.keys.first,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+
+              // Payment mode
+              SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Payment Mode",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: accentColor),
+                ),
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    ...Const().paymentModes.keys.map((mode) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: primaryColor),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: Image.asset(
+                                      Const().paymentModes[mode]!['icon']!),
+                                ),
+                                Text(
+                                  mode,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+
+              // seva name
+              SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Seva Name",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: accentColor),
+                ),
+              ),
+              DropdownButton<String>(
+                isExpanded: true,
+                value: sevaNames.isNotEmpty ? sevaNames[0] : null,
+                items: sevaNames.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    // Handle the selected value
+                  });
+                },
+                hint: Text(
+                  "Select Seva",
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+
+              // buttons
+              SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Cancel"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Add"),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -221,15 +384,14 @@ class _TicketPageState extends State<TicketPage> {
             floatingActionButton: FloatingActionButton(
               child: Icon(Icons.add),
               onPressed: () {
-                // navigate to add ticket page
+                _createAddEditDialog(context);
               },
             ),
           ),
 
           // circular progress indicator
           if (_isLoading)
-            LoadingOverlay(
-                image: 'assets/images/Logo/KrishnaLilaPark_square.png')
+            LoadingOverlay(image: 'assets/images/LauncherIcons/NityaSeva.png')
         ],
       ),
     );
@@ -242,7 +404,7 @@ class Ticket {
   final String mode;
   final int ticketNumber;
   final String user;
-  final String remarks;
+  final String note;
   final String image;
   final String seva;
 
@@ -252,7 +414,7 @@ class Ticket {
       required this.mode,
       required this.ticketNumber,
       required this.user,
-      required this.remarks,
+      required this.note,
       required this.image,
       required this.seva});
 
@@ -263,7 +425,7 @@ class Ticket {
       mode: json['mode'],
       ticketNumber: json['ticketNumber'],
       user: json['user'],
-      remarks: json['remarks'],
+      note: json['note'],
       image: json['image'],
       seva: json['seva'],
     );
@@ -276,7 +438,7 @@ class Ticket {
       'mode': mode,
       'ticketNumber': ticketNumber,
       'user': user,
-      'remarks': remarks,
+      'note': note,
       'image': image,
       'seva': seva,
     };

@@ -73,11 +73,17 @@ class _TicketPageState extends State<TicketPage> {
     double sizeOfContainer = 75;
     String time = DateFormat("HH:mm").format(ticket.timestamp);
 
+    Color color = Const()
+        .nityaSeva['amounts']!
+        .firstWhere((element) => element.keys.first == ticket.amount.toString())
+        .values
+        .first['color']! as Color;
+
     return Row(
       children: [
         // left badge
         Container(
-          color: primaryColor,
+          color: color,
           child: SizedBox(
             height: sizeOfContainer,
             width: sizeOfContainer,
@@ -105,7 +111,7 @@ class _TicketPageState extends State<TicketPage> {
           child: Container(
             height: sizeOfContainer,
             decoration: BoxDecoration(
-              border: Border.all(color: primaryColor),
+              border: Border.all(color: color),
             ),
             child: Padding(
               padding: const EdgeInsets.all(8.0),

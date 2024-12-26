@@ -19,14 +19,6 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   final Widget home = const HomePage(title: "Hare Krishna");
-  final Widget test = TicketPage(
-      session: Session(
-          name: "Morning Nitya Seva",
-          defaultAmount: 400,
-          defaultPaymentMode: "Cash",
-          icon: "assets/images/Common/morning.png",
-          sevakarta: "Guest",
-          timestamp: DateTime.now()));
 
   // This widget is the root of your application.
   @override

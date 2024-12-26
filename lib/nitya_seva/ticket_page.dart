@@ -45,7 +45,11 @@ class _TicketPageState extends State<TicketPage> {
                 .subtract(Duration(seconds: Const().fbListenerDelay)))) {
               _lastCallbackInvoked = DateTime.now();
 
-              print(data);
+              Map<String, dynamic> ticket = Map<String, dynamic>.from(data);
+              setState(() {
+                _tickets.add(Ticket.fromJson(ticket));
+                _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+              });
             }
           },
 
@@ -79,6 +83,7 @@ class _TicketPageState extends State<TicketPage> {
   @override
   dispose() {
     // clear all lists
+    _tickets.clear();
 
     // clear all controllers and focus nodes
     for (var listener in _listeners) {
@@ -173,7 +178,7 @@ class _TicketPageState extends State<TicketPage> {
                                   style: Theme.of(context)
                                       .textTheme
                                       .headlineSmall!
-                                      .copyWith(color: primaryColor)),
+                                      .copyWith(color: color)),
 
                               // note icon
                               SizedBox(width: 4),

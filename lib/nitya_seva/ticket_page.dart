@@ -162,6 +162,54 @@ class _TicketPageState extends State<TicketPage> {
     return ret;
   }
 
+  List<String> _prevalidateTicket(Ticket ticket) {
+    List<String> errors = [];
+
+    // check if ticket number is > 0
+    if (ticket.ticketNumber <= 0) {
+      errors.add("Ticket number should be greater than 0");
+    }
+
+    // check if ticket number is unique
+    if (_tickets
+        .where((t) => t.ticketNumber == ticket.ticketNumber)
+        .isNotEmpty) {
+      errors.add("Duplicate ticket number");
+    }
+
+    // check if ticket number is contiguous
+    if (_tickets.isNotEmpty) {
+      if (ticket.ticketNumber - _tickets.first.ticketNumber != 1) {
+        errors.add("Ticket number should be contiguous");
+      }
+    }
+
+    return errors;
+  }
+
+  Future<List<String>> _postvalidateTicket(Ticket ticket) async {
+    List<String> errors = [];
+
+    // fetch all latest tickets and validate again
+    await refresh();
+    errors.addAll(_prevalidateTicket(ticket));
+
+    // check if ticket is created in the correct session
+    String dbDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+    var sessions = await FB().getList(path: "NityaSeva/$dbDate");
+    if (sessions.isEmpty) {
+      errors.add("No sessions found for today");
+    } else {
+      DateTime lastSession =
+          DateTime.parse(sessions.last['Settings']['timestamp']);
+      if (lastSession != widget.session.timestamp) {
+        errors.add("Ticket created in wrong session");
+      }
+    }
+
+    return errors;
+  }
+
   void _createAddEditDialog(context) {
     // locals
     int amount = widget.session.defaultAmount;
@@ -394,7 +442,7 @@ class _TicketPageState extends State<TicketPage> {
                         child: Text("Cancel"),
                       ),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           Navigator.pop(context);
 
                           // fetch the icon
@@ -420,6 +468,17 @@ class _TicketPageState extends State<TicketPage> {
                             seva: sevaName,
                           );
 
+                          // pre validations
+                          List<String> errors = _prevalidateTicket(ticket);
+                          if (errors.isNotEmpty) {
+                            String? action = await CommonWidgets()
+                                .createErrorDialog(
+                                    context: context, errors: errors);
+                            if (action == "Cancel") {
+                              return;
+                            }
+                          }
+
                           // add ticket to list
                           setState(() {
                             _tickets.insert(0, ticket);
@@ -436,9 +495,22 @@ class _TicketPageState extends State<TicketPage> {
                               path: "NityaSeva/$dbDate/$dbSession/Tickets",
                               data: ticket.toJson());
 
+                          // post validations
+                          if (errors.isEmpty) {
+                            errors = await _postvalidateTicket(ticket);
+                            if (errors.isNotEmpty) {
+                              String? action = await CommonWidgets()
+                                  .createErrorDialog(
+                                      context: context,
+                                      errors: errors,
+                                      post: true);
+                            }
+                          }
+
                           // clear all lists
                           sevaNames.clear();
                           filteredTickets.clear();
+                          errors.clear();
 
                           // dispose all controllers and focus nodes
                           ticketNumberController.dispose();

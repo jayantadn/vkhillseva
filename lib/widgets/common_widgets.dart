@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class CommonWidgets {
@@ -72,6 +74,92 @@ class CommonWidgets {
             .toList();
       },
     );
+  }
+
+  Future<String?> createErrorDialog(
+      {required BuildContext context,
+      required List<String> errors,
+      bool post = false}) async {
+    Completer<String?> action = Completer<String?>();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.error, color: Colors.red),
+              SizedBox(width: 10),
+              Text('ERROR',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineMedium!
+                      .copyWith(color: Colors.red)),
+            ],
+          ),
+          content: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start, // Add this line
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("The following errors are detected:"),
+                ),
+                for (var error in errors)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(" - $error"),
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            // cancel button
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                action.complete('Cancel');
+              },
+            ),
+
+            // create button
+            if (post == false)
+              TextButton(
+                child: Text('Create'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  action.complete('Create');
+                },
+              ),
+
+            // Edit button
+            if (post == true)
+              TextButton(
+                child: Text('Edit'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  action.complete('Edit');
+                },
+              ),
+
+            // delete button
+            if (post == true)
+              TextButton(
+                child: Text('Delete'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  action.complete('Delete');
+                },
+              ),
+          ],
+        );
+      },
+    );
+
+    return action.future;
   }
 }
 

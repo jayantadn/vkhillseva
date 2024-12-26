@@ -168,90 +168,6 @@ class _NityaSevaState extends State<NityaSeva> {
     });
   }
 
-  Future<String?> _createErrorDialog(
-      {required List<String> errors, bool post = false}) async {
-    Completer<String?> completer = Completer<String?>();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Row(
-            children: [
-              Icon(Icons.error, color: Colors.red),
-              SizedBox(width: 10),
-              Text('ERROR',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineMedium!
-                      .copyWith(color: Colors.red)),
-            ],
-          ),
-          content: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start, // Add this line
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text("The following errors are detected:"),
-                ),
-                for (var error in errors)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(" - $error"),
-                  ),
-              ],
-            ),
-          ),
-          actions: [
-            // cancel button
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                completer.complete('Cancel');
-              },
-            ),
-
-            // create button
-            if (post == false)
-              TextButton(
-                child: Text('Create'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  completer.complete('Create');
-                },
-              ),
-
-            // Edit button
-            if (post == true)
-              TextButton(
-                child: Text('Edit'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  completer.complete('Edit');
-                },
-              ),
-
-            // delete button
-            if (post == true)
-              TextButton(
-                child: Text('Delete'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  completer.complete('Delete');
-                },
-              ),
-          ],
-        );
-      },
-    );
-
-    return completer.future;
-  }
-
   List<String> _preValidation(Session session) {
     List<String> errors = [];
 
@@ -303,7 +219,8 @@ class _NityaSevaState extends State<NityaSeva> {
       }
 
       if (errors.isNotEmpty) {
-        String? ret = await _createErrorDialog(errors: errors, post: true);
+        String? ret = await CommonWidgets()
+            .createErrorDialog(context: context, errors: errors, post: true);
         if (ret == 'Edit') {
           _createEditSession(session: session);
         } else if (ret == 'Delete') {
@@ -467,7 +384,8 @@ class _NityaSevaState extends State<NityaSeva> {
                   List<String> errors = _preValidation(newSession);
                   String? ret = 'Create';
                   if (errors.isNotEmpty) {
-                    ret = await _createErrorDialog(errors: errors);
+                    ret = await CommonWidgets()
+                        .createErrorDialog(context: context, errors: errors);
                   }
                   if (errors.isEmpty || ret == 'Create') {
                     // push to db

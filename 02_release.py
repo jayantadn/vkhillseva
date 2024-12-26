@@ -86,43 +86,47 @@ def main():
                         flag_start = False
     
 
-    print("commit all changes and push to git")
-    if run_command('git status --porcelain'):
-        run_command('git add -A')
-        run_command(f'git commit -m "release {branch_name}"')
-        run_command('git push origin')
-        run_command('git checkout main')
-        run_command('git pull')
-        run_command(f'git merge {branch_name}')
-        run_command('git push origin')
-    else:
-        print("No changes to commit")
+    try:
+        print("commit all changes and push to git")
+        if run_command('git status --porcelain'):
+            run_command('git add -A')
+            run_command(f'git commit -m "release {branch_name}"')
+            run_command('git push origin')
+            run_command('git checkout main')
+            run_command('git pull')
+            run_command(f'git merge {branch_name}')
+            run_command('git push origin')
+        else:
+            print("No changes to commit")
 
-    print("building for web")
-    run_command("flutter clean")
-    run_command("flutter pub get")
-    run_command("flutter build web")
-    run_command("firebase deploy --only hosting")
-    run_command("git checkout *.cache")
+        print("building for web")
+        run_command("flutter clean")
+        run_command("flutter pub get")
+        run_command("flutter build web")
+        run_command("firebase deploy --only hosting")
+        run_command("git checkout *.cache")
 
-    print("building for android")
-    run_command("flutter build apk")
-    apk_path = "build/app/outputs/flutter-apk/app-release.apk"
-    new_apk_path = f"build/app/outputs/flutter-apk/vkhillseva_v{branch_name}.apk"
-    if os.path.exists(apk_path):
-        if os.path.exists(new_apk_path):
-            os.remove(new_apk_path)
-        os.rename(apk_path, new_apk_path)
-    else:
-        print("ERROR: APK not found")
+        print("building for android")
+        run_command("flutter build apk")
+        apk_path = "build/app/outputs/flutter-apk/app-release.apk"
+        new_apk_path = f"build/app/outputs/flutter-apk/vkhillseva_v{branch_name}.apk"
+        if os.path.exists(apk_path):
+            if os.path.exists(new_apk_path):
+                os.remove(new_apk_path)
+            os.rename(apk_path, new_apk_path)
+        else:
+            print("ERROR: APK not found")
 
-    print("upload apk to my google drive")
-    drive_path = "X:/GoogleDrive/PublicRO/Garuda"
-    if os.path.exists(drive_path):
-        shutil.copy(new_apk_path, drive_path)
-        shutil.copy(os.path.join(drive_path, f'vkhillseva_v{branch_name}.apk'), os.path.join(drive_path, 'vkhillseva_latest.apk'))
-    else:
-        print("ERROR: Google Drive not found in your local system")
+        print("upload apk to my google drive")
+        drive_path = "X:/GoogleDrive/PublicRO/Garuda"
+        if os.path.exists(drive_path):
+            shutil.copy(new_apk_path, drive_path)
+            shutil.copy(os.path.join(drive_path, f'vkhillseva_v{branch_name}.apk'), os.path.join(drive_path, 'vkhillseva_latest.apk'))
+        else:
+            print("ERROR: Google Drive not found in your local system")
+    except Exception as e:
+        print("reverting changes")
+        run_command(f'git checkout {branch_name}')
 
 
     print("all operations completed")

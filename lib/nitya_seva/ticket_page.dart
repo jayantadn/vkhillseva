@@ -334,7 +334,6 @@ class _TicketPageState extends State<TicketPage> {
 
     // controllers
     TextEditingController ticketNumberController = TextEditingController();
-    TextEditingController noteController = TextEditingController();
 
     // field values
     if (filteredTickets.isNotEmpty) {
@@ -359,12 +358,20 @@ class _TicketPageState extends State<TicketPage> {
                     SizedBox(height: 10),
                     Row(
                       children: [
+                        // ticket number
                         Expanded(
                           child: TextField(
                             controller: ticketNumberController,
                             decoration:
                                 InputDecoration(labelText: "Ticket Number"),
                           ),
+                        ),
+
+                        // note button
+                        SizedBox(width: 10),
+                        IconButton(
+                          icon: Icon(Icons.note, color: accentColor),
+                          onPressed: () {},
                         ),
                       ],
                     ),
@@ -519,36 +526,29 @@ class _TicketPageState extends State<TicketPage> {
                             .copyWith(color: accentColor),
                       ),
                     ),
-                    DropdownButton<String>(
-                      isExpanded: true,
-                      value: sevaNames.isNotEmpty ? sevaNames[0] : null,
-                      items: sevaNames.map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        sevaName = newValue!;
-                      },
-                      hint: Text(
-                        "Select Seva",
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ),
-
-                    // note
-                    SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
-                          child: TextField(
-                            controller: noteController,
-                            decoration: InputDecoration(labelText: "Note"),
+                          child: DropdownButton<String>(
+                            isExpanded: true,
+                            value: sevaNames.isNotEmpty ? sevaNames[0] : null,
+                            items: sevaNames.map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              sevaName = newValue!;
+                            },
+                            hint: Text(
+                              "Select Seva",
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ),
                         ),
 
-                        // ok button
+                        // add button
                         SizedBox(width: 10),
                         ElevatedButton(
                           child: Text("Add"),
@@ -573,7 +573,7 @@ class _TicketPageState extends State<TicketPage> {
                               ticketNumber:
                                   int.parse(ticketNumberController.text),
                               user: "Guest",
-                              note: noteController.text,
+                              note: "",
                               image: icon,
                               seva: sevaName,
                             );
@@ -630,7 +630,6 @@ class _TicketPageState extends State<TicketPage> {
 
                             // dispose all controllers and focus nodes
                             ticketNumberController.dispose();
-                            noteController.dispose();
                           },
                         ),
                       ],

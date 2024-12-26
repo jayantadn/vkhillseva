@@ -26,12 +26,12 @@ class MyApp extends StatelessWidget {
           defaultPaymentMode: "UPI",
           icon: "assets/images/Common/morning.png",
           sevakarta: "Guest",
-          timestamp: DateTime.parse("2024-12-24T12:21:18.348")));
+          timestamp: DateTime.now()));
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);
+        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);
   }
 }

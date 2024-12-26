@@ -33,10 +33,10 @@ class _TicketPageState extends State<TicketPage> {
         note: "",
         image: 'assets/images/LauncherIcons/NityaSeva.png'),
     Ticket(
-        timestamp: DateTime.now(),
+        timestamp: DateTime.now().add(Duration(minutes: 5)),
         amount: 400,
         mode: "UPI",
-        ticketNumber: 2143,
+        ticketNumber: 2144,
         user: "Guest",
         seva: "Pushpanjali Seva",
         note: "",
@@ -71,6 +71,7 @@ class _TicketPageState extends State<TicketPage> {
     });
 
     setState(() {
+      _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       _isLoading = false;
     });
   }
@@ -169,6 +170,19 @@ class _TicketPageState extends State<TicketPage> {
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
     List<String> sevaNames = ["Pushpanjali Seva", "Tulasi Archana Seva"];
 
+    // controllers
+    TextEditingController ticketNumberController = TextEditingController();
+
+    // field values
+    int amount = widget.session.defaultAmount;
+    int ticketNumber = 0;
+    List<Ticket> filteredTickets =
+        _tickets.where((ticket) => ticket.amount == amount).toList();
+    if (filteredTickets.isNotEmpty) {
+      ticketNumber = filteredTickets.first.ticketNumber + 1;
+    }
+    ticketNumberController.text = ticketNumber.toString();
+
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -179,6 +193,7 @@ class _TicketPageState extends State<TicketPage> {
               // Ticket number
               SizedBox(height: 10),
               TextField(
+                controller: ticketNumberController,
                 decoration: InputDecoration(labelText: "Ticket Number"),
               ),
 
@@ -203,6 +218,9 @@ class _TicketPageState extends State<TicketPage> {
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
                           decoration: BoxDecoration(
+                            color: amount.toString() == seva.keys.first
+                                ? seva.values.first['color']! as Color
+                                : Colors.transparent,
                             border: Border.all(
                                 color: seva.values.first['color']! as Color),
                             borderRadius: BorderRadius.circular(8.0),
@@ -211,7 +229,14 @@ class _TicketPageState extends State<TicketPage> {
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
                               seva.keys.first,
-                              style: Theme.of(context).textTheme.bodyLarge,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(
+                                      color:
+                                          amount.toString() == seva.keys.first
+                                              ? Colors.white
+                                              : primaryColor),
                             ),
                           ),
                         ),
@@ -309,12 +334,23 @@ class _TicketPageState extends State<TicketPage> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
+
+                      // clear all lists
+                      sevaNames.clear();
+
+                      // dispose all controllers and focus nodes
+                      ticketNumberController.dispose();
                     },
                     child: Text("Cancel"),
                   ),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
+
+                      // clear all lists
+                      sevaNames.clear();
+
+                      // dispose all controllers and focus nodes
                     },
                     child: Text("Add"),
                   ),

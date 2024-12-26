@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/datatypes.dart';
 import 'package:vkhillseva/common/fb.dart';
-import 'package:vkhillseva/common/notification.dart';
 import 'package:vkhillseva/common/toaster.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/nitya_seva/ticket_page.dart';

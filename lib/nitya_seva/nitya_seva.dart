@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -482,10 +481,11 @@ class _NityaSevaState extends State<NityaSeva> {
                       _sessions.add(newSession);
                     });
                   }
-                  // if (errors.isEmpty)
-                  {
+                  if (errors.isEmpty) {
                     _postValidation(newSession);
                   }
+
+                  // TODO: push notification
                 } else {
                   // edit session
 

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:vkhillseva/common/theme.dart';
-import 'package:vkhillseva/common/toaster.dart';
 import 'package:vkhillseva/home/home.dart';
-import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -17,7 +14,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   final Widget home = const HomePage(title: "Hare Krishna");
   // final Widget test = NotificationHomePage();

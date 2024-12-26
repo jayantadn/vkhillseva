@@ -28,13 +28,17 @@ class _MyHomePageState extends State<HomePage> {
     _firebaseMessaging = FirebaseMessaging.instance;
     _firebaseMessaging.requestPermission();
     _firebaseMessaging.getToken().then((token) {
-      print("FCM Token: $token");
+      // print("FCM Token: $token");
     });
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print("Message received: ${message.notification?.title}");
     });
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print("Message clicked: ${message.notification?.title}");
+    });
+    FirebaseMessaging.onBackgroundMessage((message) async {
+      print("Message in background: ${message.notification?.title}");
+      return Future<void>.value();
     });
 
     refresh();

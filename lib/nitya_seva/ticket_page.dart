@@ -106,12 +106,22 @@ class _TicketPageState extends State<TicketPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // seva name headline
-                          Text(ticket.seva,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall!
-                                  .copyWith(color: primaryColor)),
+                          Row(
+                            children: [
+                              // seva name headline
+                              Text(ticket.seva,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall!
+                                      .copyWith(color: primaryColor)),
+
+                              // note icon
+                              SizedBox(width: 4),
+                              if (ticket.note.isNotEmpty)
+                                Icon(Icons.note,
+                                    color: Colors.orange, size: 16),
+                            ],
+                          ),
 
                           // other details
                           SizedBox(height: 2),
@@ -120,6 +130,14 @@ class _TicketPageState extends State<TicketPage> {
                             style: Theme.of(context).textTheme.bodySmall,
                             softWrap: true,
                           ),
+
+                          // note
+                          if (ticket.note.isNotEmpty)
+                            Text(
+                              "Note: ${ticket.note}",
+                              style: Theme.of(context).textTheme.bodySmall,
+                              softWrap: true,
+                            ),
                         ],
                       ),
                     ),
@@ -174,7 +192,7 @@ class _TicketPageState extends State<TicketPage> {
     if (_tickets
         .where((t) => t.ticketNumber == ticket.ticketNumber)
         .isNotEmpty) {
-      errors.add("Duplicate ticket number");
+      errors.add("Ticket number already exists");
     }
 
     // check if ticket number is contiguous
@@ -187,12 +205,23 @@ class _TicketPageState extends State<TicketPage> {
     return errors;
   }
 
-  Future<List<String>> _postvalidateTicket(Ticket ticket) async {
+  Future<List<String>> _postvalidateTicket() async {
     List<String> errors = [];
 
-    // fetch all latest tickets and validate again
     await refresh();
-    errors.addAll(_prevalidateTicket(ticket));
+
+    // check if ticket numbers are unique
+    if (_tickets.length != _tickets.toSet().length) {
+      errors.add("Duplicate ticket numbers found");
+    }
+
+    // check if ticket numbers are contiguous
+    for (int i = 0; i < _tickets.length - 1; i++) {
+      if (_tickets[i].ticketNumber - _tickets[i + 1].ticketNumber != 1) {
+        errors.add("Ticket numbers are not contiguous");
+        break;
+      }
+    }
 
     // check if ticket is created in the correct session
     String dbDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
@@ -499,7 +528,7 @@ class _TicketPageState extends State<TicketPage> {
 
                           // post validations
                           if (errors.isEmpty) {
-                            errors = await _postvalidateTicket(ticket);
+                            errors = await _postvalidateTicket();
                             if (errors.isNotEmpty) {
                               String? action = await CommonWidgets()
                                   .createErrorDialog(

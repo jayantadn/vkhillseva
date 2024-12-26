@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
@@ -19,29 +20,9 @@ class TicketPage extends StatefulWidget {
 
 class _TicketPageState extends State<TicketPage> {
   bool _isLoading = true;
-  final DateTime _selectedDate = DateTime.now();
 
   // lists
-  final List<Ticket> _tickets = [
-    Ticket(
-        timestamp: DateTime.now(),
-        amount: 400,
-        mode: "UPI",
-        ticketNumber: 2143,
-        user: "Guest",
-        seva: "Pushpanjali Seva",
-        note: "",
-        image: 'assets/images/LauncherIcons/NityaSeva.png'),
-    Ticket(
-        timestamp: DateTime.now().add(Duration(minutes: 5)),
-        amount: 400,
-        mode: "UPI",
-        ticketNumber: 2144,
-        user: "Guest",
-        seva: "Pushpanjali Seva",
-        note: "",
-        image: 'assets/images/LauncherIcons/NityaSeva.png'),
-  ];
+  final List<Ticket> _tickets = [];
 
   // controllers, listeners and focus nodes
   final List<StreamSubscription<DatabaseEvent>> _listeners = [];
@@ -195,6 +176,7 @@ class _TicketPageState extends State<TicketPage> {
 
     // controllers
     TextEditingController ticketNumberController = TextEditingController();
+    TextEditingController noteController = TextEditingController();
 
     // field values
     if (filteredTickets.isNotEmpty) {
@@ -202,6 +184,7 @@ class _TicketPageState extends State<TicketPage> {
     }
     ticketNumberController.text = ticketNumber.toString();
     sevaNames = _getSevaNames(amount);
+    sevaName = sevaNames.isNotEmpty ? sevaNames[0] : "";
 
     showModalBottomSheet(
       context: context,
@@ -253,6 +236,8 @@ class _TicketPageState extends State<TicketPage> {
                                           : 0)
                                       .toString();
                                   sevaNames = _getSevaNames(amount);
+                                  sevaName =
+                                      sevaNames.isNotEmpty ? sevaNames[0] : "";
                                 });
                               },
                               child: Container(
@@ -382,6 +367,13 @@ class _TicketPageState extends State<TicketPage> {
                     ),
                   ),
 
+                  // note
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: noteController,
+                    decoration: InputDecoration(labelText: "Note"),
+                  ),
+
                   // buttons
                   SizedBox(height: 8),
                   Row(
@@ -397,6 +389,7 @@ class _TicketPageState extends State<TicketPage> {
 
                           // dispose all controllers and focus nodes
                           ticketNumberController.dispose();
+                          noteController.dispose();
                         },
                         child: Text("Cancel"),
                       ),
@@ -404,11 +397,52 @@ class _TicketPageState extends State<TicketPage> {
                         onPressed: () {
                           Navigator.pop(context);
 
+                          // fetch the icon
+                          List sevas = Const()
+                              .nityaSeva['amounts']!
+                              .firstWhere((element) =>
+                                  element.keys.first == amount.toString())
+                              .values
+                              .first['sevas'] as List;
+                          String icon = sevas.firstWhere(
+                              (element) => element['name'] == sevaName)['icon'];
+
+                          // create ticket
+                          Ticket ticket = Ticket(
+                            timestamp: DateTime.now(),
+                            amount: amount,
+                            mode: mode,
+                            ticketNumber:
+                                int.parse(ticketNumberController.text),
+                            user: "Guest",
+                            note: noteController.text,
+                            image: icon,
+                            seva: sevaName,
+                          );
+
+                          // add ticket to list
+                          setState(() {
+                            _tickets.insert(0, ticket);
+                          });
+
+                          // add ticket to database
+                          String dbDate = DateFormat("yyyy-MM-dd")
+                              .format(widget.session.timestamp)
+                              .toString();
+                          String dbSession = widget.session.timestamp
+                              .toIso8601String()
+                              .replaceAll(".", "^");
+                          FB().addToList(
+                              path: "NityaSeva/$dbDate/$dbSession/Tickets",
+                              data: ticket.toJson());
+
                           // clear all lists
                           sevaNames.clear();
                           filteredTickets.clear();
 
                           // dispose all controllers and focus nodes
+                          ticketNumberController.dispose();
+                          noteController.dispose();
                         },
                         child: Text("Add"),
                       ),

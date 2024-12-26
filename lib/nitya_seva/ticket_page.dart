@@ -166,6 +166,21 @@ class _TicketPageState extends State<TicketPage> {
     );
   }
 
+  List<String> _getSevaNames(int amount) {
+    List<String> ret = [];
+
+    for (var seva in Const().nityaSeva['amounts']!) {
+      if (seva.keys.first == amount.toString()) {
+        List sevas = seva.values.first['sevas'] as List;
+        for (var seva in sevas) {
+          ret.add(seva['name']);
+        }
+      }
+    }
+
+    return ret;
+  }
+
   void _createAddEditDialog(context) {
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
     List<String> sevaNames = ["Pushpanjali Seva", "Tulasi Archana Seva"];
@@ -182,6 +197,8 @@ class _TicketPageState extends State<TicketPage> {
       ticketNumber = filteredTickets.first.ticketNumber + 1;
     }
     ticketNumberController.text = ticketNumber.toString();
+    String mode = widget.session.defaultPaymentMode;
+    sevaNames = _getSevaNames(amount);
 
     showModalBottomSheet(
       context: context,
@@ -262,12 +279,14 @@ class _TicketPageState extends State<TicketPage> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    ...Const().paymentModes.keys.map((mode) {
+                    ...Const().paymentModes.keys.map((m) {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: primaryColor),
+                            color:
+                                mode == m ? primaryColor : Colors.transparent,
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: Padding(
@@ -278,11 +297,18 @@ class _TicketPageState extends State<TicketPage> {
                                   width: 20,
                                   height: 20,
                                   child: Image.asset(
-                                      Const().paymentModes[mode]!['icon']!),
+                                      Const().paymentModes[m]!['icon']!),
                                 ),
                                 Text(
-                                  mode,
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                                  m,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .copyWith(
+                                        color: mode == m
+                                            ? Colors.white
+                                            : primaryColor,
+                                      ),
                                 ),
                               ],
                             ),

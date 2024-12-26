@@ -1,3 +1,6 @@
+# 0.7.0
+- feature: add ticket
+
 # 0.6.2
 
 # 0.6.1

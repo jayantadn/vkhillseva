@@ -19,7 +19,9 @@ class TicketPage extends StatefulWidget {
 }
 
 class _TicketPageState extends State<TicketPage> {
+  // locals
   bool _isLoading = true;
+  DateTime _lastCallbackInvoked = DateTime.now();
 
   // lists
   final List<Ticket> _tickets = [];
@@ -30,6 +32,46 @@ class _TicketPageState extends State<TicketPage> {
   @override
   initState() {
     super.initState();
+
+    String dbDate = DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
+    String sessionKey =
+        widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+    FB().listenForChange(
+        "NityaSeva/$dbDate/$sessionKey/Tickets",
+        FBCallbacks(
+          // add
+          add: (data) {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              print(data);
+            }
+          },
+
+          // edit
+          edit: () {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              refresh();
+            }
+          },
+
+          // delete
+          delete: (data) {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+            }
+          },
+
+          // get listeners
+          getListeners: (listeners) {
+            _listeners = listeners;
+          },
+        ));
 
     refresh();
   }

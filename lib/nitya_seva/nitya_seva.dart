@@ -78,6 +78,8 @@ class _NityaSevaState extends State<NityaSeva> {
             if (_lastCallbackInvoked.isBefore(DateTime.now()
                 .subtract(Duration(seconds: Const().fbListenerDelay)))) {
               _lastCallbackInvoked = DateTime.now();
+
+              refresh();
             }
           },
 

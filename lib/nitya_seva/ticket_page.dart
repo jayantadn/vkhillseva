@@ -51,6 +51,18 @@ class _TicketPageState extends State<TicketPage> {
       _isLoading = true;
     });
 
+    // fetch tickets
+    _tickets.clear();
+    String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
+    String dbSession =
+        widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+    List ticketsJson =
+        await FB().getList(path: "NityaSeva/$dbDate/$dbSession/Tickets");
+    for (var t in ticketsJson) {
+      Map<String, dynamic> ticket = Map<String, dynamic>.from(t);
+      _tickets.add(Ticket.fromJson(ticket));
+    }
+
     setState(() {
       _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       _isLoading = false;
@@ -182,6 +194,8 @@ class _TicketPageState extends State<TicketPage> {
 
   List<String> _prevalidateTicket(Ticket ticket) {
     List<String> errors = [];
+    List<Ticket> filteredTickets =
+        _tickets.where((t) => t.amount == ticket.amount).toList();
 
     // check if ticket number is > 0
     if (ticket.ticketNumber <= 0) {
@@ -189,15 +203,15 @@ class _TicketPageState extends State<TicketPage> {
     }
 
     // check if ticket number is unique
-    if (_tickets
+    if (filteredTickets
         .where((t) => t.ticketNumber == ticket.ticketNumber)
         .isNotEmpty) {
       errors.add("Ticket number already exists");
     }
 
     // check if ticket number is contiguous
-    if (_tickets.isNotEmpty) {
-      if (ticket.ticketNumber - _tickets.first.ticketNumber != 1) {
+    if (filteredTickets.isNotEmpty && filteredTickets.length > 1) {
+      if (ticket.ticketNumber - filteredTickets.first.ticketNumber != 1) {
         errors.add("Ticket number should be contiguous");
       }
     }
@@ -210,18 +224,30 @@ class _TicketPageState extends State<TicketPage> {
 
     await refresh();
 
+    // create a map of tickets as per amount
+    Map<int, List<Ticket>> ticketsMap = {};
+    for (var ticket in _tickets) {
+      if (!ticketsMap.containsKey(ticket.amount)) {
+        ticketsMap[ticket.amount] = [];
+      }
+      ticketsMap[ticket.amount]!.add(ticket);
+    }
+
     // check if ticket numbers are unique
     if (_tickets.length != _tickets.toSet().length) {
       errors.add("Duplicate ticket numbers found");
     }
 
-    // check if ticket numbers are contiguous
-    for (int i = 0; i < _tickets.length - 1; i++) {
-      if (_tickets[i].ticketNumber - _tickets[i + 1].ticketNumber != 1) {
-        errors.add("Ticket numbers are not contiguous");
-        break;
+    // check for each key, whether the list of tickets have contiguous numbers
+    ticketsMap.forEach((amount, tickets) {
+      tickets.sort((a, b) => a.ticketNumber.compareTo(b.ticketNumber));
+      for (int i = 0; i < tickets.length - 1; i++) {
+        if (tickets[i + 1].ticketNumber - tickets[i].ticketNumber != 1) {
+          errors.add("Ticket numbers for amount $amount are not contiguous");
+          break;
+        }
       }
-    }
+    });
 
     // check if ticket is created in the correct session
     String dbDate = DateFormat("yyyy-MM-dd").format(DateTime.now());

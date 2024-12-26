@@ -22,7 +22,8 @@ class _NityaSevaState extends State<NityaSeva> {
   // lists
 
   // controllers, listeners and focus nodes
-  final List<StreamSubscription<DatabaseEvent>> _listeners = [];
+  // ignore: prefer_final_fields
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {

@@ -27,7 +27,7 @@ class _TicketPageState extends State<TicketPage> {
   final List<Ticket> _tickets = [];
 
   // controllers, listeners and focus nodes
-  final List<StreamSubscription<DatabaseEvent>> _listeners = [];
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {

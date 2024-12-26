@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
@@ -53,10 +54,93 @@ class _TicketPageState extends State<TicketPage> {
     });
   }
 
+  Widget _createTicketTile(int count, Ticket ticket) {
+    double sizeOfContainer = 75;
+    String time = DateFormat("HH:mm").format(ticket.timestamp);
+
+    return Row(
+      children: [
+        // left badge
+        Container(
+          color: primaryColor,
+          child: SizedBox(
+            height: sizeOfContainer,
+            width: sizeOfContainer,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // serial number
+                Text(count.toString(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineLarge!
+                        .copyWith(color: backgroundColor)),
+
+                // ticket number
+                Text(ticket.ticketNumber.toString(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(color: backgroundColor)),
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          child: Container(
+            height: sizeOfContainer,
+            decoration: BoxDecoration(
+              border: Border.all(color: primaryColor),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // seva name headline
+                      Text(ticket.seva,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall!
+                              .copyWith(color: primaryColor)),
+
+                      // other details
+                      SizedBox(height: 2),
+                      Text(
+                        "${ticket.user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
+                        style: Theme.of(context).textTheme.bodySmall,
+                        softWrap: true,
+                      ),
+                    ],
+                  ),
+
+                  // right side image
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: primaryColor, width: 1),
+                    ),
+                    child: CircleAvatar(
+                      backgroundImage: AssetImage(
+                        ticket.image,
+                      ),
+                      radius: sizeOfContainer / 2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    double sizeOfContainer = 75;
-
     return Theme(
       data: themeDefault,
       child: Stack(
@@ -100,89 +184,18 @@ class _TicketPageState extends State<TicketPage> {
                 children: [
                   Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          // left badge
-                          Container(
-                            color: primaryColor,
-                            child: SizedBox(
-                              height: sizeOfContainer,
-                              width: sizeOfContainer,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // serial number
-                                  Text("1",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineLarge!
-                                          .copyWith(color: backgroundColor)),
-
-                                  // ticket number
-                                  Text("#2143",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium!
-                                          .copyWith(color: backgroundColor)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            // right side container
-                            child: Container(
-                              height: sizeOfContainer,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: primaryColor),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // seva name headline
-                                        Text("Pushpanjali Seva",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineMedium!
-                                                .copyWith(color: primaryColor)),
-
-                                        // other details
-                                        Text(
-                                          "User: Guest, Time: 12:00, Amount: 400, Mode: UPI",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall,
-                                          softWrap: true,
-                                        ),
-                                      ],
-                                    ),
-
-                                    // right side image
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color: primaryColor, width: 2),
-                                      ),
-                                      child: CircleAvatar(
-                                        backgroundImage: AssetImage(
-                                            'assets/images/LauncherIcons/NityaSeva.png'),
-                                        radius: sizeOfContainer / 2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )),
+                      child: _createTicketTile(
+                          1,
+                          Ticket(
+                              timestamp: DateTime.now(),
+                              amount: 400,
+                              mode: "UPI",
+                              ticketNumber: 2143,
+                              user: "Guest",
+                              seva: "Pushpanjali Seva",
+                              remarks: "",
+                              image:
+                                  'assets/images/LauncherIcons/NityaSeva.png'))),
                 ],
               ),
             ),
@@ -203,5 +216,52 @@ class _TicketPageState extends State<TicketPage> {
         ],
       ),
     );
+  }
+}
+
+class Ticket {
+  final DateTime timestamp;
+  final int amount;
+  final String mode;
+  final int ticketNumber;
+  final String user;
+  final String remarks;
+  final String image;
+  final String seva;
+
+  Ticket(
+      {required this.timestamp,
+      required this.amount,
+      required this.mode,
+      required this.ticketNumber,
+      required this.user,
+      required this.remarks,
+      required this.image,
+      required this.seva});
+
+  factory Ticket.fromJson(Map<String, dynamic> json) {
+    return Ticket(
+      timestamp: DateTime.parse(json['timestamp']),
+      amount: json['amount'],
+      mode: json['mode'],
+      ticketNumber: json['ticketNumber'],
+      user: json['user'],
+      remarks: json['remarks'],
+      image: json['image'],
+      seva: json['seva'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'timestamp': timestamp.toIso8601String(),
+      'amount': amount,
+      'mode': mode,
+      'ticketNumber': ticketNumber,
+      'user': user,
+      'remarks': remarks,
+      'image': image,
+      'seva': seva,
+    };
   }
 }

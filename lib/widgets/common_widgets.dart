@@ -165,12 +165,16 @@ class CommonWidgets {
 
   Widget customAppBarTitle(String title) {
     return Container(
+      width: double.infinity, // Make the container stretch horizontally
       decoration: BoxDecoration(
         border: Border.all(color: accentColor, width: 2.0),
         borderRadius: BorderRadius.circular(24),
       ),
       padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Text(title),
+      child: Center(
+        // Center the text inside the box
+        child: Text(title),
+      ),
     );
   }
 }

@@ -401,6 +401,7 @@ class _TicketPageState extends State<TicketPage> {
                           controller: ticketNumberController,
                           decoration:
                               InputDecoration(labelText: "Ticket Number"),
+                          keyboardType: TextInputType.number,
                         ),
 
                         // Seva amount

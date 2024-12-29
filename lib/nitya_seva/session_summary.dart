@@ -240,7 +240,16 @@ class _SessionSummaryState extends State<SessionSummary> {
     }
 
     // Select a color based on the number
-    return Const().nityaSeva['amounts']![0]['$number']!['color'] as Color;
+    List amounts = Const().nityaSeva['amounts'] as List;
+    for (var amount in amounts) {
+      if (amount.keys.first == number.toString()) {
+        Map<String, dynamic> amountJson =
+            Map<String, dynamic>.from(amount.values.first);
+        return amountJson['color'] as Color;
+      }
+    }
+
+    return Colors.grey;
   }
 
   List<Widget> _getListOfRows(List<String> rows) {

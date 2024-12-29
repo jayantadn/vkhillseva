@@ -364,18 +364,11 @@ class _TicketPageState extends State<TicketPage> {
                     child: Column(
                       children: [
                         // Ticket number
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            // ticket number
-                            Expanded(
-                              child: TextField(
-                                controller: ticketNumberController,
-                                decoration:
-                                    InputDecoration(labelText: "Ticket Number"),
-                              ),
-                            ),
-                          ],
+                        SizedBox(height: 8),
+                        TextField(
+                          controller: ticketNumberController,
+                          decoration:
+                              InputDecoration(labelText: "Ticket Number"),
                         ),
 
                         // Seva amount
@@ -532,119 +525,137 @@ class _TicketPageState extends State<TicketPage> {
                                 .copyWith(color: accentColor),
                           ),
                         ),
+                        DropdownButton<String>(
+                          isExpanded: true,
+                          value: sevaNames.isNotEmpty ? sevaNames[0] : null,
+                          items: sevaNames.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setDialogState(() {
+                              sevaName = newValue!;
+                            });
+                          },
+                          hint: Text(
+                            "Select Seva",
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
+
+                        // note field
+                        SizedBox(height: 8),
+                        TextField(
+                          decoration: InputDecoration(labelText: "Note"),
+                        ),
+
+                        // buttons
+                        SizedBox(height: 8),
                         Row(
                           children: [
+                            // cancel button
                             Expanded(
-                              child: DropdownButton<String>(
-                                isExpanded: true,
-                                value:
-                                    sevaNames.isNotEmpty ? sevaNames[0] : null,
-                                items: sevaNames.map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  setDialogState(() {
-                                    sevaName = newValue!;
-                                  });
+                              child: OutlinedButton(
+                                child: Text("Cancel"),
+                                onPressed: () {
+                                  Navigator.pop(context);
                                 },
-                                hint: Text(
-                                  "Select Seva",
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
                               ),
                             ),
 
                             // add button
-                            SizedBox(width: 10),
-                            ElevatedButton(
-                              child: Text("Add"),
-                              onPressed: () async {
-                                Navigator.pop(context);
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: ElevatedButton(
+                                child: Text("Add"),
+                                onPressed: () async {
+                                  Navigator.pop(context);
 
-                                // fetch the icon
-                                List sevas = Const()
-                                    .nityaSeva['amounts']!
-                                    .firstWhere((element) =>
-                                        element.keys.first == amount.toString())
-                                    .values
-                                    .first['sevas'] as List;
-                                String icon = sevas.firstWhere((element) =>
-                                    element['name'] == sevaName)['icon'];
+                                  // fetch the icon
+                                  List sevas = Const()
+                                      .nityaSeva['amounts']!
+                                      .firstWhere((element) =>
+                                          element.keys.first ==
+                                          amount.toString())
+                                      .values
+                                      .first['sevas'] as List;
+                                  String icon = sevas.firstWhere((element) =>
+                                      element['name'] == sevaName)['icon'];
 
-                                // create ticket
-                                Ticket ticket = Ticket(
-                                  timestamp: DateTime.now(),
-                                  amount: amount,
-                                  mode: mode,
-                                  ticketNumber:
-                                      int.parse(ticketNumberController.text),
-                                  user: "Guest",
-                                  note: "",
-                                  image: icon,
-                                  seva: sevaName,
-                                );
+                                  // create ticket
+                                  Ticket ticket = Ticket(
+                                    timestamp: DateTime.now(),
+                                    amount: amount,
+                                    mode: mode,
+                                    ticketNumber:
+                                        int.parse(ticketNumberController.text),
+                                    user: "Guest",
+                                    note: "",
+                                    image: icon,
+                                    seva: sevaName,
+                                  );
 
-                                // pre validations
-                                List<String> errors =
-                                    _prevalidateTicket(ticket);
-                                if (errors.isNotEmpty) {
-                                  String? action = await CommonWidgets()
-                                      .createErrorDialog(
-                                          context: context, errors: errors);
-                                  if (action == "Cancel") {
-                                    return;
-                                  }
-                                }
-
-                                // add ticket to list
-                                setState(() {
-                                  _tickets.insert(0, ticket);
-                                });
-
-                                // add ticket to database
-                                String dbDate = DateFormat("yyyy-MM-dd")
-                                    .format(widget.session.timestamp)
-                                    .toString();
-                                String dbSession = widget.session.timestamp
-                                    .toIso8601String()
-                                    .replaceAll(".", "^");
-                                FB().addToList(
-                                    path:
-                                        "NityaSeva/$dbDate/$dbSession/Tickets",
-                                    data: ticket.toJson());
-
-                                // post validations
-                                if (errors.isEmpty) {
-                                  errors = await _postvalidateTicket();
+                                  // pre validations
+                                  List<String> errors =
+                                      _prevalidateTicket(ticket);
                                   if (errors.isNotEmpty) {
                                     String? action = await CommonWidgets()
                                         .createErrorDialog(
-                                            context: context,
-                                            errors: errors,
-                                            post: true);
-
-                                    if (action == "Delete") {
-                                      _deleteTicket(ticket);
-                                    } else if (action == "Edit") {
-                                      _addEditTicket(ticket);
+                                            context: context, errors: errors);
+                                    if (action == "Cancel") {
+                                      return;
                                     }
                                   }
-                                }
 
-                                // clear all lists
-                                sevaNames.clear();
-                                filteredTickets.clear();
-                                errors.clear();
+                                  // add ticket to list
+                                  setState(() {
+                                    _tickets.insert(0, ticket);
+                                  });
 
-                                // dispose all controllers and focus nodes
-                                ticketNumberController.dispose();
-                              },
+                                  // add ticket to database
+                                  String dbDate = DateFormat("yyyy-MM-dd")
+                                      .format(widget.session.timestamp)
+                                      .toString();
+                                  String dbSession = widget.session.timestamp
+                                      .toIso8601String()
+                                      .replaceAll(".", "^");
+                                  FB().addToList(
+                                      path:
+                                          "NityaSeva/$dbDate/$dbSession/Tickets",
+                                      data: ticket.toJson());
+
+                                  // post validations
+                                  if (errors.isEmpty) {
+                                    errors = await _postvalidateTicket();
+                                    if (errors.isNotEmpty) {
+                                      String? action = await CommonWidgets()
+                                          .createErrorDialog(
+                                              context: context,
+                                              errors: errors,
+                                              post: true);
+
+                                      if (action == "Delete") {
+                                        _deleteTicket(ticket);
+                                      } else if (action == "Edit") {
+                                        _addEditTicket(ticket);
+                                      }
+                                    }
+                                  }
+
+                                  // clear all lists
+                                  sevaNames.clear();
+                                  filteredTickets.clear();
+                                  errors.clear();
+
+                                  // dispose all controllers and focus nodes
+                                  ticketNumberController.dispose();
+                                },
+                              ),
                             ),
                           ],
-                        ),
+                        )
                       ],
                     ),
                   ),

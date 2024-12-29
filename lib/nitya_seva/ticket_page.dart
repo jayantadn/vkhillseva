@@ -6,6 +6,7 @@ import 'package:synchronized/synchronized.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/nitya_seva/summary_page.dart';
 import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
@@ -728,10 +729,27 @@ class _TicketPageState extends State<TicketPage> {
             appBar: AppBar(
               title: CommonWidgets().customAppBarTitle(widget.session.name),
               actions: [
+                // add button
+                IconButton(
+                  icon: Icon(Icons.add, size: 32),
+                  onPressed: () {
+                    _addEditTicket(context);
+                  },
+                ),
+
                 // summary button
                 IconButton(
                   icon: Icon(Icons.article, size: 32),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SummaryPage(
+                              title: 'Summary',
+                              icon:
+                                  'assets/images/LauncherIcons/NityaSeva.png')),
+                    );
+                  },
                 ),
 
                 // menu button
@@ -768,14 +786,6 @@ class _TicketPageState extends State<TicketPage> {
                   );
                 },
               ),
-            ),
-
-            // floating action button
-            floatingActionButton: FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () {
-                _addEditTicket(context);
-              },
             ),
           ),
 

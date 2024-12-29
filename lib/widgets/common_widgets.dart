@@ -55,7 +55,7 @@ class CommonWidgets {
 
   PopupMenuButton<String> createPopupMenu(List<MyPopupMenuItem> items) {
     return PopupMenuButton<String>(
-      icon: Icon(Icons.more_vert),
+      icon: Icon(Icons.more_vert, size: 32),
       onSelected: (String value) {
         final selectedItem = items.firstWhere((item) => item.text == value);
         selectedItem.onPressed();

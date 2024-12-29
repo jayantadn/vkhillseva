@@ -7,17 +7,17 @@ import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 
-class NityaSeva extends StatefulWidget {
+class SummaryPage extends StatefulWidget {
   final String title;
   final String icon;
 
-  const NityaSeva({super.key, required this.title, required this.icon});
+  const SummaryPage({super.key, required this.title, required this.icon});
 
   @override
-  _NityaSevaState createState() => _NityaSevaState();
+  _SummaryPageState createState() => _SummaryPageState();
 }
 
-class _NityaSevaState extends State<NityaSeva> {
+class _SummaryPageState extends State<SummaryPage> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   final DateTime _selectedDate = DateTime.now();

@@ -351,298 +351,305 @@ class _TicketPageState extends State<TicketPage> {
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (BuildContext buildContext, Animation animation,
           Animation secondaryAnimation) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setModalState) {
-            return AlertDialog(
-              content: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    // Ticket number
-                    SizedBox(height: 10),
-                    Row(
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: Material(
+            child: StatefulBuilder(
+              builder: (context, setDialogState) {
+                return Container(
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.all(8.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
                       children: [
-                        // ticket number
-                        Expanded(
-                          child: TextField(
-                            controller: ticketNumberController,
-                            decoration:
-                                InputDecoration(labelText: "Ticket Number"),
+                        // Ticket number
+                        SizedBox(height: 10),
+                        Row(
+                          children: [
+                            // ticket number
+                            Expanded(
+                              child: TextField(
+                                controller: ticketNumberController,
+                                decoration:
+                                    InputDecoration(labelText: "Ticket Number"),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Seva amount
+                        SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Seva Amount",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: accentColor),
                           ),
                         ),
-
-                        // note button
-                        SizedBox(width: 10),
-                        IconButton(
-                          icon: Icon(Icons.note, color: accentColor),
-                          onPressed: () {},
-                        ),
-                      ],
-                    ),
-
-                    // Seva amount
-                    SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Seva Amount",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(color: accentColor),
-                      ),
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          ...Const().nityaSeva['amounts']!.map((seva) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  setModalState(() {
-                                    amount = int.parse(seva.keys.first);
-                                    filteredTickets = _tickets
-                                        .where(
-                                            (ticket) => ticket.amount == amount)
-                                        .toList();
-                                    ticketNumberController.text =
-                                        (filteredTickets.isNotEmpty
-                                                ? filteredTickets
-                                                        .first.ticketNumber +
-                                                    1
-                                                : 0)
-                                            .toString();
-                                    sevaNames = _getSevaNames(amount);
-                                    sevaName = sevaNames.isNotEmpty
-                                        ? sevaNames[0]
-                                        : "";
-                                  });
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: amount.toString() == seva.keys.first
-                                        ? seva.values.first['color']! as Color
-                                        : Colors.transparent,
-                                    border: Border.all(
-                                        color: seva.values.first['color']!
-                                            as Color),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      seva.keys.first,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge!
-                                          .copyWith(
-                                              color: amount.toString() ==
-                                                      seva.keys.first
-                                                  ? Colors.white
-                                                  : primaryColor),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ],
-                      ),
-                    ),
-
-                    // Payment mode
-                    SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Payment Mode",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(color: accentColor),
-                      ),
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          ...Const().paymentModes.keys.map((m) {
-                            if (m == "Gift") return Container();
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  setModalState(() {
-                                    mode = m;
-                                  });
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: primaryColor),
-                                    color: mode == m
-                                        ? primaryColor
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: Image.asset(Const()
-                                              .paymentModes[m]!['icon']!),
-                                        ),
-                                        Text(
-                                          m,
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              ...Const().nityaSeva['amounts']!.map((seva) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setDialogState(() {
+                                        amount = int.parse(seva.keys.first);
+                                        filteredTickets = _tickets
+                                            .where((ticket) =>
+                                                ticket.amount == amount)
+                                            .toList();
+                                        ticketNumberController.text =
+                                            (filteredTickets.isNotEmpty
+                                                    ? filteredTickets.first
+                                                            .ticketNumber +
+                                                        1
+                                                    : 0)
+                                                .toString();
+                                        sevaNames = _getSevaNames(amount);
+                                        sevaName = sevaNames.isNotEmpty
+                                            ? sevaNames[0]
+                                            : "";
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color:
+                                            amount.toString() == seva.keys.first
+                                                ? seva.values.first['color']!
+                                                    as Color
+                                                : Colors.transparent,
+                                        border: Border.all(
+                                            color: seva.values.first['color']!
+                                                as Color),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          seva.keys.first,
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge!
                                               .copyWith(
-                                                color: mode == m
-                                                    ? Colors.white
-                                                    : primaryColor,
-                                              ),
+                                                  color: amount.toString() ==
+                                                          seva.keys.first
+                                                      ? Colors.white
+                                                      : primaryColor),
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            );
-                          }),
-                        ],
-                      ),
-                    ),
-
-                    // seva name
-                    SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Seva Name",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(color: accentColor),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: sevaNames.isNotEmpty ? sevaNames[0] : null,
-                            items: sevaNames.map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              sevaName = newValue!;
-                            },
-                            hint: Text(
-                              "Select Seva",
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
+                                );
+                              }).toList(),
+                            ],
                           ),
                         ),
 
-                        // add button
-                        SizedBox(width: 10),
-                        ElevatedButton(
-                          child: Text("Add"),
-                          onPressed: () async {
-                            Navigator.pop(context);
+                        // Payment mode
+                        SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Payment Mode",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: accentColor),
+                          ),
+                        ),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              ...Const().paymentModes.keys.map((m) {
+                                if (m == "Gift") return Container();
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setDialogState(() {
+                                        mode = m;
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: primaryColor),
+                                        color: mode == m
+                                            ? primaryColor
+                                            : Colors.transparent,
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: Image.asset(Const()
+                                                  .paymentModes[m]!['icon']!),
+                                            ),
+                                            Text(
+                                              m,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge!
+                                                  .copyWith(
+                                                    color: mode == m
+                                                        ? Colors.white
+                                                        : primaryColor,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
 
-                            // fetch the icon
-                            List sevas = Const()
-                                .nityaSeva['amounts']!
-                                .firstWhere((element) =>
-                                    element.keys.first == amount.toString())
-                                .values
-                                .first['sevas'] as List;
-                            String icon = sevas.firstWhere((element) =>
-                                element['name'] == sevaName)['icon'];
+                        // seva name
+                        SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Seva Name",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: accentColor),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButton<String>(
+                                isExpanded: true,
+                                value:
+                                    sevaNames.isNotEmpty ? sevaNames[0] : null,
+                                items: sevaNames.map((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  setDialogState(() {
+                                    sevaName = newValue!;
+                                  });
+                                },
+                                hint: Text(
+                                  "Select Seva",
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ),
+                            ),
 
-                            // create ticket
-                            Ticket ticket = Ticket(
-                              timestamp: DateTime.now(),
-                              amount: amount,
-                              mode: mode,
-                              ticketNumber:
-                                  int.parse(ticketNumberController.text),
-                              user: "Guest",
-                              note: "",
-                              image: icon,
-                              seva: sevaName,
-                            );
+                            // add button
+                            SizedBox(width: 10),
+                            ElevatedButton(
+                              child: Text("Add"),
+                              onPressed: () async {
+                                Navigator.pop(context);
 
-                            // pre validations
-                            List<String> errors = _prevalidateTicket(ticket);
-                            if (errors.isNotEmpty) {
-                              String? action = await CommonWidgets()
-                                  .createErrorDialog(
-                                      context: context, errors: errors);
-                              if (action == "Cancel") {
-                                return;
-                              }
-                            }
+                                // fetch the icon
+                                List sevas = Const()
+                                    .nityaSeva['amounts']!
+                                    .firstWhere((element) =>
+                                        element.keys.first == amount.toString())
+                                    .values
+                                    .first['sevas'] as List;
+                                String icon = sevas.firstWhere((element) =>
+                                    element['name'] == sevaName)['icon'];
 
-                            // add ticket to list
-                            setState(() {
-                              _tickets.insert(0, ticket);
-                            });
+                                // create ticket
+                                Ticket ticket = Ticket(
+                                  timestamp: DateTime.now(),
+                                  amount: amount,
+                                  mode: mode,
+                                  ticketNumber:
+                                      int.parse(ticketNumberController.text),
+                                  user: "Guest",
+                                  note: "",
+                                  image: icon,
+                                  seva: sevaName,
+                                );
 
-                            // add ticket to database
-                            String dbDate = DateFormat("yyyy-MM-dd")
-                                .format(widget.session.timestamp)
-                                .toString();
-                            String dbSession = widget.session.timestamp
-                                .toIso8601String()
-                                .replaceAll(".", "^");
-                            FB().addToList(
-                                path: "NityaSeva/$dbDate/$dbSession/Tickets",
-                                data: ticket.toJson());
-
-                            // post validations
-                            if (errors.isEmpty) {
-                              errors = await _postvalidateTicket();
-                              if (errors.isNotEmpty) {
-                                String? action = await CommonWidgets()
-                                    .createErrorDialog(
-                                        context: context,
-                                        errors: errors,
-                                        post: true);
-
-                                if (action == "Delete") {
-                                  _deleteTicket(ticket);
-                                } else if (action == "Edit") {
-                                  _addEditTicket(ticket);
+                                // pre validations
+                                List<String> errors =
+                                    _prevalidateTicket(ticket);
+                                if (errors.isNotEmpty) {
+                                  String? action = await CommonWidgets()
+                                      .createErrorDialog(
+                                          context: context, errors: errors);
+                                  if (action == "Cancel") {
+                                    return;
+                                  }
                                 }
-                              }
-                            }
 
-                            // clear all lists
-                            sevaNames.clear();
-                            filteredTickets.clear();
-                            errors.clear();
+                                // add ticket to list
+                                setState(() {
+                                  _tickets.insert(0, ticket);
+                                });
 
-                            // dispose all controllers and focus nodes
-                            ticketNumberController.dispose();
-                          },
+                                // add ticket to database
+                                String dbDate = DateFormat("yyyy-MM-dd")
+                                    .format(widget.session.timestamp)
+                                    .toString();
+                                String dbSession = widget.session.timestamp
+                                    .toIso8601String()
+                                    .replaceAll(".", "^");
+                                FB().addToList(
+                                    path:
+                                        "NityaSeva/$dbDate/$dbSession/Tickets",
+                                    data: ticket.toJson());
+
+                                // post validations
+                                if (errors.isEmpty) {
+                                  errors = await _postvalidateTicket();
+                                  if (errors.isNotEmpty) {
+                                    String? action = await CommonWidgets()
+                                        .createErrorDialog(
+                                            context: context,
+                                            errors: errors,
+                                            post: true);
+
+                                    if (action == "Delete") {
+                                      _deleteTicket(ticket);
+                                    } else if (action == "Edit") {
+                                      _addEditTicket(ticket);
+                                    }
+                                  }
+                                }
+
+                                // clear all lists
+                                sevaNames.clear();
+                                filteredTickets.clear();
+                                errors.clear();
+
+                                // dispose all controllers and focus nodes
+                                ticketNumberController.dispose();
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          },
+                  ),
+                );
+              },
+            ),
+          ),
         );
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {

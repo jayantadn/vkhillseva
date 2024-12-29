@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/home/settings.dart';

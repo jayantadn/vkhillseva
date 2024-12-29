@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
@@ -20,6 +21,7 @@ class TicketPage extends StatefulWidget {
 
 class _TicketPageState extends State<TicketPage> {
   // locals
+  final Lock _lock = Lock();
   bool _isLoading = true;
   DateTime _lastCallbackInvoked = DateTime.now();
 
@@ -99,16 +101,18 @@ class _TicketPageState extends State<TicketPage> {
     });
 
     // fetch tickets
-    _tickets.clear();
     String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
     String dbSession =
         widget.session.timestamp.toIso8601String().replaceAll(".", "^");
     List ticketsJson =
         await FB().getList(path: "NityaSeva/$dbDate/$dbSession/Tickets");
-    for (var t in ticketsJson) {
-      Map<String, dynamic> ticket = Map<String, dynamic>.from(t);
-      _tickets.add(Ticket.fromJson(ticket));
-    }
+    await _lock.synchronized(() async {
+      _tickets.clear();
+      for (var t in ticketsJson) {
+        Map<String, dynamic> ticket = Map<String, dynamic>.from(t);
+        _tickets.add(Ticket.fromJson(ticket));
+      }
+    });
 
     setState(() {
       _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
@@ -334,6 +338,7 @@ class _TicketPageState extends State<TicketPage> {
 
     // controllers
     TextEditingController ticketNumberController = TextEditingController();
+    TextEditingController noteController = TextEditingController();
 
     // field values
     if (filteredTickets.isNotEmpty) {
@@ -352,7 +357,7 @@ class _TicketPageState extends State<TicketPage> {
       pageBuilder: (BuildContext buildContext, Animation animation,
           Animation secondaryAnimation) {
         return Align(
-          alignment: Alignment.bottomCenter,
+          alignment: Alignment.topCenter,
           child: Material(
             child: StatefulBuilder(
               builder: (context, setDialogState) {
@@ -364,7 +369,7 @@ class _TicketPageState extends State<TicketPage> {
                     child: Column(
                       children: [
                         // Ticket number
-                        SizedBox(height: 8),
+                        SizedBox(height: 24),
                         TextField(
                           controller: ticketNumberController,
                           decoration:
@@ -441,7 +446,7 @@ class _TicketPageState extends State<TicketPage> {
                                     ),
                                   ),
                                 );
-                              }).toList(),
+                              }),
                             ],
                           ),
                         ),
@@ -548,6 +553,7 @@ class _TicketPageState extends State<TicketPage> {
                         // note field
                         SizedBox(height: 8),
                         TextField(
+                          controller: noteController,
                           decoration: InputDecoration(labelText: "Note"),
                         ),
 
@@ -561,6 +567,13 @@ class _TicketPageState extends State<TicketPage> {
                                 child: Text("Cancel"),
                                 onPressed: () {
                                   Navigator.pop(context);
+                                  // clear all lists
+                                  sevaNames.clear();
+                                  filteredTickets.clear();
+
+                                  // dispose all controllers and focus nodes
+                                  ticketNumberController.dispose();
+                                  noteController.dispose();
                                 },
                               ),
                             ),
@@ -592,7 +605,7 @@ class _TicketPageState extends State<TicketPage> {
                                     ticketNumber:
                                         int.parse(ticketNumberController.text),
                                     user: "Guest",
-                                    note: "",
+                                    note: noteController.text,
                                     image: icon,
                                     seva: sevaName,
                                   );
@@ -651,6 +664,7 @@ class _TicketPageState extends State<TicketPage> {
 
                                   // dispose all controllers and focus nodes
                                   ticketNumberController.dispose();
+                                  noteController.dispose();
                                 },
                               ),
                             ),
@@ -668,7 +682,7 @@ class _TicketPageState extends State<TicketPage> {
       transitionBuilder: (context, animation, secondaryAnimation, child) {
         return SlideTransition(
           position: Tween<Offset>(
-            begin: Offset(0, 1),
+            begin: Offset(0, -1),
             end: Offset(0, 0),
           ).animate(animation),
           child: child,

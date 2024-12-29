@@ -1,7 +1,7 @@
 import sys
 import subprocess
 import sys
-import os
+from packaging.version import Version
 
 def create_or_switch_branch(new_branch):
     """Create a new branch """
@@ -40,7 +40,7 @@ def main():
             output = subprocess.check_output(["git", "ls-remote", "--heads", "origin"]).decode("utf-8")
             branches = [line.split("\t")[1].split("refs/heads/")[1] for line in output.splitlines()]
             branches = [branch for branch in branches if branch.count('.') == 2 and all(part.isdigit() for part in branch.split('.'))]
-            latest_branch = max(branches)
+            latest_branch = max(branches, key=Version)
         except subprocess.CalledProcessError:
             print("Failed to retrieve remote branches")
 

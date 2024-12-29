@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
@@ -17,6 +18,7 @@ class NityaSeva extends StatefulWidget {
 }
 
 class _NityaSevaState extends State<NityaSeva> {
+  final Lock _lock = Lock();
   bool _isLoading = true;
   final DateTime _selectedDate = DateTime.now();
 
@@ -46,12 +48,14 @@ class _NityaSevaState extends State<NityaSeva> {
   }
 
   Future<void> refresh() async {
-    setState(() {
-      _isLoading = true;
-    });
+    await _lock.synchronized(() async {
+      setState(() {
+        _isLoading = true;
+      });
 
-    setState(() {
-      _isLoading = false;
+      setState(() {
+        _isLoading = false;
+      });
     });
   }
 

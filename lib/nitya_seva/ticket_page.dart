@@ -175,56 +175,56 @@ class _TicketPageState extends State<TicketPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              // seva name headline
-                              Text(ticket.seva,
+                          Row(children: [
+                            // seva name headline
+                            Flexible(
+                              child: Text(ticket.seva,
                                   style: Theme.of(context)
                                       .textTheme
                                       .headlineSmall!
                                       .copyWith(color: color)),
+                            ),
 
-                              // note icon
-                              SizedBox(width: 8),
-                              if (ticket.note.isNotEmpty)
-                                GestureDetector(
-                                  onTap: () {
-                                    // Handle note click event
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text('Note'),
-                                          content: Text(ticket.note),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Text('Close'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
-                                      color: Colors.yellow,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(1.0),
-                                      child: Text('Note',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall!
-                                              .copyWith(color: Colors.black)),
-                                    ),
+                            // note icon
+                            SizedBox(width: 8),
+                            if (ticket.note.isNotEmpty)
+                              GestureDetector(
+                                onTap: () {
+                                  // Handle note click event
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Note'),
+                                        content: Text(ticket.note),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Close'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    color: Colors.yellow,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(1.0),
+                                    child: Text('Note',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(color: Colors.black)),
                                   ),
                                 ),
-                            ],
-                          ),
+                              ),
+                          ]),
 
                           // other details
                           SizedBox(height: 2),

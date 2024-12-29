@@ -485,6 +485,8 @@ class _TicketPageState extends State<TicketPage> {
                                         color: mode == m
                                             ? primaryColor
                                             : Colors.transparent,
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
                                       ),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),

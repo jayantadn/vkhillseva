@@ -653,7 +653,7 @@ class _TicketPageState extends State<TicketPage> {
           Scaffold(
             // app bar
             appBar: AppBar(
-              title: Text(widget.session.name),
+              title: CommonWidgets().customAppBarTitle(widget.session.name),
               actions: [
                 // summary button
                 IconButton(

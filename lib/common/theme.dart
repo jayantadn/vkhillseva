@@ -16,23 +16,9 @@ ThemeData themeDefault = ThemeData(
 
   // appbar theme
   appBarTheme: AppBarTheme(
-    backgroundColor: primaryColor,
-    foregroundColor: backgroundColor,
-    titleTextStyle: GoogleFonts.pacifico(
-      textStyle: TextStyle(
-        color: backgroundColor,
-        fontSize: 30.0,
-      ),
-    ),
-    elevation: 10,
-    toolbarHeight: 50.0,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        bottomLeft: Radius.circular(20.0),
-        bottomRight: Radius.circular(20.0),
-      ),
-    ),
-    shadowColor: Colors.black.withOpacity(0.5), // Add shadow color
+    backgroundColor: backgroundColor,
+    foregroundColor: accentColor,
+    titleTextStyle: GoogleFonts.pacifico(color: accentColor, fontSize: 24),
   ),
 
   // Text Styles
@@ -157,7 +143,7 @@ ThemeData themeDefault = ThemeData(
   // Icon Button Theme
   iconButtonTheme: IconButtonThemeData(
     style: ButtonStyle(
-      iconColor: WidgetStateProperty.all(backgroundColor),
+      iconColor: WidgetStateProperty.all(accentColor),
       iconSize: WidgetStateProperty.all(24.0),
     ),
   ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:vkhillseva/common/theme.dart';
 
 class CommonWidgets {
   static final CommonWidgets _instance = CommonWidgets._internal();
@@ -160,6 +161,17 @@ class CommonWidgets {
     );
 
     return action.future;
+  }
+
+  Widget customAppBarTitle(String title) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: accentColor, width: 2.0),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Text(title),
+    );
   }
 }
 

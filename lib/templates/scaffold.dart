@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 
@@ -62,7 +63,7 @@ class _NityaSevaState extends State<NityaSeva> {
         children: [
           Scaffold(
             appBar: AppBar(
-              title: Text(widget.title),
+              title: CommonWidgets().customAppBarTitle(widget.title),
             ),
             body: RefreshIndicator(
               onRefresh: refresh,

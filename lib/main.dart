@@ -19,11 +19,12 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const HomePage(title: "Hare Krishna");
+  final Widget test = const HomePage(title: "Hare Krishna");
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);
+        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);
   }
 }

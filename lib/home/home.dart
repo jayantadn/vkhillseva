@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/theme.dart';
+import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/home/settings.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
@@ -65,7 +67,7 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: CommonWidgets().customAppBarTitle(widget.title),
         actions: [
           IconButton(
             icon: Icon(Icons.settings),

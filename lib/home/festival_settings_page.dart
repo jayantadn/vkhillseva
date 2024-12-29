@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/datatypes.dart';
 import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/image_selector.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
@@ -238,14 +239,16 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
       child: Stack(
         children: [
           Scaffold(
-            appBar: AppBar(title: Text(widget.title), actions: [
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () {
-                  _onAddEdit(null);
-                },
-              ),
-            ]),
+            appBar: AppBar(
+                title: CommonWidgets().customAppBarTitle(widget.title),
+                actions: [
+                  IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      _onAddEdit(null);
+                    },
+                  ),
+                ]),
             body: RefreshIndicator(
               onRefresh: refresh,
               child: ListView(

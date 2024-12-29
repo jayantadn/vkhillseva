@@ -6,7 +6,7 @@ import 'package:synchronized/synchronized.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
-import 'package:vkhillseva/nitya_seva/summary_page.dart';
+import 'package:vkhillseva/nitya_seva/session_summary.dart';
 import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
@@ -744,10 +744,10 @@ class _TicketPageState extends State<TicketPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => SummaryPage(
+                          builder: (context) => SessionSummary(
                               title: 'Summary',
-                              icon:
-                                  'assets/images/LauncherIcons/NityaSeva.png')),
+                              icon: 'assets/images/LauncherIcons/NityaSeva.png',
+                              session: widget.session)),
                     );
                   },
                 ),

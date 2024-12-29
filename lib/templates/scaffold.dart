@@ -18,6 +18,7 @@ class NityaSeva extends StatefulWidget {
 }
 
 class _NityaSevaState extends State<NityaSeva> {
+  // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
   final DateTime _selectedDate = DateTime.now();
@@ -43,14 +44,17 @@ class _NityaSevaState extends State<NityaSeva> {
   }
 
   Future<void> refresh() async {
-    await _lock.synchronized(() async {
-      setState(() {
-        _isLoading = true;
-      });
+    setState(() {
+      _isLoading = true;
+    });
 
-      setState(() {
-        _isLoading = false;
-      });
+    // perform async operations here
+
+    // perform sync operations here
+    await _lock.synchronized(() async {});
+
+    setState(() {
+      _isLoading = false;
     });
   }
 

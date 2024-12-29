@@ -657,7 +657,7 @@ class _TicketPageState extends State<TicketPage> {
               actions: [
                 // summary button
                 IconButton(
-                  icon: Icon(Icons.summarize),
+                  icon: Icon(Icons.article, size: 32),
                   onPressed: () {},
                 ),
 

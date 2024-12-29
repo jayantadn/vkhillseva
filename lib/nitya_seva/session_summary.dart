@@ -67,7 +67,7 @@ class _SessionSummaryState extends State<SessionSummary> {
 
     for (int? amount in pushpanjaliTickets) {
       List<Ticket> listFiltered =
-          _listEntries!.where((e) => e.amount == amount).toList();
+          _listEntries.where((e) => e.amount == amount).toList();
 
       // highest and lowest ticketNumber numbers
       int entryWithLowestTicket = 0;

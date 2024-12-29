@@ -243,7 +243,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                 title: CommonWidgets().customAppBarTitle(widget.title),
                 actions: [
                   IconButton(
-                    icon: Icon(Icons.add),
+                    icon: Icon(Icons.add, size: 32),
                     onPressed: () {
                       _onAddEdit(null);
                     },

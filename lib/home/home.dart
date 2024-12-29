@@ -70,7 +70,10 @@ class _MyHomePageState extends State<HomePage> {
         title: CommonWidgets().customAppBarTitle(widget.title),
         actions: [
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: Icon(
+              Icons.settings,
+              size: 32,
+            ),
             onPressed: () {
               Navigator.push(
                 context,

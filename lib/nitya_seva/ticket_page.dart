@@ -343,12 +343,19 @@ class _TicketPageState extends State<TicketPage> {
     sevaNames = _getSevaNames(amount);
     sevaName = sevaNames.isNotEmpty ? sevaNames[0] : "";
 
-    showModalBottomSheet(
+    showGeneralDialog(
       context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setModalState) {
-            return Padding(
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black45,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (BuildContext buildContext, Animation animation,
+          Animation secondaryAnimation) {
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: Material(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(8.0),
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
@@ -397,7 +404,7 @@ class _TicketPageState extends State<TicketPage> {
                               padding: const EdgeInsets.all(8.0),
                               child: GestureDetector(
                                 onTap: () {
-                                  setModalState(() {
+                                  setState(() {
                                     amount = int.parse(seva.keys.first);
                                     filteredTickets = _tickets
                                         .where(
@@ -424,7 +431,6 @@ class _TicketPageState extends State<TicketPage> {
                                     border: Border.all(
                                         color: seva.values.first['color']!
                                             as Color),
-                                    borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -443,7 +449,7 @@ class _TicketPageState extends State<TicketPage> {
                                 ),
                               ),
                             );
-                          }),
+                          }).toList(),
                         ],
                       ),
                     ),
@@ -470,7 +476,7 @@ class _TicketPageState extends State<TicketPage> {
                               padding: const EdgeInsets.all(8.0),
                               child: GestureDetector(
                                 onTap: () {
-                                  setModalState(() {
+                                  setState(() {
                                     mode = m;
                                   });
                                 },
@@ -480,7 +486,6 @@ class _TicketPageState extends State<TicketPage> {
                                     color: mode == m
                                         ? primaryColor
                                         : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -509,7 +514,7 @@ class _TicketPageState extends State<TicketPage> {
                                 ),
                               ),
                             );
-                          }),
+                          }).toList(),
                         ],
                       ),
                     ),
@@ -539,7 +544,9 @@ class _TicketPageState extends State<TicketPage> {
                               );
                             }).toList(),
                             onChanged: (String? newValue) {
-                              sevaName = newValue!;
+                              setState(() {
+                                sevaName = newValue!;
+                              });
                             },
                             hint: Text(
                               "Select Seva",
@@ -637,8 +644,17 @@ class _TicketPageState extends State<TicketPage> {
                   ],
                 ),
               ),
-            );
-          },
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: Offset(0, 1),
+            end: Offset(0, 0),
+          ).animate(animation),
+          child: child,
         );
       },
     );

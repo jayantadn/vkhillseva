@@ -185,10 +185,44 @@ class _TicketPageState extends State<TicketPage> {
                                       .copyWith(color: color)),
 
                               // note icon
-                              SizedBox(width: 4),
+                              SizedBox(width: 8),
                               if (ticket.note.isNotEmpty)
-                                Icon(Icons.note,
-                                    color: Colors.orange, size: 16),
+                                GestureDetector(
+                                  onTap: () {
+                                    // Handle note click event
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Note'),
+                                          content: Text(ticket.note),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text('Close'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey),
+                                      color: Colors.yellow,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(1.0),
+                                      child: Text('Note',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall!
+                                              .copyWith(color: Colors.black)),
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
 
@@ -199,14 +233,6 @@ class _TicketPageState extends State<TicketPage> {
                             style: Theme.of(context).textTheme.bodySmall,
                             softWrap: true,
                           ),
-
-                          // note
-                          if (ticket.note.isNotEmpty)
-                            Text(
-                              "Note: ${ticket.note}",
-                              style: Theme.of(context).textTheme.bodySmall,
-                              softWrap: true,
-                            ),
                         ],
                       ),
                     ),

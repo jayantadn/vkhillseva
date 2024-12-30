@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:share_plus/share_plus.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -236,7 +236,7 @@ class _DaySummaryState extends State<DaySummary> {
           GestureDetector(
             child: Icon(Icons.share, color: Colors.white),
             onTap: () {
-              // Add your share functionality here
+              Share.share('check out my website https://example.com');
             },
           ),
         ],

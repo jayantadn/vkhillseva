@@ -1,3 +1,6 @@
+# 0.14.5
+- fix: pie chart
+
 # 0.14.4
 - fix: day summary updating on date scroll
 

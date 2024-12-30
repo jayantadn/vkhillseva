@@ -1,21 +1,4 @@
-# 0.14.1
-- fix: height of grand total
-- fix: sort sessions
-- fix: update version to 0.14.1 and refactor MyApp initialization
-
-<<<<<<< HEAD
-# 0.13.0
-
 # 0.12.0
-=======
-# 0.14.0
-- feature: screenshot sharing
-- fix: crash issues with day summary
-- feature: day summary
-- fix: seva dropdown
-- feature: edit ticket
-- feature delete ticket
->>>>>>> 0.14.0
 
 # 0.11.0
 - feature: sesson summary

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -163,7 +164,6 @@ class _NityaSevaState extends State<NityaSeva> {
           Map<String, dynamic>.from(map['Settings'] as Map);
       _sessions.add(Session.fromJson(json));
     }
-    _sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
     setState(() {
       _isLoading = false;
@@ -384,12 +384,12 @@ class _NityaSevaState extends State<NityaSeva> {
                 // add session
                 if (session == null) {
                   List<String> errors = _preValidation(newSession);
-                  String? ret = 'Proceed';
+                  String? ret = 'Create';
                   if (errors.isNotEmpty) {
                     ret = await CommonWidgets()
                         .createErrorDialog(context: context, errors: errors);
                   }
-                  if (errors.isEmpty || ret == 'Proceed') {
+                  if (errors.isEmpty || ret == 'Create') {
                     // push to db
                     FB().addToList(
                       path: "NityaSeva/$dbDate",
@@ -584,7 +584,7 @@ class _NityaSevaState extends State<NityaSeva> {
                     ),
 
                     // summary
-                    DaySummary(date: _selectedDate),
+                    DaySummary(),
                   ],
                 ),
               ),

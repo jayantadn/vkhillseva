@@ -1,23 +1,10 @@
-import 'dart:async';
-import 'package:share_plus/share_plus.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/common/utils.dart';
-import 'package:vkhillseva/nitya_seva/session.dart';
-import 'package:vkhillseva/nitya_seva/ticket_page.dart';
-import 'package:screenshot/screenshot.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 
 class DaySummary extends StatefulWidget {
-  final DateTime date;
-
-  const DaySummary({super.key, required this.date});
+  const DaySummary({super.key});
 
   @override
   State<DaySummary> createState() => _DaySummaryState();
@@ -27,69 +14,47 @@ GlobalKey<_DaySummaryState> daySummaryKey = GlobalKey<_DaySummaryState>();
 
 class _DaySummaryState extends State<DaySummary> {
   final Lock _lock = Lock();
-  DateTime _lastCallbackInvoked = DateTime.now();
-  List<StreamSubscription<DatabaseEvent>> _listeners = [];
-
-  final ScreenshotController _screenshotController = ScreenshotController();
 
   // ticket table data for day summary
-  final List<String> _amountTableHeaderRow = [];
-  final List<List<String>> _amountTableTicketRow = [];
-  final List<List<String>> _amountTableTotalRow = [];
-  final List<int> _grandTotal = []; // [totalTicket, totalAmount]
+  List<String> amountTableHeaderRow = [
+    "Seva Ticket",
+    "Sat Morning",
+    "Sat Evening"
+  ];
+  List<int> grandTotal = [39, 20300]; // [totalTicket, totalAmount]
+  List<List<String>> amountTableTicketRow = [
+    ["400", "21", "0"],
+    ["500", "14", "0"],
+    ["1000", "1", "0"],
+    ["2500", "1", "0"],
+  ];
+  List<List<String>> amountTableTotalRow = [
+    ["Total", "37", "0"],
+    [
+      "Amount",
+      Utils().formatIndianCurrency("18900"),
+      Utils().formatIndianCurrency("0")
+    ]
+  ];
 
   // pie chart data
-  final Map<String, int> _countMode = {
+  Map<String, int> countMode = {
     // {mode: count}
+    'UPI': 16,
+    'Cash': 19,
+    'Card': 6,
+    'Gift': 0,
   };
-  final Map<String, int> _countModePercentage = {
+  Map<String, int> countModePercentage = {
     // {mode: percentage}
+    'UPI': 40,
+    'Cash': 45,
+    'Card': 15,
   };
 
   @override
   void initState() {
     super.initState();
-
-// listed to database events
-    String dbDate = DateFormat('yyyy-MM-dd').format(widget.date);
-    FB().listenForChange(
-        "NityaSeva/$dbDate",
-        FBCallbacks(
-          // add
-          add: (data) {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
-                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
-
-              refresh();
-            }
-          },
-
-          // edit
-          edit: () {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
-                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
-
-              refresh();
-            }
-          },
-
-          // delete
-          delete: (data) {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
-                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
-
-              refresh();
-            }
-          },
-
-          // get listeners
-          getListeners: (listeners) {
-            _listeners = listeners;
-          },
-        ));
 
     refresh();
   }
@@ -97,127 +62,18 @@ class _DaySummaryState extends State<DaySummary> {
   @override
   dispose() {
     // clear all lists
-    _amountTableHeaderRow.clear();
-    _grandTotal.clear();
-    _amountTableTicketRow.clear();
-    _amountTableTotalRow.clear();
 
     // clear all controllers
-    for (var element in _listeners) {
-      element.cancel();
-    }
 
     super.dispose();
   }
 
   void refresh() async {
-    // async work
-    String dbDate = DateFormat("yyyy-MM-dd").format(widget.date);
-    List sessionsList = await FB().getList(path: "NityaSeva/$dbDate");
-    List<Session> sessions = [];
-    for (var sessionRaw in sessionsList) {
-      Map<String, dynamic> s =
-          Map<String, dynamic>.from(sessionRaw['Settings']);
-      sessions.add(Session.fromJson(s));
-    }
-    sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-    // sychronized work
     await _lock.synchronized(() async {
-      setState(() {
-        // clear everything
-        _amountTableHeaderRow.clear();
-        _amountTableHeaderRow.add("Seva Ticket");
-        _amountTableTicketRow.clear();
-        _amountTableTotalRow.clear();
-        _amountTableTotalRow.add(["Total"]);
-        _amountTableTotalRow.add(["Amount"]);
-        _grandTotal.clear();
-
-        // loop through each session
-        for (var session in sessions) {
-          int indexSession = sessions.indexOf(session);
-
-          // header row
-          _amountTableHeaderRow.add(session.name);
-
-          // total row
-          _amountTableTotalRow[0].add("0");
-          _amountTableTotalRow[1].add("0");
-
-          // grand total
-          _grandTotal.add(0);
-          _grandTotal.add(0);
-
-          // count mode
-          Const().paymentModes.forEach((key, value) {
-            if (key != 'Gift') {
-              _countMode[key] = 0;
-              _countModePercentage[key] = 0;
-            }
-          });
-
-          // loop through each ticket in the session
-          for (var amount in Const().nityaSeva['amounts'] as List) {
-            Map<String, dynamic> amountMap = Map<String, dynamic>.from(amount);
-
-            // checking if the amount was already entered
-            int index = _amountTableTicketRow
-                .indexWhere((row) => row[0] == amountMap.keys.first);
-            if (index >= 0) {
-              // amount was indeed entered
-              _amountTableTicketRow[index].add("0");
-            } else {
-              // no entry found for the amount
-              _amountTableTicketRow.add([amountMap.keys.first]);
-              _amountTableTicketRow[_amountTableTicketRow.length - 1].add("0");
-            }
-          }
-          String dbSession =
-              session.timestamp.toIso8601String().replaceAll(".", "^");
-          FB()
-              .getList(path: "NityaSeva/$dbDate/$dbSession/Tickets")
-              .then((tickets) {
-            // async work in another thread
-            for (var ticket in tickets) {
-              // find the index for the amount
-              Map<String, dynamic> ticketJson =
-                  Map<String, dynamic>.from(ticket);
-              Ticket ticketTyped = Ticket.fromJson(ticketJson);
-              int index = _amountTableTicketRow
-                  .indexWhere((row) => row[0] == ticketTyped.amount.toString());
-
-              // add count to the index
-              _amountTableTicketRow[index][indexSession + 1] =
-                  (int.parse(_amountTableTicketRow[index][indexSession + 1]) +
-                          1)
-                      .toString();
-
-              // add count to the total row
-              _amountTableTotalRow[0][indexSession + 1] =
-                  (int.parse(_amountTableTotalRow[0][indexSession + 1]) + 1)
-                      .toString();
-              _amountTableTotalRow[1][indexSession + 1] =
-                  (int.parse(_amountTableTotalRow[1][indexSession + 1]) +
-                          ticketTyped.amount)
-                      .toString();
-
-              // add count to the grand total
-              _grandTotal[0] += 1;
-              _grandTotal[1] += ticketTyped.amount;
-
-              // add count to the mode
-              _countMode[ticketTyped.mode] = _countMode[ticketTyped.mode]! + 1;
-              _countModePercentage[ticketTyped.mode] =
-                  ((_countMode[ticketTyped.mode]! / _grandTotal[0]) * 100)
-                      .round();
-            }
-          });
-        }
-      });
+      // all you need to do
     });
 
-    sessions.clear();
+    setState(() {});
   }
 
   Widget _createTitlebar(BuildContext context) {
@@ -237,7 +93,7 @@ class _DaySummaryState extends State<DaySummary> {
         children: [
           // Title Text
           Text(
-            "Day Summary",
+            "Summary",
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: Colors.white,
                 ),
@@ -246,22 +102,8 @@ class _DaySummaryState extends State<DaySummary> {
           // Share Button
           GestureDetector(
             child: Icon(Icons.share, color: Colors.white),
-            onTap: () async {
-              String date = DateFormat('yyyy-MM-dd').format(widget.date);
-
-              final image = await _screenshotController.capture();
-              if (image != null) {
-                final directory = await getApplicationDocumentsDirectory();
-                final imagePath =
-                    await File('${directory.path}/DaySummary_$date.png')
-                        .create();
-                await imagePath.writeAsBytes(image);
-
-                Share.shareXFiles(
-                  [XFile(imagePath.path)],
-                  text: 'Day Summary for $date',
-                );
-              }
+            onTap: () {
+              // Add your share functionality here
             },
           ),
         ],
@@ -270,16 +112,12 @@ class _DaySummaryState extends State<DaySummary> {
   }
 
   Widget _createGrandTotal(BuildContext context) {
-    double width = 100;
-    double height = 110;
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // total tickets sold
         SizedBox(
-          width: width,
-          height: height,
+          width: 100, // Set the desired width
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0), // Set the border radius
@@ -295,8 +133,7 @@ class _DaySummaryState extends State<DaySummary> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
-                      child: Text(
-                          _grandTotal.isEmpty ? "0" : _grandTotal[0].toString(),
+                      child: Text('37',
                           style:
                               Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     color: Colors.white,
@@ -323,8 +160,7 @@ class _DaySummaryState extends State<DaySummary> {
 
         // total amount
         SizedBox(
-          width: width,
-          height: height,
+          width: 100, // Set the same width as the first card
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0), // Set the border radius
@@ -341,10 +177,7 @@ class _DaySummaryState extends State<DaySummary> {
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: Text(
-                        _grandTotal.isEmpty
-                            ? "0"
-                            : Utils().formatIndianCurrency(
-                                _grandTotal[1].toString()),
+                        Utils().formatIndianCurrency('18900'),
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -371,9 +204,7 @@ class _DaySummaryState extends State<DaySummary> {
   }
 
   Widget _createTicketTable(BuildContext context) {
-    if (_amountTableHeaderRow.length == 1 ||
-        _grandTotal.isEmpty ||
-        _grandTotal[0] == 0) {
+    if (amountTableHeaderRow.length == 1 || grandTotal[0] == 0) {
       return const Text("no data");
     }
 
@@ -393,7 +224,7 @@ class _DaySummaryState extends State<DaySummary> {
         children: [
           // table header
           TableRow(
-            children: _amountTableHeaderRow.map((header) {
+            children: amountTableHeaderRow.map((header) {
               return Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 8.0), // Adjust the padding as needed
@@ -408,7 +239,7 @@ class _DaySummaryState extends State<DaySummary> {
           ),
 
           // row for entries
-          ..._amountTableTicketRow.map((row) {
+          ...amountTableTicketRow.map((row) {
             return TableRow(
               children: row.map((cell) {
                 return Padding(
@@ -426,9 +257,9 @@ class _DaySummaryState extends State<DaySummary> {
           }),
 
           // row for total
-          ..._amountTableTotalRow.map((row) {
+          ...amountTableTotalRow.map((row) {
             return TableRow(
-              decoration: _amountTableTotalRow.indexOf(row) == 0
+              decoration: amountTableTotalRow.indexOf(row) == 0
                   ? const BoxDecoration(
                       border: Border(
                         top: BorderSide(color: Colors.grey),
@@ -436,15 +267,12 @@ class _DaySummaryState extends State<DaySummary> {
                     )
                   : null,
               children: row.map((cell) {
-                int cellIndex = row.indexOf(cell);
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8.0), // Adjust the padding as needed
                   child: Center(
                     child: Text(
-                      cellIndex == 0 || row[0] != "Amount"
-                          ? cell.toString()
-                          : Utils().formatIndianCurrency(cell.toString()),
+                      cell.toString(),
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),
@@ -458,9 +286,9 @@ class _DaySummaryState extends State<DaySummary> {
   }
 
   Widget _wLegends() {
-    if (_countModePercentage['UPI'] == 0 &&
-        _countModePercentage['Cash'] == 0 &&
-        _countModePercentage['Card'] == 0) {
+    if (countModePercentage['UPI'] == 0 &&
+        countModePercentage['Cash'] == 0 &&
+        countModePercentage['Card'] == 0) {
       return const Text("");
     }
     return Column(
@@ -491,15 +319,9 @@ class _DaySummaryState extends State<DaySummary> {
   Widget _createModeChart(BuildContext context) {
     double radius = 40;
 
-    if (_countModePercentage['UPI'] == null &&
-        _countModePercentage['Cash'] == null &&
-        _countModePercentage['Card'] == null) {
-      return const Text("");
-    }
-
-    if (_countModePercentage['UPI'] == 0 &&
-        _countModePercentage['Cash'] == 0 &&
-        _countModePercentage['Card'] == 0) {
+    if (countModePercentage['UPI'] == 0 &&
+        countModePercentage['Cash'] == 0 &&
+        countModePercentage['Card'] == 0) {
       return const Text("");
     }
 
@@ -509,52 +331,52 @@ class _DaySummaryState extends State<DaySummary> {
           // UPI
           PieChartSectionData(
             color: Colors.orange,
-            value: _countModePercentage['UPI']!.toDouble(),
-            title: '${_countMode['UPI']}',
+            value: countModePercentage['UPI']!.toDouble(),
+            title: '${countMode['UPI']}',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: _countModePercentage['UPI']! > 9
+              color: countModePercentage['UPI']! > 9
                   ? Colors.white
                   : Theme.of(context).textTheme.bodyLarge!.color,
             ),
             titlePositionPercentageOffset:
-                _countModePercentage['UPI']! > 9 ? 0.5 : 1.2,
+                countModePercentage['UPI']! > 9 ? 0.5 : 1.2,
           ),
 
           // cash
           PieChartSectionData(
             color: Colors.green,
-            value: _countModePercentage['Cash']!.toDouble(),
-            title: '${_countMode['Cash']}',
+            value: countModePercentage['Cash']!.toDouble(),
+            title: '${countMode['Cash']}',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: _countModePercentage['Cash']! > 9
+              color: countModePercentage['Cash']! > 9
                   ? Colors.white
                   : Theme.of(context).textTheme.bodyLarge!.color,
             ),
             titlePositionPercentageOffset:
-                _countModePercentage['Cash']! > 9 ? 0.5 : 1.2,
+                countModePercentage['Cash']! > 9 ? 0.5 : 1.2,
           ),
 
           // card
           PieChartSectionData(
             color: Colors.blue,
-            value: _countModePercentage['Card']!.toDouble(),
-            title: '${_countMode['Card']}',
+            value: countModePercentage['Card']!.toDouble(),
+            title: '${countMode['Card']}',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: _countModePercentage['Card']! > 9
+              color: countModePercentage['Card']! > 9
                   ? Colors.white
                   : Theme.of(context).textTheme.bodyLarge!.color,
             ),
             titlePositionPercentageOffset:
-                _countModePercentage['Card']! > 9 ? 0.5 : 1.2,
+                countModePercentage['Card']! > 9 ? 0.5 : 1.2,
           ),
         ],
         sectionsSpace: 2,
@@ -565,51 +387,48 @@ class _DaySummaryState extends State<DaySummary> {
 
   @override
   Widget build(BuildContext context) {
-    return Screenshot(
-      controller: _screenshotController,
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _createTitlebar(context),
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _createTitlebar(context),
 
-            // body
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  // create chart for payment mode
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 100, // Reduced width
-                        height: 100, // Reduced height
-                        child: _createModeChart(context),
-                      ),
-                      const SizedBox(
-                          width: 30), // Increased width for more padding
-                      _wLegends(),
-                    ],
-                  ),
+          // body
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                // create chart for payment mode
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 100, // Reduced width
+                      height: 100, // Reduced height
+                      child: _createModeChart(context),
+                    ),
+                    const SizedBox(
+                        width: 30), // Increased width for more padding
+                    _wLegends(),
+                  ],
+                ),
 
-                  SizedBox(height: 8),
+                SizedBox(height: 8),
 
-                  // table for tickets
-                  _createTicketTable(context),
+                // table for tickets
+                _createTicketTable(context),
 
-                  SizedBox(height: 8),
+                SizedBox(height: 8),
 
-                  // tiles for total
-                  _createGrandTotal(context),
-                ],
-              ),
+                // tiles for total
+                _createGrandTotal(context),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

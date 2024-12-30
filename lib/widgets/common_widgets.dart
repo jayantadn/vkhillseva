@@ -80,8 +80,7 @@ class CommonWidgets {
   Future<String?> createErrorDialog(
       {required BuildContext context,
       required List<String> errors,
-      bool post = false,
-      bool noaction = false}) async {
+      bool post = false}) async {
     Completer<String?> action = Completer<String?>();
 
     showDialog(
@@ -128,12 +127,12 @@ class CommonWidgets {
             ),
 
             // create button
-            if (post == false && noaction == false)
+            if (post == false)
               TextButton(
-                child: Text('Proceed'),
+                child: Text('Create'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  action.complete('Proceed');
+                  action.complete('Create');
                 },
               ),
 

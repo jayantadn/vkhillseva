@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/home/home.dart';
-import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
+import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/nitya_seva/session_summary.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -15,15 +16,26 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   final Widget home = const HomePage(title: "Hare Krishna");
-  final Widget test = const NityaSeva(title: "Hare Krishna");
+  final Widget test = SessionSummary(
+    title: "Hare Krishna",
+    icon: "assets/images/Logo/KrishnaLilaPark_square.png",
+    session: Session(
+      name: "Morning Nitya Seva",
+      defaultAmount: 400,
+      defaultPaymentMode: "Cash",
+      icon: "assets/images/Common/morning.png",
+      sevakarta: "Guest",
+      timestamp: DateTime.parse("2024-12-29T10:09:15.371"),
+    ),
+  );
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);
+        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);
   }
 }

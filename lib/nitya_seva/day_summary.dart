@@ -30,7 +30,7 @@ class _DaySummaryState extends State<DaySummary> {
   DateTime _lastCallbackInvoked = DateTime.now();
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
-  ScreenshotController _screenshotController = ScreenshotController();
+  final ScreenshotController _screenshotController = ScreenshotController();
 
   // ticket table data for day summary
   final List<String> _amountTableHeaderRow = [];

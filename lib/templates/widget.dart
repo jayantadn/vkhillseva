@@ -31,11 +31,12 @@ class _SummaryState extends State<Summary> {
   }
 
   void refresh() async {
-    await _lock.synchronized(() async {
-      // all you need to do
-    });
+    // perform async work here
 
-    setState(() {});
+    // perform sync work here
+    await _lock.synchronized(() async {
+      setState(() {});
+    });
   }
 
   @override

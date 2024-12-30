@@ -19,6 +19,9 @@ ThemeData themeDefault = ThemeData(
     backgroundColor: backgroundColor,
     foregroundColor: accentColor,
     titleTextStyle: GoogleFonts.pacifico(color: accentColor, fontSize: 24),
+    iconTheme: IconThemeData(
+      size: 32.0,
+    ),
   ),
 
   // Text Styles
@@ -59,9 +62,9 @@ ThemeData themeDefault = ThemeData(
 
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
+      foregroundColor: accentColor, // Set the foreground color explicitly
       side: BorderSide(color: accentColor, width: 2.0),
       textStyle: TextStyle(
-        color: accentColor,
         fontWeight: FontWeight.bold,
         fontSize: 16.0,
       ),

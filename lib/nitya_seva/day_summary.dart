@@ -26,12 +26,7 @@ class _DaySummaryState extends State<DaySummary> {
   final List<String> _amountTableHeaderRow = [
     "Seva Ticket",
   ];
-  final List<List<String>> _amountTableTicketRow = [
-    // ["400", "21", "0"],
-    // ["500", "14", "0"],
-    // ["1000", "1", "0"],
-    // ["2500", "1", "0"],
-  ];
+  final List<List<String>> _amountTableTicketRow = [];
   final List<List<String>> _amountTableTotalRow = [
     ["Total", "37", "0"],
     [
@@ -89,7 +84,10 @@ class _DaySummaryState extends State<DaySummary> {
         _amountTableHeaderRow.clear();
         _amountTableHeaderRow.add("Seva Ticket");
         _amountTableTicketRow.clear();
+        _amountTableTotalRow.clear();
+        _amountTableTotalRow.add(["Total"]);
 
+        // loop through each session
         for (var session in sessions) {
           int indexSession = sessions.indexOf(session);
           Map<String, dynamic> s =
@@ -98,6 +96,9 @@ class _DaySummaryState extends State<DaySummary> {
 
           // header row
           _amountTableHeaderRow.add(ss.name);
+
+          // total row
+          _amountTableTotalRow[0].add("0");
 
           // ticket row
           // add zero values for the session
@@ -122,6 +123,7 @@ class _DaySummaryState extends State<DaySummary> {
               .getList(path: "NityaSeva/$dbDate/$dbSession/Tickets")
               .then((tickets) {
             // async work in another thread
+            // loop through each ticket in the session
             for (var ticket in tickets) {
               // find the index for the amount
               Map<String, dynamic> ticketJson =
@@ -134,6 +136,11 @@ class _DaySummaryState extends State<DaySummary> {
               _amountTableTicketRow[index][indexSession + 1] =
                   (int.parse(_amountTableTicketRow[index][indexSession + 1]) +
                           1)
+                      .toString();
+
+              // add count to the total row
+              _amountTableTotalRow[0][indexSession + 1] =
+                  (int.parse(_amountTableTotalRow[0][indexSession + 1]) + 1)
                       .toString();
             }
           });

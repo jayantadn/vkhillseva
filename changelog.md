@@ -1,3 +1,7 @@
+# 0.15.0
+- fixes
+- fix: session without settings
+
 # 0.14.6
 - fix: pie setstate
 - fix: pie no sessions

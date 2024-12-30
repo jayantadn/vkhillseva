@@ -148,10 +148,10 @@ class _NityaSevaState extends State<NityaSeva> {
 
     // put Nitya Seva at the top
     _sevaList.sort((a, b) {
-      if (a.name == 'Morning Nitya Seva') return -1;
-      if (b.name == 'Morning Nitya Seva') return 1;
-      if (a.name == 'Evening Nitya Seva') return -1;
-      if (b.name == 'Evening Nitya Seva') return 1;
+      if (a.name == 'Morning Pushpanjali') return -1;
+      if (b.name == 'Morning Pushpanjali') return 1;
+      if (a.name == 'Evening Pushpanjali') return -1;
+      if (b.name == 'Evening Pushpanjali') return 1;
       return 0;
     });
 
@@ -513,7 +513,7 @@ class _NityaSevaState extends State<NityaSeva> {
         children: [
           Scaffold(
             appBar: AppBar(
-                title: CommonWidgets().customAppBarTitle(widget.title),
+                title: CommonWidgets().customAppBarTitle(Text(widget.title)),
                 actions: [
                   // TAS
                   IconButton(

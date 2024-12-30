@@ -282,7 +282,7 @@ class _SessionSummaryState extends State<SessionSummary> {
         children: [
           Scaffold(
             appBar: AppBar(
-              title: CommonWidgets().customAppBarTitle(widget.title),
+              title: CommonWidgets().customAppBarTitle(Text(widget.title)),
             ),
             body: RefreshIndicator(
               onRefresh: refresh,

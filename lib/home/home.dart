@@ -66,7 +66,7 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: CommonWidgets().customAppBarTitle(widget.title),
+        title: CommonWidgets().customAppBarTitle(Text(widget.title)),
         actions: [
           IconButton(
             icon: Icon(

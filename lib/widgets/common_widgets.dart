@@ -195,7 +195,7 @@ class CommonWidgets {
     return action.future;
   }
 
-  Widget customAppBarTitle(String title) {
+  Widget customAppBarTitle(Widget title) {
     return Container(
       width: double.infinity, // Make the container stretch horizontally
       decoration: BoxDecoration(
@@ -205,7 +205,7 @@ class CommonWidgets {
       padding: EdgeInsets.symmetric(horizontal: 16),
       child: Center(
         // Center the text inside the box
-        child: Text(title),
+        child: title,
       ),
     );
   }

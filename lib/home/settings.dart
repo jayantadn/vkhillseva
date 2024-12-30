@@ -64,7 +64,7 @@ class _SettingsState extends State<Settings> {
         children: [
           Scaffold(
             appBar: AppBar(
-              title: CommonWidgets().customAppBarTitle(widget.title),
+              title: CommonWidgets().customAppBarTitle(Text(widget.title)),
             ),
             body: RefreshIndicator(
               onRefresh: refresh,

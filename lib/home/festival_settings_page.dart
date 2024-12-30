@@ -240,7 +240,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
         children: [
           Scaffold(
             appBar: AppBar(
-                title: CommonWidgets().customAppBarTitle(widget.title),
+                title: CommonWidgets().customAppBarTitle(Text(widget.title)),
                 actions: [
                   IconButton(
                     icon: Icon(Icons.add, size: 32),

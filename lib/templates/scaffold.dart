@@ -65,7 +65,7 @@ class _NityaSevaState extends State<NityaSeva> {
         children: [
           Scaffold(
             appBar: AppBar(
-              title: CommonWidgets().customAppBarTitle(widget.title),
+              title: CommonWidgets().customAppBarTitle(Text(widget.title)),
             ),
             body: RefreshIndicator(
               onRefresh: refresh,

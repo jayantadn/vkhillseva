@@ -848,7 +848,19 @@ class _TicketPageState extends State<TicketPage> {
           Scaffold(
             // app bar
             appBar: AppBar(
-              title: CommonWidgets().customAppBarTitle(widget.session.name),
+              title: CommonWidgets().customAppBarTitle(Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.session.name,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  Text(
+                    DateFormat("dd MMM, yyyy").format(widget.session.timestamp),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              )),
               actions: [
                 // add button
                 IconButton(
@@ -897,16 +909,27 @@ class _TicketPageState extends State<TicketPage> {
             // body
             body: RefreshIndicator(
               onRefresh: refresh,
-              child: ListView.builder(
-                itemCount: _tickets.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: _createTicketTile(
-                        _tickets.length - index, _tickets[index]),
-                  );
-                },
-              ),
+              child: _tickets.isEmpty
+                  ? Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Text(
+                          "Click '+' to add a ticket",
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: _tickets.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: _createTicketTile(
+                              _tickets.length - index, _tickets[index]),
+                        );
+                      },
+                    ),
             ),
           ),
 

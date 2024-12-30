@@ -1,3 +1,11 @@
+# 0.14.0
+- feature: screenshot sharing
+- fix: crash issues with day summary
+- feature: day summary
+- fix: seva dropdown
+- feature: edit ticket
+- feature delete ticket
+
 # 0.11.0
 - feature: sesson summary
 - feature: note field

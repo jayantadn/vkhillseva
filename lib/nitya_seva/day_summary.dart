@@ -216,9 +216,12 @@ class _DaySummaryState extends State<DaySummary> {
 
               // add count to the mode
               _countMode[ticketTyped.mode] = _countMode[ticketTyped.mode]! + 1;
-              _countModePercentage[ticketTyped.mode] =
-                  ((_countMode[ticketTyped.mode]! / _grandTotal[0]) * 100)
-                      .round();
+              Const().paymentModes.forEach((key, value) {
+                if (key != 'Gift') {
+                  _countModePercentage[key] =
+                      ((_countMode[key]! / _grandTotal[0]) * 100).round();
+                }
+              });
             }
           });
         }

@@ -142,6 +142,18 @@ class _DaySummaryState extends State<DaySummary> {
         _amountTableTotalRow.add(["Amount"]);
         _grandTotal.clear();
 
+        // clear pie
+        Const().paymentModes.forEach((key, value) {
+          if (key != 'Gift') {
+            _countMode[key] = 0;
+            _countModePercentage[key] = 0;
+          }
+        });
+
+        if (sessions.isEmpty) {
+          return;
+        }
+
         // loop through each session
         for (Session session in sessions) {
           int indexSession = sessions.indexOf(session);
@@ -165,7 +177,7 @@ class _DaySummaryState extends State<DaySummary> {
             }
           });
 
-          // still doing zero filling for _amountTableTicketRow
+          // doing zero filling for _amountTableTicketRow
           for (var amount in Const().nityaSeva['amounts'] as List) {
             Map<String, dynamic> amountMap = Map<String, dynamic>.from(amount);
 

@@ -163,6 +163,7 @@ class _NityaSevaState extends State<NityaSeva> {
           Map<String, dynamic>.from(map['Settings'] as Map);
       _sessions.add(Session.fromJson(json));
     }
+    _sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
     setState(() {
       _isLoading = false;

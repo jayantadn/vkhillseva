@@ -113,7 +113,14 @@ class _DaySummaryState extends State<DaySummary> {
   void refresh() async {
     // async work
     String dbDate = DateFormat("yyyy-MM-dd").format(widget.date);
-    List sessions = await FB().getList(path: "NityaSeva/$dbDate");
+    List sessionsList = await FB().getList(path: "NityaSeva/$dbDate");
+    List<Session> sessions = [];
+    for (var sessionRaw in sessionsList) {
+      Map<String, dynamic> s =
+          Map<String, dynamic>.from(sessionRaw['Settings']);
+      sessions.add(Session.fromJson(s));
+    }
+    sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
     // sychronized work
     await _lock.synchronized(() async {
@@ -130,12 +137,9 @@ class _DaySummaryState extends State<DaySummary> {
         // loop through each session
         for (var session in sessions) {
           int indexSession = sessions.indexOf(session);
-          Map<String, dynamic> s =
-              Map<String, dynamic>.from(session['Settings']);
-          Session ss = Session.fromJson(s);
 
           // header row
-          _amountTableHeaderRow.add(ss.name);
+          _amountTableHeaderRow.add(session.name);
 
           // total row
           _amountTableTotalRow[0].add("0");
@@ -170,7 +174,7 @@ class _DaySummaryState extends State<DaySummary> {
             }
           }
           String dbSession =
-              ss.timestamp.toIso8601String().replaceAll(".", "^");
+              session.timestamp.toIso8601String().replaceAll(".", "^");
           FB()
               .getList(path: "NityaSeva/$dbDate/$dbSession/Tickets")
               .then((tickets) {
@@ -212,6 +216,8 @@ class _DaySummaryState extends State<DaySummary> {
         }
       });
     });
+
+    sessions.clear();
   }
 
   Widget _createTitlebar(BuildContext context) {

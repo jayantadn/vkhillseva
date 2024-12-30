@@ -341,15 +341,22 @@ class _TicketPageState extends State<TicketPage> {
 
     // check if ticket is not from latest session
     String dbDate = DateFormat("yyyy-MM-dd").format(now);
-    var sessions = await FB().getList(path: "NityaSeva/$dbDate");
+    var sessionsList = await FB().getList(path: "NityaSeva/$dbDate");
+    List<Session> sessions = [];
+    for (var sessionRaw in sessionsList) {
+      Map<String, dynamic> s =
+          Map<String, dynamic>.from(sessionRaw['Settings']);
+      sessions.add(Session.fromJson(s));
+    }
+    sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     if (sessions.isNotEmpty) {
-      DateTime lastSession =
-          DateTime.parse(sessions.last['Settings']['timestamp']);
+      DateTime lastSession = sessions.last.timestamp;
       if (lastSession != widget.session.timestamp) {
         errors.add("Ticket from another session");
       }
     }
 
+    sessions.clear();
     return errors;
   }
 

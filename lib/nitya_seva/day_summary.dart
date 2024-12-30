@@ -89,7 +89,6 @@ class _DaySummaryState extends State<DaySummary> {
         _amountTableHeaderRow.clear();
         _amountTableHeaderRow.add("Seva Ticket");
         _amountTableTicketRow.clear();
-        // Map<String, dynamic> ticketCount = {}; // { session : { amount: count }
 
         for (var session in sessions) {
           int indexSession = sessions.indexOf(session);
@@ -117,18 +116,26 @@ class _DaySummaryState extends State<DaySummary> {
               _amountTableTicketRow[_amountTableTicketRow.length - 1].add("0");
             }
           }
-          // ["400", "21", "0"],
-          // ["500", "14", "0"],
-          // ["1000", "1", "0"],
-          // ["2500", "1", "0"],
-          // { session : { amount: count }
           String dbSession =
               ss.timestamp.toIso8601String().replaceAll(".", "^");
           FB()
               .getList(path: "NityaSeva/$dbDate/$dbSession/Tickets")
               .then((tickets) {
             // async work in another thread
-            for (var ticket in tickets) {}
+            for (var ticket in tickets) {
+              // find the index for the amount
+              Map<String, dynamic> ticketJson =
+                  Map<String, dynamic>.from(ticket);
+              Ticket ticketTyped = Ticket.fromJson(ticketJson);
+              int index = _amountTableTicketRow
+                  .indexWhere((row) => row[0] == ticketTyped.amount.toString());
+
+              // add count to the index
+              _amountTableTicketRow[index][indexSession + 1] =
+                  (int.parse(_amountTableTicketRow[index][indexSession + 1]) +
+                          1)
+                      .toString();
+            }
           });
         }
       });

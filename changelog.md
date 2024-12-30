@@ -1,3 +1,8 @@
+# 0.14.6
+- fix: pie setstate
+- fix: pie no sessions
+- fix: pie chart
+
 # 0.14.5
 - fix: pie chart
 

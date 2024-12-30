@@ -86,6 +86,7 @@ class _DaySummaryState extends State<DaySummary> {
         _amountTableTicketRow.clear();
         _amountTableTotalRow.clear();
         _amountTableTotalRow.add(["Total"]);
+        _amountTableTotalRow.add(["Amount"]);
 
         // loop through each session
         for (var session in sessions) {
@@ -99,6 +100,7 @@ class _DaySummaryState extends State<DaySummary> {
 
           // total row
           _amountTableTotalRow[0].add("0");
+          _amountTableTotalRow[1].add("0");
 
           // ticket row
           // add zero values for the session
@@ -141,6 +143,10 @@ class _DaySummaryState extends State<DaySummary> {
               // add count to the total row
               _amountTableTotalRow[0][indexSession + 1] =
                   (int.parse(_amountTableTotalRow[0][indexSession + 1]) + 1)
+                      .toString();
+              _amountTableTotalRow[1][indexSession + 1] =
+                  (int.parse(_amountTableTotalRow[1][indexSession + 1]) +
+                          ticketTyped.amount)
                       .toString();
             }
           });
@@ -340,12 +346,15 @@ class _DaySummaryState extends State<DaySummary> {
                     )
                   : null,
               children: row.map((cell) {
+                int cellIndex = row.indexOf(cell);
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8.0), // Adjust the padding as needed
                   child: Center(
                     child: Text(
-                      cell.toString(),
+                      cellIndex == 0 || row[0] != "Amount"
+                          ? cell.toString()
+                          : Utils().formatIndianCurrency(cell.toString()),
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),

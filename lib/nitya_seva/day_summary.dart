@@ -21,14 +21,6 @@ class DaySummary extends StatefulWidget {
 
   @override
   State<DaySummary> createState() => _DaySummaryState();
-
-  void setDate(DateTime date) {
-    // set the date
-    this.date = date;
-
-    // refresh the data
-    daySummaryKey.currentState?.refresh();
-  }
 }
 
 GlobalKey<_DaySummaryState> daySummaryKey = GlobalKey<_DaySummaryState>();

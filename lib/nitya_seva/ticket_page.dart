@@ -652,7 +652,7 @@ class _TicketPageState extends State<TicketPage> {
                         // seva name dropdown
                         DropdownButton<String>(
                           isExpanded: true,
-                          value: sevaNames.isNotEmpty ? sevaNames[0] : null,
+                          value: sevaName,
                           items: sevaNames.map((String value) {
                             return DropdownMenuItem<String>(
                               value: value,

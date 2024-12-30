@@ -59,9 +59,9 @@ ThemeData themeDefault = ThemeData(
 
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
+      foregroundColor: accentColor, // Set the foreground color explicitly
       side: BorderSide(color: accentColor, width: 2.0),
       textStyle: TextStyle(
-        color: accentColor,
         fontWeight: FontWeight.bold,
         fontSize: 16.0,
       ),

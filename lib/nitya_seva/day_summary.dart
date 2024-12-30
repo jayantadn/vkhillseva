@@ -15,12 +15,20 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class DaySummary extends StatefulWidget {
-  final DateTime date;
+  DateTime date;
 
-  const DaySummary({super.key, required this.date});
+  DaySummary({super.key, required this.date});
 
   @override
   State<DaySummary> createState() => _DaySummaryState();
+
+  void setDate(DateTime date) {
+    // set the date
+    this.date = date;
+
+    // refresh the data
+    daySummaryKey.currentState?.refresh();
+  }
 }
 
 GlobalKey<_DaySummaryState> daySummaryKey = GlobalKey<_DaySummaryState>();

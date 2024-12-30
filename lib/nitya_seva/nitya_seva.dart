@@ -491,6 +491,11 @@ class _NityaSevaState extends State<NityaSeva> {
     );
   }
 
+  void _onDateChange(DateTime date) {
+    _selectedDate = date;
+    refresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -536,8 +541,7 @@ class _NityaSevaState extends State<NityaSeva> {
                     // date header
                     DateHeader(callbacks:
                         DateHeaderCallbacks(onChange: (DateTime date) {
-                      _selectedDate = date;
-                      refresh();
+                      _onDateChange(date);
                     })),
 
                     // Session tiles

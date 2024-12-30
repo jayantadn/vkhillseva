@@ -10,6 +10,9 @@ import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/common/utils.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/nitya_seva/ticket_page.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class DaySummary extends StatefulWidget {
   final DateTime date;
@@ -27,7 +30,7 @@ class _DaySummaryState extends State<DaySummary> {
   DateTime _lastCallbackInvoked = DateTime.now();
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
-  ScreenshotController screenshotController = ScreenshotController();
+  ScreenshotController _screenshotController = ScreenshotController();
 
   // ticket table data for day summary
   final List<String> _amountTableHeaderRow = [];
@@ -237,8 +240,22 @@ class _DaySummaryState extends State<DaySummary> {
           // Share Button
           GestureDetector(
             child: Icon(Icons.share, color: Colors.white),
-            onTap: () {
-              Share.share('check out my website https://example.com');
+            onTap: () async {
+              String date = DateFormat('yyyy-MM-dd').format(widget.date);
+
+              final image = await _screenshotController.capture();
+              if (image != null) {
+                final directory = await getApplicationDocumentsDirectory();
+                final imagePath =
+                    await File('${directory.path}/DaySummary_$date.png')
+                        .create();
+                await imagePath.writeAsBytes(image);
+
+                Share.shareXFiles(
+                  [XFile(imagePath.path)],
+                  text: 'Day Summary for $date',
+                );
+              }
             },
           ),
         ],
@@ -537,48 +554,51 @@ class _DaySummaryState extends State<DaySummary> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _createTitlebar(context),
+    return Screenshot(
+      controller: _screenshotController,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _createTitlebar(context),
 
-          // body
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                // create chart for payment mode
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 100, // Reduced width
-                      height: 100, // Reduced height
-                      child: _createModeChart(context),
-                    ),
-                    const SizedBox(
-                        width: 30), // Increased width for more padding
-                    _wLegends(),
-                  ],
-                ),
+            // body
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  // create chart for payment mode
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 100, // Reduced width
+                        height: 100, // Reduced height
+                        child: _createModeChart(context),
+                      ),
+                      const SizedBox(
+                          width: 30), // Increased width for more padding
+                      _wLegends(),
+                    ],
+                  ),
 
-                SizedBox(height: 8),
+                  SizedBox(height: 8),
 
-                // table for tickets
-                _createTicketTable(context),
+                  // table for tickets
+                  _createTicketTable(context),
 
-                SizedBox(height: 8),
+                  SizedBox(height: 8),
 
-                // tiles for total
-                _createGrandTotal(context),
-              ],
+                  // tiles for total
+                  _createGrandTotal(context),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

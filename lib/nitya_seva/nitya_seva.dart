@@ -384,12 +384,12 @@ class _NityaSevaState extends State<NityaSeva> {
                 // add session
                 if (session == null) {
                   List<String> errors = _preValidation(newSession);
-                  String? ret = 'Create';
+                  String? ret = 'Proceed';
                   if (errors.isNotEmpty) {
                     ret = await CommonWidgets()
                         .createErrorDialog(context: context, errors: errors);
                   }
-                  if (errors.isEmpty || ret == 'Create') {
+                  if (errors.isEmpty || ret == 'Proceed') {
                     // push to db
                     FB().addToList(
                       path: "NityaSeva/$dbDate",

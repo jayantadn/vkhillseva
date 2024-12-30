@@ -131,133 +131,157 @@ class _TicketPageState extends State<TicketPage> {
         .values
         .first['color']! as Color;
 
-    return Row(
-      children: [
-        // left badge
-        Container(
-          color: color,
-          child: SizedBox(
-            height: sizeOfContainer,
-            width: sizeOfContainer,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // serial number
-                Text(sl.toString(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineLarge!
-                        .copyWith(color: backgroundColor)),
-
-                // ticket number
-                Text("#${ticket.ticketNumber}",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium!
-                        .copyWith(color: backgroundColor)),
-              ],
-            ),
-          ),
-        ),
-        Expanded(
-          child: Container(
-            height: sizeOfContainer,
-            decoration: BoxDecoration(
-              border: Border.all(color: color),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Dismissible(
+      key: Key(ticket.ticketNumber.toString()),
+      background: Container(
+        color: Colors.blue,
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Icon(Icons.edit, color: Colors.white),
+      ),
+      secondaryBackground: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Icon(Icons.delete, color: Colors.white),
+      ),
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          return false;
+        } else if (direction == DismissDirection.endToStart) {
+          _deleteTicket(ticket);
+          return false;
+        }
+        return false;
+      },
+      child: Row(
+        children: [
+          // left badge
+          Container(
+            color: color,
+            child: SizedBox(
+              height: sizeOfContainer,
+              width: sizeOfContainer,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(children: [
-                            // seva name headline
-                            Flexible(
-                              child: Text(ticket.seva,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall!
-                                      .copyWith(color: color)),
-                            ),
+                  // serial number
+                  Text(sl.toString(),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineLarge!
+                          .copyWith(color: backgroundColor)),
 
-                            // note icon
-                            SizedBox(width: 8),
-                            if (ticket.note.isNotEmpty)
-                              GestureDetector(
-                                onTap: () {
-                                  // Handle note click event
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text('Note'),
-                                        content: Text(ticket.note),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text('Close'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    color: Colors.yellow,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(1.0),
-                                    child: Text('Note',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(color: Colors.black)),
-                                  ),
-                                ),
-                              ),
-                          ]),
-
-                          // other details
-                          SizedBox(height: 2),
-                          Text(
-                            "${ticket.user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
-                            style: Theme.of(context).textTheme.bodySmall,
-                            softWrap: true,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // right side image
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: primaryColor, width: 1),
-                    ),
-                    child: CircleAvatar(
-                      backgroundImage: AssetImage(
-                        ticket.image,
-                      ),
-                      radius: sizeOfContainer / 2,
-                    ),
-                  ),
+                  // ticket number
+                  Text("#${ticket.ticketNumber}",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: backgroundColor)),
                 ],
               ),
             ),
           ),
-        ),
-      ],
+          Expanded(
+            child: Container(
+              height: sizeOfContainer,
+              decoration: BoxDecoration(
+                border: Border.all(color: color),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              // seva name headline
+                              Flexible(
+                                child: Text(ticket.seva,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall!
+                                        .copyWith(color: color)),
+                              ),
+
+                              // note icon
+                              SizedBox(width: 8),
+                              if (ticket.note.isNotEmpty)
+                                GestureDetector(
+                                  onTap: () {
+                                    // Handle note click event
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Note'),
+                                          content: Text(ticket.note),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text('Close'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey),
+                                      color: Colors.yellow,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(1.0),
+                                      child: Text('Note',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall!
+                                              .copyWith(color: Colors.black)),
+                                    ),
+                                  ),
+                                ),
+                            ]),
+
+                            // other details
+                            SizedBox(height: 2),
+                            Text(
+                              "${ticket.user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
+                              style: Theme.of(context).textTheme.bodySmall,
+                              softWrap: true,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // right side image
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: primaryColor, width: 1),
+                      ),
+                      child: CircleAvatar(
+                        backgroundImage: AssetImage(
+                          ticket.image,
+                        ),
+                        radius: sizeOfContainer / 2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -297,6 +321,31 @@ class _TicketPageState extends State<TicketPage> {
     if (filteredTickets.isNotEmpty && filteredTickets.length > 1) {
       if (ticket.ticketNumber - filteredTickets.first.ticketNumber != 1) {
         errors.add("Ticket number should be contiguous");
+      }
+    }
+
+    return errors;
+  }
+
+  Future<List<String>> _prevalidateDelete(Ticket ticket) async {
+    List<String> errors = [];
+
+    // check if ticket is from another date
+    DateTime now = DateTime.now();
+    if (ticket.timestamp.day != now.day ||
+        ticket.timestamp.month != now.month ||
+        ticket.timestamp.year != now.year) {
+      errors.add("Ticket from another date");
+    }
+
+    // check if ticket is not from latest session
+    String dbDate = DateFormat("yyyy-MM-dd").format(now);
+    var sessions = await FB().getList(path: "NityaSeva/$dbDate");
+    if (sessions.isNotEmpty) {
+      DateTime lastSession =
+          DateTime.parse(sessions.last['Settings']['timestamp']);
+      if (lastSession != widget.session.timestamp) {
+        errors.add("Ticket from another session");
       }
     }
 
@@ -349,7 +398,35 @@ class _TicketPageState extends State<TicketPage> {
     return errors;
   }
 
-  void _deleteTicket(Ticket ticket) {}
+  Future<void> _deleteTicket(Ticket ticket) async {
+    List<String> errors = await _prevalidateDelete(ticket);
+
+    if (errors.isNotEmpty) {
+      await CommonWidgets().createErrorDialog(
+        context: context,
+        errors: errors,
+        noaction: true,
+      );
+      return;
+    }
+
+    CommonWidgets().confirm(
+        context: context,
+        callbacks: ConfirmationCallbacks(onConfirm: () {
+          // delete ticket from list
+          setState(() {
+            _tickets.remove(ticket);
+          });
+
+          // delete ticket from database
+          String dbDate =
+              DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
+          String dbSession =
+              widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+          String key = ticket.timestamp.toIso8601String().replaceAll(".", "^");
+          FB().deleteValue(path: "NityaSeva/$dbDate/$dbSession/Tickets/$key");
+        }));
+  }
 
   void _addEditTicket(context) {
     // locals

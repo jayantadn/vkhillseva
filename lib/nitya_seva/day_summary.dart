@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
@@ -21,6 +24,8 @@ GlobalKey<_DaySummaryState> daySummaryKey = GlobalKey<_DaySummaryState>();
 
 class _DaySummaryState extends State<DaySummary> {
   final Lock _lock = Lock();
+  DateTime _lastCallbackInvoked = DateTime.now();
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   // ticket table data for day summary
   final List<String> _amountTableHeaderRow = [];
@@ -31,20 +36,55 @@ class _DaySummaryState extends State<DaySummary> {
   // pie chart data
   final Map<String, int> _countMode = {
     // {mode: count}
-    'UPI': 16,
-    'Cash': 19,
-    'Card': 6,
   };
   final Map<String, int> _countModePercentage = {
     // {mode: percentage}
-    'UPI': 40,
-    'Cash': 45,
-    'Card': 15,
   };
 
   @override
   void initState() {
     super.initState();
+
+// listed to database events
+    String dbDate = DateFormat('yyyy-MM-dd').format(widget.date);
+    FB().listenForChange(
+        "NityaSeva/$dbDate",
+        FBCallbacks(
+          // add
+          add: (data) {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              refresh();
+            }
+          },
+
+          // edit
+          edit: () {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              refresh();
+            }
+          },
+
+          // delete
+          delete: (data) {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              refresh();
+            }
+          },
+
+          // get listeners
+          getListeners: (listeners) {
+            _listeners = listeners;
+          },
+        ));
 
     refresh();
   }
@@ -58,6 +98,9 @@ class _DaySummaryState extends State<DaySummary> {
     _amountTableTotalRow.clear();
 
     // clear all controllers
+    for (var element in _listeners) {
+      element.cancel();
+    }
 
     super.dispose();
   }

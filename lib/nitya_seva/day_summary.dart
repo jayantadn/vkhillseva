@@ -26,7 +26,7 @@ class _DaySummaryState extends State<DaySummary> {
   final List<String> _amountTableHeaderRow = [];
   final List<List<String>> _amountTableTicketRow = [];
   final List<List<String>> _amountTableTotalRow = [];
-  final List<int> _grandTotal = [39, 20300]; // [totalTicket, totalAmount]
+  final List<int> _grandTotal = []; // [totalTicket, totalAmount]
 
   // pie chart data
   final Map<String, int> _countMode = {
@@ -34,7 +34,6 @@ class _DaySummaryState extends State<DaySummary> {
     'UPI': 16,
     'Cash': 19,
     'Card': 6,
-    'Gift': 0,
   };
   final Map<String, int> _countModePercentage = {
     // {mode: percentage}
@@ -98,8 +97,15 @@ class _DaySummaryState extends State<DaySummary> {
           _grandTotal.add(0);
           _grandTotal.add(0);
 
-          // ticket row
-          // add zero values for the session
+          // count mode
+          Const().paymentModes.forEach((key, value) {
+            if (key != 'Gift') {
+              _countMode[key] = 0;
+              _countModePercentage[key] = 0;
+            }
+          });
+
+          // loop through each ticket in the session
           for (var amount in Const().nityaSeva['amounts'] as List) {
             Map<String, dynamic> amountMap = Map<String, dynamic>.from(amount);
 
@@ -121,7 +127,6 @@ class _DaySummaryState extends State<DaySummary> {
               .getList(path: "NityaSeva/$dbDate/$dbSession/Tickets")
               .then((tickets) {
             // async work in another thread
-            // loop through each ticket in the session
             for (var ticket in tickets) {
               // find the index for the amount
               Map<String, dynamic> ticketJson =
@@ -148,6 +153,12 @@ class _DaySummaryState extends State<DaySummary> {
               // add count to the grand total
               _grandTotal[0] += 1;
               _grandTotal[1] += ticketTyped.amount;
+
+              // add count to the mode
+              _countMode[ticketTyped.mode] = _countMode[ticketTyped.mode]! + 1;
+              _countModePercentage[ticketTyped.mode] =
+                  ((_countMode[ticketTyped.mode]! / _grandTotal[0]) * 100)
+                      .round();
             }
           });
         }

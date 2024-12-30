@@ -1,3 +1,8 @@
+# 0.14.1
+- fix: height of grand total
+- fix: sort sessions
+- fix: update version to 0.14.1 and refactor MyApp initialization
+
 <<<<<<< HEAD
 # 0.13.0
 

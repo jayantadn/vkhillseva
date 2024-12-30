@@ -1,3 +1,6 @@
+# 0.14.4
+- fix: day summary updating on date scroll
+
 # 0.14.3
 - fix: update date scroller for day summary
 

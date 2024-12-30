@@ -472,6 +472,7 @@ class _NityaSevaState extends State<NityaSeva> {
                 // confirmation dialog
                 CommonWidgets().confirm(
                     context: context,
+                    msg: 'Are you sure you want to delete this session?',
                     callbacks: ConfirmationCallbacks(onConfirm: () {
                       // TODO: pre validations e.g. for admin only
 

@@ -422,6 +422,7 @@ class _TicketPageState extends State<TicketPage> {
 
     CommonWidgets().confirm(
         context: context,
+        msg: "Are you sure you want to delete this ticket?",
         callbacks: ConfirmationCallbacks(onConfirm: () {
           // delete ticket from list
           setState(() {

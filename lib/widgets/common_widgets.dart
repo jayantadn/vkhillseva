@@ -88,14 +88,13 @@ class CommonWidgets {
     // populate skipErrorCheck
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? sk = prefs.getString('SkipErrorCheck');
-    bool skipErrorCheck = false;
     if (sk != null) {
       DateTime today = DateTime.now();
       DateTime skDate = DateTime.parse(sk);
       if (today.year == skDate.year &&
           today.month == skDate.month &&
           today.day == skDate.day) {
-        skipErrorCheck = true;
+        return 'Proceed';
       }
     }
 
@@ -107,7 +106,7 @@ class CommonWidgets {
             children: [
               Icon(Icons.error, color: Colors.red),
               SizedBox(width: 10),
-              Text('ERROR',
+              Text('WARNING',
                   style: Theme.of(context)
                       .textTheme
                       .headlineMedium!
@@ -129,17 +128,10 @@ class CommonWidgets {
                     alignment: Alignment.centerLeft,
                     child: Text(" - $error"),
                   ),
-
-                // checkbox to skip error checks
-                CheckboxListTile(
-                  title: Text('Skip error checks for today',
-                      style: Theme.of(context).textTheme.bodySmall),
-                  value: skipErrorCheck,
-                  onChanged: (bool? value) {
-                    if (value != null) {
-                      if (value) {}
-                    }
-                  },
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                      "\nClick 'Proceed' to ignore the errors and continue"),
                 ),
               ],
             ),
@@ -161,6 +153,18 @@ class CommonWidgets {
                 onPressed: () {
                   Navigator.of(context).pop();
                   action.complete('Proceed');
+                },
+              ),
+
+            // skip button
+            if (post == false && noaction == false)
+              TextButton(
+                child: Text('Proceed and disable error'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  action.complete('Proceed');
+                  prefs.setString(
+                      'SkipErrorCheck', DateTime.now().toIso8601String());
                 },
               ),
 

@@ -270,12 +270,16 @@ class _DaySummaryState extends State<DaySummary> {
   }
 
   Widget _createGrandTotal(BuildContext context) {
+    double width = 100;
+    double height = 110;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // total tickets sold
         SizedBox(
-          width: 100, // Set the desired width
+          width: width,
+          height: height,
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0), // Set the border radius
@@ -319,7 +323,8 @@ class _DaySummaryState extends State<DaySummary> {
 
         // total amount
         SizedBox(
-          width: 100, // Set the same width as the first card
+          width: width,
+          height: height,
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0), // Set the border radius

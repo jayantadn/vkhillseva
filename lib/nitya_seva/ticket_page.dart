@@ -147,6 +147,7 @@ class _TicketPageState extends State<TicketPage> {
       ),
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
+          _addEditTicket(context, ticket);
           return false;
         } else if (direction == DismissDirection.endToStart) {
           _deleteTicket(ticket);
@@ -430,12 +431,13 @@ class _TicketPageState extends State<TicketPage> {
         }));
   }
 
-  void _addEditTicket(context) {
+  void _addEditTicket(context, Ticket? ticket) {
     // locals
-    int amount = widget.session.defaultAmount;
-    int ticketNumber = 0;
-    String mode = widget.session.defaultPaymentMode;
-    String sevaName = "";
+    int amount = ticket == null ? widget.session.defaultAmount : ticket.amount;
+    int ticketNumber = ticket == null ? 0 : ticket.ticketNumber;
+    String mode =
+        ticket == null ? widget.session.defaultPaymentMode : ticket.mode;
+    String sevaName = ticket == null ? "" : ticket.seva;
 
     // lists
     List<String> sevaNames = [];
@@ -444,15 +446,20 @@ class _TicketPageState extends State<TicketPage> {
 
     // controllers
     TextEditingController ticketNumberController = TextEditingController();
-    TextEditingController noteController = TextEditingController();
+    TextEditingController noteController =
+        TextEditingController(text: ticket == null ? "" : ticket.note);
 
     // field values
-    if (filteredTickets.isNotEmpty) {
-      ticketNumber = filteredTickets.first.ticketNumber + 1;
+    if (ticket == null) {
+      if (filteredTickets.isNotEmpty) {
+        ticketNumber = filteredTickets.first.ticketNumber + 1;
+      }
     }
     ticketNumberController.text = ticketNumber.toString();
     sevaNames = _getSevaNames(amount);
-    sevaName = sevaNames.isNotEmpty ? sevaNames[0] : "";
+    if (ticket == null) {
+      sevaName = sevaNames.isNotEmpty ? sevaNames[0] : "";
+    }
 
     showGeneralDialog(
       context: context,
@@ -483,7 +490,7 @@ class _TicketPageState extends State<TicketPage> {
                           keyboardType: TextInputType.number,
                         ),
 
-                        // Seva amount
+                        // Seva amount label
                         SizedBox(height: 8),
                         Align(
                           alignment: Alignment.centerLeft,
@@ -495,6 +502,8 @@ class _TicketPageState extends State<TicketPage> {
                                 .copyWith(color: accentColor),
                           ),
                         ),
+
+                        // buttons for seva amounts
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
@@ -558,7 +567,7 @@ class _TicketPageState extends State<TicketPage> {
                           ),
                         ),
 
-                        // Payment mode
+                        // Payment mode label
                         SizedBox(height: 8),
                         Align(
                           alignment: Alignment.centerLeft,
@@ -570,6 +579,8 @@ class _TicketPageState extends State<TicketPage> {
                                 .copyWith(color: accentColor),
                           ),
                         ),
+
+                        // seva amount buttons
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
@@ -625,7 +636,7 @@ class _TicketPageState extends State<TicketPage> {
                           ),
                         ),
 
-                        // seva name
+                        // seva name label
                         SizedBox(height: 8),
                         Align(
                           alignment: Alignment.centerLeft,
@@ -637,6 +648,8 @@ class _TicketPageState extends State<TicketPage> {
                                 .copyWith(color: accentColor),
                           ),
                         ),
+
+                        // seva name dropdown
                         DropdownButton<String>(
                           isExpanded: true,
                           value: sevaNames.isNotEmpty ? sevaNames[0] : null,
@@ -689,7 +702,7 @@ class _TicketPageState extends State<TicketPage> {
                             SizedBox(width: 8),
                             Expanded(
                               child: ElevatedButton(
-                                child: Text("Add"),
+                                child: Text(ticket == null ? "Add" : "Update"),
                                 onPressed: () async {
                                   Navigator.pop(context);
 
@@ -705,8 +718,10 @@ class _TicketPageState extends State<TicketPage> {
                                       element['name'] == sevaName)['icon'];
 
                                   // create ticket
-                                  Ticket ticket = Ticket(
-                                    timestamp: DateTime.now(),
+                                  Ticket t = Ticket(
+                                    timestamp: ticket == null
+                                        ? DateTime.now()
+                                        : ticket.timestamp,
                                     amount: amount,
                                     mode: mode,
                                     ticketNumber:
@@ -718,20 +733,28 @@ class _TicketPageState extends State<TicketPage> {
                                   );
 
                                   // pre validations
-                                  List<String> errors =
-                                      _prevalidateTicket(ticket);
-                                  if (errors.isNotEmpty) {
-                                    String? action = await CommonWidgets()
-                                        .createErrorDialog(
-                                            context: context, errors: errors);
-                                    if (action == "Cancel") {
-                                      return;
+                                  List<String> errors = [];
+                                  if (ticket == null) {
+                                    errors = _prevalidateTicket(t);
+                                    if (errors.isNotEmpty) {
+                                      String? action = await CommonWidgets()
+                                          .createErrorDialog(
+                                              context: context, errors: errors);
+                                      if (action == "Cancel") {
+                                        return;
+                                      }
                                     }
                                   }
 
                                   // add ticket to list
                                   setState(() {
-                                    _tickets.insert(0, ticket);
+                                    if (ticket == null) {
+                                      _tickets.insert(0, t);
+                                    } else {
+                                      _tickets[_tickets.indexWhere((element) =>
+                                          element.timestamp ==
+                                          ticket.timestamp)] = t;
+                                    }
                                   });
 
                                   // add ticket to database
@@ -741,10 +764,18 @@ class _TicketPageState extends State<TicketPage> {
                                   String dbSession = widget.session.timestamp
                                       .toIso8601String()
                                       .replaceAll(".", "^");
+                                  if (ticket != null) {
+                                    String key = ticket.timestamp
+                                        .toIso8601String()
+                                        .replaceAll(".", "^");
+                                    FB().deleteValue(
+                                        path:
+                                            "NityaSeva/$dbDate/$dbSession/Tickets/$key");
+                                  }
                                   FB().addToList(
                                       path:
                                           "NityaSeva/$dbDate/$dbSession/Tickets",
-                                      data: ticket.toJson());
+                                      data: t.toJson());
 
                                   // post validations
                                   if (errors.isEmpty) {
@@ -757,9 +788,9 @@ class _TicketPageState extends State<TicketPage> {
                                               post: true);
 
                                       if (action == "Delete") {
-                                        _deleteTicket(ticket);
+                                        _deleteTicket(t);
                                       } else if (action == "Edit") {
-                                        _addEditTicket(ticket);
+                                        _addEditTicket(context, t);
                                       }
                                     }
                                   }
@@ -813,7 +844,7 @@ class _TicketPageState extends State<TicketPage> {
                 IconButton(
                   icon: Icon(Icons.add, size: 32),
                   onPressed: () {
-                    _addEditTicket(context);
+                    _addEditTicket(context, null);
                   },
                 ),
 

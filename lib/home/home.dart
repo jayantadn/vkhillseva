@@ -130,24 +130,30 @@ class _MyHomePageState extends State<HomePage> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  LauncherTile(
-                      image: 'assets/images/LauncherIcons/NityaSeva.png',
-                      title: "Nitya Seva",
-                      callback: LauncherTileCallback(onClick: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const NityaSeva(title: "Nitya Seva")),
-                        );
-                      })),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: LauncherTile(
+                        image: 'assets/images/LauncherIcons/NityaSeva.png',
+                        title: "Nitya Seva",
+                        callback: LauncherTileCallback(onClick: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const NityaSeva(title: "Nitya Seva")),
+                          );
+                        })),
+                  ),
                   LauncherTile(
                     image: 'assets/images/LauncherIcons/Harinaam.png',
                     title: "Harinaam",
                   ),
-                  LauncherTile(
-                    image: 'assets/images/LauncherIcons/Deepotsava.png',
-                    title: "Deepotsava",
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: LauncherTile(
+                      image: 'assets/images/LauncherIcons/Deepotsava.png',
+                      title: "Deepotsava",
+                    ),
                   ),
                 ],
               ),

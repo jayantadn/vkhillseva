@@ -600,13 +600,15 @@ class _DaySummaryState extends State<DaySummary> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // pie chart
                       SizedBox(
-                        width: 100, // Reduced width
-                        height: 100, // Reduced height
+                        width: 100,
+                        height: 100,
                         child: _createModeChart(context),
                       ),
-                      const SizedBox(
-                          width: 30), // Increased width for more padding
+
+                      // legends
+                      const SizedBox(width: 30),
                       _wLegends(),
                     ],
                   ),

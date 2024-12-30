@@ -266,7 +266,8 @@ class _DaySummaryState extends State<DaySummary> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
-                      child: Text(_grandTotal[0].toString(),
+                      child: Text(
+                          _grandTotal.isEmpty ? "0" : _grandTotal[0].toString(),
                           style:
                               Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     color: Colors.white,
@@ -310,7 +311,10 @@ class _DaySummaryState extends State<DaySummary> {
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: Text(
-                        Utils().formatIndianCurrency(_grandTotal[1].toString()),
+                        _grandTotal.isEmpty
+                            ? "0"
+                            : Utils().formatIndianCurrency(
+                                _grandTotal[1].toString()),
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -337,7 +341,9 @@ class _DaySummaryState extends State<DaySummary> {
   }
 
   Widget _createTicketTable(BuildContext context) {
-    if (_amountTableHeaderRow.length == 1 || _grandTotal[0] == 0) {
+    if (_amountTableHeaderRow.length == 1 ||
+        _grandTotal.isEmpty ||
+        _grandTotal[0] == 0) {
       return const Text("no data");
     }
 
@@ -454,6 +460,12 @@ class _DaySummaryState extends State<DaySummary> {
 
   Widget _createModeChart(BuildContext context) {
     double radius = 40;
+
+    if (_countModePercentage['UPI'] == null &&
+        _countModePercentage['Cash'] == null &&
+        _countModePercentage['Card'] == null) {
+      return const Text("");
+    }
 
     if (_countModePercentage['UPI'] == 0 &&
         _countModePercentage['Cash'] == 0 &&

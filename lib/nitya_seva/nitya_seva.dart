@@ -492,7 +492,9 @@ class _NityaSevaState extends State<NityaSeva> {
   }
 
   void _onDateChange(DateTime date) {
-    _selectedDate = date;
+    setState(() {
+      _selectedDate = date;
+    });
     refresh();
   }
 

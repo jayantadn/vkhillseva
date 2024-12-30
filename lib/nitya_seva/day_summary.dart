@@ -15,7 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class DaySummary extends StatefulWidget {
-  DateTime date;
+  final DateTime date;
 
   DaySummary({super.key, required this.date});
 
@@ -92,6 +92,14 @@ class _DaySummaryState extends State<DaySummary> {
         ));
 
     refresh();
+  }
+
+  @override
+  void didUpdateWidget(DaySummary oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.date != widget.date) {
+      refresh();
+    }
   }
 
   @override

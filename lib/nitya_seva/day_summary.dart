@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/common/utils.dart';
+import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/nitya_seva/ticket_page.dart';
 
 class DaySummary extends StatefulWidget {
-  const DaySummary({super.key});
+  final DateTime date;
+
+  const DaySummary({super.key, required this.date});
 
   @override
   State<DaySummary> createState() => _DaySummaryState();
@@ -16,19 +23,16 @@ class _DaySummaryState extends State<DaySummary> {
   final Lock _lock = Lock();
 
   // ticket table data for day summary
-  List<String> amountTableHeaderRow = [
+  final List<String> _amountTableHeaderRow = [
     "Seva Ticket",
-    "Sat Morning",
-    "Sat Evening"
   ];
-  List<int> grandTotal = [39, 20300]; // [totalTicket, totalAmount]
-  List<List<String>> amountTableTicketRow = [
-    ["400", "21", "0"],
-    ["500", "14", "0"],
-    ["1000", "1", "0"],
-    ["2500", "1", "0"],
+  final List<List<String>> _amountTableTicketRow = [
+    // ["400", "21", "0"],
+    // ["500", "14", "0"],
+    // ["1000", "1", "0"],
+    // ["2500", "1", "0"],
   ];
-  List<List<String>> amountTableTotalRow = [
+  final List<List<String>> _amountTableTotalRow = [
     ["Total", "37", "0"],
     [
       "Amount",
@@ -36,16 +40,17 @@ class _DaySummaryState extends State<DaySummary> {
       Utils().formatIndianCurrency("0")
     ]
   ];
+  final List<int> _grandTotal = [39, 20300]; // [totalTicket, totalAmount]
 
   // pie chart data
-  Map<String, int> countMode = {
+  final Map<String, int> _countMode = {
     // {mode: count}
     'UPI': 16,
     'Cash': 19,
     'Card': 6,
     'Gift': 0,
   };
-  Map<String, int> countModePercentage = {
+  final Map<String, int> _countModePercentage = {
     // {mode: percentage}
     'UPI': 40,
     'Cash': 45,
@@ -62,6 +67,10 @@ class _DaySummaryState extends State<DaySummary> {
   @override
   dispose() {
     // clear all lists
+    _amountTableHeaderRow.clear();
+    _grandTotal.clear();
+    _amountTableTicketRow.clear();
+    _amountTableTotalRow.clear();
 
     // clear all controllers
 
@@ -69,11 +78,61 @@ class _DaySummaryState extends State<DaySummary> {
   }
 
   void refresh() async {
-    await _lock.synchronized(() async {
-      // all you need to do
-    });
+    // async work
+    String dbDate = DateFormat("yyyy-MM-dd").format(widget.date);
+    List sessions = await FB().getList(path: "NityaSeva/$dbDate");
 
-    setState(() {});
+    // sychronized work
+    await _lock.synchronized(() async {
+      setState(() {
+        // clear everything
+        _amountTableHeaderRow.clear();
+        _amountTableHeaderRow.add("Seva Ticket");
+        _amountTableTicketRow.clear();
+        // Map<String, dynamic> ticketCount = {}; // { session : { amount: count }
+
+        for (var session in sessions) {
+          int indexSession = sessions.indexOf(session);
+          Map<String, dynamic> s =
+              Map<String, dynamic>.from(session['Settings']);
+          Session ss = Session.fromJson(s);
+
+          // header row
+          _amountTableHeaderRow.add(ss.name);
+
+          // ticket row
+          // add zero values for the session
+          for (var amount in Const().nityaSeva['amounts'] as List) {
+            Map<String, dynamic> amountMap = Map<String, dynamic>.from(amount);
+
+            // checking if the amount was already entered
+            int index = _amountTableTicketRow
+                .indexWhere((row) => row[0] == amountMap.keys.first);
+            if (index >= 0) {
+              // amount was indeed entered
+              _amountTableTicketRow[index].add("0");
+            } else {
+              // no entry found for the amount
+              _amountTableTicketRow.add([amountMap.keys.first]);
+              _amountTableTicketRow[_amountTableTicketRow.length - 1].add("0");
+            }
+          }
+          // ["400", "21", "0"],
+          // ["500", "14", "0"],
+          // ["1000", "1", "0"],
+          // ["2500", "1", "0"],
+          // { session : { amount: count }
+          String dbSession =
+              ss.timestamp.toIso8601String().replaceAll(".", "^");
+          FB()
+              .getList(path: "NityaSeva/$dbDate/$dbSession/Tickets")
+              .then((tickets) {
+            // async work in another thread
+            for (var ticket in tickets) {}
+          });
+        }
+      });
+    });
   }
 
   Widget _createTitlebar(BuildContext context) {
@@ -204,7 +263,7 @@ class _DaySummaryState extends State<DaySummary> {
   }
 
   Widget _createTicketTable(BuildContext context) {
-    if (amountTableHeaderRow.length == 1 || grandTotal[0] == 0) {
+    if (_amountTableHeaderRow.length == 1 || _grandTotal[0] == 0) {
       return const Text("no data");
     }
 
@@ -224,7 +283,7 @@ class _DaySummaryState extends State<DaySummary> {
         children: [
           // table header
           TableRow(
-            children: amountTableHeaderRow.map((header) {
+            children: _amountTableHeaderRow.map((header) {
               return Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 8.0), // Adjust the padding as needed
@@ -239,7 +298,7 @@ class _DaySummaryState extends State<DaySummary> {
           ),
 
           // row for entries
-          ...amountTableTicketRow.map((row) {
+          ..._amountTableTicketRow.map((row) {
             return TableRow(
               children: row.map((cell) {
                 return Padding(
@@ -257,9 +316,9 @@ class _DaySummaryState extends State<DaySummary> {
           }),
 
           // row for total
-          ...amountTableTotalRow.map((row) {
+          ..._amountTableTotalRow.map((row) {
             return TableRow(
-              decoration: amountTableTotalRow.indexOf(row) == 0
+              decoration: _amountTableTotalRow.indexOf(row) == 0
                   ? const BoxDecoration(
                       border: Border(
                         top: BorderSide(color: Colors.grey),
@@ -286,9 +345,9 @@ class _DaySummaryState extends State<DaySummary> {
   }
 
   Widget _wLegends() {
-    if (countModePercentage['UPI'] == 0 &&
-        countModePercentage['Cash'] == 0 &&
-        countModePercentage['Card'] == 0) {
+    if (_countModePercentage['UPI'] == 0 &&
+        _countModePercentage['Cash'] == 0 &&
+        _countModePercentage['Card'] == 0) {
       return const Text("");
     }
     return Column(
@@ -319,9 +378,9 @@ class _DaySummaryState extends State<DaySummary> {
   Widget _createModeChart(BuildContext context) {
     double radius = 40;
 
-    if (countModePercentage['UPI'] == 0 &&
-        countModePercentage['Cash'] == 0 &&
-        countModePercentage['Card'] == 0) {
+    if (_countModePercentage['UPI'] == 0 &&
+        _countModePercentage['Cash'] == 0 &&
+        _countModePercentage['Card'] == 0) {
       return const Text("");
     }
 
@@ -331,52 +390,52 @@ class _DaySummaryState extends State<DaySummary> {
           // UPI
           PieChartSectionData(
             color: Colors.orange,
-            value: countModePercentage['UPI']!.toDouble(),
-            title: '${countMode['UPI']}',
+            value: _countModePercentage['UPI']!.toDouble(),
+            title: '${_countMode['UPI']}',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: countModePercentage['UPI']! > 9
+              color: _countModePercentage['UPI']! > 9
                   ? Colors.white
                   : Theme.of(context).textTheme.bodyLarge!.color,
             ),
             titlePositionPercentageOffset:
-                countModePercentage['UPI']! > 9 ? 0.5 : 1.2,
+                _countModePercentage['UPI']! > 9 ? 0.5 : 1.2,
           ),
 
           // cash
           PieChartSectionData(
             color: Colors.green,
-            value: countModePercentage['Cash']!.toDouble(),
-            title: '${countMode['Cash']}',
+            value: _countModePercentage['Cash']!.toDouble(),
+            title: '${_countMode['Cash']}',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: countModePercentage['Cash']! > 9
+              color: _countModePercentage['Cash']! > 9
                   ? Colors.white
                   : Theme.of(context).textTheme.bodyLarge!.color,
             ),
             titlePositionPercentageOffset:
-                countModePercentage['Cash']! > 9 ? 0.5 : 1.2,
+                _countModePercentage['Cash']! > 9 ? 0.5 : 1.2,
           ),
 
           // card
           PieChartSectionData(
             color: Colors.blue,
-            value: countModePercentage['Card']!.toDouble(),
-            title: '${countMode['Card']}',
+            value: _countModePercentage['Card']!.toDouble(),
+            title: '${_countMode['Card']}',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: countModePercentage['Card']! > 9
+              color: _countModePercentage['Card']! > 9
                   ? Colors.white
                   : Theme.of(context).textTheme.bodyLarge!.color,
             ),
             titlePositionPercentageOffset:
-                countModePercentage['Card']! > 9 ? 0.5 : 1.2,
+                _countModePercentage['Card']! > 9 ? 0.5 : 1.2,
           ),
         ],
         sectionsSpace: 2,

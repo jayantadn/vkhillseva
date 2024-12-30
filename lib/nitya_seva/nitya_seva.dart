@@ -584,7 +584,7 @@ class _NityaSevaState extends State<NityaSeva> {
                     ),
 
                     // summary
-                    DaySummary(),
+                    DaySummary(date: _selectedDate),
                   ],
                 ),
               ),

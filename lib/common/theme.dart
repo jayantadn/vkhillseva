@@ -19,6 +19,9 @@ ThemeData themeDefault = ThemeData(
     backgroundColor: backgroundColor,
     foregroundColor: accentColor,
     titleTextStyle: GoogleFonts.pacifico(color: accentColor, fontSize: 24),
+    iconTheme: IconThemeData(
+      size: 32.0,
+    ),
   ),
 
   // Text Styles

@@ -481,8 +481,10 @@ class _TicketPageState extends State<TicketPage> {
                     scrollDirection: Axis.vertical,
                     child: Column(
                       children: [
+                        // padding at the top
+                        SizedBox(height: 32),
+
                         // Ticket number
-                        SizedBox(height: 24),
                         TextField(
                           controller: ticketNumberController,
                           decoration:

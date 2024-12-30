@@ -23,18 +23,9 @@ class _DaySummaryState extends State<DaySummary> {
   final Lock _lock = Lock();
 
   // ticket table data for day summary
-  final List<String> _amountTableHeaderRow = [
-    "Seva Ticket",
-  ];
+  final List<String> _amountTableHeaderRow = [];
   final List<List<String>> _amountTableTicketRow = [];
-  final List<List<String>> _amountTableTotalRow = [
-    ["Total", "37", "0"],
-    [
-      "Amount",
-      Utils().formatIndianCurrency("18900"),
-      Utils().formatIndianCurrency("0")
-    ]
-  ];
+  final List<List<String>> _amountTableTotalRow = [];
   final List<int> _grandTotal = [39, 20300]; // [totalTicket, totalAmount]
 
   // pie chart data
@@ -87,6 +78,7 @@ class _DaySummaryState extends State<DaySummary> {
         _amountTableTotalRow.clear();
         _amountTableTotalRow.add(["Total"]);
         _amountTableTotalRow.add(["Amount"]);
+        _grandTotal.clear();
 
         // loop through each session
         for (var session in sessions) {
@@ -101,6 +93,10 @@ class _DaySummaryState extends State<DaySummary> {
           // total row
           _amountTableTotalRow[0].add("0");
           _amountTableTotalRow[1].add("0");
+
+          // grand total
+          _grandTotal.add(0);
+          _grandTotal.add(0);
 
           // ticket row
           // add zero values for the session
@@ -148,6 +144,10 @@ class _DaySummaryState extends State<DaySummary> {
                   (int.parse(_amountTableTotalRow[1][indexSession + 1]) +
                           ticketTyped.amount)
                       .toString();
+
+              // add count to the grand total
+              _grandTotal[0] += 1;
+              _grandTotal[1] += ticketTyped.amount;
             }
           });
         }
@@ -172,7 +172,7 @@ class _DaySummaryState extends State<DaySummary> {
         children: [
           // Title Text
           Text(
-            "Summary",
+            "Day Summary",
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: Colors.white,
                 ),
@@ -212,7 +212,7 @@ class _DaySummaryState extends State<DaySummary> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
-                      child: Text('37',
+                      child: Text(_grandTotal[0].toString(),
                           style:
                               Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     color: Colors.white,
@@ -256,7 +256,7 @@ class _DaySummaryState extends State<DaySummary> {
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: Text(
-                        Utils().formatIndianCurrency('18900'),
+                        Utils().formatIndianCurrency(_grandTotal[1].toString()),
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

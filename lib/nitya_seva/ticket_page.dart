@@ -858,7 +858,7 @@ class _TicketPageState extends State<TicketPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => SessionSummary(
-                              title: 'Summary',
+                              title: 'Session summary',
                               icon: 'assets/images/LauncherIcons/NityaSeva.png',
                               session: widget.session)),
                     );

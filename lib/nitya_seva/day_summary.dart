@@ -17,7 +17,7 @@ import 'dart:io';
 class DaySummary extends StatefulWidget {
   final DateTime date;
 
-  DaySummary({super.key, required this.date});
+  const DaySummary({super.key, required this.date});
 
   @override
   State<DaySummary> createState() => _DaySummaryState();
@@ -143,7 +143,7 @@ class _DaySummaryState extends State<DaySummary> {
         _grandTotal.clear();
 
         // loop through each session
-        for (var session in sessions) {
+        for (Session session in sessions) {
           int indexSession = sessions.indexOf(session);
 
           // header row
@@ -165,7 +165,7 @@ class _DaySummaryState extends State<DaySummary> {
             }
           });
 
-          // loop through each ticket in the session
+          // still doing zero filling for _amountTableTicketRow
           for (var amount in Const().nityaSeva['amounts'] as List) {
             Map<String, dynamic> amountMap = Map<String, dynamic>.from(amount);
 
@@ -181,8 +181,11 @@ class _DaySummaryState extends State<DaySummary> {
               _amountTableTicketRow[_amountTableTicketRow.length - 1].add("0");
             }
           }
+
           String dbSession =
               session.timestamp.toIso8601String().replaceAll(".", "^");
+
+          // loop through each ticket
           FB()
               .getList(path: "NityaSeva/$dbDate/$dbSession/Tickets")
               .then((tickets) {
@@ -218,8 +221,9 @@ class _DaySummaryState extends State<DaySummary> {
               _countMode[ticketTyped.mode] = _countMode[ticketTyped.mode]! + 1;
               Const().paymentModes.forEach((key, value) {
                 if (key != 'Gift') {
-                  _countModePercentage[key] =
-                      ((_countMode[key]! / _grandTotal[0]) * 100).round();
+                  _countModePercentage[key] = _grandTotal[0] == 0
+                      ? 0
+                      : ((_countMode[key]! / _grandTotal[0]) * 100).round();
                 }
               });
             }

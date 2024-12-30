@@ -402,12 +402,14 @@ class _TicketPageState extends State<TicketPage> {
     List<String> errors = await _prevalidateDelete(ticket);
 
     if (errors.isNotEmpty) {
-      await CommonWidgets().createErrorDialog(
+      String? action = await CommonWidgets().createErrorDialog(
         context: context,
         errors: errors,
-        noaction: true,
       );
-      return;
+
+      if (action == "Cancel") {
+        return;
+      }
     }
 
     CommonWidgets().confirm(

@@ -124,6 +124,9 @@ class _DaySummaryState extends State<DaySummary> {
     List sessionsList = await FB().getList(path: "NityaSeva/$dbDate");
     List<Session> sessions = [];
     for (var sessionRaw in sessionsList) {
+      if (sessionRaw['Settings'] == null) {
+        continue;
+      }
       Map<String, dynamic> s =
           Map<String, dynamic>.from(sessionRaw['Settings']);
       sessions.add(Session.fromJson(s));

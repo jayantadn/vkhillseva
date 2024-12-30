@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CommonWidgets {
   static final CommonWidgets _instance = CommonWidgets._internal();
@@ -84,6 +85,20 @@ class CommonWidgets {
       bool noaction = false}) async {
     Completer<String?> action = Completer<String?>();
 
+    // populate skipErrorCheck
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? sk = prefs.getString('SkipErrorCheck');
+    bool skipErrorCheck = false;
+    if (sk != null) {
+      DateTime today = DateTime.now();
+      DateTime skDate = DateTime.parse(sk);
+      if (today.year == skDate.year &&
+          today.month == skDate.month &&
+          today.day == skDate.day) {
+        skipErrorCheck = true;
+      }
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -114,6 +129,18 @@ class CommonWidgets {
                     alignment: Alignment.centerLeft,
                     child: Text(" - $error"),
                   ),
+
+                // checkbox to skip error checks
+                CheckboxListTile(
+                  title: Text('Skip error checks for today',
+                      style: Theme.of(context).textTheme.bodySmall),
+                  value: skipErrorCheck,
+                  onChanged: (bool? value) {
+                    if (value != null) {
+                      if (value) {}
+                    }
+                  },
+                ),
               ],
             ),
           ),

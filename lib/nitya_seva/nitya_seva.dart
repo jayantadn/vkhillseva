@@ -90,17 +90,19 @@ class _NityaSevaState extends State<NityaSeva> {
 
               // process the received data
               Map<String, dynamic> map = Map<String, dynamic>.from(data);
-              Map<String, dynamic> json =
-                  Map<String, dynamic>.from(map['Settings']);
-              Session session = Session.fromJson(json);
+              if (map['Settings'] != null) {
+                Map<String, dynamic> json =
+                    Map<String, dynamic>.from(map['Settings']);
+                Session session = Session.fromJson(json);
 
-              setState(() {
-                int index = _sessions
-                    .indexWhere((s) => s.timestamp == session.timestamp);
-                if (index != -1) {
-                  _sessions.removeAt(index);
-                }
-              });
+                setState(() {
+                  int index = _sessions
+                      .indexWhere((s) => s.timestamp == session.timestamp);
+                  if (index != -1) {
+                    _sessions.removeAt(index);
+                  }
+                });
+              }
             }
           },
 
@@ -157,11 +159,13 @@ class _NityaSevaState extends State<NityaSeva> {
     _sessions.clear();
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
     List<dynamic> sessions = await FB().getList(path: "NityaSeva/$dbDate");
-    for (var element in sessions) {
-      Map<String, dynamic> map = Map<String, dynamic>.from(element as Map);
-      Map<String, dynamic> json =
-          Map<String, dynamic>.from(map['Settings'] as Map);
-      _sessions.add(Session.fromJson(json));
+    for (var session in sessions) {
+      Map<String, dynamic> map = Map<String, dynamic>.from(session as Map);
+      if (map['Settings'] != null) {
+        Map<String, dynamic> json =
+            Map<String, dynamic>.from(map['Settings'] as Map);
+        _sessions.add(Session.fromJson(json));
+      }
     }
     _sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
@@ -204,20 +208,22 @@ class _NityaSevaState extends State<NityaSeva> {
 
     refresh(spinner: false).then((_) async {
       Session lastSession = _sessions.last;
-      if (lastSession.name == session.name &&
-          lastSession.sevakarta == session.sevakarta) {
-        lastSession = _sessions[_sessions.length - 2];
-      }
 
-      // validate duplicate session name
-      if (session.name == lastSession.name) {
-        errors.add("Duplicate session name");
-      }
+      if (_sessions.length > 1) {
+        if (lastSession.name == session.name &&
+            lastSession.sevakarta == session.sevakarta) {
+          lastSession = _sessions[_sessions.length - 2];
+        }
 
-      // check if last session was created recently
-      lastSession.timestamp;
-      if (lastSession.timestamp.difference(lastSession.timestamp).inHours < 3) {
-        errors.add("Session created too recently");
+        // validate duplicate session name
+        if (session.name == lastSession.name) {
+          errors.add("Duplicate session name");
+        }
+
+        // check if last session was created recently
+        if (lastSession.timestamp.difference(session.timestamp).inHours < 3) {
+          errors.add("Session created too recently");
+        }
       }
 
       if (errors.isNotEmpty) {

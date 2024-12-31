@@ -1,3 +1,7 @@
+# 0.17.0
+- fix: persistent pujari signature
+- feature: tas
+
 # 0.16.2
 - fix: text wrapping on grand total
 

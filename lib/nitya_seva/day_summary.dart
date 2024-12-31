@@ -348,7 +348,7 @@ class _DaySummaryState extends State<DaySummary> {
 
         // total amount
         SizedBox(
-          width: width,
+          width: width * 1.25,
           height: height,
           child: Card(
             shape: RoundedRectangleBorder(
@@ -365,15 +365,19 @@ class _DaySummaryState extends State<DaySummary> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
-                      child: Text(
-                        _grandTotal.isEmpty
-                            ? "0"
-                            : Utils().formatIndianCurrency(
-                                _grandTotal[1].toString()),
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          _grandTotal.isEmpty
+                              ? "0"
+                              : Utils().formatIndianCurrency(
+                                  _grandTotal[1].toString()),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
                       ),
                     ),
                   ),

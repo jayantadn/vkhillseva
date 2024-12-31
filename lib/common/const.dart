@@ -12,7 +12,7 @@ class Const {
   }
 
   final String dbroot = "VKHILLSEVA_01";
-  final String version = "0.16.1";
+  final String version = "0.16.2";
 
   final int fbListenerDelay = 2; // seconds
 

@@ -1,3 +1,6 @@
+# 0.16.2
+- fix: text wrapping on grand total
+
 # 0.16.1
 - fix: contiguous ticket numbers
 - fix: username

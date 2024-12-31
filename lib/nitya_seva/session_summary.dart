@@ -101,11 +101,10 @@ class _SessionSummaryState extends State<SessionSummary> {
         _appendRow("Tickets sold", listFiltered.length.toString());
       } else {
         // ticketNumber numbers are not continuous
-
         listFiltered.sort((a, b) => a.ticketNumber.compareTo(b.ticketNumber));
 
         int start = listFiltered[0].ticketNumber;
-        int end = listFiltered[1].ticketNumber;
+        int end = listFiltered[0].ticketNumber;
         int totalSold = 0;
         for (int i = 1; i < listFiltered.length; i++) {
           if (listFiltered[i].ticketNumber - 1 ==

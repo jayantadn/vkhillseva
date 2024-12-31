@@ -1,3 +1,6 @@
+# 0.17.2
+- fix: more validations
+
 # 0.17.1
 - fix: ticket validations
 

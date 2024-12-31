@@ -441,39 +441,3 @@ class _ReturnStockDialogState extends State<ReturnStockDialog> {
     Navigator.of(context).pop(true);
   }
 }
-
-Widget _getPurposeDropDown(BuildContext context, {String? defaultPurpose}) {
-  List<int?> pushpanjaliTickets =
-      Const().pushpanjaliTickets.map((e) => e['amount']).toList();
-  List<String> Purposes =
-      pushpanjaliTickets.map((e) => "Seva ${e.toString()}").toList();
-
-  Purposes.add("Others");
-  Purposes.add("Missing");
-
-  // if there was no change in the dropdown, set the selected purpose to default
-  if (!selectedPurposeChanged) {
-    selectedPurpose = defaultPurpose ?? 'Others';
-  }
-
-  return DropdownButtonFormField<String>(
-    value: defaultPurpose ?? 'Others',
-    decoration: InputDecoration(labelText: 'Purpose'),
-    items: Purposes.map((String value) {
-      return DropdownMenuItem<String>(
-        value: value,
-        child: Text(value),
-      );
-    }).toList(),
-    onChanged: (String? newValue) {
-      selectedPurpose = newValue ?? 'Others';
-      selectedPurposeChanged = true;
-    },
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return 'Please select a purpose';
-      }
-      return null;
-    },
-  );
-}

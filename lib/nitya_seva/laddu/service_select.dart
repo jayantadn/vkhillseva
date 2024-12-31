@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/serve.dart';
-import 'package:garuda/pushpanjali/sevaslot.dart';
+import 'package:vkhillseva/nitya_seva/session.dart';
 
 class ServiceSelect extends StatefulWidget {
   @override
@@ -9,7 +10,7 @@ class ServiceSelect extends StatefulWidget {
 }
 
 class _ServiceSelectDialogState extends State<ServiceSelect> {
-  List<PushpanjaliSlot> slots = [];
+  List<Session> slots = [];
   List<String> services = [];
   String status = "loading";
 
@@ -21,12 +22,12 @@ class _ServiceSelectDialogState extends State<ServiceSelect> {
 
   void _loadServices() async {
     slots = await FBL().readPushpanjaliSlotsByDate(DateTime.now());
-    List<PushpanjaliSlot> slotsYest = await FB()
+    List<Session> slotsYest = await FBL()
         .readPushpanjaliSlotsByDate(DateTime.now().subtract(Duration(days: 1)));
     slots.addAll(slotsYest);
 
     setState(() {
-      services = slots.map((e) => e.title).toList();
+      services = slots.map((e) => e.name).toList();
       status = services.isEmpty ? "empty" : "loaded";
     });
   }

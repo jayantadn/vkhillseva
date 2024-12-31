@@ -21,6 +21,20 @@ final GlobalKey<_SummaryState> SummaryKey = GlobalKey<_SummaryState>();
 class _SummaryState extends State<Summary> {
   final _lockInit = Lock();
 
+  // theme ticketColors
+  final Color colorPrimary =
+      ColorScheme.fromSeed(seedColor: const Color(0xFF3B4043)).primary;
+  final _ticketColors = {
+    '400': Colors.blue[300],
+    '400variant': Colors.blue[900],
+    '500': Colors.yellow[600],
+    '500variant': Colors.yellow[900],
+    '1000': Colors.green[300],
+    '1000variant': Colors.green[900],
+    '2500': Colors.pink[200],
+    '2500variant': Colors.pink[900],
+  };
+
   int total_procured = 0;
   int total_served = 0;
 
@@ -197,16 +211,16 @@ class _SummaryState extends State<Summary> {
                 Color barColor;
                 switch (barLabels[index]) {
                   case "Seva 400":
-                    barColor = Const().ticketColors['400']!;
+                    barColor = _ticketColors['400']!;
                     break;
                   case "Seva 500":
-                    barColor = Const().ticketColors['500']!;
+                    barColor = _ticketColors['500']!;
                     break;
                   case "Seva 1000":
-                    barColor = Const().ticketColors['1000']!;
+                    barColor = _ticketColors['1000']!;
                     break;
                   case "Seva 2500":
-                    barColor = Const().ticketColors['2500']!;
+                    barColor = _ticketColors['2500']!;
                     break;
                   default:
                     barColor = Utils().getRandomDarkColor();

@@ -6,9 +6,10 @@ import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/laddu_calc.dart';
 import 'package:vkhillseva/nitya_seva/laddu/serve.dart';
 import 'package:vkhillseva/nitya_seva/laddu/utils.dart';
-import 'package:garuda/pushpanjali/sevaslot.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/nitya_seva/ticket_page.dart';
 
 class Log extends StatefulWidget {
   final DateTime? session;
@@ -207,11 +208,15 @@ class _LogState extends State<Log> {
                 MaterialPageRoute(
                     builder: (context) => Serve(
                           serve: serve,
-                          slot: PushpanjaliSlot(
-                              timestampSlot:
+                          slot: Session(
+                              defaultAmount: 400,
+                              defaultPaymentMode: 'UPI',
+                              icon:
+                                  'assets/images/NityaSeva/vishnu_pushpanjali.png',
+                              timestamp:
                                   serve.pushpanjaliSlot ?? DateTime.now(),
-                              title: serve.title,
-                              sevakartaSlot: serve.user),
+                              name: serve.title,
+                              sevakarta: serve.user),
                         )),
               );
             });
@@ -232,7 +237,7 @@ class _LogState extends State<Log> {
             ));
 
         // calculate ticket sold
-        List<SevaTicket> tickets = [];
+        List<Ticket> tickets = [];
         if (serve.pushpanjaliSlot != null) {
           tickets = await FBL().readPushpanjaliTickets(serve.pushpanjaliSlot!);
         }
@@ -263,13 +268,13 @@ class _LogState extends State<Log> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      Center(
-                        child: Text(
-                          'Slips received',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+                      // Center(
+                      //   child: Text(
+                      //     'Slips received',
+                      //     style: TextStyle(fontWeight: FontWeight.bold),
+                      //     textAlign: TextAlign.center,
+                      //   ),
+                      // ),
                       Center(
                         child: Text(
                           'Laddu packs',
@@ -285,8 +290,7 @@ class _LogState extends State<Log> {
                         children: [
                           Center(
                             // ticket amount
-                            child:
-                                Text('${serve.packsPushpanjali[i].keys.first}'),
+                            child: Text(serve.packsPushpanjali[i].keys.first),
                           ),
                           Center(
                             // Tickets issued
@@ -296,14 +300,14 @@ class _LogState extends State<Log> {
                                         serve.packsPushpanjali[i].keys.first))
                                 .toString()),
                           ),
-                          Center(
-                            // Slip collected
-                            child: Text(_getSlipCount(
-                                    int.parse(
-                                        serve.packsPushpanjali[i].keys.first),
-                                    serve.packsPushpanjali[i].values.first)
-                                .toString()),
-                          ),
+                          // Center(
+                          //   // Slip collected
+                          //   child: Text(_getSlipCount(
+                          //           int.parse(
+                          //               serve.packsPushpanjali[i].keys.first),
+                          //           serve.packsPushpanjali[i].values.first)
+                          //       .toString()),
+                          // ),
                           Center(
                             // laddu packs
                             child: Text(
@@ -381,9 +385,9 @@ class _LogState extends State<Log> {
     }
   }
 
-  int _getTicketCount(List<SevaTicket> tickets, int amount) {
+  int _getTicketCount(List<Ticket> tickets, int amount) {
     int count = 0;
-    for (SevaTicket ticket in tickets) {
+    for (Ticket ticket in tickets) {
       if (ticket.amount == amount) {
         count++;
       }
@@ -391,15 +395,15 @@ class _LogState extends State<Log> {
     return count;
   }
 
-  int _getSlipCount(int amount, int ladduCount) {
-    int count = 0;
-    Const().pushpanjaliTickets.forEach((element) {
-      if (element['amount'] == amount) {
-        count = ladduCount ~/ element['ladduPacks']!;
-      }
-    });
-    return count;
-  }
+  // int _getSlipCount(int amount, int ladduCount) {
+  //   int count = 0;
+  //   Const().pushpanjaliTickets.forEach((element) {
+  //     if (element['amount'] == amount) {
+  //       count = ladduCount ~/ element['ladduPacks']!;
+  //     }
+  //   });
+  //   return count;
+  // }
 
   Widget _getListView() {
     if (_logItems.isEmpty) {

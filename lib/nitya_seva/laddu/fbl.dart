@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:intl/intl.dart';
 import 'package:vkhillseva/common/const.dart';
-import 'package:garuda/laddu_seva/datatypes.dart';
 import 'package:vkhillseva/common/toaster.dart';
-import 'package:garuda/pushpanjali/sevaslot.dart';
+import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
+import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/nitya_seva/ticket_page.dart';
 
 class FBL {
   static FBL? _instance;
@@ -27,244 +29,244 @@ class FBL {
     // Code to be executed when first instantiated
   }
 
-  Future<List<PushpanjaliSlot>> readPushpanjaliSlots() async {
-    final dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/sevaSlots');
-    DatabaseEvent event = await dbRef.once();
-    DataSnapshot snapshot = event.snapshot;
-    List<PushpanjaliSlot> sevaSlots = [];
+  // Future<List<Session>> readPushpanjaliSlots() async {
+  //   final dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/sevaSlots');
+  //   DatabaseEvent event = await dbRef.once();
+  //   DataSnapshot snapshot = event.snapshot;
+  //   List<Session> sevaSlots = [];
 
-    if (snapshot.value != null) {
-      sevaSlots = (snapshot.value as Map)
-          .values
-          .map((value) =>
-              PushpanjaliSlot.fromJson(Map<String, dynamic>.from(value as Map)))
-          .toList();
-    }
+  //   if (snapshot.value != null) {
+  //     sevaSlots = (snapshot.value as Map)
+  //         .values
+  //         .map((value) =>
+  //             PushpanjaliSlot.fromJson(Map<String, dynamic>.from(value as Map)))
+  //         .toList();
+  //   }
 
-    return sevaSlots;
-  }
+  //   return sevaSlots;
+  // }
 
-  Future<List<PushpanjaliSlot>> readPushpanjaliSlotsByDate(
-      DateTime date) async {
-    final dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/sevaSlots');
+  Future<List<Session>> readPushpanjaliSlotsByDate(DateTime date) async {
+    String dbDate = DateFormat('yyyy-MM-dd').format(date);
+    final dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/NityaSeva/$dbDate');
 
-    String pattern =
-        date.toIso8601String().substring(0, 10); // only the date part
-    Query query = dbRef.orderByKey().startAt(pattern).endAt('$pattern\uf8ff');
+    // final dbRef = FirebaseDatabase.instance
+    //     .ref('record_db${Const().dbVersion}/sevaSlots');
 
-    DataSnapshot snapshot = await query.get();
+    // String pattern =
+    //     date.toIso8601String().substring(0, 10); // only the date part
+    // Query query = dbRef.orderByKey().startAt(pattern).endAt('$pattern\uf8ff');
 
-    if (snapshot.exists) {
-      return (snapshot.value as Map)
-          .values
-          .map((value) =>
-              PushpanjaliSlot.fromJson(Map<String, dynamic>.from(value as Map)))
-          .toList();
-    } else {
-      return [];
-    }
-  }
-
-  Future<List<SevaTicket>> readPushpanjaliTickets(
-      DateTime timestampSlot) async {
-    final dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/sevaTickets');
-    DatabaseReference ref =
-        dbRef.child(timestampSlot.toIso8601String().replaceAll(".", "^"));
-
-    DataSnapshot snapshot = await ref.get();
-
-    if (snapshot.exists) {
-      return (snapshot.value as Map)
-          .values
-          .map((value) =>
-              SevaTicket.fromJson(Map<String, dynamic>.from(value as Map)))
-          .toList();
-    } else {
-      return [];
-    }
-  }
-
-  // "Sat Morning": [ticket1, ticket2], "Sat Evening": [ticket3, ticket4]
-  Future<Map<String, List<SevaTicket>>> readPushpanjaliTicketsByDate(
-      DateTime date) async {
-    final dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/sevaTickets');
-    final dbRefSlot = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/sevaSlots');
-
-    String pattern =
-        date.toIso8601String().substring(0, 10); // only the date part
-    Query query = dbRef.orderByKey().startAt(pattern).endAt('$pattern\uf8ff');
-
-    DataSnapshot snapshot = await query.get();
-
-    Map<String, List<SevaTicket>> sevaTickets =
-        {}; // "Sat Morning": [ticket1, ticket2], "Sat Evening": [ticket3, ticket4]
-    if (snapshot.exists) {
-      var mapSlotsFiltered = snapshot.value as Map;
-      for (var entry in mapSlotsFiltered.entries) {
-        var key = entry.key;
-        var value = entry.value;
-
-        // find the seva slot title for the given key
-        DatabaseReference ref = dbRefSlot.child(key);
-        DataSnapshot snapshotSlot = await ref.get();
-        String title = '';
-        if (snapshotSlot.value != null) {
-          var slotValue = snapshotSlot.value as Map<dynamic, dynamic>;
-          if (slotValue.containsKey('title')) {
-            title = slotValue['title'];
-          }
-        }
-        if (title.isEmpty) {
-          Toaster().error("Unable to find title for slot");
-          continue;
-        } else {
-          sevaTickets[title] = [];
-        }
-
-        var mapTickets = value as Map;
-        mapTickets.forEach((ticketKey, ticketValue) {
-          SevaTicket ticket = SevaTicket.fromJson(
-              Map<String, dynamic>.from(ticketValue as Map));
-          sevaTickets[title]!.add(ticket);
-        });
-      }
-
-      return sevaTickets;
-    } else {
-      return {};
-    }
-  }
-
-  Future<void> addSevaSlot(
-      DateTime timestampSlot, Map<String, dynamic> sevaSlot) async {
-    // Add a new seva slot
-    final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('record_db${Const().dbVersion}');
-    DatabaseReference ref = dbRef
-        .child('sevaSlots')
-        .child(timestampSlot.toIso8601String().replaceAll(".", "^"));
-    await ref.set(sevaSlot);
-  }
-
-  Future<void> deleteSevaSlot(DateTime timestampSlot) async {
-    for (String key in [
-      'sevaSlots',
-      'sevaTickets',
-      'tallyCash',
-      'tallyUpiCard'
-    ]) {
-      final DatabaseReference dbRef =
-          FirebaseDatabase.instance.ref('record_db${Const().dbVersion}');
-      DatabaseReference ref = dbRef
-          .child(key)
-          .child(timestampSlot.toIso8601String().replaceAll(".", "^"));
-      await ref.remove();
-    }
-  }
-
-  Future<String> _getSelectedSlotKey(
-      DatabaseReference dbRef, String timestamp) async {
-    if (keyCache.containsKey(timestamp)) {
-      return keyCache[timestamp]!;
-    }
-
-    String ret = '';
     DataSnapshot snapshot = await dbRef.get();
 
     if (snapshot.exists) {
-      Map<String, dynamic> entries =
-          Map<String, dynamic>.from(snapshot.value as Map);
-      entries.forEach((key, value) {
-        if (value['timestamp'] == timestamp) {
-          ret = key;
-          keyCache[timestamp] = key;
-        }
-      });
-    }
-    return ret;
-  }
-
-  Future<void> addSevaTicket(String timestampSlot, String timestampTicket,
-      Map<String, dynamic> ticket) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/sevaTickets');
-
-    if (timestampSlot.isEmpty) {
-      Toaster().error("Unable to add to database");
+      return (snapshot.value as Map)
+          .values
+          .map((value) => Session.fromJson(
+              Map<String, dynamic>.from(value['Settings'] as Map)))
+          .toList();
     } else {
-      DatabaseReference ref = dbRef
-          .child(timestampSlot.replaceAll(".", "^"))
-          .child(timestampTicket.replaceAll(".", "^"));
-      await ref.set(ticket);
+      return [];
     }
   }
 
-  Future<void> deleteSevaTicket(
-      String timestampSlot, String timestampTicket) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/sevaTickets');
-
-    DatabaseReference ref = dbRef
-        .child(timestampSlot.replaceAll(".", "^"))
-        .child(timestampTicket.replaceAll(".", "^"));
-    await ref.remove();
-  }
-
-  Future<void> editSevaTicket(String timestampSlot, String timestampTicket,
-      Map<String, dynamic> json) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/sevaTickets');
-
-    DatabaseReference ref = dbRef
-        .child(timestampSlot.replaceAll(".", "^"))
-        .child(timestampTicket.replaceAll(".", "^"));
-    await ref.set(json);
-  }
-
-  Future<void> listenForSevaSlotChange(FBCallbacks callbacks) async {
+  Future<List<Ticket>> readPushpanjaliTickets(DateTime timestampSlot) async {
+    String dbDate = DateFormat('yyyy-MM-dd').format(timestampSlot);
+    String dbSession = timestampSlot.toIso8601String().replaceAll('.', '^');
     final dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/sevaSlots');
+        .ref('${Const().dbroot}/NityaSeva/$dbDate/$dbSession/Tickets');
 
-    _sevaSlotAddedSubscription = dbRef.onChildAdded.listen((event) {
-      callbacks.onChange("ADD_SEVA_SLOT", event.snapshot.value);
-    });
-
-    _sevaSlotChangedSubscription = dbRef.onChildChanged.listen((event) {
-      callbacks.onChange("UPDATE_SEVA_SLOT", event.snapshot.value);
-    });
-
-    _sevaSlotRemovedSubscription = dbRef.onChildRemoved.listen((event) {
-      callbacks.onChange("REMOVE_SEVA_SLOT", event.snapshot.value);
-    });
+    DataSnapshot snapshot = await dbRef.get();
+    if (snapshot.exists) {
+      return (snapshot.value as Map)
+          .values
+          .map((value) =>
+              Ticket.fromJson(Map<String, dynamic>.from(value as Map)))
+          .toList();
+    } else {
+      return [];
+    }
   }
 
-  Future<void> listenForSevaTicketChange(FBCallbacks callbacks) async {
-    final dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/sevaTickets');
+  // // "Sat Morning": [ticket1, ticket2], "Sat Evening": [ticket3, ticket4]
+  // Future<Map<String, List<SevaTicket>>> readPushpanjaliTicketsByDate(
+  //     DateTime date) async {
+  //   final dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/sevaTickets');
+  //   final dbRefSlot = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/sevaSlots');
 
-    _sevaTicketAddedSubscription = dbRef.onChildAdded.listen((event) {
-      callbacks.onChange("ADD_SEVA_TICKET", event.snapshot.value);
-    });
+  //   String pattern =
+  //       date.toIso8601String().substring(0, 10); // only the date part
+  //   Query query = dbRef.orderByKey().startAt(pattern).endAt('$pattern\uf8ff');
 
-    _sevaTicketChangedSubscription = dbRef.onChildChanged.listen((event) {
-      callbacks.onChange("UPDATE_SEVA_TICKET", event.snapshot.value);
-    });
+  //   DataSnapshot snapshot = await query.get();
 
-    _sevaTicketRemovedSubscription = dbRef.onChildRemoved.listen((event) {
-      callbacks.onChange("REMOVE_SEVA_TICKET", event.snapshot.value);
-    });
-  }
+  //   Map<String, List<SevaTicket>> sevaTickets =
+  //       {}; // "Sat Morning": [ticket1, ticket2], "Sat Evening": [ticket3, ticket4]
+  //   if (snapshot.exists) {
+  //     var mapSlotsFiltered = snapshot.value as Map;
+  //     for (var entry in mapSlotsFiltered.entries) {
+  //       var key = entry.key;
+  //       var value = entry.value;
 
-  Future<void> listenForChange(String path, FBCallbacks callbacks) async {
+  //       // find the seva slot title for the given key
+  //       DatabaseReference ref = dbRefSlot.child(key);
+  //       DataSnapshot snapshotSlot = await ref.get();
+  //       String title = '';
+  //       if (snapshotSlot.value != null) {
+  //         var slotValue = snapshotSlot.value as Map<dynamic, dynamic>;
+  //         if (slotValue.containsKey('title')) {
+  //           title = slotValue['title'];
+  //         }
+  //       }
+  //       if (title.isEmpty) {
+  //         Toaster().error("Unable to find title for slot");
+  //         continue;
+  //       } else {
+  //         sevaTickets[title] = [];
+  //       }
+
+  //       var mapTickets = value as Map;
+  //       mapTickets.forEach((ticketKey, ticketValue) {
+  //         SevaTicket ticket = SevaTicket.fromJson(
+  //             Map<String, dynamic>.from(ticketValue as Map));
+  //         sevaTickets[title]!.add(ticket);
+  //       });
+  //     }
+
+  //     return sevaTickets;
+  //   } else {
+  //     return {};
+  //   }
+  // }
+
+  // Future<void> addSevaSlot(
+  //     DateTime timestampSlot, Map<String, dynamic> sevaSlot) async {
+  //   // Add a new seva slot
+  //   final DatabaseReference dbRef =
+  //       FirebaseDatabase.instance.ref('record_db${Const().dbVersion}');
+  //   DatabaseReference ref = dbRef
+  //       .child('sevaSlots')
+  //       .child(timestampSlot.toIso8601String().replaceAll(".", "^"));
+  //   await ref.set(sevaSlot);
+  // }
+
+  // Future<void> deleteSevaSlot(DateTime timestampSlot) async {
+  //   for (String key in [
+  //     'sevaSlots',
+  //     'sevaTickets',
+  //     'tallyCash',
+  //     'tallyUpiCard'
+  //   ]) {
+  //     final DatabaseReference dbRef =
+  //         FirebaseDatabase.instance.ref('record_db${Const().dbVersion}');
+  //     DatabaseReference ref = dbRef
+  //         .child(key)
+  //         .child(timestampSlot.toIso8601String().replaceAll(".", "^"));
+  //     await ref.remove();
+  //   }
+  // }
+
+  // Future<String> _getSelectedSlotKey(
+  //     DatabaseReference dbRef, String timestamp) async {
+  //   if (keyCache.containsKey(timestamp)) {
+  //     return keyCache[timestamp]!;
+  //   }
+
+  //   String ret = '';
+  //   DataSnapshot snapshot = await dbRef.get();
+
+  //   if (snapshot.exists) {
+  //     Map<String, dynamic> entries =
+  //         Map<String, dynamic>.from(snapshot.value as Map);
+  //     entries.forEach((key, value) {
+  //       if (value['timestamp'] == timestamp) {
+  //         ret = key;
+  //         keyCache[timestamp] = key;
+  //       }
+  //     });
+  //   }
+  //   return ret;
+  // }
+
+  // Future<void> addSevaTicket(String timestampSlot, String timestampTicket,
+  //     Map<String, dynamic> ticket) async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/sevaTickets');
+
+  //   if (timestampSlot.isEmpty) {
+  //     Toaster().error("Unable to add to database");
+  //   } else {
+  //     DatabaseReference ref = dbRef
+  //         .child(timestampSlot.replaceAll(".", "^"))
+  //         .child(timestampTicket.replaceAll(".", "^"));
+  //     await ref.set(ticket);
+  //   }
+  // }
+
+  // Future<void> deleteSevaTicket(
+  //     String timestampSlot, String timestampTicket) async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/sevaTickets');
+
+  //   DatabaseReference ref = dbRef
+  //       .child(timestampSlot.replaceAll(".", "^"))
+  //       .child(timestampTicket.replaceAll(".", "^"));
+  //   await ref.remove();
+  // }
+
+  // Future<void> editSevaTicket(String timestampSlot, String timestampTicket,
+  //     Map<String, dynamic> json) async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/sevaTickets');
+
+  //   DatabaseReference ref = dbRef
+  //       .child(timestampSlot.replaceAll(".", "^"))
+  //       .child(timestampTicket.replaceAll(".", "^"));
+  //   await ref.set(json);
+  // }
+
+  // Future<void> listenForSevaSlotChange(FBLCallbacks callbacks) async {
+  //   final dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/sevaSlots');
+
+  //   _sevaSlotAddedSubscription = dbRef.onChildAdded.listen((event) {
+  //     callbacks.onChange("ADD_SEVA_SLOT", event.snapshot.value);
+  //   });
+
+  //   _sevaSlotChangedSubscription = dbRef.onChildChanged.listen((event) {
+  //     callbacks.onChange("UPDATE_SEVA_SLOT", event.snapshot.value);
+  //   });
+
+  //   _sevaSlotRemovedSubscription = dbRef.onChildRemoved.listen((event) {
+  //     callbacks.onChange("REMOVE_SEVA_SLOT", event.snapshot.value);
+  //   });
+  // }
+
+  // Future<void> listenForSevaTicketChange(FBLCallbacks callbacks) async {
+  //   final dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/sevaTickets');
+
+  //   _sevaTicketAddedSubscription = dbRef.onChildAdded.listen((event) {
+  //     callbacks.onChange("ADD_SEVA_TICKET", event.snapshot.value);
+  //   });
+
+  //   _sevaTicketChangedSubscription = dbRef.onChildChanged.listen((event) {
+  //     callbacks.onChange("UPDATE_SEVA_TICKET", event.snapshot.value);
+  //   });
+
+  //   _sevaTicketRemovedSubscription = dbRef.onChildRemoved.listen((event) {
+  //     callbacks.onChange("REMOVE_SEVA_TICKET", event.snapshot.value);
+  //   });
+  // }
+
+  Future<void> listenForChange(String path, FBLCallbacks callbacks) async {
     bool initialLoad = true;
 
-    final dbRef =
-        FirebaseDatabase.instance.ref('record_db${Const().dbVersion}/$path');
+    final dbRef = FirebaseDatabase.instance.ref('${Const().dbroot}/$path');
 
     _sevaTicketAddedSubscription = dbRef.onChildAdded.listen((event) {
       if (!initialLoad) callbacks.onChange("ADD", event.snapshot.value);
@@ -283,199 +285,199 @@ class FBL {
     });
   }
 
-  Future<void> deleteSevaSlotListeners() async {
-    await _sevaSlotAddedSubscription?.cancel();
-    await _sevaSlotChangedSubscription?.cancel();
-    await _sevaSlotRemovedSubscription?.cancel();
-  }
+  // Future<void> deleteSevaSlotListeners() async {
+  //   await _sevaSlotAddedSubscription?.cancel();
+  //   await _sevaSlotChangedSubscription?.cancel();
+  //   await _sevaSlotRemovedSubscription?.cancel();
+  // }
 
-  Future<void> deleteSevaTicketListeners() async {
-    await _sevaTicketAddedSubscription?.cancel();
-    await _sevaTicketChangedSubscription?.cancel();
-    await _sevaTicketRemovedSubscription?.cancel();
-  }
+  // Future<void> deleteSevaTicketListeners() async {
+  //   await _sevaTicketAddedSubscription?.cancel();
+  //   await _sevaTicketChangedSubscription?.cancel();
+  //   await _sevaTicketRemovedSubscription?.cancel();
+  // }
 
-  Future<void> addUpdateTallyCash(
-      DateTime timestampSlot, Map<String, int> cash) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/tallyCash');
+  // Future<void> addUpdateTallyCash(
+  //     DateTime timestampSlot, Map<String, int> cash) async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/tallyCash');
 
-    String key = timestampSlot.toIso8601String().replaceAll(".", "^");
+  //   String key = timestampSlot.toIso8601String().replaceAll(".", "^");
 
-    DatabaseReference ref = dbRef.child(key);
-    await ref.set(cash);
-    Toaster().info("Saved successfully");
-  }
+  //   DatabaseReference ref = dbRef.child(key);
+  //   await ref.set(cash);
+  //   Toaster().info("Saved successfully");
+  // }
 
-  Future<Map<String, int>> readTallyCash(DateTime timestampSlot) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/tallyCash');
+  // Future<Map<String, int>> readTallyCash(DateTime timestampSlot) async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/tallyCash');
 
-    String key = timestampSlot.toIso8601String().replaceAll(".", "^");
+  //   String key = timestampSlot.toIso8601String().replaceAll(".", "^");
 
-    DataSnapshot snapshot = await dbRef.child(key).get();
-    Map<String, int> cash = {};
+  //   DataSnapshot snapshot = await dbRef.child(key).get();
+  //   Map<String, int> cash = {};
 
-    if (snapshot.exists) {
-      cash = Map<String, int>.from(snapshot.value as Map);
-    }
+  //   if (snapshot.exists) {
+  //     cash = Map<String, int>.from(snapshot.value as Map);
+  //   }
 
-    return cash;
-  }
+  //   return cash;
+  // }
 
-  Future<void> addUpdateTallyUpi(
-      DateTime timestampSlot, Map<String, int> json) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/tallyUpiCard');
+  // Future<void> addUpdateTallyUpi(
+  //     DateTime timestampSlot, Map<String, int> json) async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/tallyUpiCard');
 
-    String key = timestampSlot.toIso8601String().replaceAll(".", "^");
+  //   String key = timestampSlot.toIso8601String().replaceAll(".", "^");
 
-    DatabaseReference ref = dbRef.child(key);
-    await ref.set(json);
-    Toaster().info("Saved successfully");
-  }
+  //   DatabaseReference ref = dbRef.child(key);
+  //   await ref.set(json);
+  //   Toaster().info("Saved successfully");
+  // }
 
-  Future<Map<String, int>> readTallyUpi(DateTime timestampSlot) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/tallyUpiCard');
+  // Future<Map<String, int>> readTallyUpi(DateTime timestampSlot) async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/tallyUpiCard');
 
-    String key = timestampSlot.toIso8601String().replaceAll(".", "^");
+  //   String key = timestampSlot.toIso8601String().replaceAll(".", "^");
 
-    DataSnapshot snapshot = await dbRef.child(key).get();
-    Map<String, int> json = {};
+  //   DataSnapshot snapshot = await dbRef.child(key).get();
+  //   Map<String, int> json = {};
 
-    if (snapshot.exists) {
-      json = Map<String, int>.from(snapshot.value as Map);
-    }
+  //   if (snapshot.exists) {
+  //     json = Map<String, int>.from(snapshot.value as Map);
+  //   }
 
-    return json;
-  }
+  //   return json;
+  // }
 
-  Future<void> addPendingUser(UserDetails user) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/users/pending');
+  // Future<void> addPendingUser(UserDetails user) async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/users/pending');
 
-    if (user.uid != null) {
-      DatabaseReference ref = dbRef.child(user.uid!);
-      try {
-        await ref.set(user.toJson());
-      } catch (e) {
-        // Handle the error here
-        Toaster().error('Database write error: $e');
-      }
-    }
-  }
+  //   if (user.uid != null) {
+  //     DatabaseReference ref = dbRef.child(user.uid!);
+  //     try {
+  //       await ref.set(user.toJson());
+  //     } catch (e) {
+  //       // Handle the error here
+  //       Toaster().error('Database write error: $e');
+  //     }
+  //   }
+  // }
 
-  // returns success or failure
-  Future<bool> approveUser(UserDetails user) async {
-    final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('record_db${Const().dbVersion}/users');
+  // // returns success or failure
+  // Future<bool> approveUser(UserDetails user) async {
+  //   final DatabaseReference dbRef =
+  //       FirebaseDatabase.instance.ref('record_db${Const().dbVersion}/users');
 
-    if (user.uid != null) {
-      DatabaseReference refPending = dbRef.child('pending').child(user.uid!);
-      DatabaseReference refApproved = dbRef.child('approved').child(user.uid!);
+  //   if (user.uid != null) {
+  //     DatabaseReference refPending = dbRef.child('pending').child(user.uid!);
+  //     DatabaseReference refApproved = dbRef.child('approved').child(user.uid!);
 
-      DataSnapshot snapshot = await refPending.get();
-      if (snapshot.exists) {
-        try {
-          await refApproved.set(user.toJson());
-          await refPending.remove();
-        } catch (e) {
-          // Handle the error here
-          Toaster().error('Database write error: $e');
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
+  //     DataSnapshot snapshot = await refPending.get();
+  //     if (snapshot.exists) {
+  //       try {
+  //         await refApproved.set(user.toJson());
+  //         await refPending.remove();
+  //       } catch (e) {
+  //         // Handle the error here
+  //         Toaster().error('Database write error: $e');
+  //         return false;
+  //       }
+  //     } else {
+  //       return false;
+  //     }
+  //   } else {
+  //     return false;
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
 
-  Future<void> rejectUser(UserDetails user) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/users/pending');
+  // Future<void> rejectUser(UserDetails user) async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/users/pending');
 
-    if (user.uid != null) {
-      DatabaseReference ref = dbRef.child(user.uid!);
-      await ref.remove();
-    }
-  }
+  //   if (user.uid != null) {
+  //     DatabaseReference ref = dbRef.child(user.uid!);
+  //     await ref.remove();
+  //   }
+  // }
 
-  // returns "pending", "approved", "none"
-  Future<String> checkUserApprovalStatus(UserDetails user) async {
-    final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('record_db${Const().dbVersion}/users');
+  // // returns "pending", "approved", "none"
+  // Future<String> checkUserApprovalStatus(UserDetails user) async {
+  //   final DatabaseReference dbRef =
+  //       FirebaseDatabase.instance.ref('record_db${Const().dbVersion}/users');
 
-    if (user.uid != null) {
-      DatabaseReference ref = dbRef.child('pending').child(user.uid!);
-      DataSnapshot snapshot = await ref.get();
-      if (snapshot.exists) {
-        // User is pending approval
-        return "pending";
-      }
+  //   if (user.uid != null) {
+  //     DatabaseReference ref = dbRef.child('pending').child(user.uid!);
+  //     DataSnapshot snapshot = await ref.get();
+  //     if (snapshot.exists) {
+  //       // User is pending approval
+  //       return "pending";
+  //     }
 
-      ref = dbRef.child('approved').child(user.uid!);
-      snapshot = await ref.get();
-      if (snapshot.exists) {
-        // User is approved
-        return "approved";
-      }
-    }
+  //     ref = dbRef.child('approved').child(user.uid!);
+  //     snapshot = await ref.get();
+  //     if (snapshot.exists) {
+  //       // User is approved
+  //       return "approved";
+  //     }
+  //   }
 
-    return "none";
-  }
+  //   return "none";
+  // }
 
-  Future<String> getUserRole(String uid) async {
-    final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('record_db${Const().dbVersion}/users');
+  // Future<String> getUserRole(String uid) async {
+  //   final DatabaseReference dbRef =
+  //       FirebaseDatabase.instance.ref('record_db${Const().dbVersion}/users');
 
-    DatabaseReference ref = dbRef.child('approved').child(uid);
-    DataSnapshot snapshot = await ref.get();
+  //   DatabaseReference ref = dbRef.child('approved').child(uid);
+  //   DataSnapshot snapshot = await ref.get();
 
-    if (snapshot.exists) {
-      if (snapshot.value != null) {
-        Map map = snapshot.value as Map;
-        return map['role'];
-      } else {
-        return "none";
-      }
-    } else {
-      return "none";
-    }
-  }
+  //   if (snapshot.exists) {
+  //     if (snapshot.value != null) {
+  //       Map map = snapshot.value as Map;
+  //       return map['role'];
+  //     } else {
+  //       return "none";
+  //     }
+  //   } else {
+  //     return "none";
+  //   }
+  // }
 
-  Future<void> editSlot(DateTime timestampSlot, String title) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/sevaSlots');
+  // Future<void> editSlot(DateTime timestampSlot, String title) async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/sevaSlots');
 
-    String key = timestampSlot.toIso8601String().replaceAll(".", "^");
+  //   String key = timestampSlot.toIso8601String().replaceAll(".", "^");
 
-    DatabaseReference ref = dbRef.child(key);
-    await ref.update({'title': title});
-  }
+  //   DatabaseReference ref = dbRef.child(key);
+  //   await ref.update({'title': title});
+  // }
 
-  Future<UserDetails> getUserDetails(String uid) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/users/approved');
+  // Future<UserDetails> getUserDetails(String uid) async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/users/approved');
 
-    DataSnapshot snapshot = await dbRef.child(uid).get();
-    UserDetails user = UserDetails();
+  //   DataSnapshot snapshot = await dbRef.child(uid).get();
+  //   UserDetails user = UserDetails();
 
-    if (snapshot.exists) {
-      user = UserDetails.fromJson(
-          Map<String, dynamic>.from(snapshot.value as Map));
-    }
+  //   if (snapshot.exists) {
+  //     user = UserDetails.fromJson(
+  //         Map<String, dynamic>.from(snapshot.value as Map));
+  //   }
 
-    return user;
-  }
+  //   return user;
+  // }
 
   Future<DateTime> readLatestLadduSession() async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva');
 
     DateTime endDate = DateTime.now();
     DateTime startDate = endDate.subtract(Duration(days: 30));
@@ -501,8 +503,8 @@ class FBL {
 
   Future<List<DateTime>> readLadduSessions(
       DateTime startDate, DateTime endDate) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva');
 
     final Query query = dbRef
         .orderByKey()
@@ -525,7 +527,7 @@ class FBL {
   Future<LadduReturn> readLadduReturnStatus(DateTime session) {
     String a = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/$a/returned');
+        .ref('${Const().dbroot}/LadduSeva/$a/returned');
 
     return dbRef.get().then((snapshot) {
       if (snapshot.exists) {
@@ -538,49 +540,49 @@ class FBL {
     });
   }
 
-  Future<List<UserDetails>> readPendingUsers() async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/users/pending');
+  // Future<List<UserDetails>> readPendingUsers() async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/users/pending');
 
-    DataSnapshot snapshot = await dbRef.get();
-    List<UserDetails> users = [];
+  //   DataSnapshot snapshot = await dbRef.get();
+  //   List<UserDetails> users = [];
 
-    if (snapshot.exists) {
-      users = (snapshot.value as Map)
-          .values
-          .map((value) =>
-              UserDetails.fromJson(Map<String, dynamic>.from(value as Map)))
-          .toList();
-    }
+  //   if (snapshot.exists) {
+  //     users = (snapshot.value as Map)
+  //         .values
+  //         .map((value) =>
+  //             UserDetails.fromJson(Map<String, dynamic>.from(value as Map)))
+  //         .toList();
+  //   }
 
-    return users;
-  }
+  //   return users;
+  // }
 
-  Future<List<UserDetails>> readApprovedUsers() async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/users/approved');
+  // Future<List<UserDetails>> readApprovedUsers() async {
+  //   final DatabaseReference dbRef = FirebaseDatabase.instance
+  //       .ref('record_db${Const().dbVersion}/users/approved');
 
-    DataSnapshot snapshot = await dbRef.get();
-    List<UserDetails> users = [];
+  //   DataSnapshot snapshot = await dbRef.get();
+  //   List<UserDetails> users = [];
 
-    if (snapshot.exists) {
-      users = (snapshot.value as Map)
-          .values
-          .map((value) =>
-              UserDetails.fromJson(Map<String, dynamic>.from(value as Map)))
-          .toList();
-    }
+  //   if (snapshot.exists) {
+  //     users = (snapshot.value as Map)
+  //         .values
+  //         .map((value) =>
+  //             UserDetails.fromJson(Map<String, dynamic>.from(value as Map)))
+  //         .toList();
+  //   }
 
-    return users;
-  }
+  //   return users;
+  // }
 
   Future<bool> addLadduStock(
     DateTime session,
     LadduStock stock,
   ) async {
     String a = session.toIso8601String().replaceAll(".", "^");
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/$a');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LladduSeva/$a');
 
     // set return status
     DatabaseReference refRet = dbRef.child('returned');
@@ -608,8 +610,8 @@ class FBL {
 
   Future<bool> editLadduStock(DateTime session, LadduStock stock) async {
     String a = session.toIso8601String().replaceAll(".", "^");
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/$a');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$a');
 
     // Add a new laddu stock
     DateTime timestamp = stock.timestamp;
@@ -633,7 +635,7 @@ class FBL {
   Future<void> editLadduReturn(DateTime session, LadduReturn lr) async {
     String a = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/$a/returned');
+        .ref('${Const().dbroot}/LadduSeva/$a/returned');
 
     // set return status
     DatabaseReference refRet = dbRef.child('count');
@@ -645,8 +647,8 @@ class FBL {
 
   Future<bool> editLadduServe(DateTime session, LadduServe serve) async {
     String s = session.toIso8601String().replaceAll(".", "^");
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/$s');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$s');
 
     // edit laddu stock
     DateTime timestamp = serve.timestamp;
@@ -669,8 +671,8 @@ class FBL {
 
   Future<bool> deleteLadduStock(DateTime session, LadduStock stock) async {
     String a = session.toIso8601String().replaceAll(".", "^");
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/$a');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$a');
 
     // delete laddu stock
     DateTime timestamp = stock.timestamp;
@@ -693,8 +695,8 @@ class FBL {
 
   Future<bool> deleteLadduServe(DateTime session, LadduServe serve) async {
     String a = session.toIso8601String().replaceAll(".", "^");
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/$a');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$a');
 
     // delete laddu serve
     DateTime timestamp = serve.timestamp;
@@ -717,8 +719,8 @@ class FBL {
 
   Future<List<LadduStock>> readLadduStocks(DateTime session) async {
     String a = session.toIso8601String().replaceAll(".", "^");
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/$a/stocks');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$a/stocks');
 
     DataSnapshot snapshot = await dbRef.get();
 
@@ -736,8 +738,8 @@ class FBL {
 
   Future<List<LadduStock>> readLadduStocksByDateRange(
       DateTime startDate, DateTime endDate) async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/stocks');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/stocks');
 
     final Query query = dbRef
         .orderByKey()
@@ -760,8 +762,8 @@ class FBL {
   }
 
   Future<DateTime> addLadduSession() async {
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva');
 
     DateTime timestamp = DateTime.now();
     DatabaseReference ref =
@@ -778,8 +780,8 @@ class FBL {
 
   Future<bool> addLadduServe(DateTime session, LadduServe dist) async {
     String s = session.toIso8601String().replaceAll(".", "^");
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/$s');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$s');
 
     // Add a new laddu distribution
     DateTime timestamp = dist.timestamp;
@@ -797,8 +799,8 @@ class FBL {
 
   Future<List<LadduServe>> readLadduServes(DateTime session) async {
     String s = session.toIso8601String().replaceAll(".", "^");
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/$s/serves');
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$s/serves');
 
     DataSnapshot snapshot;
     snapshot = await dbRef.get();
@@ -818,7 +820,7 @@ class FBL {
   Future<void> returnLadduStock(DateTime session, LadduReturn lr) async {
     String s = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('record_db${Const().dbVersion}/ladduSeva/$s/returned');
+        .ref('${Const().dbroot}/LadduSeva/$s/returned');
 
     await dbRef.update({
       'count': lr.count,

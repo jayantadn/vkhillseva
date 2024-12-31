@@ -13,6 +13,8 @@ import 'package:vkhillseva/common/toaster.dart';
 import 'package:intl/intl.dart';
 
 class LadduMain extends StatefulWidget {
+  const LadduMain({super.key});
+
   @override
   _LadduSevaState createState() => _LadduSevaState();
 }

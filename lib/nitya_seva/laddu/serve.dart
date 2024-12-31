@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/common/utils.dart';
 import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
+import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/utils.dart';
-import 'package:garuda/pushpanjali/sevaslot.dart';
 import 'package:vkhillseva/common/toaster.dart';
+import 'package:vkhillseva/nitya_seva/session.dart';
 
 class Serve extends StatefulWidget {
   final LadduServe? serve; // for update
-  final PushpanjaliSlot? slot;
+  final Session? slot;
 
   Serve({this.serve, this.slot});
 
@@ -20,25 +21,53 @@ class _ServeState extends State<Serve> {
   List<TextEditingController> _controllersPushpanjali = [];
   List<TextEditingController> _controllersOtherSeva = [];
   List<TextEditingController> _controllerMisc = [];
-  TextEditingController _controllerNote = TextEditingController();
-  TextEditingController _controllerTitle = TextEditingController();
+  final TextEditingController _controllerNote = TextEditingController();
+  final TextEditingController _controllerTitle = TextEditingController();
 
   int _totalLadduPacks = 0;
-  List<String> _misc = ["Miscellaneous"];
+  final List<String> _misc = ["Miscellaneous"];
   bool _isLoading = false;
+
+  final List<Map<String, int>> _pushpanjaliTickets = [
+    {'amount': 400, 'ladduPacks': 1},
+    {'amount': 500, 'ladduPacks': 1},
+    {'amount': 1000, 'ladduPacks': 2},
+    {'amount': 2500, 'ladduPacks': 3},
+  ];
+
+  final List<Map<String, dynamic>> _otherSevaTickets = [
+    {
+      'name': "Special Puja",
+      'amount': 0,
+      'ladduPacks': 1,
+      'color': Colors.pink[900]
+    },
+    {
+      'name': "Festival",
+      'amount': 500,
+      'ladduPacks': 2,
+      'color': Colors.indigo[900]
+    },
+  ];
 
   @override
   void initState() {
     super.initState();
 
-    List<int?> pushpanjaliTickets =
-        Const().pushpanjaliTickets.map((e) => e['amount']).toList();
+    List<int?> pushpanjaliTickets = [];
+    List amountsList = Const().nityaSeva['amounts'] as List;
+    for (var amountRaw in amountsList) {
+      Map<String, dynamic> amountMap = Map<String, dynamic>.from(amountRaw);
+      pushpanjaliTickets.add(int.parse(amountMap.keys.first));
+    }
+    // List<int?> pushpanjaliTickets =
+    // _pushpanjaliTickets.map((e) => e['amount']).toList();
 
     // default populate the controllers
     _controllersPushpanjali = List.generate(
         pushpanjaliTickets.length, (index) => TextEditingController());
     _controllersOtherSeva = List.generate(
-        Const().otherSevaTickets.length, (index) => TextEditingController());
+        _otherSevaTickets.length, (index) => TextEditingController());
     _controllerMisc =
         List.generate(_misc.length, (index) => TextEditingController());
 
@@ -48,14 +77,14 @@ class _ServeState extends State<Serve> {
 
       // controllers for pushpanjali
       for (int i = 0; i < widget.serve!.packsOtherSeva.length; i++) {
-        int divider = Const().otherSevaTickets[i]['ladduPacks']!;
+        int divider = _otherSevaTickets[i]['ladduPacks']!;
         int value = widget.serve!.packsOtherSeva[i].values.first ~/ divider;
         _controllersOtherSeva[i].text = value.toString();
       }
 
       // controllers for other sevas
       for (int i = 0; i < widget.serve!.packsPushpanjali.length; i++) {
-        int divider = Const().pushpanjaliTickets[i]['ladduPacks']!;
+        int divider = _pushpanjaliTickets[i]['ladduPacks']!;
         int value = widget.serve!.packsPushpanjali[i].values.first ~/ divider;
         _controllersPushpanjali[i].text =
             value.toString(); // assuming that there is only one key-value pair
@@ -72,7 +101,7 @@ class _ServeState extends State<Serve> {
       _controllerNote.text = widget.serve!.note;
     } else {
       // formulate title for the slot
-      _controllerTitle.text = widget.slot!.title;
+      _controllerTitle.text = widget.slot!.name;
     }
 
     _calculateTotalLadduPacks();
@@ -89,7 +118,7 @@ class _ServeState extends State<Serve> {
     // add all entries for pushpanjali
     for (int i = 0; i < _controllersPushpanjali.length; i++) {
       if (_controllersPushpanjali[i].text.isNotEmpty) {
-        int multiplier = Const().pushpanjaliTickets[i]['ladduPacks']!;
+        int multiplier = _pushpanjaliTickets[i]['ladduPacks']!;
         _totalLadduPacks +=
             (int.tryParse(_controllersPushpanjali[i].text)! * multiplier);
       }
@@ -98,7 +127,7 @@ class _ServeState extends State<Serve> {
     // add all entries for other sevas
     for (int i = 0; i < _controllersOtherSeva.length; i++) {
       if (_controllersOtherSeva[i].text.isNotEmpty) {
-        int multiplier = Const().otherSevaTickets[i]['ladduPacks']!;
+        int multiplier = _otherSevaTickets[i]['ladduPacks']!;
         _totalLadduPacks +=
             (int.tryParse(_controllersOtherSeva[i].text)! * multiplier);
       }
@@ -112,7 +141,7 @@ class _ServeState extends State<Serve> {
 
   Widget _createTable() {
     List<int?> pushpanjaliTickets =
-        Const().pushpanjaliTickets.map((e) => e['amount']).toList();
+        _pushpanjaliTickets.map((e) => e['amount']).toList();
 
     return Table(
       columnWidths: {
@@ -179,7 +208,7 @@ class _ServeState extends State<Serve> {
         ),
 
         // Table rows for pushpanjali
-        for (int i = 0; i < Const().pushpanjaliTickets.length; i++)
+        for (int i = 0; i < _pushpanjaliTickets.length; i++)
           TableRow(
             children: [
               // seva cell
@@ -233,7 +262,7 @@ class _ServeState extends State<Serve> {
                     child: _controllersPushpanjali[i].text.isEmpty
                         ? Text("0")
                         : Text((int.parse(_controllersPushpanjali[i].text) *
-                                Const().pushpanjaliTickets[i]['ladduPacks']!)
+                                _pushpanjaliTickets[i]['ladduPacks']!)
                             .toString()),
                   ),
                 ),
@@ -242,7 +271,7 @@ class _ServeState extends State<Serve> {
           ),
 
         // Table rows for other sevas
-        for (int i = 0; i < Const().otherSevaTickets.length; i++)
+        for (int i = 0; i < _otherSevaTickets.length; i++)
           TableRow(
             children: [
               // seva cell
@@ -253,7 +282,7 @@ class _ServeState extends State<Serve> {
                   padding: const EdgeInsets.all(8.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text("${Const().otherSevaTickets[i]['name']}"),
+                    child: Text("${_otherSevaTickets[i]['name']}"),
                   ),
                 ),
               ),
@@ -295,7 +324,7 @@ class _ServeState extends State<Serve> {
                     child: _controllersOtherSeva[i].text.isEmpty
                         ? Text("0")
                         : Text((int.parse(_controllersOtherSeva[i].text) *
-                                Const().otherSevaTickets[i]['ladduPacks']!)
+                                _otherSevaTickets[i]['ladduPacks']!)
                             .toString()),
                   ),
                 ),
@@ -405,7 +434,7 @@ class _ServeState extends State<Serve> {
     List<Map<String, int>> packsMisc = [];
 
     List<int?> pushpanjaliTickets =
-        Const().pushpanjaliTickets.map((e) => e['amount']).toList();
+        _pushpanjaliTickets.map((e) => e['amount']).toList();
 
     // pushpanjali
     for (int i = 0; i < _controllersPushpanjali.length; i++) {
@@ -416,7 +445,7 @@ class _ServeState extends State<Serve> {
       packsPushpanjali.add({
         pushpanjaliTickets[i]!.toString():
             int.tryParse(_controllersPushpanjali[i].text)! *
-                Const().pushpanjaliTickets[i]['ladduPacks']!
+                _pushpanjaliTickets[i]['ladduPacks']!
       });
     }
 
@@ -424,14 +453,14 @@ class _ServeState extends State<Serve> {
     for (int i = 0; i < _controllersOtherSeva.length; i++) {
       // no entries
       if (_controllersOtherSeva[i].text.isEmpty) {
-        packsOtherSeva.add({Const().otherSevaTickets[i]['name']: 0});
+        packsOtherSeva.add({_otherSevaTickets[i]['name']: 0});
         continue;
       }
 
       // add entries
-      int mul = Const().otherSevaTickets[i]['ladduPacks']!;
+      int mul = _otherSevaTickets[i]['ladduPacks']!;
       packsOtherSeva.add({
-        Const().otherSevaTickets[i]['name']:
+        _otherSevaTickets[i]['name']:
             int.tryParse(_controllersOtherSeva[i].text)! * mul
       });
     }
@@ -474,7 +503,7 @@ class _ServeState extends State<Serve> {
       note: _controllerNote.text,
       title: _controllerTitle.text,
       balance: total_procured - total_served,
-      pushpanjaliSlot: widget.slot!.timestampSlot,
+      pushpanjaliSlot: widget.slot!.timestamp,
       available: available,
     );
 

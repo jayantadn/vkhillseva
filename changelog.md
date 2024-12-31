@@ -1,3 +1,8 @@
+# 0.16.1
+- fix: contiguous ticket numbers
+- fix: username
+- fix: removed the oval from appbar title
+
 # 0.16.0
 - feature: laddu is integrated
 - fixed common issues

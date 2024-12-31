@@ -18,10 +18,12 @@ ThemeData themeDefault = ThemeData(
   appBarTheme: AppBarTheme(
     backgroundColor: backgroundColor,
     foregroundColor: accentColor,
-    titleTextStyle: GoogleFonts.pacifico(color: accentColor, fontSize: 24),
+    titleTextStyle: GoogleFonts.pacifico(color: accentColor, fontSize: 32),
     iconTheme: IconThemeData(
       size: 32.0,
     ),
+    elevation: 2.0, // This will create a shadow which looks like an underline
+    shadowColor: accentColor, // Color of the shadow
   ),
 
   // Text Styles

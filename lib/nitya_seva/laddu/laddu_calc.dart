@@ -223,10 +223,10 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
               Navigator.pop(context);
             }
           },
-          child: Text(widget.edit ? 'Update' : 'Add'),
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           ),
+          child: Text(widget.edit ? 'Update' : 'Add'),
         ),
       ],
     );
@@ -234,7 +234,7 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
 }
 
 Future<void> addEditStock(BuildContext context,
-    {bool edit = false, LadduStock? stock = null, DateTime? session}) async {
+    {bool edit = false, LadduStock? stock, DateTime? session}) async {
   showDialog(
     context: context,
     builder: (context) {
@@ -268,9 +268,9 @@ Future<void> returnStock(BuildContext context, {LadduReturn? lr}) async {
 
   // sum of all distributions
   int totalServe = 0;
-  serves.forEach((serve) {
+  for (var serve in serves) {
     totalServe += CalculateTotalLadduPacksServed(serve);
-  });
+  }
 
   int remaining = totalStock - totalServe;
 
@@ -298,7 +298,7 @@ class ReturnStockDialog extends StatefulWidget {
   int returnCount;
   LadduReturn? lr;
 
-  ReturnStockDialog({
+  ReturnStockDialog({super.key, 
     required this.session,
     required this.totalStock,
     required this.totalServe,
@@ -386,19 +386,19 @@ class _ReturnStockDialogState extends State<ReturnStockDialog> {
           onPressed: () {
             Navigator.of(context).pop(false);
           },
-          child: Text('Cancel'),
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           ),
+          child: Text('Cancel'),
         ),
 
         // confirm button
         ElevatedButton(
           onPressed: _isLoading ? null : _confirm,
-          child: Text(widget.lr != null ? 'Update' : 'Return'),
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           ),
+          child: Text(widget.lr != null ? 'Update' : 'Return'),
         ),
       ],
     );
@@ -422,7 +422,7 @@ class _ReturnStockDialogState extends State<ReturnStockDialog> {
       return;
     }
 
-    String username = await Utils().getUserName();
+    String username = Utils().getUserName();
 
     await FBL().returnLadduStock(
         widget.session,

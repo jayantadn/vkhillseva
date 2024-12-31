@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/utils.dart';
 import 'package:synchronized/synchronized.dart';
 
 class AvailabilityBar extends StatefulWidget {
-  AvailabilityBar({super.key});
+  const AvailabilityBar({super.key});
 
   @override
   State<AvailabilityBar> createState() => _AvailabilityBarState();
@@ -108,7 +107,7 @@ class _AvailabilityBarState extends State<AvailabilityBar> {
                 ),
               ),
               Text(
-                'Available: ${currentStock}',
+                'Available: $currentStock',
                 style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge!.color,
                   fontSize: 18.0, // Increase the font size as needed

@@ -848,7 +848,7 @@ class _TicketPageState extends State<TicketPage> {
           Scaffold(
             // app bar
             appBar: AppBar(
-              title: CommonWidgets().customAppBarTitle(Column(
+              title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -860,7 +860,7 @@ class _TicketPageState extends State<TicketPage> {
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
-              )),
+              ),
               actions: [
                 // add button
                 IconButton(

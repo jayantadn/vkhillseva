@@ -1,7 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/utils.dart';
@@ -76,7 +74,7 @@ class _SummaryState extends State<Summary> {
         total_served += CalculateTotalLadduPacksServed(serve);
 
         // calculate pie chart values for Pushpanjali Seva
-        serve.packsPushpanjali.forEach((element) {
+        for (var element in serve.packsPushpanjali) {
           String purpose = "Seva ${element.keys.first}";
           int count = element.values.first;
           if (count > 0) {
@@ -88,25 +86,10 @@ class _SummaryState extends State<Summary> {
               values.add(count);
             }
           }
-        });
+        }
 
         // calculate pie chart values for other Seva
-        serve.packsOtherSeva.forEach((element) {
-          String purpose = "${element.keys.first}";
-          int count = element.values.first;
-          if (count > 0) {
-            if (labels.contains(purpose)) {
-              int index = labels.indexOf(purpose);
-              values[index] += count;
-            } else {
-              labels.add(purpose);
-              values.add(count);
-            }
-          }
-        });
-
-        // calculate pie chart values for misc
-        serve.packsMisc.forEach((element) {
+        for (var element in serve.packsOtherSeva) {
           String purpose = element.keys.first;
           int count = element.values.first;
           if (count > 0) {
@@ -118,7 +101,22 @@ class _SummaryState extends State<Summary> {
               values.add(count);
             }
           }
-        });
+        }
+
+        // calculate pie chart values for misc
+        for (var element in serve.packsMisc) {
+          String purpose = element.keys.first;
+          int count = element.values.first;
+          if (count > 0) {
+            if (labels.contains(purpose)) {
+              int index = labels.indexOf(purpose);
+              values[index] += count;
+            } else {
+              labels.add(purpose);
+              values.add(count);
+            }
+          }
+        }
       }
 
       // populate bar chart data
@@ -203,7 +201,7 @@ class _SummaryState extends State<Summary> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 16),
-          Container(
+          SizedBox(
             height: barChartHeight,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -227,7 +225,7 @@ class _SummaryState extends State<Summary> {
                 }
 
                 // Add newline character to the labels
-                String label = barLabels[index].replaceAll(' ', '\n') + ' ';
+                String label = '${barLabels[index].replaceAll(' ', '\n')} ';
 
                 return Expanded(
                   child: Column(
@@ -283,7 +281,7 @@ class _SummaryState extends State<Summary> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 16),
-          Container(
+          SizedBox(
             height: barChartHeight,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,

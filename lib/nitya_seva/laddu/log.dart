@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/laddu_calc.dart';
@@ -183,7 +181,7 @@ class _LogState extends State<Log> {
                           ),
                         ),
                         TextSpan(
-                          text: '${serve.user}',
+                          text: serve.user,
                           style: TextStyle(
                             fontFamily:
                                 'YourFontFamily', // Replace with your font family
@@ -353,7 +351,7 @@ class _LogState extends State<Log> {
             ));
 
         // note
-        if (serve.note.isNotEmpty)
+        if (serve.note.isNotEmpty) {
           (tile.subtitle as Column).children.add(Align(
                 alignment: Alignment.centerLeft,
                 child: Container(
@@ -361,6 +359,7 @@ class _LogState extends State<Log> {
                   child: Text('Note: ${serve.note}'),
                 ),
               ));
+        }
 
         _logItems.add(tile);
       }

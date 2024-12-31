@@ -239,16 +239,14 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
       child: Stack(
         children: [
           Scaffold(
-            appBar: AppBar(
-                title: CommonWidgets().customAppBarTitle(Text(widget.title)),
-                actions: [
-                  IconButton(
-                    icon: Icon(Icons.add, size: 32),
-                    onPressed: () {
-                      _onAddEdit(null);
-                    },
-                  ),
-                ]),
+            appBar: AppBar(title: Text(widget.title), actions: [
+              IconButton(
+                icon: Icon(Icons.add, size: 32),
+                onPressed: () {
+                  _onAddEdit(null);
+                },
+              ),
+            ]),
             body: RefreshIndicator(
               onRefresh: refresh,
               child: ListView(

@@ -76,7 +76,7 @@ class LadduServe {
       pushpanjaliSlot: json['pushpanjaliSlot'] != null
           ? DateTime.parse(json['pushpanjaliSlot'])
           : null,
-      available: json['available'] != null ? json['available'] : null,
+      available: json['available'],
     );
   }
 

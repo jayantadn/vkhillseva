@@ -11,7 +11,7 @@ class Serve extends StatefulWidget {
   final LadduServe? serve; // for update
   final Session? slot;
 
-  Serve({this.serve, this.slot});
+  const Serve({super.key, this.serve, this.slot});
 
   @override
   _ServeState createState() => _ServeState();
@@ -344,7 +344,7 @@ class _ServeState extends State<Serve> {
                   padding: const EdgeInsets.all(8.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text('$seva'),
+                    child: Text(seva),
                   ),
                 ),
               ),
@@ -471,24 +471,24 @@ class _ServeState extends State<Serve> {
     }
 
     // calculate balance
-    int total_procured = 0;
-    int total_served = 0;
+    int totalProcured = 0;
+    int totalServed = 0;
     DateTime session = await FBL().readLatestLadduSession();
     await FBL().readLadduStocks(session).then((stocks) {
       for (LadduStock stock in stocks) {
-        total_procured += stock.count;
+        totalProcured += stock.count;
       }
     });
     await FBL().readLadduServes(session).then((serves) {
       for (LadduServe serve in serves) {
-        total_served += CalculateTotalLadduPacksServed(serve);
+        totalServed += CalculateTotalLadduPacksServed(serve);
       }
     });
     if (widget.serve != null) {
       // in edit mode, remove the previous serve count
-      total_served -= CalculateTotalLadduPacksServed(widget.serve!);
+      totalServed -= CalculateTotalLadduPacksServed(widget.serve!);
     }
-    total_served += _totalLadduPacks;
+    totalServed += _totalLadduPacks;
 
     DateTime now = DateTime.now();
     if (widget.serve != null) {
@@ -496,13 +496,13 @@ class _ServeState extends State<Serve> {
     }
     LadduServe ladduServe = LadduServe(
       timestamp: now,
-      user: await Utils().getUserName(),
+      user: Utils().getUserName(),
       packsPushpanjali: packsPushpanjali,
       packsOtherSeva: packsOtherSeva,
       packsMisc: packsMisc,
       note: _controllerNote.text,
       title: _controllerTitle.text,
-      balance: total_procured - total_served,
+      balance: totalProcured - totalServed,
       pushpanjaliSlot: widget.slot!.timestamp,
       available: available,
     );

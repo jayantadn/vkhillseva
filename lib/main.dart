@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhillseva/common/theme.dart';
-import 'package:vkhillseva/home/home.dart';
 import 'package:vkhillseva/home/pin_page.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
 import 'firebase_options.dart';
@@ -25,6 +24,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);
+        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);
   }
 }

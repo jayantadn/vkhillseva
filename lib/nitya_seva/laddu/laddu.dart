@@ -144,9 +144,9 @@ class _LadduSevaState extends State<LadduMain> {
 
         // total serve
         int totalServe = 0;
-        serves.forEach((serve) {
+        for (var serve in serves) {
           totalServe += CalculateTotalLadduPacksServed(serve);
-        });
+        }
 
         int remaining = totalStock - totalServe;
         if (remaining < 0) {

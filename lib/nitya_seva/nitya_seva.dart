@@ -513,40 +513,38 @@ class _NityaSevaState extends State<NityaSeva> {
       child: Stack(
         children: [
           Scaffold(
-            appBar: AppBar(
-                title: CommonWidgets().customAppBarTitle(Text(widget.title)),
-                actions: [
-                  // TAS
-                  IconButton(
-                    icon: ClipOval(
-                      child: Image.asset(
-                        'assets/images/NityaSeva/tas.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    onPressed: () {
-                      // navigate to add ticket page
-                    },
+            appBar: AppBar(title: Text(widget.title), actions: [
+              // TAS
+              IconButton(
+                icon: ClipOval(
+                  child: Image.asset(
+                    'assets/images/NityaSeva/tas.png',
+                    fit: BoxFit.cover,
                   ),
+                ),
+                onPressed: () {
+                  // navigate to add ticket page
+                },
+              ),
 
-                  // laddu seva
-                  IconButton(
-                    icon: ClipOval(
-                      child: Image.asset(
-                        'assets/images/NityaSeva/laddu.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LadduMain(),
-                        ),
-                      );
-                    },
+              // laddu seva
+              IconButton(
+                icon: ClipOval(
+                  child: Image.asset(
+                    'assets/images/NityaSeva/laddu.png',
+                    fit: BoxFit.cover,
                   ),
-                ]),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LadduMain(),
+                    ),
+                  );
+                },
+              ),
+            ]),
             body: Padding(
               padding: const EdgeInsets.all(4.0),
               child: RefreshIndicator(

@@ -1,27 +1,26 @@
-import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 
 int CalculateTotalLadduPacksServed(LadduServe serve) {
   int total = 0;
-  serve.packsPushpanjali.forEach((element) {
+  for (var element in serve.packsPushpanjali) {
     element.forEach((key, value) {
       total += value;
     });
-  });
+  }
 
-  serve.packsOtherSeva.forEach((element) {
+  for (var element in serve.packsOtherSeva) {
     element.forEach((key, value) {
       total += value;
     });
-  });
+  }
 
-  serve.packsMisc.forEach((element) {
+  for (var element in serve.packsMisc) {
     element.forEach((key, value) {
       total += value;
     });
-  });
+  }
 
   return total;
 }

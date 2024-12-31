@@ -10,6 +10,7 @@ import 'package:vkhillseva/common/toaster.dart';
 import 'package:vkhillseva/common/utils.dart';
 import 'package:vkhillseva/nitya_seva/laddu/laddu.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/nitya_seva/tas/tas.dart';
 import 'package:vkhillseva/nitya_seva/ticket_page.dart';
 import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
@@ -527,7 +528,12 @@ class _NityaSevaState extends State<NityaSeva> {
                   ),
                 ),
                 onPressed: () {
-                  // navigate to add ticket page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TAS(title: "Tulasi Archana Seva"),
+                    ),
+                  );
                 },
               ),
 

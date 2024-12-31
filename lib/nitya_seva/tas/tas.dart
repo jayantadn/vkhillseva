@@ -105,11 +105,15 @@ class _TASState extends State<TAS> {
         .getValue(path: "TAS/DataEntries/$formattedDate/pujariSignature");
     if (data != null) {
       _pujariSignatureController.text = data['Signature'];
+    } else {
+      _pujariSignatureController.text = "";
     }
     data = await FB()
         .getValue(path: "TAS/DataEntries/$formattedDate/securitySignature");
     if (data != null) {
       _securitySignatureController.text = data['Signature'];
+    } else {
+      _securitySignatureController.text = "";
     }
 
     setState(() {

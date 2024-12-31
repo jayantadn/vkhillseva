@@ -1,3 +1,6 @@
+# 0.17.1
+- fix: ticket validations
+
 # 0.17.0
 - fix: persistent pujari signature
 - feature: tas

@@ -163,7 +163,7 @@ class _PinPageState extends State<PinPage> {
               )),
 
           // circular progress indicator
-          if (_isLoading) LoadingOverlay(image: 'assets/images/tas.png')
+          if (_isLoading) LoadingOverlay()
         ],
       ),
     );

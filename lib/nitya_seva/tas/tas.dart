@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/widgets/date_header.dart';
 import 'package:vkhillseva/common/fb.dart';
@@ -74,7 +73,7 @@ class _TASState extends State<TAS> {
 
     // read config
     DatabaseReference dbref =
-        FirebaseDatabase.instance.ref("${Const().dbroot}/Config");
+        FirebaseDatabase.instance.ref("${Const().dbroot}/Settings");
     DataSnapshot snapshot = await dbref.child("GotraList").get();
     if (snapshot.value != null) {
       _gotraList = List<String>.from(snapshot.value as List);
@@ -86,7 +85,7 @@ class _TASState extends State<TAS> {
 
     // read sevakartas for today
     _sevakartas.clear();
-    dbref = FirebaseDatabase.instance.ref("${Const().dbroot}/DataEntries");
+    dbref = FirebaseDatabase.instance.ref("${Const().dbroot}/TAS/DataEntries");
     String date = DateFormat('yyyy-MM-dd').format(_selectedDate);
     snapshot = await dbref.child("$date/Sevakartas").get();
     if (snapshot.value != null) {
@@ -159,22 +158,22 @@ class _TASState extends State<TAS> {
 
   Future<void> _updateGotraListFB() async {
     final dbref =
-        FirebaseDatabase.instance.ref("${Const().dbroot}/Config/GotraList");
+        FirebaseDatabase.instance.ref("${Const().dbroot}/Settings/GotraList");
 
     await dbref.set(_gotraList);
   }
 
   Future<void> _updateNakshatraListFB() async {
-    final dbref =
-        FirebaseDatabase.instance.ref("${Const().dbroot}/Config/NakshatraList");
+    final dbref = FirebaseDatabase.instance
+        .ref("${Const().dbroot}/Settings/NakshatraList");
 
     await dbref.set(_nakshatraList);
   }
 
   Future<void> _updateSevakartasFB() async {
     String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
-    final dbref =
-        FirebaseDatabase.instance.ref("${Const().dbroot}//$formattedDate");
+    final dbref = FirebaseDatabase.instance
+        .ref("${Const().dbroot}/TAS/DataEntries/$formattedDate/Sevakartas");
 
     await dbref.set(_sevakartas);
   }
@@ -726,20 +725,8 @@ class _TASState extends State<TAS> {
         ),
         if (_isLoading)
           LoadingOverlay(
-            image: "assets/images/tas.png",
+            image: "assets/images/NityaSeva/tas.png",
           ),
-
-        // version
-        Positioned(
-          bottom: 10,
-          right: 10,
-          child: Text(
-            "v${Const().version}",
-            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  color: Colors.grey,
-                ),
-          ),
-        ),
       ],
     );
   }

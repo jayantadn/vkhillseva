@@ -77,11 +77,11 @@ class CommonWidgets {
     );
   }
 
-  Future<String?> createErrorDialog(
-      {required BuildContext context,
-      required List<String> errors,
-      bool post = false,
-      bool noaction = false}) async {
+  Future<String?> createErrorDialog({
+    required BuildContext context,
+    required List<String> errors,
+    bool post = false,
+  }) async {
     Completer<String?> action = Completer<String?>();
 
     // populate skipErrorCheck
@@ -127,18 +127,24 @@ class CommonWidgets {
                     alignment: Alignment.centerLeft,
                     child: Text(" - $error"),
                   ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                      "\nClick 'Proceed' to ignore the errors and continue"),
-                ),
+                if (post == false)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                        "\nClick 'Proceed' to ignore the errors and continue"),
+                  ),
+                if (post == true)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("\nPlease take necessary action"),
+                  ),
               ],
             ),
           ),
           actions: [
             // cancel button
             TextButton(
-              child: Text('Cancel'),
+              child: Text('Close'),
               onPressed: () {
                 Navigator.of(context).pop();
                 action.complete('Cancel');
@@ -146,7 +152,7 @@ class CommonWidgets {
             ),
 
             // create button
-            if (post == false && noaction == false)
+            if (post == false)
               TextButton(
                 child: Text('Proceed'),
                 onPressed: () {
@@ -156,34 +162,14 @@ class CommonWidgets {
               ),
 
             // skip button
-            if (post == false && noaction == false)
+            if (post == false)
               TextButton(
-                child: Text('Proceed and disable error'),
+                child: Text('Proceed & disable error'),
                 onPressed: () {
                   Navigator.of(context).pop();
                   action.complete('Proceed');
                   prefs.setString(
                       'SkipErrorCheck', DateTime.now().toIso8601String());
-                },
-              ),
-
-            // Edit button
-            if (post == true)
-              TextButton(
-                child: Text('Edit'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  action.complete('Edit');
-                },
-              ),
-
-            // delete button
-            if (post == true)
-              TextButton(
-                child: Text('Delete'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  action.complete('Delete');
                 },
               ),
           ],

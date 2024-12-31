@@ -396,13 +396,19 @@ class _TicketPageState extends State<TicketPage> {
 
     // check if ticket is created in the correct session
     String dbDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-    var sessions = await FB().getList(path: "NityaSeva/$dbDate");
-    if (sessions.isEmpty) {
+    var sessionsList = await FB().getList(path: "NityaSeva/$dbDate");
+    if (sessionsList.isEmpty) {
       errors.add("No sessions found for today");
     } else {
-      DateTime lastSession =
-          DateTime.parse(sessions.last['Settings']['timestamp']);
-      if (lastSession != widget.session.timestamp) {
+      List<Session> sessions = [];
+      for (var sessionRaw in sessionsList) {
+        Map<String, dynamic> sessionMap =
+            Map<String, dynamic>.from(sessionRaw['Settings']);
+        sessions.add(Session.fromJson(sessionMap));
+      }
+      sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+      if (sessions.last.timestamp != widget.session.timestamp) {
         errors.add("Ticket created in wrong session");
       }
     }

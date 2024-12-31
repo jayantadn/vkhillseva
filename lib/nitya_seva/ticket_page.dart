@@ -329,6 +329,14 @@ class _TicketPageState extends State<TicketPage> {
       }
     }
 
+    // check if ticket is entered in another date
+    DateTime now = DateTime.now();
+    if (widget.session.timestamp.day != now.day ||
+        widget.session.timestamp.month != now.month ||
+        widget.session.timestamp.year != now.year) {
+      errors.add("Ticket from another date");
+    }
+
     return errors;
   }
 
@@ -340,7 +348,7 @@ class _TicketPageState extends State<TicketPage> {
     if (ticket.timestamp.day != now.day ||
         ticket.timestamp.month != now.month ||
         ticket.timestamp.year != now.year) {
-      errors.add("Ticket from another date");
+      errors.add("Ticket created in older date");
     }
 
     // check if ticket is not from latest session
@@ -409,7 +417,7 @@ class _TicketPageState extends State<TicketPage> {
       sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
       if (sessions.last.timestamp != widget.session.timestamp) {
-        errors.add("Ticket created in wrong session");
+        errors.add("Ticket created in old session");
       }
     }
 

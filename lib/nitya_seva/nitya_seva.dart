@@ -205,6 +205,13 @@ class _NityaSevaState extends State<NityaSeva> {
       }
     }
 
+    // check if session is created for today
+    if (_selectedDate.day != now.day ||
+        _selectedDate.month != now.month ||
+        _selectedDate.year != now.year) {
+      errors.add("Session created in older date");
+    }
+
     return errors;
   }
 

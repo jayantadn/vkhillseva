@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/home/home.dart';
+import 'package:vkhillseva/home/pin_page.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
 import 'firebase_options.dart';
 
@@ -17,8 +18,8 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  final Widget home = const HomePage(title: "Hare Krishna");
-  final Widget test = const NityaSeva(title: "Hare Krishna");
+  final Widget home = const PinPage(title: "Hare Krishna");
+  final Widget test = const NityaSeva(title: "Testing");
 
   // This widget is the root of your application.
   @override

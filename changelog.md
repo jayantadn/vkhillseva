@@ -1,3 +1,8 @@
+# 0.16.0
+- feature: laddu is integrated
+- fixed common issues
+- feature: pin authentication
+
 # 0.15.0
 - fixes
 - fix: session without settings

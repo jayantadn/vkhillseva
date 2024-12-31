@@ -582,7 +582,7 @@ class FBL {
   ) async {
     String a = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LladduSeva/$a');
+        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$a');
 
     // set return status
     DatabaseReference refRet = dbRef.child('returned');

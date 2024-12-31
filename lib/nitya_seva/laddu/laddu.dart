@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/laddu/avilability_bar.dart';
 import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
-import 'package:vkhillseva/nitya_seva/laddu/history.dart';
 import 'package:vkhillseva/nitya_seva/laddu/laddu_calc.dart';
 import 'package:vkhillseva/nitya_seva/laddu/log.dart';
 import 'package:vkhillseva/nitya_seva/laddu/service_select.dart';
@@ -30,7 +28,7 @@ class _LadduSevaState extends State<LadduMain> {
     refresh().then((data) async {
       await _ensureReturn(context);
 
-      FBL().listenForChange("ladduSeva",
+      FBL().listenForChange("LadduSeva",
           FBLCallbacks(onChange: (String changeType, dynamic data) async {
         await refresh();
       }));
@@ -182,18 +180,18 @@ class _LadduSevaState extends State<LadduMain> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Laddu Seva'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.list),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => History()),
-              );
-            },
-            tooltip: 'Complete Log',
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.list),
+        //     onPressed: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(builder: (context) => History()),
+        //       );
+        //     },
+        //     tooltip: 'Complete Log',
+        //   ),
+        // ],
       ),
       body: RefreshIndicator(
         onRefresh: refresh,
@@ -217,7 +215,10 @@ class _LadduSevaState extends State<LadduMain> {
                   onPressed: () async {
                     addEditStock(context);
                   },
-                  icon: Icon(Icons.add),
+                  icon: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
                   label: Text('Stock'),
                 ),
 
@@ -228,7 +229,7 @@ class _LadduSevaState extends State<LadduMain> {
                           _createServeDialog(context);
                         }
                       : null,
-                  icon: Icon(Icons.remove),
+                  icon: Icon(Icons.remove, color: Colors.white),
                   label: Text('Serve'),
                 ),
 
@@ -239,7 +240,7 @@ class _LadduSevaState extends State<LadduMain> {
                           returnStock(context);
                         }
                       : null,
-                  icon: Icon(Icons.undo),
+                  icon: Icon(Icons.undo, color: Colors.white),
                   label: Text('Return'),
                 )
               ],

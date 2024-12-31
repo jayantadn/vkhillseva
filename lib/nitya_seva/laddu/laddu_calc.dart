@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/utils.dart';

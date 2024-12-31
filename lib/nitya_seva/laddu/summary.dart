@@ -421,10 +421,10 @@ class _SummaryState extends State<Summary> {
               ],
 
               // padding before pie chart
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: _getBarChart(context),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(16.0),
+              //   child: _getBarChart(context),
+              // ),
             ],
           );
         }

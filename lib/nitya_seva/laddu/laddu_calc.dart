@@ -171,7 +171,7 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
                 isLoading = true;
               });
 
-              String username = Utils().getUserName();
+              String username = await Utils().getUsername(context);
 
               LadduStock stockNew;
               if (widget.edit) {
@@ -298,7 +298,8 @@ class ReturnStockDialog extends StatefulWidget {
   int returnCount;
   LadduReturn? lr;
 
-  ReturnStockDialog({super.key, 
+  ReturnStockDialog({
+    super.key,
     required this.session,
     required this.totalStock,
     required this.totalServe,
@@ -422,7 +423,7 @@ class _ReturnStockDialogState extends State<ReturnStockDialog> {
       return;
     }
 
-    String username = Utils().getUserName();
+    String username = await Utils().getUsername(context);
 
     await FBL().returnLadduStock(
         widget.session,

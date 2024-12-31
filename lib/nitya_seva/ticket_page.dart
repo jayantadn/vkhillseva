@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/common/utils.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/nitya_seva/session_summary.dart';
 import 'package:vkhillseva/widgets/common_widgets.dart';
@@ -25,6 +26,7 @@ class _TicketPageState extends State<TicketPage> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   DateTime _lastCallbackInvoked = DateTime.now();
+  String _username = "Guest";
 
   // lists
   final List<Ticket> _tickets = [];
@@ -100,6 +102,8 @@ class _TicketPageState extends State<TicketPage> {
     setState(() {
       _isLoading = true;
     });
+
+    _username = await Utils().getUsername(context);
 
     // fetch tickets
     String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
@@ -736,7 +740,7 @@ class _TicketPageState extends State<TicketPage> {
                                     mode: mode,
                                     ticketNumber:
                                         int.parse(ticketNumberController.text),
-                                    user: "Guest",
+                                    user: _username,
                                     note: noteController.text,
                                     image: icon,
                                     seva: sevaName,

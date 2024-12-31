@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/widgets/common_widgets.dart';
+import 'package:vkhillseva/common/utils.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/home/settings.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
@@ -17,6 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<HomePage> {
   bool _isLoading = true;
+  String _username = "Guest";
 
   // late FirebaseMessaging _firebaseMessaging;
 
@@ -57,6 +58,8 @@ class _MyHomePageState extends State<HomePage> {
   }
 
   Future<void> refresh() async {
+    _username = await Utils().getUsername(context);
+
     setState(() {
       _isLoading = false;
     });
@@ -116,7 +119,7 @@ class _MyHomePageState extends State<HomePage> {
               style: Theme.of(context).textTheme.headlineLarge,
             ),
             Text(
-              'Guest',
+              _username,
               style: Theme.of(context).textTheme.headlineLarge,
             ),
             Text(

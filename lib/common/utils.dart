@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:vkhillseva/common/local_storage.dart';
 
 class Utils {
   static final Utils _instance = Utils._internal();
@@ -61,7 +63,40 @@ class Utils {
     return lightColors[DateTime.now().millisecond % lightColors.length];
   }
 
-  String getUserName() {
-    return "Guest";
+  Future<String> getUsername(context) async {
+    String? username = await LS().read('username');
+    if (username != null) {
+      return username;
+    } else {
+      // prompt for username
+      TextEditingController usernameController = TextEditingController();
+      username = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Enter your name'),
+            content: TextField(
+              controller: usernameController,
+              decoration: InputDecoration(hintText: "Username"),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(usernameController.text);
+                },
+              ),
+            ],
+          );
+        },
+      );
+
+      if (username == null) {
+        return "Guest";
+      } else {
+        await LS().write('username', username);
+        return username;
+      }
+    }
   }
 }

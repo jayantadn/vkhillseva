@@ -7,6 +7,7 @@ import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/datatypes.dart';
 import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/common/toaster.dart';
+import 'package:vkhillseva/common/utils.dart';
 import 'package:vkhillseva/nitya_seva/laddu/laddu.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/nitya_seva/ticket_page.dart';
@@ -31,6 +32,7 @@ class _NityaSevaState extends State<NityaSeva> {
   bool _isLoading = true;
   DateTime _selectedDate = DateTime.now();
   DateTime _lastCallbackInvoked = DateTime.now();
+  String _username = "Guest";
 
   // lists
   final List<FestivalSettings> _sevaList = [];
@@ -136,6 +138,8 @@ class _NityaSevaState extends State<NityaSeva> {
         _isLoading = true;
       });
     }
+
+    _username = await Utils().getUsername(context);
 
     // fetch festival sevas from db
     _sevaList.clear();
@@ -384,7 +388,7 @@ class _NityaSevaState extends State<NityaSeva> {
                   defaultAmount: int.parse(sevaAmount),
                   defaultPaymentMode: paymentMode,
                   icon: icon,
-                  sevakarta: 'Guest',
+                  sevakarta: _username,
                   timestamp: session == null ? now : session.timestamp,
                 );
 

@@ -60,62 +60,104 @@ class _PinPageState extends State<PinPage> {
               body: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextField(
-                        maxLength: 4,
-                        obscureText: true,
-                        keyboardType: TextInputType.number,
-                        autofocus: true,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Enter pin',
-                          counterText: '',
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // app logo
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Container(
+                            height: 200,
+                            width: 200,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.5),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: ClipOval(
+                              child: Image.asset(
+                                'assets/images/Logo/KrishnaLilaPark_circle.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
                         ),
-                        onChanged: (value) async {
-                          if (value.length == 4) {
-                            var bytes = utf8.encode(value);
-                            var digest = sha256.convert(bytes);
 
-                            DatabaseReference dbref = FirebaseDatabase.instance
-                                .ref("${Const().dbroot}/Settings");
-                            DataSnapshot snapshot =
-                                await dbref.child("PinHash").get();
+                        // welcome message
+                        Text(
+                          'ISKCON Vaikuntha Hill',
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        Text('Seva App v${Const().version}',
+                            style: Theme.of(context).textTheme.headlineSmall),
 
-                            if (snapshot.value == digest.toString()) {
-                              SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
-                              prefs.setString('pincache', digest.toString());
+                        // input pin
+                        SizedBox(height: 16),
+                        TextField(
+                          maxLength: 4,
+                          obscureText: true,
+                          keyboardType: TextInputType.number,
+                          autofocus: true,
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Enter pin',
+                            counterText: '',
+                          ),
+                          onChanged: (value) async {
+                            if (value.length == 4) {
+                              var bytes = utf8.encode(value);
+                              var digest = sha256.convert(bytes);
 
-                              Navigator.pushReplacement(
-                                // ignore: use_build_context_synchronously
+                              DatabaseReference dbref = FirebaseDatabase
+                                  .instance
+                                  .ref("${Const().dbroot}/Settings");
+                              DataSnapshot snapshot =
+                                  await dbref.child("PinHash").get();
+
+                              if (snapshot.value == digest.toString()) {
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                prefs.setString('pincache', digest.toString());
+
+                                Navigator.pushReplacement(
+                                  // ignore: use_build_context_synchronously
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomePage(
+                                      title: "Hare Krishna",
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                Toaster().error('Invalid pin');
+                              }
+                            }
+                          },
+                        ),
+
+                        // change pin
+                        SizedBox(height: 16),
+                        TextButton(
+                            child: Text('Change pin'),
+                            onPressed: () {
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => HomePage(
-                                    title: "Hare Krishna",
-                                  ),
-                                ),
+                                    builder: (context) => const ChangePin(
+                                          title: 'Change pin',
+                                        )),
                               );
-                            } else {
-                              Toaster().error('Invalid pin');
-                            }
-                          }
-                        },
-                      ),
-                      SizedBox(height: 16),
-                      TextButton(
-                          child: Text('Change pin'),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const ChangePin(
-                                        title: 'Change pin',
-                                      )),
-                            );
-                          }),
-                    ],
+                            }),
+                      ],
+                    ),
                   ),
                 ),
               )),

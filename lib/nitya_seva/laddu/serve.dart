@@ -494,9 +494,10 @@ class _ServeState extends State<Serve> {
     if (widget.serve != null) {
       now = widget.serve!.timestamp;
     }
+    String username = await Utils().getUsername(context);
     LadduServe ladduServe = LadduServe(
       timestamp: now,
-      user: Utils().getUserName(),
+      user: username,
       packsPushpanjali: packsPushpanjali,
       packsOtherSeva: packsOtherSeva,
       packsMisc: packsMisc,

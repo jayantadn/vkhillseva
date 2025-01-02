@@ -34,6 +34,7 @@ class _NityaSevaState extends State<NityaSeva> {
   DateTime _selectedDate = DateTime.now();
   DateTime _lastCallbackInvoked = DateTime.now();
   String _username = "Guest";
+  String _sessionTiming = "Morning";
 
   // lists
   final List<FestivalSettings> _sevaList = [];
@@ -269,8 +270,16 @@ class _NityaSevaState extends State<NityaSeva> {
     if (session == null) {
       if (now.hour < 14) {
         selectedSeva = _sevaList.first.name;
+
+        setState(() {
+          _sessionTiming = "Morning";
+        });
       } else {
         selectedSeva = _sevaList[1].name;
+
+        setState(() {
+          _sessionTiming = "Evening";
+        });
       }
     } else {
       selectedSeva = session.name;

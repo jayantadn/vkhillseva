@@ -82,6 +82,7 @@ class LauncherTile2 extends StatelessWidget {
               // title
               SizedBox(
                 height: 55,
+                width: double.infinity,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Center(

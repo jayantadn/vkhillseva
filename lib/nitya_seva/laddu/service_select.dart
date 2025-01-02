@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/serve.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
@@ -28,7 +29,10 @@ class _ServiceSelectDialogState extends State<ServiceSelect> {
     slots.addAll(slotsYest);
 
     setState(() {
-      services = slots.map((e) => e.name).toList();
+      services = slots.map((e) {
+        String day = DateFormat("EEE").format(e.timestamp);
+        return "$day - ${e.name}";
+      }).toList();
       status = services.isEmpty ? "empty" : "loaded";
     });
   }

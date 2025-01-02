@@ -71,26 +71,49 @@ class Utils {
       TextEditingController usernameController = TextEditingController();
       username = await showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Enter your name'),
-            content: TextField(
-              controller: usernameController,
-              decoration: InputDecoration(hintText: "Username"),
+            title: Text('Please enter your name'),
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    TextField(
+                      controller: usernameController,
+                      decoration: InputDecoration(hintText: "Username"),
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                    ),
+                    if (usernameController.text.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          'Username is required',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
             actions: <Widget>[
               TextButton(
+                onPressed: usernameController.text.isEmpty
+                    ? null
+                    : () {
+                        Navigator.of(context).pop(usernameController.text);
+                      },
                 child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop(usernameController.text);
-                },
               ),
             ],
           );
         },
       );
 
-      if (username == null) {
+      if (username == null || username.isEmpty) {
         return "Guest";
       } else {
         await LS().write('username', username);

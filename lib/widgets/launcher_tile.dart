@@ -88,6 +88,7 @@ class LauncherTile2 extends StatelessWidget {
                     child: Text(
                       title,
                       style: Theme.of(context).textTheme.headlineSmall,
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
@@ -107,7 +108,7 @@ class LauncherTile2 extends StatelessWidget {
 
               // footer
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: Text(
                   text,
                   style: Theme.of(context).textTheme.bodySmall,

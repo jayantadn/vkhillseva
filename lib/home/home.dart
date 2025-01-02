@@ -126,7 +126,7 @@ class _MyHomePageState extends State<HomePage> {
               'ISKCON Vaikuntha Hill',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            Text('Seva App v${Const().version}',
+            Text('Garuda v${Const().version}',
                 style: Theme.of(context).textTheme.headlineSmall),
             SizedBox(height: 50),
             SingleChildScrollView(

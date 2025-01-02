@@ -154,10 +154,10 @@ class _NityaSevaState extends State<NityaSeva> {
 
     // put Nitya Seva at the top
     _sevaList.sort((a, b) {
-      if (a.name == 'Morning Pushpanjali') return -1;
-      if (b.name == 'Morning Pushpanjali') return 1;
-      if (a.name == 'Evening Pushpanjali') return -1;
-      if (b.name == 'Evening Pushpanjali') return 1;
+      if (a.name == 'Regular Morning Seva') return -1;
+      if (b.name == 'Regular Morning Seva') return 1;
+      if (a.name == 'Regular Evening Seva') return -1;
+      if (b.name == 'Regular Evening Seva') return 1;
       return 0;
     });
 
@@ -243,7 +243,7 @@ class _NityaSevaState extends State<NityaSeva> {
         String? ret = await CommonWidgets()
             .createErrorDialog(context: context, errors: errors, post: true);
         if (ret == 'Edit') {
-          _createEditSession(session: session);
+          _addEditSession(session: session);
         } else if (ret == 'Delete') {
           // delete locally
           setState(() {
@@ -259,7 +259,7 @@ class _NityaSevaState extends State<NityaSeva> {
     });
   }
 
-  Future<void> _createEditSession({Session? session}) async {
+  Future<void> _addEditSession({Session? session}) async {
     final double padding = 10.0;
     DateTime now = DateTime.now();
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
@@ -475,7 +475,7 @@ class _NityaSevaState extends State<NityaSeva> {
               title: Text('Edit'),
               onTap: () {
                 Navigator.of(context).pop();
-                _createEditSession(session: session);
+                _addEditSession(session: session);
               },
             ),
             ListTile(
@@ -589,7 +589,7 @@ class _NityaSevaState extends State<NityaSeva> {
                                 image: session.icon,
                                 title: session.name,
                                 text:
-                                    "${session.sevakarta}, ${DateFormat('dd MMM, HH:mm').format(session.timestamp)}",
+                                    "${session.sevakarta}, ${DateFormat('HH:mm').format(session.timestamp)}",
                                 callback: LauncherTileCallback(onClick: () {
                                   Navigator.push(
                                     context,
@@ -610,7 +610,7 @@ class _NityaSevaState extends State<NityaSeva> {
                             title: 'New Session',
                             text: "Add a new session",
                             callback: LauncherTileCallback(onClick: () {
-                              _createEditSession();
+                              _addEditSession();
                             }),
                           ),
                         ],

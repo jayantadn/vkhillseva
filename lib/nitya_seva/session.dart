@@ -1,5 +1,6 @@
 class Session {
   final String name;
+  final String type;
   final int defaultAmount;
   final String defaultPaymentMode;
   final String icon;
@@ -8,6 +9,7 @@ class Session {
 
   Session(
       {required this.name,
+      required this.type,
       required this.defaultAmount,
       required this.defaultPaymentMode,
       required this.icon,
@@ -17,6 +19,7 @@ class Session {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
+      'type': type,
       'defaultAmount': defaultAmount,
       'defaultPaymentMode': defaultPaymentMode,
       'icon': icon,
@@ -28,6 +31,7 @@ class Session {
   factory Session.fromJson(Map<String, dynamic> json) {
     Session session = Session(
       name: json['name'],
+      type: json['type'],
       defaultAmount: json['defaultAmount'],
       defaultPaymentMode: json['defaultPaymentMode'],
       icon: json['icon'],

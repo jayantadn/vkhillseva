@@ -290,257 +290,247 @@ class _NityaSevaState extends State<NityaSeva> {
       paymentMode = session.defaultPaymentMode;
     }
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(session == null ? 'Add New Session' : 'Edit Session',
-              style: Theme.of(context).textTheme.headlineMedium),
-          content: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              children: [
-                // PP vs KK
-                StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedSevaType = "Pushpanjali";
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: selectedSevaType == "Pushpanjali"
-                                    ? accentColor
-                                    : Colors.transparent,
-                                border: Border.all(color: accentColor),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(8),
-                                  bottomLeft: Radius.circular(8),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        session == null ? 'Add New Session' : 'Edit Session',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                      SizedBox(height: 16.0),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedSevaType = "Pushpanjali";
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: selectedSevaType == "Pushpanjali"
+                                      ? accentColor
+                                      : Colors.transparent,
+                                  border: Border.all(color: accentColor),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(8),
+                                    bottomLeft: Radius.circular(8),
+                                  ),
                                 ),
-                              ),
-                              padding: EdgeInsets.all(8),
-                              child: Text(
-                                "Pushpanjali",
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                      color: selectedSevaType == "Pushpanjali"
-                                          ? Colors.white
-                                          : accentColor,
-                                    ),
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  "Pushpanjali",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: selectedSevaType == "Pushpanjali"
+                                            ? Colors.white
+                                            : accentColor,
+                                      ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedSevaType = "Kumkum Archana";
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: selectedSevaType == "Kumkum Archana"
-                                    ? accentColor
-                                    : Colors.transparent,
-                                border: Border(
-                                  top: BorderSide(color: accentColor),
-                                  right: BorderSide(color: accentColor),
-                                  bottom: BorderSide(color: accentColor),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedSevaType = "Kumkum Archana";
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: selectedSevaType == "Kumkum Archana"
+                                      ? accentColor
+                                      : Colors.transparent,
+                                  border: Border(
+                                    top: BorderSide(color: accentColor),
+                                    right: BorderSide(color: accentColor),
+                                    bottom: BorderSide(color: accentColor),
+                                  ),
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(8),
+                                    bottomRight: Radius.circular(8),
+                                  ),
                                 ),
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(8),
-                                  bottomRight: Radius.circular(8),
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  "Kumkum Archana",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color:
+                                            selectedSevaType == "Kumkum Archana"
+                                                ? Colors.white
+                                                : accentColor,
+                                      ),
                                 ),
-                              ),
-                              padding: EdgeInsets.all(8),
-                              child: Text(
-                                "Kumkum Archana",
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                      color:
-                                          selectedSevaType == "Kumkum Archana"
-                                              ? Colors.white
-                                              : accentColor,
-                                    ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-
-                // drop down for seva
-                SizedBox(height: padding),
-                DropdownButtonFormField<String>(
-                  value: selectedSeva, // Set the default value here
-                  decoration: InputDecoration(labelText: 'Seva'),
-                  items: _sevaList.map((FestivalSettings value) {
-                    return DropdownMenuItem<String>(
-                      value: value.name,
-                      child: Text(value.name),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      if (newValue != null) {
-                        selectedSeva = newValue;
-                      }
-                    });
-                  },
-                ),
-
-                SizedBox(height: padding),
-
-                Row(
-                  children: [
-                    // default amount
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: sevaAmount, // Set the default value here
-                        decoration:
-                            InputDecoration(labelText: 'Default seva amount'),
-                        items: sevaAmounts.map((String value) {
+                        ],
+                      ),
+                      SizedBox(height: 16.0),
+                      DropdownButtonFormField<String>(
+                        value: selectedSeva,
+                        decoration: InputDecoration(labelText: 'Seva'),
+                        items: _sevaList.map((FestivalSettings value) {
                           return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
+                            value: value.name,
+                            child: Text(value.name),
                           );
                         }).toList(),
                         onChanged: (newValue) {
-                          sevaAmount = newValue ?? sevaAmounts.first;
+                          setState(() {
+                            if (newValue != null) {
+                              selectedSeva = newValue;
+                            }
+                          });
                         },
                       ),
-                    ),
+                      SizedBox(height: 16.0),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: sevaAmount,
+                              decoration: InputDecoration(
+                                  labelText: 'Default seva amount'),
+                              items: sevaAmounts.map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (newValue) {
+                                sevaAmount = newValue ?? sevaAmounts.first;
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 16.0),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: paymentMode,
+                              decoration: InputDecoration(
+                                  labelText: 'Default payment mode'),
+                              items: paymentModes.map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (newValue) {
+                                paymentMode = newValue ?? paymentModes.first;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            child: Text('Cancel'),
+                            onPressed: () {
+                              sevaAmounts.clear();
+                              paymentModes.clear();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: Text(session == null ? 'Add' : 'Edit'),
+                            onPressed: () async {
+                              String icon = '';
+                              for (var element in _sevaList) {
+                                if (element.name == selectedSeva) {
+                                  icon = element.icon;
+                                  break;
+                                }
+                              }
 
-                    // default payment mode
-                    SizedBox(width: padding),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: paymentMode,
-                        decoration:
-                            InputDecoration(labelText: 'Default payment mode'),
-                        items: paymentModes.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          paymentMode = newValue ?? paymentModes.first;
-                        },
+                              Session newSession = Session(
+                                name: selectedSeva,
+                                type: selectedSevaType,
+                                defaultAmount: int.parse(sevaAmount),
+                                defaultPaymentMode: paymentMode,
+                                icon: icon,
+                                sevakarta: _username,
+                                timestamp:
+                                    session == null ? now : session.timestamp,
+                              );
+
+                              if (session == null) {
+                                List<String> errors =
+                                    _preValidation(newSession);
+                                String? ret = 'Proceed';
+                                if (errors.isNotEmpty) {
+                                  ret = await CommonWidgets().createErrorDialog(
+                                      context: context, errors: errors);
+                                }
+                                if (errors.isEmpty || ret == 'Proceed') {
+                                  FB().addToList(
+                                    path: "NityaSeva/$dbDate",
+                                    child: "Settings",
+                                    data: newSession.toJson(),
+                                  );
+
+                                  setState(() {
+                                    _sessions.add(newSession);
+                                  });
+                                }
+                                if (errors.isEmpty) {
+                                  _postValidation(newSession);
+                                }
+                              } else {
+                                setState(() {
+                                  int index = _sessions.indexWhere(
+                                      (s) => s.timestamp == session.timestamp);
+                                  if (index != -1) {
+                                    _sessions[index] = newSession;
+                                  }
+                                });
+
+                                String dbTimestamp = session.timestamp
+                                    .toIso8601String()
+                                    .replaceAll(".", "^");
+                                FB().editJson(
+                                    path:
+                                        "NityaSeva/$dbDate/$dbTimestamp/Settings",
+                                    json: newSession.toJson());
+                              }
+
+                              sevaAmounts.clear();
+                              paymentModes.clear();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                // clear all local lists
-                sevaAmounts.clear();
-                paymentModes.clear();
-
-                // clear all local controllers and focus nodes
-
-                // close the dialog
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text(session == null ? 'Add' : 'Edit'),
-              onPressed: () async {
-                // find the icon for the selected seva
-                String icon = '';
-                for (var element in _sevaList) {
-                  if (element.name == selectedSeva) {
-                    icon = element.icon;
-                    break;
-                  }
-                }
-
-                // create a new session
-                Session newSession = Session(
-                  name: selectedSeva,
-                  defaultAmount: int.parse(sevaAmount),
-                  defaultPaymentMode: paymentMode,
-                  icon: icon,
-                  sevakarta: _username,
-                  timestamp: session == null ? now : session.timestamp,
-                );
-
-                // add session
-                if (session == null) {
-                  List<String> errors = _preValidation(newSession);
-                  String? ret = 'Proceed';
-                  if (errors.isNotEmpty) {
-                    ret = await CommonWidgets()
-                        .createErrorDialog(context: context, errors: errors);
-                  }
-                  if (errors.isEmpty || ret == 'Proceed') {
-                    // push to db
-                    FB().addToList(
-                      path: "NityaSeva/$dbDate",
-                      child: "Settings",
-                      data: newSession.toJson(),
-                    );
-
-                    setState(() {
-                      _sessions.add(newSession);
-                    });
-                  }
-                  if (errors.isEmpty) {
-                    _postValidation(newSession);
-                  }
-                } else {
-                  // edit session
-
-                  // doing no validation for edit,
-                  // as it may give false positive against the session being edited
-
-                  // local edit
-                  setState(() {
-                    int index = _sessions
-                        .indexWhere((s) => s.timestamp == session.timestamp);
-                    if (index != -1) {
-                      _sessions[index] = newSession;
-                    }
-                  });
-
-                  // server edit
-                  String dbTimestamp =
-                      session.timestamp.toIso8601String().replaceAll(".", "^");
-                  FB().editJson(
-                      path: "NityaSeva/$dbDate/$dbTimestamp/Settings",
-                      json: newSession.toJson());
-                }
-
-                // clear all local lists
-                sevaAmounts.clear();
-                paymentModes.clear();
-
-                // clear all local controllers and focus nodes
-
-                // close the dialog
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+              ),
+            );
+          },
         );
       },
     );
@@ -609,18 +599,7 @@ class _NityaSevaState extends State<NityaSeva> {
       child: Stack(
         children: [
           Scaffold(
-            appBar: AppBar(title: Text(widget.title), actions: [
-              // Add session
-              IconButton(
-                icon: Icon(
-                  Icons.add,
-                  size: 32,
-                ),
-                onPressed: () {
-                  _addEditSession();
-                },
-              ),
-            ]),
+            appBar: AppBar(title: Text(widget.title), actions: []),
             body: Padding(
               padding: const EdgeInsets.all(4.0),
               child: RefreshIndicator(
@@ -632,50 +611,6 @@ class _NityaSevaState extends State<NityaSeva> {
                         DateHeaderCallbacks(onChange: (DateTime date) {
                       _onDateChange(date);
                     })),
-
-                    // prompt if no sessions
-                    if (_sessions.isEmpty)
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "Click '+' to add a new session",
-                            style: Theme.of(context).textTheme.headlineMedium,
-                          ),
-                        ),
-                      ),
-
-                    // Session tiles
-                    ..._sessions.map((Session session) {
-                      return GestureDetector(
-                        onLongPress: () {
-                          HapticFeedback.mediumImpact();
-                          _createContextMenu(session);
-                        },
-                        child: LauncherTile2(
-                          imageLeading: session.icon,
-                          imageTrailing: session.timestamp.hour < 14
-                              ? 'assets/images/Common/morning.png'
-                              : 'assets/images/Common/evening.png',
-                          title: session.name,
-                          text:
-                              "${session.sevakarta}, ${session.timestamp.hour < 14 ? 'Morning' : 'Evening'} session, ${DateFormat('HH:mm').format(session.timestamp)}",
-                          callback: LauncherTileCallback(onClick: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TicketPage(
-                                  session: session,
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
-                      );
-                    }),
-
-                    // summary
-                    DaySummary(date: _selectedDate),
 
                     // other apps
                     Row(
@@ -713,9 +648,64 @@ class _NityaSevaState extends State<NityaSeva> {
                         ),
                       ],
                     ),
+
+                    // summary
+                    DaySummary(date: _selectedDate),
+
+                    // prompt if no sessions
+                    if (_sessions.isEmpty)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Click '+' to add a new session",
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
+                        ),
+                      ),
+
+                    // Session tiles
+                    ..._sessions.map((Session session) {
+                      return GestureDetector(
+                        onLongPress: () {
+                          HapticFeedback.mediumImpact();
+                          _createContextMenu(session);
+                        },
+                        child: LauncherTile2(
+                          imageLeading: session.icon,
+                          imageTrailing: session.timestamp.hour < 14
+                              ? 'assets/images/Common/morning.png'
+                              : 'assets/images/Common/evening.png',
+                          title: "${session.name} - ${session.type}",
+                          text:
+                              "${session.sevakarta}, ${session.timestamp.hour < 14 ? 'Morning' : 'Evening'} session, ${DateFormat('HH:mm').format(session.timestamp)}",
+                          callback: LauncherTileCallback(onClick: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TicketPage(
+                                  session: session,
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                      );
+                    }),
+
+                    // leave some bottom spacing
+                    SizedBox(height: 100),
                   ],
                 ),
               ),
+            ),
+
+            // Add session
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                _addEditSession();
+              },
+              child: Icon(Icons.add, size: Const().toolbarIconSize),
             ),
           ),
 

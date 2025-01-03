@@ -209,6 +209,7 @@ class _LogState extends State<Log> {
                           slot: Session(
                               defaultAmount: 400,
                               defaultPaymentMode: 'UPI',
+                              type: "Pushpanjali",
                               icon:
                                   'assets/images/NityaSeva/vishnu_pushpanjali.png',
                               timestamp:

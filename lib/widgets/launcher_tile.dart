@@ -84,7 +84,11 @@ class LauncherTile2 extends StatelessWidget {
 
     return Card(
       child: ListTile(
-        title: Text(title, style: Theme.of(context).textTheme.headlineSmall),
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.headlineSmall,
+          overflow: TextOverflow.ellipsis,
+        ),
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: Image.asset(

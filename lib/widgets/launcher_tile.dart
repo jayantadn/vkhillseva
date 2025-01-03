@@ -53,13 +53,15 @@ class LauncherTile extends StatelessWidget {
 // title, icon, text
 class LauncherTile2 extends StatelessWidget {
   final String title;
-  final String image;
+  final String imageLeading;
+  final String imageTrailing;
   final String text;
   final LauncherTileCallback? callback;
 
   const LauncherTile2(
       {super.key,
-      required this.image,
+      required this.imageLeading,
+      required this.imageTrailing,
       required this.title,
       required this.text,
       this.callback});
@@ -68,11 +70,14 @@ class LauncherTile2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: Text(title),
+        title: Text(title, style: Theme.of(context).textTheme.headlineSmall),
         leading: CircleAvatar(
-          backgroundImage: AssetImage(image),
+          backgroundImage: AssetImage(imageLeading),
         ),
         subtitle: Text(text),
+        trailing: CircleAvatar(
+          backgroundImage: AssetImage(imageTrailing),
+        ),
         onTap: () {
           if (callback != null) {
             callback!.onClick();

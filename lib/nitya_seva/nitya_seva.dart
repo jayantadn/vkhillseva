@@ -34,7 +34,6 @@ class _NityaSevaState extends State<NityaSeva> {
   DateTime _selectedDate = DateTime.now();
   DateTime _lastCallbackInvoked = DateTime.now();
   String _username = "Guest";
-  String _sessionTiming = "Morning";
 
   // lists
   final List<FestivalSettings> _sevaList = [];
@@ -576,40 +575,33 @@ class _NityaSevaState extends State<NityaSeva> {
                     })),
 
                     // Session tiles
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          ..._sessions.map((Session session) {
-                            return GestureDetector(
-                              onLongPress: () {
-                                HapticFeedback.mediumImpact();
-                                _createContextMenu(session);
-                              },
-                              child: SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.98,
-                                child: LauncherTile2(
-                                  image: session.icon,
-                                  title: session.name,
-                                  text:
-                                      "${session.sevakarta}, ${DateFormat('HH:mm').format(session.timestamp)}",
-                                  callback: LauncherTileCallback(onClick: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => TicketPage(
-                                          session: session,
-                                        ),
-                                      ),
-                                    );
-                                  }),
+                    ..._sessions.map((Session session) {
+                      return GestureDetector(
+                        onLongPress: () {
+                          HapticFeedback.mediumImpact();
+                          _createContextMenu(session);
+                        },
+                        child: LauncherTile2(
+                          imageLeading: session.icon,
+                          imageTrailing: session.timestamp.hour < 14
+                              ? 'assets/images/Common/morning.png'
+                              : 'assets/images/Common/evening.png',
+                          title: session.name,
+                          text:
+                              "${session.sevakarta}, ${session.timestamp.hour < 14 ? 'Morning' : 'Evening'} session, ${DateFormat('HH:mm').format(session.timestamp)}",
+                          callback: LauncherTileCallback(onClick: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TicketPage(
+                                  session: session,
                                 ),
                               ),
                             );
                           }),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    }),
 
                     // summary
                     DaySummary(date: _selectedDate),

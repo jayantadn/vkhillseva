@@ -1,3 +1,11 @@
+# 0.18.0
+- feature: select pushpanjali or kumkum archana
+- fixed the state management
+- feature: new session tile
+- feature: username made mandatory
+- feature: change app name to Garuda
+- feature: app icon changed
+
 # 0.17.2
 - fix: more validations
 

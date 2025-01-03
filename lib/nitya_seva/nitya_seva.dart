@@ -297,7 +297,50 @@ class _NityaSevaState extends State<NityaSeva> {
             scrollDirection: Axis.vertical,
             child: Column(
               children: [
+                // PP vs KK
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: accentColor),
+                        ),
+                        padding: EdgeInsets.all(8),
+                        child: Text(
+                          "Pushpanjali",
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    color: accentColor,
+                                  ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(color: accentColor),
+                            right: BorderSide(color: accentColor),
+                            bottom: BorderSide(color: accentColor),
+                          ),
+                        ),
+                        padding: EdgeInsets.all(8),
+                        child: Text(
+                          "Kumkum Archana",
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    color: accentColor,
+                                  ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
                 // drop down for seva
+                SizedBox(height: padding),
                 DropdownButtonFormField<String>(
                   value: selectedSeva, // Set the default value here
                   decoration: InputDecoration(labelText: 'Seva'),

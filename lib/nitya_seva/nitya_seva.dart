@@ -309,81 +309,86 @@ class _NityaSevaState extends State<NityaSeva> {
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   SizedBox(height: 16.0),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedSevaType = "Pushpanjali";
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: selectedSevaType == "Pushpanjali"
-                                  ? accentColor
-                                  : Colors.transparent,
-                              border: Border.all(color: accentColor),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(8),
-                                bottomLeft: Radius.circular(8),
-                              ),
-                            ),
-                            padding: EdgeInsets.all(8),
-                            child: Text(
-                              "Pushpanjali",
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    color: selectedSevaType == "Pushpanjali"
-                                        ? Colors.white
-                                        : accentColor,
+                  StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedSevaType = "Pushpanjali";
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: selectedSevaType == "Pushpanjali"
+                                      ? accentColor
+                                      : Colors.transparent,
+                                  border: Border.all(color: accentColor),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(8),
+                                    bottomLeft: Radius.circular(8),
                                   ),
+                                ),
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  "Pushpanjali",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: selectedSevaType == "Pushpanjali"
+                                            ? Colors.white
+                                            : accentColor,
+                                      ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedSevaType = "Kumkum Archana";
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: selectedSevaType == "Kumkum Archana"
-                                  ? accentColor
-                                  : Colors.transparent,
-                              border: Border(
-                                top: BorderSide(color: accentColor),
-                                right: BorderSide(color: accentColor),
-                                bottom: BorderSide(color: accentColor),
-                              ),
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(8),
-                                bottomRight: Radius.circular(8),
-                              ),
-                            ),
-                            padding: EdgeInsets.all(8),
-                            child: Text(
-                              "Kumkum Archana",
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    color: selectedSevaType == "Kumkum Archana"
-                                        ? Colors.white
-                                        : accentColor,
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedSevaType = "Kumkum Archana";
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: selectedSevaType == "Kumkum Archana"
+                                      ? accentColor
+                                      : Colors.transparent,
+                                  border: Border(
+                                    top: BorderSide(color: accentColor),
+                                    right: BorderSide(color: accentColor),
+                                    bottom: BorderSide(color: accentColor),
                                   ),
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(8),
+                                    bottomRight: Radius.circular(8),
+                                  ),
+                                ),
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  "Kumkum Archana",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color:
+                                            selectedSevaType == "Kumkum Archana"
+                                                ? Colors.white
+                                                : accentColor,
+                                      ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
+                        ],
+                      );
+                    },
                   ),
 
                   // select seva

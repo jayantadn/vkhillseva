@@ -153,15 +153,6 @@ class _NityaSevaState extends State<NityaSeva> {
       }
     }
 
-    // put Nitya Seva at the top
-    _sevaList.sort((a, b) {
-      if (a.name == 'Regular Morning Seva') return -1;
-      if (b.name == 'Regular Morning Seva') return 1;
-      if (a.name == 'Regular Evening Seva') return -1;
-      if (b.name == 'Regular Evening Seva') return 1;
-      return 0;
-    });
-
     // fetch session details from db
     _sessions.clear();
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
@@ -268,19 +259,7 @@ class _NityaSevaState extends State<NityaSeva> {
     // select default seva
     String selectedSeva = '';
     if (session == null) {
-      if (now.hour < 14) {
-        selectedSeva = _sevaList.first.name;
-
-        setState(() {
-          _sessionTiming = "Morning";
-        });
-      } else {
-        selectedSeva = _sevaList[1].name;
-
-        setState(() {
-          _sessionTiming = "Evening";
-        });
-      }
+      selectedSeva = "Nitya Seva";
     } else {
       selectedSeva = session.name;
     }
@@ -539,17 +518,12 @@ class _NityaSevaState extends State<NityaSeva> {
               IconButton(
                 icon: ClipOval(
                   child: Image.asset(
-                    'assets/images/NityaSeva/tas.png',
+                    'assets/images/Common/add.png',
                     fit: BoxFit.cover,
                   ),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TAS(title: "Tulasi Archana Seva"),
-                    ),
-                  );
+                  _addEditSession();
                 },
               ),
 

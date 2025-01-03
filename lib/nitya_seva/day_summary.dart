@@ -135,6 +135,7 @@ class _DaySummaryState extends State<DaySummary> {
 
     // sychronized work
     await _lock.synchronized(() async {
+      if (!mounted) return;
       setState(() {
         // clear everything
         _amountTableHeaderRow.clear();

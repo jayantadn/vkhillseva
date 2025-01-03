@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:vkhillseva/common/theme.dart';
 
 // top icon, bottom text
 class LauncherTile extends StatelessWidget {
   final String image;
   final String title;
+  final double scale;
   final LauncherTileCallback? callback;
 
   const LauncherTile(
-      {super.key, required this.image, required this.title, this.callback});
+      {super.key,
+      required this.image,
+      required this.title,
+      this.scale = 1.0,
+      this.callback});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 150,
-      height: 200,
+      width: 150 * scale,
+      height: 220 * scale,
       child: GestureDetector(
         onTap: () {
           if (callback != null) {
@@ -36,9 +42,15 @@ class LauncherTile extends StatelessWidget {
               ),
               Expanded(
                 child: Center(
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.headlineMedium,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      title,
+                      style: scale == 1
+                          ? Theme.of(context).textTheme.headlineMedium
+                          : Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: primaryColor, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ),
@@ -68,15 +80,29 @@ class LauncherTile2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double imageSize = 50;
+
     return Card(
       child: ListTile(
         title: Text(title, style: Theme.of(context).textTheme.headlineSmall),
-        leading: CircleAvatar(
-          backgroundImage: AssetImage(imageLeading),
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: Image.asset(
+            imageLeading,
+            width: imageSize,
+            height: imageSize,
+            fit: BoxFit.cover,
+          ),
         ),
         subtitle: Text(text),
-        trailing: CircleAvatar(
-          backgroundImage: AssetImage(imageTrailing),
+        trailing: ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: Image.asset(
+            imageTrailing,
+            width: imageSize,
+            height: imageSize,
+            fit: BoxFit.cover,
+          ),
         ),
         onTap: () {
           if (callback != null) {

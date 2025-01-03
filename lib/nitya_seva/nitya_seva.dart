@@ -255,6 +255,9 @@ class _NityaSevaState extends State<NityaSeva> {
     DateTime now = DateTime.now();
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
 
+    // seva type
+    String selectedSevaType = "Pushpanjali";
+
     // select default seva
     String selectedSeva = '';
     if (session == null) {
@@ -298,45 +301,86 @@ class _NityaSevaState extends State<NityaSeva> {
             child: Column(
               children: [
                 // PP vs KK
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: accentColor),
-                        ),
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          "Pushpanjali",
-                          overflow: TextOverflow.ellipsis,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    color: accentColor,
-                                  ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            top: BorderSide(color: accentColor),
-                            right: BorderSide(color: accentColor),
-                            bottom: BorderSide(color: accentColor),
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedSevaType = "Pushpanjali";
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: selectedSevaType == "Pushpanjali"
+                                    ? accentColor
+                                    : Colors.transparent,
+                                border: Border.all(color: accentColor),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  bottomLeft: Radius.circular(8),
+                                ),
+                              ),
+                              padding: EdgeInsets.all(8),
+                              child: Text(
+                                "Pushpanjali",
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color: selectedSevaType == "Pushpanjali"
+                                          ? Colors.white
+                                          : accentColor,
+                                    ),
+                              ),
+                            ),
                           ),
                         ),
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          "Kumkum Archana",
-                          overflow: TextOverflow.ellipsis,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    color: accentColor,
-                                  ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedSevaType = "Kumkum Archana";
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: selectedSevaType == "Kumkum Archana"
+                                    ? accentColor
+                                    : Colors.transparent,
+                                border: Border(
+                                  top: BorderSide(color: accentColor),
+                                  right: BorderSide(color: accentColor),
+                                  bottom: BorderSide(color: accentColor),
+                                ),
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(8),
+                                  bottomRight: Radius.circular(8),
+                                ),
+                              ),
+                              padding: EdgeInsets.all(8),
+                              child: Text(
+                                "Kumkum Archana",
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color:
+                                          selectedSevaType == "Kumkum Archana"
+                                              ? Colors.white
+                                              : accentColor,
+                                    ),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
+                      ],
+                    );
+                  },
                 ),
 
                 // drop down for seva
@@ -359,37 +403,47 @@ class _NityaSevaState extends State<NityaSeva> {
                   },
                 ),
 
-                // default amount
                 SizedBox(height: padding),
-                DropdownButtonFormField<String>(
-                  value: sevaAmount, // Set the default value here
-                  decoration: InputDecoration(labelText: 'Default seva amount'),
-                  items: sevaAmounts.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    sevaAmount = newValue ?? sevaAmounts.first;
-                  },
-                ),
 
-                // default payment mode
-                SizedBox(height: padding),
-                DropdownButtonFormField<String>(
-                  value: paymentMode,
-                  decoration:
-                      InputDecoration(labelText: 'Default payment mode'),
-                  items: paymentModes.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    paymentMode = newValue ?? paymentModes.first;
-                  },
+                Row(
+                  children: [
+                    // default amount
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: sevaAmount, // Set the default value here
+                        decoration:
+                            InputDecoration(labelText: 'Default seva amount'),
+                        items: sevaAmounts.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          sevaAmount = newValue ?? sevaAmounts.first;
+                        },
+                      ),
+                    ),
+
+                    // default payment mode
+                    SizedBox(width: padding),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: paymentMode,
+                        decoration:
+                            InputDecoration(labelText: 'Default payment mode'),
+                        items: paymentModes.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          paymentMode = newValue ?? paymentModes.first;
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -558,50 +612,12 @@ class _NityaSevaState extends State<NityaSeva> {
             appBar: AppBar(title: Text(widget.title), actions: [
               // Add session
               IconButton(
-                icon: ClipOval(
-                  child: Image.asset(
-                    'assets/images/Common/add.png',
-                    fit: BoxFit.cover,
-                  ),
+                icon: Icon(
+                  Icons.add,
+                  size: 32,
                 ),
                 onPressed: () {
                   _addEditSession();
-                },
-              ),
-
-              // TAS
-              IconButton(
-                icon: ClipOval(
-                  child: Image.asset(
-                    'assets/images/NityaSeva/tas.png',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TAS(title: "Tulasi Archana Seva"),
-                    ),
-                  );
-                },
-              ),
-
-              // laddu seva
-              IconButton(
-                icon: ClipOval(
-                  child: Image.asset(
-                    'assets/images/NityaSeva/laddu.png',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LadduMain(),
-                    ),
-                  );
                 },
               ),
             ]),
@@ -616,6 +632,18 @@ class _NityaSevaState extends State<NityaSeva> {
                         DateHeaderCallbacks(onChange: (DateTime date) {
                       _onDateChange(date);
                     })),
+
+                    // prompt if no sessions
+                    if (_sessions.isEmpty)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Click '+' to add a new session",
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
+                        ),
+                      ),
 
                     // Session tiles
                     ..._sessions.map((Session session) {
@@ -648,6 +676,43 @@ class _NityaSevaState extends State<NityaSeva> {
 
                     // summary
                     DaySummary(date: _selectedDate),
+
+                    // other apps
+                    Row(
+                      children: [
+                        // TAS
+                        LauncherTile(
+                          title: "Tulasi Archana Seva",
+                          image: 'assets/images/NityaSeva/tas.png',
+                          scale: 0.75,
+                          callback: LauncherTileCallback(onClick: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    TAS(title: "Tulasi Archana Seva"),
+                              ),
+                            );
+                          }),
+                        ),
+
+                        // Laddu seva
+                        LauncherTile(
+                          title: "Laddu distribution",
+                          image: 'assets/images/NityaSeva/laddu.png',
+                          scale: 0.75,
+                          callback: LauncherTileCallback(onClick: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    TAS(title: "Laddu distribution"),
+                              ),
+                            );
+                          }),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

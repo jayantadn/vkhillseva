@@ -64,9 +64,7 @@ class Utils {
 
   Future<String> getUsername(context) async {
     String? username = await LS().read('username');
-    if (username != null) {
-      return username;
-    } else {
+    if (username == null || username.isEmpty) {
       // prompt for username
       TextEditingController usernameController = TextEditingController();
       username = await showDialog(
@@ -74,39 +72,20 @@ class Utils {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Please enter your name'),
-            content: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    TextField(
-                      controller: usernameController,
-                      decoration: InputDecoration(hintText: "Username"),
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                    ),
-                    if (usernameController.text.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          'Username is required',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ),
-                  ],
-                );
-              },
+            title: Text('Enter your name'),
+            content: TextField(
+              controller: usernameController,
+              decoration: InputDecoration(hintText: "Username"),
             ),
             actions: <Widget>[
               TextButton(
-                onPressed: usernameController.text.isEmpty
-                    ? null
-                    : () {
-                        Navigator.of(context).pop(usernameController.text);
-                      },
                 child: Text('OK'),
+                onPressed: () {
+                  if (usernameController.text.isEmpty) {
+                    return;
+                  }
+                  Navigator.of(context).pop(usernameController.text);
+                },
               ),
             ],
           );
@@ -119,6 +98,8 @@ class Utils {
         await LS().write('username', username);
         return username;
       }
+    } else {
+      return username;
     }
   }
 }

@@ -535,6 +535,24 @@ class _NityaSevaState extends State<NityaSeva> {
         children: [
           Scaffold(
             appBar: AppBar(title: Text(widget.title), actions: [
+              // Add session
+              IconButton(
+                icon: ClipOval(
+                  child: Image.asset(
+                    'assets/images/NityaSeva/tas.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TAS(title: "Tulasi Archana Seva"),
+                    ),
+                  );
+                },
+              ),
+
               // TAS
               IconButton(
                 icon: ClipOval(
@@ -614,14 +632,14 @@ class _NityaSevaState extends State<NityaSeva> {
                           }),
 
                           // add slot
-                          LauncherTile2(
-                            image: 'assets/images/Common/add.png',
-                            title: 'New Session',
-                            text: "Add a new session",
-                            callback: LauncherTileCallback(onClick: () {
-                              _addEditSession();
-                            }),
-                          ),
+                          // LauncherTile2(
+                          //   image: 'assets/images/Common/add.png',
+                          //   title: 'New Session',
+                          //   text: "Add a new session",
+                          //   callback: LauncherTileCallback(onClick: () {
+                          //     _addEditSession();
+                          //   }),
+                          // ),
                         ],
                       ),
                     ),

@@ -162,16 +162,16 @@ class CommonWidgets {
               ),
 
             // skip button
-            if (post == false)
-              TextButton(
-                child: Text('Proceed & disable error'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  action.complete('Proceed');
-                  prefs.setString(
-                      'SkipErrorCheck', DateTime.now().toIso8601String());
-                },
-              ),
+            TextButton(
+              child: Text(
+                  post == true ? 'Disable error' : 'Proceed & disable error'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                action.complete('Proceed');
+                prefs.setString(
+                    'SkipErrorCheck', DateTime.now().toIso8601String());
+              },
+            ),
           ],
         );
       },

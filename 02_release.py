@@ -109,7 +109,7 @@ def main():
         print("building for android")
         run_command("flutter build apk")
         apk_path = "build/app/outputs/flutter-apk/app-release.apk"
-        new_apk_path = f"build/app/outputs/flutter-apk/vkhillseva_v{branch_name}.apk"
+        new_apk_path = f"build/app/outputs/flutter-apk/garuda_v{branch_name}.apk"
         if os.path.exists(apk_path):
             if os.path.exists(new_apk_path):
                 os.remove(new_apk_path)
@@ -121,7 +121,7 @@ def main():
         drive_path = "X:/GoogleDrive/PublicRO/Garuda"
         if os.path.exists(drive_path):
             shutil.copy(new_apk_path, drive_path)
-            shutil.copy(os.path.join(drive_path, f'vkhillseva_v{branch_name}.apk'), os.path.join(drive_path, 'vkhillseva_latest.apk'))
+            shutil.copy(os.path.join(drive_path, f'garuda_v{branch_name}.apk'), os.path.join(drive_path, 'garuda_latest.apk'))
         else:
             print("ERROR: Google Drive not found in your local system")
     except Exception as e:

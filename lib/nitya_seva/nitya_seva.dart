@@ -644,8 +644,7 @@ class _NityaSevaState extends State<NityaSeva> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    TAS(title: "Laddu distribution"),
+                                builder: (context) => LadduMain(),
                               ),
                             );
                           }),
@@ -680,9 +679,9 @@ class _NityaSevaState extends State<NityaSeva> {
                           imageTrailing: session.timestamp.hour < 14
                               ? 'assets/images/Common/morning.png'
                               : 'assets/images/Common/evening.png',
-                          title: "${session.name} - ${session.type}",
+                          title: session.name,
                           text:
-                              "${session.sevakarta}, ${session.timestamp.hour < 14 ? 'Morning' : 'Evening'} session, ${DateFormat('HH:mm').format(session.timestamp)}",
+                              "${session.sevakarta}, ${session.timestamp.hour < 14 ? 'Morning' : 'Evening'} ${session.type}, ${DateFormat('HH:mm').format(session.timestamp)}",
                           callback: LauncherTileCallback(onClick: () {
                             Navigator.push(
                               context,

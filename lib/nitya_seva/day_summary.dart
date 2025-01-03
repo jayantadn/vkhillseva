@@ -139,7 +139,7 @@ class _DaySummaryState extends State<DaySummary> {
       setState(() {
         // clear everything
         _amountTableHeaderRow.clear();
-        _amountTableHeaderRow.add("Seva Ticket");
+        _amountTableHeaderRow.add("Seva\nTicket");
         _amountTableTicketRow.clear();
         _amountTableTotalRow.clear();
         _amountTableTotalRow.add(["Total"]);
@@ -163,7 +163,13 @@ class _DaySummaryState extends State<DaySummary> {
           int indexSession = sessions.indexOf(session);
 
           // header row
-          _amountTableHeaderRow.add(session.name);
+          String header = (session.type == "Pushpanjali" ? "PP " : "KK ");
+          header = session.timestamp.hour < Const().morningCutoff
+              ? header += "MNG "
+              : header += "EVE ";
+          header += session.name.substring(0, 6);
+          header += "..";
+          _amountTableHeaderRow.add(header);
 
           // total row
           _amountTableTotalRow[0].add("0");
@@ -425,8 +431,7 @@ class _DaySummaryState extends State<DaySummary> {
           TableRow(
             children: _amountTableHeaderRow.map((header) {
               return Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0), // Adjust the padding as needed
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Center(
                   child: Text(
                     header,

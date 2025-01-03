@@ -586,34 +586,27 @@ class _NityaSevaState extends State<NityaSeva> {
                                 HapticFeedback.mediumImpact();
                                 _createContextMenu(session);
                               },
-                              child: LauncherTile2(
-                                image: session.icon,
-                                title: session.name,
-                                text:
-                                    "${session.sevakarta}, ${DateFormat('HH:mm').format(session.timestamp)}",
-                                callback: LauncherTileCallback(onClick: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => TicketPage(
-                                        session: session,
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.98,
+                                child: LauncherTile2(
+                                  image: session.icon,
+                                  title: session.name,
+                                  text:
+                                      "${session.sevakarta}, ${DateFormat('HH:mm').format(session.timestamp)}",
+                                  callback: LauncherTileCallback(onClick: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => TicketPage(
+                                          session: session,
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                }),
+                                    );
+                                  }),
+                                ),
                               ),
                             );
                           }),
-
-                          // add slot
-                          // LauncherTile2(
-                          //   image: 'assets/images/Common/add.png',
-                          //   title: 'New Session',
-                          //   text: "Add a new session",
-                          //   callback: LauncherTileCallback(onClick: () {
-                          //     _addEditSession();
-                          //   }),
-                          // ),
                         ],
                       ),
                     ),

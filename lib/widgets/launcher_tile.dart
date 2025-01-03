@@ -66,60 +66,75 @@ class LauncherTile2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 150,
-      height: 210,
-      child: GestureDetector(
+    return Card(
+      child: ListTile(
+        title: Text(title),
+        leading: CircleAvatar(
+          backgroundImage: AssetImage(image),
+        ),
+        subtitle: Text(text),
         onTap: () {
           if (callback != null) {
             callback!.onClick();
           }
         },
-        child: Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              // title
-              SizedBox(
-                height: 55,
-                width: double.infinity,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-
-              Divider(),
-
-              // image
-              Center(
-                child: CircleAvatar(
-                  radius: 35,
-                  backgroundImage: AssetImage(image),
-                ),
-              ),
-
-              Divider(),
-
-              // footer
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Text(
-                  text,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
+
+    // return SizedBox(
+    //   width: 150,
+    //   height: 210,
+    //   child: GestureDetector(
+    //     onTap: () {
+    //       if (callback != null) {
+    //         callback!.onClick();
+    //       }
+    //     },
+    //     child: Card(
+    //       child: Column(
+    //         mainAxisSize: MainAxisSize.min,
+    //         children: <Widget>[
+    //           // title
+    //           SizedBox(
+    //             height: 55,
+    //             width: double.infinity,
+    //             child: Padding(
+    //               padding: const EdgeInsets.all(8.0),
+    //               child: Center(
+    //                 child: Text(
+    //                   title,
+    //                   style: Theme.of(context).textTheme.headlineSmall,
+    //                   textAlign: TextAlign.center,
+    //                 ),
+    //               ),
+    //             ),
+    //           ),
+
+    //           Divider(),
+
+    //           // image
+    //           Center(
+    //             child: CircleAvatar(
+    //               radius: 35,
+    //               backgroundImage: AssetImage(image),
+    //             ),
+    //           ),
+
+    //           Divider(),
+
+    //           // footer
+    //           Padding(
+    //             padding: const EdgeInsets.symmetric(horizontal: 4.0),
+    //             child: Text(
+    //               text,
+    //               style: Theme.of(context).textTheme.bodySmall,
+    //             ),
+    //           ),
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
   }
 }
 

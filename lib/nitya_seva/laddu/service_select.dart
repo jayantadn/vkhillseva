@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/serve.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
@@ -31,7 +32,10 @@ class _ServiceSelectDialogState extends State<ServiceSelect> {
     setState(() {
       services = slots.map((e) {
         String day = DateFormat("EEE").format(e.timestamp);
-        return "$day - ${e.name}";
+        String sessionTiming =
+            e.timestamp.hour < Const().morningCutoff ? "MNG" : "EVE";
+        String type = e.type == "Pushpanjali" ? "PP" : "KK";
+        return "$day - $type $sessionTiming ${e.name}";
       }).toList();
       status = services.isEmpty ? "empty" : "loaded";
     });

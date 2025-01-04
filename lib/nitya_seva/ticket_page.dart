@@ -179,10 +179,8 @@ class _TicketPageState extends State<TicketPage> {
 
                   // ticket number
                   Text("#${ticket.ticketNumber}",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium!
-                          .copyWith(color: backgroundColor)),
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: backgroundColor, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),

@@ -342,7 +342,7 @@ class _DaySummaryState extends State<DaySummary> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    'Total tickets',
+                    'Total\ntickets',
                     textAlign: TextAlign.center, // Center the text
                   ),
                 ),

@@ -262,7 +262,7 @@ class _TicketPageState extends State<TicketPage> {
                             // other details
                             SizedBox(height: 2),
                             Text(
-                              "${user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
+                              "$user, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
                               style: Theme.of(context).textTheme.bodyMedium,
                               softWrap: true,
                             ),

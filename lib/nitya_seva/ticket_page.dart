@@ -128,6 +128,9 @@ class _TicketPageState extends State<TicketPage> {
   Widget _createTicketTile(int sl, Ticket ticket) {
     double sizeOfContainer = 75;
     String time = DateFormat("HH:mm").format(ticket.timestamp);
+    String user = ticket.user.length > 10
+        ? "${ticket.user.substring(0, 8)}.."
+        : ticket.user;
 
     Color color = Const()
         .nityaSeva['amounts']!
@@ -205,11 +208,14 @@ class _TicketPageState extends State<TicketPage> {
                             Row(children: [
                               // seva name headline
                               Flexible(
-                                child: Text(ticket.seva,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall!
-                                        .copyWith(color: color)),
+                                child: Text(
+                                  ticket.seva,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall!
+                                      .copyWith(color: color),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
 
                               // note icon
@@ -256,7 +262,7 @@ class _TicketPageState extends State<TicketPage> {
                             // other details
                             SizedBox(height: 2),
                             Text(
-                              "${ticket.user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
+                              "${user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
                               style: Theme.of(context).textTheme.bodyMedium,
                               softWrap: true,
                             ),

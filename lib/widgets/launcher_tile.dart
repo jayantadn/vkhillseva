@@ -46,7 +46,7 @@ class LauncherTile extends StatelessWidget {
                     child: FittedBox(
                       fit: BoxFit.contain,
                       child: Text(
-                        title.replaceAll(" ", "\n"),
+                        scale == 1 ? title : title.replaceAll(" ", "\n"),
                         style: scale == 1
                             ? Theme.of(context).textTheme.headlineMedium
                             : Theme.of(context).textTheme.bodyMedium,

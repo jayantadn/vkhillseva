@@ -48,8 +48,7 @@ class LauncherTile extends StatelessWidget {
                       title,
                       style: scale == 1
                           ? Theme.of(context).textTheme.headlineMedium
-                          : Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: primaryColor, fontWeight: FontWeight.bold),
+                          : Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                 ),

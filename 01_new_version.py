@@ -91,17 +91,17 @@ def main():
         sys.exit(1)
 
     # print("main patch for testing")
-    # main_file = 'lib/main.dart'
-    # search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);'
-    # replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);\n'
-    # with open(main_file, 'r') as file:
-    #     lines = file.readlines()
-    # with open(main_file, 'w') as file:
-    #     for line in lines:
-    #         if search_string in line:
-    #             file.write(replacement_string)
-    #         else:
-    #             file.write(line)
+    main_file = 'lib/main.dart'
+    search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);'
+    replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);\n'
+    with open(main_file, 'r') as file:
+        lines = file.readlines()
+    with open(main_file, 'w') as file:
+        for line in lines:
+            if search_string in line:
+                file.write(replacement_string)
+            else:
+                file.write(line)
 
     print("dart fix")
     try:

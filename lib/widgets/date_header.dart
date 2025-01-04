@@ -141,7 +141,7 @@ class _DateHeaderState extends State<DateHeader> {
               alignment: Alignment.center,
               child: Text(
                 DateFormat('EEE, dd MMM').format(_date),
-                style: Theme.of(context).textTheme.headlineLarge,
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
           ),

@@ -618,6 +618,7 @@ class _NityaSevaState extends State<NityaSeva> {
 
                     // other apps
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // TAS
                         LauncherTile(

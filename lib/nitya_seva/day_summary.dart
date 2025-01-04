@@ -165,8 +165,8 @@ class _DaySummaryState extends State<DaySummary> {
           // header row
           String header = (session.type == "Pushpanjali" ? "PP " : "KK ");
           header = session.timestamp.hour < Const().morningCutoff
-              ? header += "MNG "
-              : header += "EVE ";
+              ? header += "MNG\n"
+              : header += "EVE\n";
           header += session.name.substring(0, 6);
           header += "..";
           _amountTableHeaderRow.add(header);

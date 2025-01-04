@@ -90,24 +90,14 @@ class LauncherTile2 extends StatelessWidget {
           style: Theme.of(context).textTheme.headlineSmall,
           overflow: TextOverflow.ellipsis,
         ),
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: Image.asset(
-            imageLeading,
-            width: imageSize,
-            height: imageSize,
-            fit: BoxFit.cover,
-          ),
+        leading: CircleAvatar(
+          backgroundImage: AssetImage(imageLeading),
+          radius: imageSize / 2,
         ),
         subtitle: Text(text),
-        trailing: ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: Image.asset(
-            imageTrailing,
-            width: imageSize,
-            height: imageSize,
-            fit: BoxFit.cover,
-          ),
+        trailing: CircleAvatar(
+          backgroundImage: AssetImage(imageTrailing),
+          radius: imageSize / 2,
         ),
         onTap: () {
           if (callback != null) {

@@ -148,13 +148,13 @@ class _PinPageState extends State<PinPage> {
                         TextButton(
                             child: Text('Change pin'),
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const ChangePin(
-                                          title: 'Change pin',
-                                        )),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //       builder: (context) => const ChangePin(
+                              //             title: 'Change pin',
+                              //           )),
+                              // );
                             }),
                       ],
                     ),

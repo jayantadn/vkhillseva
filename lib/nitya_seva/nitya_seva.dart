@@ -176,23 +176,28 @@ class _NityaSevaState extends State<NityaSeva> {
 
     // check if session is created during service time
     DateTime now = DateTime.now();
-    if (now.hour < 9 || now.hour > 21) {
+    if (now.hour < 10 || now.hour > 20) {
       errors.add("Outside service hours");
+    }
+
+    // check if last session was created recently
+    bool isRecent = false;
+    if (_sessions.isNotEmpty) {
+      Session lastSession = _sessions.last;
+      var diff = now.difference(lastSession.timestamp).inHours;
+      if (diff < 3) {
+        errors.add("Session created too recently");
+        isRecent = true;
+      }
     }
 
     // validate duplicate session name
     for (var element in _sessions) {
-      if (element.name == session.name) {
+      if (element.name == session.name &&
+          element.type == session.type &&
+          isRecent) {
         errors.add("Duplicate session name");
         break;
-      }
-    }
-
-    // check if last session was created recently
-    if (_sessions.isNotEmpty) {
-      Session lastSession = _sessions.last;
-      if (lastSession.timestamp.difference(now).inHours < 3) {
-        errors.add("Session created too recently");
       }
     }
 
@@ -219,14 +224,18 @@ class _NityaSevaState extends State<NityaSeva> {
           lastSession = _sessions[_sessions.length - 2];
         }
 
-        // validate duplicate session name
-        if (session.name == lastSession.name) {
-          errors.add("Duplicate session name");
+        // check if last session was created recently
+        bool isRecent = false;
+        if (session.timestamp.difference(lastSession.timestamp).inHours < 3) {
+          errors.add("Session created too recently");
+          isRecent = true;
         }
 
-        // check if last session was created recently
-        if (lastSession.timestamp.difference(session.timestamp).inHours < 3) {
-          errors.add("Session created too recently");
+        // validate duplicate session name
+        if (session.name == lastSession.name &&
+            lastSession.type == session.type &&
+            isRecent) {
+          errors.add("Duplicate session name");
         }
       }
 

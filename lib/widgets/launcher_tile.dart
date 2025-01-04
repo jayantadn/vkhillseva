@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/theme.dart';
 
 // top icon, bottom text
 class LauncherTile extends StatelessWidget {
@@ -44,11 +43,14 @@ class LauncherTile extends StatelessWidget {
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      title,
-                      style: scale == 1
-                          ? Theme.of(context).textTheme.headlineMedium
-                          : Theme.of(context).textTheme.bodyMedium,
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: Text(
+                        title.replaceAll(" ", "\n"),
+                        style: scale == 1
+                            ? Theme.of(context).textTheme.headlineMedium
+                            : Theme.of(context).textTheme.bodyMedium,
+                      ),
                     ),
                   ),
                 ),
@@ -114,61 +116,6 @@ class LauncherTile2 extends StatelessWidget {
         },
       ),
     );
-
-    // return SizedBox(
-    //   width: 150,
-    //   height: 210,
-    //   child: GestureDetector(
-    //     onTap: () {
-    //       if (callback != null) {
-    //         callback!.onClick();
-    //       }
-    //     },
-    //     child: Card(
-    //       child: Column(
-    //         mainAxisSize: MainAxisSize.min,
-    //         children: <Widget>[
-    //           // title
-    //           SizedBox(
-    //             height: 55,
-    //             width: double.infinity,
-    //             child: Padding(
-    //               padding: const EdgeInsets.all(8.0),
-    //               child: Center(
-    //                 child: Text(
-    //                   title,
-    //                   style: Theme.of(context).textTheme.headlineSmall,
-    //                   textAlign: TextAlign.center,
-    //                 ),
-    //               ),
-    //             ),
-    //           ),
-
-    //           Divider(),
-
-    //           // image
-    //           Center(
-    //             child: CircleAvatar(
-    //               radius: 35,
-    //               backgroundImage: AssetImage(image),
-    //             ),
-    //           ),
-
-    //           Divider(),
-
-    //           // footer
-    //           Padding(
-    //             padding: const EdgeInsets.symmetric(horizontal: 4.0),
-    //             child: Text(
-    //               text,
-    //               style: Theme.of(context).textTheme.bodySmall,
-    //             ),
-    //           ),
-    //         ],
-    //       ),
-    //     ),
-    //   ),
-    // );
   }
 }
 

@@ -622,7 +622,7 @@ class _NityaSevaState extends State<NityaSeva> {
                       children: [
                         // TAS
                         LauncherTile(
-                          title: "Tulasi Archana Seva",
+                          title: "Tulasi Archana",
                           image: 'assets/images/NityaSeva/tas.png',
                           scale: 0.75,
                           callback: LauncherTileCallback(onClick: () {

@@ -12,7 +12,7 @@ class Const {
   }
 
   final String dbroot = "VKHILLSEVA_01";
-  final String version = "0.18.12";
+  final String version = "0.18.13";
 
   final int fbListenerDelay = 2; // seconds
   final double toolbarIconSize = 32;

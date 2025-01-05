@@ -253,7 +253,7 @@ class _DaySummaryState extends State<DaySummary> {
   }
 
   Future<void> _shareDaySummary(BuildContext context) async {
-    String date = DateFormat('yyyy-MM-dd').format(widget.date);
+    String date = DateFormat('EEE, dd MMM, yyyy').format(widget.date);
 
     final image = await _screenshotController.capture();
     if (image != null) {
@@ -262,18 +262,18 @@ class _DaySummaryState extends State<DaySummary> {
           await File('${directory.path}/DaySummary_$date.png').create();
       await imagePath.writeAsBytes(image);
 
+      String user = await Utils().getUsername(context);
       String msg = "Hare Krishna Prabhu,\n\n";
       msg +=
           "Please accept my humble obeisances. All glories to Srila Prabhupada.\n";
       msg +=
           "Today's ($date) Nitya Seva details for your kind information please.\n\n";
       msg += "Your servant,\n";
-      msg += "${Utils().getUsername(context)}";
+      msg += user;
 
       Share.shareXFiles(
         [XFile(imagePath.path)],
         text: msg,
-        // text: 'Day Summary for $date',
       );
     }
   }

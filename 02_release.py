@@ -25,7 +25,7 @@ def main():
     filtered_log_messages = []
     for log_message in log_messages:
         first_line = log_message.split('\n')[0]
-        if first_line.startswith("feature") or first_line.startswith("fix"):
+        if first_line.startswith("feature:") or first_line.startswith("fix:"):
             filtered_log_messages.append(log_message)
     log_messages = filtered_log_messages
 

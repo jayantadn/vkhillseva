@@ -182,7 +182,7 @@ class _TicketPageState extends State<TicketPage> {
 
                   // ticket number
                   Text("#${ticket.ticketNumber}",
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                           color: backgroundColor, fontWeight: FontWeight.bold)),
                 ],
               ),
@@ -493,7 +493,7 @@ class _TicketPageState extends State<TicketPage> {
 
     showGeneralDialog(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
       barrierColor: Colors.black45,
       transitionDuration: const Duration(milliseconds: 300),

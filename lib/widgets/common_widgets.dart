@@ -20,6 +20,7 @@ class CommonWidgets {
       required ConfirmationCallbacks callbacks}) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
           title: Row(
@@ -99,6 +100,7 @@ class CommonWidgets {
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Row(

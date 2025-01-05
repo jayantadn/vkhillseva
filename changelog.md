@@ -1,3 +1,6 @@
+# 0.18.13
+- fix: share message
+
 # 0.18.12
 - fix: 1. large font for ticket numbers
 2. update share message

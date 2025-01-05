@@ -1,3 +1,8 @@
+# 0.18.12
+- fix: 1. large font for ticket numbers
+2. update share message
+3. disable outside click to cancel for dialog
+
 # 0.18.11
 
 # main

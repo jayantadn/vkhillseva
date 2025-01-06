@@ -1,3 +1,6 @@
+# 0.18.16
+- fix: contiguous tickets
+
 # 0.18.15
 - fix: calling setState after all async work
 

@@ -1,3 +1,6 @@
+# 1.0.0
+- feature: festival record
+
 # 0.19.1
 
 # 0.19.0

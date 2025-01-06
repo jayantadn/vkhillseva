@@ -114,10 +114,12 @@ class _TicketPageState extends State<TicketPage> {
     super.dispose();
   }
 
-  Future<void> refresh() async {
-    setState(() {
-      _isLoading = true;
-    });
+  Future<void> refresh({bool? spinner = true}) async {
+    if (spinner != null && spinner == true) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
 
     _username = await Utils().getUsername(context);
 
@@ -792,6 +794,18 @@ class _TicketPageState extends State<TicketPage> {
                                     }
                                   }
 
+                                  // add ticket to list
+                                  setState(() {
+                                    if (ticket == null) {
+                                      _tickets.insert(0, t);
+                                    } else {
+                                      _tickets[_tickets.indexWhere((element) =>
+                                          element.timestamp ==
+                                          ticket.timestamp)] = t;
+                                    }
+                                  });
+                                  _lastCallbackInvoked = DateTime.now();
+
                                   // add ticket to database
                                   String dbDate = DateFormat("yyyy-MM-dd")
                                       .format(widget.session.timestamp)
@@ -803,25 +817,14 @@ class _TicketPageState extends State<TicketPage> {
                                     String key = ticket.timestamp
                                         .toIso8601String()
                                         .replaceAll(".", "^");
-                                    await FB().deleteValue(
+                                    FB().deleteValue(
                                         path:
                                             "NityaSeva/$dbDate/$dbSession/Tickets/$key");
                                   }
-                                  await FB().addToList(
+                                  FB().addToList(
                                       path:
                                           "NityaSeva/$dbDate/$dbSession/Tickets",
                                       data: t.toJson());
-
-                                  // add ticket to list
-                                  setState(() {
-                                    if (ticket == null) {
-                                      _tickets.insert(0, t);
-                                    } else {
-                                      _tickets[_tickets.indexWhere((element) =>
-                                          element.timestamp ==
-                                          ticket.timestamp)] = t;
-                                    }
-                                  });
 
                                   // post validations
                                   // if (errors.isEmpty) {

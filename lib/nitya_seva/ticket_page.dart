@@ -5,9 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/common/local_storage.dart';
 import 'package:vkhillseva/common/utils.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/nitya_seva/session_summary.dart';
+import 'package:vkhillseva/nitya_seva/tally_cash.dart';
 import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
@@ -97,6 +99,10 @@ class _TicketPageState extends State<TicketPage> {
             _listeners = listeners;
           },
         ));
+
+    // write the current session to LS
+    // this is used by tally cash and tally UPI
+    LS().write("selectedSlot", widget.session.timestamp.toIso8601String());
 
     refresh();
   }
@@ -936,7 +942,11 @@ class _TicketPageState extends State<TicketPage> {
                       text: "Tally cash",
                       icon: Icons.money,
                       onPressed: () {
-                        print("Tally cash");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TallyCashPage()),
+                        );
                       }),
 
                   // tally UPI button

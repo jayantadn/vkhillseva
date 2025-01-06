@@ -1,3 +1,6 @@
+# 0.18.18
+- fix: auto refresh logic
+
 # 0.18.17
 - fix: multiple update
 

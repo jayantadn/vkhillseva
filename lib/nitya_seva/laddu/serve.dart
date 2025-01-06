@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/common/utils.dart';
 import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
@@ -28,25 +29,25 @@ class _ServeState extends State<Serve> {
   final List<String> _misc = ["Miscellaneous"];
   bool _isLoading = false;
 
-  final List<Map<String, int>> _pushpanjaliTickets = [
+  List<Map<String, int>> _pushpanjaliTickets = [
+    // do not delete the default values
     {'amount': 400, 'ladduPacks': 1},
     {'amount': 500, 'ladduPacks': 1},
     {'amount': 1000, 'ladduPacks': 2},
     {'amount': 2500, 'ladduPacks': 3},
   ];
 
-  final List<Map<String, dynamic>> _otherSevaTickets = [
+  List<Map<String, dynamic>> _otherSevaTickets = [
+    // do not delete the default values
     {
       'name': "Special Puja",
       'amount': 0,
       'ladduPacks': 1,
-      'color': Colors.pink[900]
     },
     {
       'name': "Festival",
       'amount': 500,
       'ladduPacks': 2,
-      'color': Colors.indigo[900]
     },
   ];
 
@@ -70,6 +71,26 @@ class _ServeState extends State<Serve> {
         _otherSevaTickets.length, (index) => TextEditingController());
     _controllerMisc =
         List.generate(_misc.length, (index) => TextEditingController());
+
+    _refresh();
+  }
+
+  Future<void> _refresh() async {
+    // load settings from fb
+    List pushpanjaliTicketsRaw = await FB().getValue(
+      path: "Settings/LadduDistribution/LadduPackMultiplier/Pushpanjali",
+    );
+    _pushpanjaliTickets.clear();
+    for (var ticket in pushpanjaliTicketsRaw) {
+      _pushpanjaliTickets.add(Map<String, int>.from(ticket));
+    }
+    List otherSevaTicketsRaw = await FB().getValue(
+      path: "Settings/LadduDistribution/LadduPackMultiplier/OtherSevas",
+    );
+    _otherSevaTickets.clear();
+    for (var ticket in otherSevaTicketsRaw) {
+      _otherSevaTickets.add(Map<String, dynamic>.from(ticket));
+    }
 
     // in edit mode, prefill all the controllers
     if (widget.serve != null) {
@@ -105,10 +126,7 @@ class _ServeState extends State<Serve> {
     }
 
     _calculateTotalLadduPacks();
-    _refresh();
-  }
 
-  Future<void> _refresh() async {
     setState(() {});
   }
 

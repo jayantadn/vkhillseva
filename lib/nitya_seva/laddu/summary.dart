@@ -338,12 +338,6 @@ class _SummaryState extends State<Summary> {
             child: Text("Total laddu packs served = ..."),
           ),
         ),
-
-        // padding before pie chart
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: _getBarChartEmpty(context),
-        ),
       ],
     );
   }

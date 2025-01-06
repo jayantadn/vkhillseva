@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/home/pin_page.dart';
+import 'package:vkhillseva/nitya_seva/laddu/laddu.dart';
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
 import 'firebase_options.dart';
 
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const PinPage(title: "Hare Krishna");
-  final Widget test = const NityaSeva(title: "Testing");
+  final Widget test = const LadduMain();
 
   // This widget is the root of your application.
   @override

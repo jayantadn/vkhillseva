@@ -180,18 +180,6 @@ class _LadduSevaState extends State<LadduMain> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Laddu Seva'),
-        // actions: [
-        //   IconButton(
-        //     icon: Icon(Icons.list),
-        //     onPressed: () {
-        //       Navigator.push(
-        //         context,
-        //         MaterialPageRoute(builder: (context) => History()),
-        //       );
-        //     },
-        //     tooltip: 'Complete Log',
-        //   ),
-        // ],
       ),
       body: RefreshIndicator(
         onRefresh: refresh,

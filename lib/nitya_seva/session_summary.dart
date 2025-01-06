@@ -65,8 +65,10 @@ class _SessionSummaryState extends State<SessionSummary> {
     }).toList();
 
     for (int? amount in pushpanjaliTickets) {
+      // get a filtered list per amount
       List<Ticket> listFiltered =
           _listEntries.where((e) => e.amount == amount).toList();
+      listFiltered.sort((a, b) => a.ticketNumber.compareTo(b.ticketNumber));
 
       // highest and lowest ticketNumber numbers
       int entryWithLowestTicket = 0;

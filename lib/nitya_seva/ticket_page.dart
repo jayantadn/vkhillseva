@@ -52,8 +52,13 @@ class _TicketPageState extends State<TicketPage> {
 
               Map<String, dynamic> ticket = Map<String, dynamic>.from(data);
               setState(() {
-                _tickets.add(Ticket.fromJson(ticket));
-                _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+                if (_tickets.indexWhere((element) =>
+                        element.timestamp ==
+                        DateTime.parse(ticket['timestamp'])) ==
+                    -1) {
+                  _tickets.add(Ticket.fromJson(ticket));
+                  _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+                }
               });
             }
           },
@@ -736,8 +741,6 @@ class _TicketPageState extends State<TicketPage> {
                               child: ElevatedButton(
                                 child: Text(ticket == null ? "Add" : "Update"),
                                 onPressed: () async {
-                                  Navigator.pop(context);
-
                                   // fetch the icon
                                   List sevas = Const()
                                       .nityaSeva['amounts']!
@@ -800,11 +803,11 @@ class _TicketPageState extends State<TicketPage> {
                                     String key = ticket.timestamp
                                         .toIso8601String()
                                         .replaceAll(".", "^");
-                                    FB().deleteValue(
+                                    await FB().deleteValue(
                                         path:
                                             "NityaSeva/$dbDate/$dbSession/Tickets/$key");
                                   }
-                                  FB().addToList(
+                                  await FB().addToList(
                                       path:
                                           "NityaSeva/$dbDate/$dbSession/Tickets",
                                       data: t.toJson());
@@ -835,6 +838,9 @@ class _TicketPageState extends State<TicketPage> {
                                   // dispose all controllers and focus nodes
                                   ticketNumberController.dispose();
                                   noteController.dispose();
+
+                                  // close the dialog
+                                  Navigator.pop(context);
                                 },
                               ),
                             ),

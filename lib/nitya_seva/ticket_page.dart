@@ -151,7 +151,7 @@ class _TicketPageState extends State<TicketPage> {
   }
 
   Widget _createTicketTile(int sl, Ticket ticket) {
-    double sizeOfContainer = 75;
+    double sizeOfContainer = 80;
     String time = DateFormat("HH:mm").format(ticket.timestamp);
 
     Color color = Const()
@@ -222,74 +222,71 @@ class _TicketPageState extends State<TicketPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(children: [
-                              // seva name headline
-                              Flexible(
-                                child: Text(
-                                  ticket.seva,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall!
-                                      .copyWith(color: color),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(children: [
+                            // seva name headline
+                            Flexible(
+                              child: Text(
+                                ticket.seva,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall!
+                                    .copyWith(color: color),
+                                overflow: TextOverflow.ellipsis,
                               ),
+                            ),
 
-                              // note icon
-                              SizedBox(width: 8),
-                              if (ticket.note.isNotEmpty)
-                                GestureDetector(
-                                  onTap: () {
-                                    // Handle note click event
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text('Note'),
-                                          content: Text(ticket.note),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Text('Close'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
-                                      color: Colors.yellow,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(1.0),
-                                      child: Text('Note',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall!
-                                              .copyWith(color: Colors.black)),
-                                    ),
+                            // note icon
+                            SizedBox(width: 8),
+                            if (ticket.note.isNotEmpty)
+                              GestureDetector(
+                                onTap: () {
+                                  // Handle note click event
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Note'),
+                                        content: Text(ticket.note),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Close'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    color: Colors.yellow,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(1.0),
+                                    child: Text('Note',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(color: Colors.black)),
                                   ),
                                 ),
-                            ]),
+                              ),
+                          ]),
 
-                            // other details
-                            SizedBox(height: 2),
-                            Text(
-                              "${ticket.user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              softWrap: true,
-                            ),
-                          ],
-                        ),
+                          // other details
+                          SizedBox(height: 2),
+                          Text(
+                            "${ticket.user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            softWrap: true,
+                          ),
+                        ],
                       ),
                     ),
                   ],

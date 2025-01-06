@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/fb.dart';
-import 'package:vkhillseva/common/utils.dart';
-import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
-import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
-import 'package:vkhillseva/nitya_seva/laddu/utils.dart';
-import 'package:vkhillseva/common/toaster.dart';
-import 'package:vkhillseva/nitya_seva/session.dart';
 
 class LadduSettings extends StatefulWidget {
   const LadduSettings({super.key});
@@ -18,13 +12,8 @@ class LadduSettings extends StatefulWidget {
 class _LadduSettingsState extends State<LadduSettings> {
   List<TextEditingController> _controllersPushpanjali = [];
   List<TextEditingController> _controllersOtherSeva = [];
-  List<TextEditingController> _controllerMisc = [];
-  final TextEditingController _controllerNote = TextEditingController();
-  final TextEditingController _controllerTitle = TextEditingController();
 
-  int _totalLadduPacks = 0;
-  final List<String> _misc = ["Miscellaneous"];
-  bool _isLoading = false;
+  bool _isLoading = true;
 
   // ignore: prefer_final_fields
   List<Map<String, int>> _pushpanjaliTickets = [
@@ -68,8 +57,6 @@ class _LadduSettingsState extends State<LadduSettings> {
         pushpanjaliTickets.length, (index) => TextEditingController());
     _controllersOtherSeva = List.generate(
         _otherSevaTickets.length, (index) => TextEditingController());
-    _controllerMisc =
-        List.generate(_misc.length, (index) => TextEditingController());
 
     _refresh();
   }
@@ -104,6 +91,8 @@ class _LadduSettingsState extends State<LadduSettings> {
         int multiplier = _otherSevaTickets[i]['ladduPacks']!;
         _controllersOtherSeva[i].text = multiplier.toString();
       }
+
+      _isLoading = false;
     });
   }
 
@@ -242,7 +231,31 @@ class _LadduSettingsState extends State<LadduSettings> {
     );
   }
 
-  Future<void> _onpressSave() async {}
+  void _onpressSave() {
+    // controllers for pushpanjali
+    for (int i = 0; i < _pushpanjaliTickets.length; i++) {
+      _pushpanjaliTickets[i]['ladduPacks'] =
+          _controllersPushpanjali[i].text.isEmpty
+              ? 0
+              : int.parse(_controllersPushpanjali[i].text);
+    }
+
+    // controllers for other seva
+    for (int i = 0; i < _otherSevaTickets.length; i++) {
+      _otherSevaTickets[i]['ladduPacks'] = _controllersOtherSeva[i].text.isEmpty
+          ? 0
+          : int.parse(_controllersOtherSeva[i].text);
+    }
+
+    FB().setValue(
+        path: "Settings/LadduDistribution/LadduPackMultiplier/Pushpanjali",
+        value: _pushpanjaliTickets);
+    FB().setValue(
+        path: "Settings/LadduDistribution/LadduPackMultiplier/OtherSevas",
+        value: _otherSevaTickets);
+
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -262,6 +275,9 @@ class _LadduSettingsState extends State<LadduSettings> {
               onPressed: _isLoading ? null : _onpressSave,
               child: _isLoading ? CircularProgressIndicator() : Text('Save'),
             ),
+
+            // leave some gaps at the bottom
+            SizedBox(height: 100),
           ],
         ),
       ),

@@ -663,6 +663,9 @@ class _ServeState extends State<Serve> {
                 child:
                     _isLoading ? CircularProgressIndicator() : Text('Delete'),
               ),
+
+            // leave some gaps at the bottom
+            SizedBox(height: 100),
           ],
         ),
       ),

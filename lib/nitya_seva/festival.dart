@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 
@@ -21,6 +23,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   String _selectedYear = "";
+  Map<String, List<Session>> _sessions = {};
 
   // lists
 
@@ -39,7 +42,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
   dispose() {
     // clear all lists
 
-    // clear all controllers and focus nodes
+    // dispose all controllers and focus nodes
 
     super.dispose();
   }
@@ -50,9 +53,32 @@ class _FestivalRecordState extends State<FestivalRecord> {
     });
 
     // perform async operations here
+    List datesRaw =
+        await FB().getListByYear(path: "NityaSeva", year: _selectedYear);
 
     // perform sync operations here
-    await _lock.synchronized(() async {});
+    await _lock.synchronized(() async {
+      for (var dateRaw in datesRaw) {
+        Map<String, dynamic> dateMap = Map<String, dynamic>.from(dateRaw);
+
+        dateMap.forEach((key, valueRaw) {
+          Map<String, dynamic> sessionMap = Map<String, dynamic>.from(valueRaw);
+          Map<String, dynamic> sessionJson =
+              Map<String, dynamic>.from(sessionMap['Settings']);
+          Session session = Session.fromJson(sessionJson);
+          if (session.name != "Nitya Seva" && session.name != "Testing") {
+            if (_sessions.containsKey(session.name)) {
+              _sessions[session.name]!.add(session);
+            } else {
+              _sessions[session.name] = [session];
+            }
+          }
+        });
+      }
+    });
+
+    // clear all lists
+    datesRaw.clear();
 
     setState(() {
       _isLoading = false;
@@ -72,9 +98,8 @@ class _FestivalRecordState extends State<FestivalRecord> {
                 DropdownButton<String>(
                   value: _selectedYear,
                   onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedYear = newValue!;
-                    });
+                    _selectedYear = newValue!;
+                    refresh();
                   },
                   items: List.generate(
                     DateTime.now().year - 2023,

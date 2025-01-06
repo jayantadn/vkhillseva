@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/home/pin_page.dart';
+import 'package:vkhillseva/nitya_seva/festival.dart';
 import 'package:vkhillseva/nitya_seva/laddu/laddu.dart';
 import 'firebase_options.dart';
 
@@ -18,12 +19,14 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const PinPage(title: "Hare Krishna");
-  final Widget test = const LadduMain();
+  final Widget test = const FestivalRecord(
+      title: "Festival record",
+      icon: 'assets/images/LauncherIcons/NityaSeva.png');
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);
+        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);
   }
 }

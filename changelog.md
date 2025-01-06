@@ -1,3 +1,6 @@
+# 0.18.15
+- fix: calling setState after all async work
+
 # 0.18.14
 - fix: ticket refresh issues
 

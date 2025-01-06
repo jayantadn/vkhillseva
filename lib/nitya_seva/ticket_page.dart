@@ -468,6 +468,7 @@ class _TicketPageState extends State<TicketPage> {
           setState(() {
             _tickets.remove(ticket);
           });
+          _lastCallbackInvoked = DateTime.now();
 
           // delete ticket from database
           String dbDate =
@@ -754,6 +755,9 @@ class _TicketPageState extends State<TicketPage> {
                               child: ElevatedButton(
                                 child: Text(ticket == null ? "Add" : "Update"),
                                 onPressed: () async {
+                                  // close the dialog
+                                  Navigator.pop(context);
+
                                   // fetch the icon
                                   List sevas = Const()
                                       .nityaSeva['amounts']!
@@ -850,11 +854,9 @@ class _TicketPageState extends State<TicketPage> {
                                   errors.clear();
 
                                   // dispose all controllers and focus nodes
-                                  ticketNumberController.dispose();
-                                  noteController.dispose();
-
-                                  // close the dialog
-                                  Navigator.pop(context);
+                                  // TODO: disposing controllers is causing an exception while editing ticket
+                                  // ticketNumberController.dispose();
+                                  // noteController.dispose();
                                 },
                               ),
                             ),

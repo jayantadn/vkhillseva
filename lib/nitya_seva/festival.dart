@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
@@ -58,6 +59,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
 
     // perform sync operations here
     await _lock.synchronized(() async {
+      _sessions.clear();
       for (var dateRaw in datesRaw) {
         Map<String, dynamic> dateMap = Map<String, dynamic>.from(dateRaw);
 
@@ -77,12 +79,73 @@ class _FestivalRecordState extends State<FestivalRecord> {
       }
     });
 
+    // sort all sessions
+    _sessions.forEach((key, value) {
+      value.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    });
+
     // clear all lists
     datesRaw.clear();
 
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Widget _createFestivalCards(String festival, List<Session> sessions) {
+    return Card(
+      child: ListTile(
+        title: Column(
+          children: [
+            Row(
+              children: [
+                // image
+                CircleAvatar(
+                  backgroundImage: AssetImage(sessions[0].icon),
+                ),
+
+                // festival name
+                SizedBox(width: 10),
+                Text(festival,
+                    style: Theme.of(context).textTheme.headlineMedium),
+              ],
+            ),
+            Divider(),
+          ],
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: sessions
+              .map((session) => Column(
+                    children: [
+                      Row(
+                        children: [
+                          // date
+                          Text(DateFormat("dd-MMM-yyyy")
+                              .format(session.timestamp)
+                              .toString()),
+
+                          // seva type
+                          SizedBox(width: 10),
+                          Text(session.type),
+
+                          // session timing
+                          SizedBox(width: 10),
+                          session.timestamp.hour < Const().morningCutoff
+                              ? Text("Morning: ")
+                              : Text("Evening: "),
+                        ],
+                      ),
+                      Divider(),
+                    ],
+                  ))
+              .toList(),
+        ),
+        onTap: () {
+          // handle tap
+        },
+      ),
+    );
   }
 
   @override
@@ -117,7 +180,10 @@ class _FestivalRecordState extends State<FestivalRecord> {
             body: RefreshIndicator(
               onRefresh: refresh,
               child: ListView(
-                children: [],
+                children: [
+                  for (var entry in _sessions.entries)
+                    _createFestivalCards(entry.key, entry.value),
+                ],
               ),
             ),
           ),

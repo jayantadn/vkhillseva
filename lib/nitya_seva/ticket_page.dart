@@ -792,17 +792,6 @@ class _TicketPageState extends State<TicketPage> {
                                     }
                                   }
 
-                                  // add ticket to list
-                                  setState(() {
-                                    if (ticket == null) {
-                                      _tickets.insert(0, t);
-                                    } else {
-                                      _tickets[_tickets.indexWhere((element) =>
-                                          element.timestamp ==
-                                          ticket.timestamp)] = t;
-                                    }
-                                  });
-
                                   // add ticket to database
                                   String dbDate = DateFormat("yyyy-MM-dd")
                                       .format(widget.session.timestamp)
@@ -823,23 +812,34 @@ class _TicketPageState extends State<TicketPage> {
                                           "NityaSeva/$dbDate/$dbSession/Tickets",
                                       data: t.toJson());
 
-                                  // post validations
-                                  if (errors.isEmpty) {
-                                    errors = await _postvalidateTicket();
-                                    if (errors.isNotEmpty) {
-                                      String? action = await CommonWidgets()
-                                          .createErrorDialog(
-                                              context: context,
-                                              errors: errors,
-                                              post: true);
-
-                                      if (action == "Delete") {
-                                        _deleteTicket(t);
-                                      } else if (action == "Edit") {
-                                        _addEditTicket(context, t);
-                                      }
+                                  // add ticket to list
+                                  setState(() {
+                                    if (ticket == null) {
+                                      _tickets.insert(0, t);
+                                    } else {
+                                      _tickets[_tickets.indexWhere((element) =>
+                                          element.timestamp ==
+                                          ticket.timestamp)] = t;
                                     }
-                                  }
+                                  });
+
+                                  // post validations
+                                  // if (errors.isEmpty) {
+                                  //   errors = await _postvalidateTicket();
+                                  //   if (errors.isNotEmpty) {
+                                  //     String? action = await CommonWidgets()
+                                  //         .createErrorDialog(
+                                  //             context: context,
+                                  //             errors: errors,
+                                  //             post: true);
+
+                                  //     if (action == "Delete") {
+                                  //       _deleteTicket(t);
+                                  //     } else if (action == "Edit") {
+                                  //       _addEditTicket(context, t);
+                                  //     }
+                                  //   }
+                                  // }
 
                                   // clear all lists
                                   sevaNames.clear();

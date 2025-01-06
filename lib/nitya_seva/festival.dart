@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
@@ -19,7 +20,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  final DateTime _selectedDate = DateTime.now();
+  String _selectedYear = "";
 
   // lists
 
@@ -28,6 +29,8 @@ class _FestivalRecordState extends State<FestivalRecord> {
   @override
   initState() {
     super.initState();
+
+    _selectedYear = DateFormat("yyyy").format(DateTime.now());
 
     refresh();
   }
@@ -65,30 +68,31 @@ class _FestivalRecordState extends State<FestivalRecord> {
           Scaffold(
             appBar: AppBar(
               title: Text(widget.title),
+              actions: [
+                DropdownButton<String>(
+                  value: _selectedYear,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedYear = newValue!;
+                    });
+                  },
+                  items: List.generate(
+                    DateTime.now().year - 2023,
+                    (index) => (2024 + index).toString(),
+                  ).map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value,
+                          style: Theme.of(context).textTheme.bodyLarge),
+                    );
+                  }).toList(),
+                )
+              ],
             ),
             body: RefreshIndicator(
               onRefresh: refresh,
-              child: DefaultTabController(
-                length: 2,
-                initialIndex: 1,
-                child: Column(
-                  children: [
-                    TabBar(
-                      tabs: [
-                        Tab(text: '2004'),
-                        Tab(text: '2005'),
-                      ],
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          Center(child: Text('Content for 2004')),
-                          Center(child: Text('Content for 2005')),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              child: ListView(
+                children: [],
               ),
             ),
           ),

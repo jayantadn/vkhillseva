@@ -1,3 +1,10 @@
+# 0.19.0
+- feature: settings for laddu packs
+- fix: adjust ticket tile layout and increase container size
+- fix: removed image from ticket
+- feature: tally UPI
+- feature: tally cash
+
 # 0.18.18
 - fix: auto refresh logic
 

@@ -25,6 +25,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);
+        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);
   }
 }

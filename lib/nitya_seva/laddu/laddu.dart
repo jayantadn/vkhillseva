@@ -180,7 +180,7 @@ class _LadduSevaState extends State<LadduMain> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Laddu Seva'),
+        title: Text('Laddu distribution'),
         actions: [
           IconButton(
             icon: Icon(Icons.settings),

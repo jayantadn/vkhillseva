@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/utils.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
-import 'package:vkhillseva/home/settings.dart';
+
 import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
 import 'package:vkhillseva/widgets/launcher_tile.dart';
 
@@ -70,21 +70,7 @@ class _MyHomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.settings,
-              size: 32,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Settings(title: 'Settings')),
-              );
-            },
-          ),
-        ],
+        actions: [],
       ),
       body: Stack(children: [
         Center(

@@ -29,7 +29,7 @@ class _ServeState extends State<Serve> {
   final List<String> _misc = ["Miscellaneous"];
   bool _isLoading = false;
 
-  List<Map<String, int>> _pushpanjaliTickets = [
+  final List<Map<String, int>> _pushpanjaliTickets = [
     // do not delete the default values
     {'amount': 400, 'ladduPacks': 1},
     {'amount': 500, 'ladduPacks': 1},
@@ -37,7 +37,7 @@ class _ServeState extends State<Serve> {
     {'amount': 2500, 'ladduPacks': 3},
   ];
 
-  List<Map<String, dynamic>> _otherSevaTickets = [
+  final List<Map<String, dynamic>> _otherSevaTickets = [
     // do not delete the default values
     {
       'name': "Special Puja",

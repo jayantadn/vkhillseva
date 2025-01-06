@@ -18,6 +18,7 @@ import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/nitya_seva/day_summary.dart';
 import 'package:vkhillseva/widgets/date_header.dart';
 import 'package:vkhillseva/widgets/launcher_tile.dart';
+import 'package:vkhillseva/home/settings.dart';
 
 class NityaSeva extends StatefulWidget {
   final String title;
@@ -612,7 +613,21 @@ class _NityaSevaState extends State<NityaSeva> {
       child: Stack(
         children: [
           Scaffold(
-            appBar: AppBar(title: Text(widget.title), actions: []),
+            appBar: AppBar(title: Text(widget.title), actions: [
+              IconButton(
+                icon: Icon(
+                  Icons.settings,
+                  size: 32,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Settings(title: 'Settings')),
+                  );
+                },
+              ),
+            ]),
             body: Padding(
               padding: const EdgeInsets.all(4.0),
               child: RefreshIndicator(

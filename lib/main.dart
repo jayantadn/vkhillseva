@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/home/pin_page.dart';
 import 'package:vkhillseva/nitya_seva/laddu/laddu.dart';
-import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {

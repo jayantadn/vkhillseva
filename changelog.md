@@ -1,3 +1,6 @@
+# 0.18.17
+- fix: multiple update
+
 # 0.18.16
 - fix: contiguous tickets
 

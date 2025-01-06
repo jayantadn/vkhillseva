@@ -3,6 +3,7 @@ import 'package:vkhillseva/nitya_seva/laddu/avilability_bar.dart';
 import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 import 'package:vkhillseva/nitya_seva/laddu/laddu_calc.dart';
+import 'package:vkhillseva/nitya_seva/laddu/laddu_settings.dart';
 import 'package:vkhillseva/nitya_seva/laddu/log.dart';
 import 'package:vkhillseva/nitya_seva/laddu/service_select.dart';
 import 'package:vkhillseva/nitya_seva/laddu/summary.dart';
@@ -180,6 +181,17 @@ class _LadduSevaState extends State<LadduMain> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Laddu Seva'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LadduSettings()),
+              );
+            },
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: refresh,

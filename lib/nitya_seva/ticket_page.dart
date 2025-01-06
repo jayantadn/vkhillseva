@@ -10,6 +10,7 @@ import 'package:vkhillseva/common/utils.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/nitya_seva/session_summary.dart';
 import 'package:vkhillseva/nitya_seva/tally_cash.dart';
+import 'package:vkhillseva/nitya_seva/tally_upi_card.dart';
 import 'package:vkhillseva/widgets/common_widgets.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
@@ -954,7 +955,11 @@ class _TicketPageState extends State<TicketPage> {
                       text: "Tally UPI",
                       icon: Icons.payment,
                       onPressed: () {
-                        print("Tally UPI");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TallyUpiCardPage()),
+                        );
                       }),
                 ]),
               ],

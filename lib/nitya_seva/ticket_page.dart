@@ -79,6 +79,17 @@ class _TicketPageState extends State<TicketPage> {
                 .subtract(Duration(seconds: Const().fbListenerDelay)))) {
               _lastCallbackInvoked = DateTime.now();
             }
+
+            Map<String, dynamic> ticket = Map<String, dynamic>.from(data);
+            setState(() {
+              if (_tickets.indexWhere((element) =>
+                      element.timestamp ==
+                      DateTime.parse(ticket['timestamp'])) ==
+                  -1) {
+                _tickets.remove(Ticket.fromJson(ticket));
+                _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+              }
+            });
           },
 
           // get listeners

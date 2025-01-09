@@ -48,7 +48,6 @@ class _FestivalRecordState extends State<FestivalRecord> {
       ]
     }
   ];
-  final Map<String, List<String>> _sessions = {};
 
   // lists
 
@@ -81,9 +80,11 @@ class _FestivalRecordState extends State<FestivalRecord> {
     List datesRaw =
         await FB().getListByYear(path: "NityaSeva", year: _selectedYear);
 
+    await Utils().fetchFestivalIcons();
+
     // perform sync operations here
     await _lock.synchronized(() async {
-      _sessions.clear();
+      _festivals.clear();
       for (var dateRaw in datesRaw) {
         Map<String, dynamic> dateMap = Map<String, dynamic>.from(dateRaw);
 
@@ -121,39 +122,46 @@ class _FestivalRecordState extends State<FestivalRecord> {
             label +=
                 ": tickets - $numTickets, amount - ${Utils().formatIndianCurrency(sumAmount)}";
 
-            if (_sessions.containsKey(session.name)) {
-              _sessions[session.name]!.add(label);
-            } else {
-              _sessions[session.name] = [label];
+            Map<String, dynamic> festival = {
+              "name": session.name,
+              "icon": Utils().getFestivalIcon(session.name),
+              "sessions": [
+                {
+                  'settings': session,
+                  "numTickets": numTickets,
+                  "sumAmount": sumAmount,
+                }
+              ]
+            };
+
+            // check if festival already exists
+            bool found = false;
+            for (var entry in _festivals) {
+              if (entry['name'] == festival['name']) {
+                entry['sessions'].add(festival['sessions'][0]);
+                found = true;
+                break;
+              }
+            }
+
+            if (!found) {
+              _festivals.add(festival);
             }
           }
         });
       }
     });
 
-    // sort _sessions by the date in the label of the first item in each list
-    var sortedSessions = Map.fromEntries(_sessions.entries.toList()
-      ..sort((a, b) {
-        DateTime dateA =
-            DateFormat("dd-MMM-yyyy").parse(a.value.first.substring(0, 11));
-        DateTime dateB =
-            DateFormat("dd-MMM-yyyy").parse(b.value.first.substring(0, 11));
-        return dateA.compareTo(dateB);
-      }));
+    // sort _festivals by festival['sessions'][0]['settings'].timestamp
+    _festivals.sort((a, b) => a['sessions'][0]['settings']
+        .timestamp
+        .compareTo(b['sessions'][0]['settings'].timestamp));
 
-    // sort each list inside the map
-    sortedSessions.forEach((key, value) {
-      value.sort((a, b) {
-        DateTime dateA = DateFormat("dd-MMM-yyyy").parse(a.substring(0, 11));
-        DateTime dateB = DateFormat("dd-MMM-yyyy").parse(b.substring(0, 11));
-        return dateA.compareTo(dateB);
-      });
-    });
-
-    // update _sorted
-    _sessions
-      ..clear()
-      ..addAll(sortedSessions);
+    // sort sessions inside festivals by timestamp
+    for (var festival in _festivals) {
+      festival['sessions'].sort(
+          (a, b) => a['settings'].timestamp.compareTo(b['settings'].timestamp));
+    }
 
     // clear all lists
     datesRaw.clear();

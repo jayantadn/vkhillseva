@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhillseva/common/theme.dart';
 import 'package:vkhillseva/home/pin_page.dart';
 import 'package:vkhillseva/nitya_seva/festival.dart';
-import 'package:vkhillseva/nitya_seva/laddu/laddu.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -27,6 +26,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);
+        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);
   }
 }

@@ -24,7 +24,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   String _selectedYear = "";
-  Map<String, List<Session>> _sessions = {};
+  final Map<String, List<Session>> _sessions = {};
 
   // lists
 

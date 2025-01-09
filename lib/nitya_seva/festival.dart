@@ -136,6 +136,30 @@ class _FestivalRecordState extends State<FestivalRecord> {
           (a, b) => a['settings'].timestamp.compareTo(b['settings'].timestamp));
     }
 
+    // inject the ticket details
+    for (var festival in _festivals) {
+      for (var ss in festival['sessions']) {
+        Session session = ss['settings'];
+        String dbDate = DateFormat("yyyy-MM-dd").format(session.timestamp);
+        String dbSession =
+            session.timestamp.toIso8601String().replaceAll(".", "^");
+        List ticketsRaw =
+            await FB().getList(path: "NityaSeva/$dbDate/$dbSession/Tickets");
+        int numTickets = 0;
+        int sumAmount = 0;
+        for (var ticketRaw in ticketsRaw) {
+          Map<String, dynamic> ticketMap = Map<String, dynamic>.from(ticketRaw);
+
+          Ticket ticket = Ticket.fromJson(ticketMap);
+          sumAmount += ticket.amount;
+          numTickets++;
+        }
+
+        ss['numTickets'] = numTickets;
+        ss['sumAmount'] = sumAmount;
+      }
+    }
+
     // clear all lists
     datesRaw.clear();
 

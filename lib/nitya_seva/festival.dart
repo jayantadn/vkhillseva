@@ -5,7 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/common/utils.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/nitya_seva/ticket_page.dart';
 import 'package:vkhillseva/widgets/loading_overlay.dart';
 import 'package:vkhillseva/common/theme.dart';
 
@@ -24,7 +26,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   String _selectedYear = "";
-  final Map<String, List<Session>> _sessions = {};
+  final Map<String, List<String>> _sessions = {};
 
   // lists
 
@@ -57,32 +59,81 @@ class _FestivalRecordState extends State<FestivalRecord> {
     List datesRaw =
         await FB().getListByYear(path: "NityaSeva", year: _selectedYear);
 
+    Utils().fetchFestivalIcons();
+
     // perform sync operations here
     await _lock.synchronized(() async {
       _sessions.clear();
       for (var dateRaw in datesRaw) {
         Map<String, dynamic> dateMap = Map<String, dynamic>.from(dateRaw);
 
-        dateMap.forEach((key, valueRaw) {
+        dateMap.forEach((key, valueRaw) async {
           Map<String, dynamic> sessionMap = Map<String, dynamic>.from(valueRaw);
           Map<String, dynamic> sessionJson =
               Map<String, dynamic>.from(sessionMap['Settings']);
           Session session = Session.fromJson(sessionJson);
           if (session.name != "Nitya Seva" && session.name != "Testing") {
-            if (_sessions.containsKey(session.name)) {
-              _sessions[session.name]!.add(session);
+            // session label
+            String label = "";
+            String date = DateFormat("dd-MMM-yyyy").format(session.timestamp);
+            if (session.timestamp.hour < Const().morningCutoff) {
+              label = "$date ${session.type} Morning";
             } else {
-              _sessions[session.name] = [session];
+              label = "$date ${session.type} Evening";
+            }
+
+            // read all tickets for the session
+            String dbDate = DateFormat("yyyy-MM-dd").format(session.timestamp);
+            String dbSession =
+                session.timestamp.toIso8601String().replaceAll(".", "^");
+            List ticketsRaw = await FB()
+                .getList(path: "NityaSeva/$dbDate/$dbSession/Tickets");
+            int numTickets = 0;
+            int sumAmount = 0;
+            for (var ticketRaw in ticketsRaw) {
+              Map<String, dynamic> ticketMap =
+                  Map<String, dynamic>.from(ticketRaw);
+
+              Ticket ticket = Ticket.fromJson(ticketMap);
+              sumAmount += ticket.amount;
+              numTickets++;
+            }
+            label +=
+                ": tickets - $numTickets, amount - ${Utils().formatIndianCurrency(sumAmount.toString())}";
+
+            if (_sessions.containsKey(session.name)) {
+              _sessions[session.name]!.add(label);
+            } else {
+              _sessions[session.name] = [label];
             }
           }
         });
       }
     });
 
-    // sort all sessions
-    _sessions.forEach((key, value) {
-      value.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    // sort _sessions by the date in the label of the first item in each list
+    var sortedSessions = Map.fromEntries(_sessions.entries.toList()
+      ..sort((a, b) {
+        DateTime dateA =
+            DateFormat("dd-MMM-yyyy").parse(a.value.first.substring(0, 11));
+        DateTime dateB =
+            DateFormat("dd-MMM-yyyy").parse(b.value.first.substring(0, 11));
+        return dateA.compareTo(dateB);
+      }));
+
+    // sort each list inside the map
+    sortedSessions.forEach((key, value) {
+      value.sort((a, b) {
+        DateTime dateA = DateFormat("dd-MMM-yyyy").parse(a.substring(0, 11));
+        DateTime dateB = DateFormat("dd-MMM-yyyy").parse(b.substring(0, 11));
+        return dateA.compareTo(dateB);
+      });
     });
+
+    // update _sorted
+    _sessions
+      ..clear()
+      ..addAll(sortedSessions);
 
     // clear all lists
     datesRaw.clear();
@@ -92,7 +143,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
     });
   }
 
-  Widget _createFestivalCards(String festival, List<Session> sessions) {
+  Widget _createFestivalCards(String festival, List<String> sessions) {
     return Card(
       child: ListTile(
         title: Column(
@@ -101,7 +152,8 @@ class _FestivalRecordState extends State<FestivalRecord> {
               children: [
                 // image
                 CircleAvatar(
-                  backgroundImage: AssetImage(sessions[0].icon),
+                  backgroundImage:
+                      AssetImage(Utils().getFestivalIcon(festival)),
                 ),
 
                 // festival name
@@ -120,20 +172,10 @@ class _FestivalRecordState extends State<FestivalRecord> {
                     children: [
                       Row(
                         children: [
-                          // date
-                          Text(DateFormat("dd-MMM-yyyy")
-                              .format(session.timestamp)
-                              .toString()),
-
-                          // seva type
-                          SizedBox(width: 10),
-                          Text(session.type),
-
-                          // session timing
-                          SizedBox(width: 10),
-                          session.timestamp.hour < Const().morningCutoff
-                              ? Text("Morning: ")
-                              : Text("Evening: "),
+                          Expanded(
+                            child: Text(session,
+                                style: Theme.of(context).textTheme.bodyMedium),
+                          ),
                         ],
                       ),
                       Divider(),

@@ -68,7 +68,7 @@ class Utils {
 
   Future<String> getUsername(context) async {
     String? username = await LS().read('username');
-    if (username.isEmpty) {
+    if (username == null || username.isEmpty) {
       // prompt for username
       TextEditingController usernameController = TextEditingController();
       username = await showDialog(

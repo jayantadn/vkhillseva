@@ -1,3 +1,6 @@
+# 1.1.2
+- feature: rename project to vkhgaruda
+
 # 1.1.1
 
 # 1.1.0

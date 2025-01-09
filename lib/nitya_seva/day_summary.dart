@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/fb.dart';
-import 'package:vkhgaruda/common/utils.dart';
-import 'package:vkhgaruda/nitya_seva/session.dart';
-import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
+import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/common/utils.dart';
+import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/nitya_seva/ticket_page.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -389,7 +389,8 @@ class _DaySummaryState extends State<DaySummary> {
                         child: Text(
                           _grandTotal.isEmpty
                               ? "0"
-                              : Utils().formatIndianCurrency(_grandTotal[1]),
+                              : Utils().formatIndianCurrency(
+                                  _grandTotal[1].toString()),
                           style:
                               Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     color: Colors.white,
@@ -489,8 +490,8 @@ class _DaySummaryState extends State<DaySummary> {
                   child: Center(
                     child: Text(
                       cellIndex == 0 || row[0] != "Amount"
-                          ? cell
-                          : Utils().formatIndianCurrency(int.parse(cell)),
+                          ? cell.toString()
+                          : Utils().formatIndianCurrency(cell.toString()),
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),

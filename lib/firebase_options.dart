@@ -26,22 +26,22 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyAs9y6fW9qc29_rLg8Uhhgj03WesQsy4U0',
     appId: '1:129760746257:web:ea4a401bcf3ee82beb8ab0',
     messagingSenderId: '129760746257',
-    projectId: 'vkhgaruda',
-    authDomain: 'vkhgaruda.firebaseapp.com',
+    projectId: 'vkhillseva',
+    authDomain: 'vkhillseva.firebaseapp.com',
     databaseURL:
-        'https://vkhgaruda-default-rtdb.asia-southeast1.firebasedatabase.app/',
-    storageBucket: 'vkhgaruda.firebasestorage.app',
+        'https://vkhillseva-default-rtdb.asia-southeast1.firebasedatabase.app/',
+    storageBucket: 'vkhillseva.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAs9y6fW9qc29_rLg8Uhhgj03WesQsy4U0',
     appId: '1:129760746257:web:ea4a401bcf3ee82beb8ab0',
     messagingSenderId: '129760746257',
-    projectId: 'vkhgaruda',
-    authDomain: 'vkhgaruda.firebaseapp.com',
+    projectId: 'vkhillseva',
+    authDomain: 'vkhillseva.firebaseapp.com',
     databaseURL:
-        'https://vkhgaruda-default-rtdb.asia-southeast1.firebasedatabase.app/',
-    storageBucket: 'vkhgaruda.firebasestorage.app',
+        'https://vkhillseva-default-rtdb.asia-southeast1.firebasedatabase.app/',
+    storageBucket: 'vkhillseva.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

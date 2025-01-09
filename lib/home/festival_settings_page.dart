@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/datatypes.dart';
-import 'package:vkhgaruda/common/fb.dart';
-import 'package:vkhgaruda/widgets/image_selector.dart';
-import 'package:vkhgaruda/widgets/loading_overlay.dart';
-import 'package:vkhgaruda/common/theme.dart';
+import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/datatypes.dart';
+import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/widgets/image_selector.dart';
+import 'package:vkhillseva/widgets/loading_overlay.dart';
+import 'package:vkhillseva/common/theme.dart';
 
 class FestivalSettingsPage extends StatefulWidget {
   final String title;

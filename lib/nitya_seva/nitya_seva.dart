@@ -3,23 +3,22 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/datatypes.dart';
-import 'package:vkhgaruda/common/fb.dart';
-import 'package:vkhgaruda/common/toaster.dart';
-import 'package:vkhgaruda/common/utils.dart';
-import 'package:vkhgaruda/nitya_seva/festival.dart';
-import 'package:vkhgaruda/nitya_seva/laddu/laddu.dart';
-import 'package:vkhgaruda/nitya_seva/session.dart';
-import 'package:vkhgaruda/nitya_seva/tas/tas.dart';
-import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
-import 'package:vkhgaruda/widgets/common_widgets.dart';
-import 'package:vkhgaruda/widgets/loading_overlay.dart';
-import 'package:vkhgaruda/common/theme.dart';
-import 'package:vkhgaruda/nitya_seva/day_summary.dart';
-import 'package:vkhgaruda/widgets/date_header.dart';
-import 'package:vkhgaruda/widgets/launcher_tile.dart';
-import 'package:vkhgaruda/home/settings.dart';
+import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/datatypes.dart';
+import 'package:vkhillseva/common/fb.dart';
+import 'package:vkhillseva/common/toaster.dart';
+import 'package:vkhillseva/common/utils.dart';
+import 'package:vkhillseva/nitya_seva/laddu/laddu.dart';
+import 'package:vkhillseva/nitya_seva/session.dart';
+import 'package:vkhillseva/nitya_seva/tas/tas.dart';
+import 'package:vkhillseva/nitya_seva/ticket_page.dart';
+import 'package:vkhillseva/widgets/common_widgets.dart';
+import 'package:vkhillseva/widgets/loading_overlay.dart';
+import 'package:vkhillseva/common/theme.dart';
+import 'package:vkhillseva/nitya_seva/day_summary.dart';
+import 'package:vkhillseva/widgets/date_header.dart';
+import 'package:vkhillseva/widgets/launcher_tile.dart';
+import 'package:vkhillseva/home/settings.dart';
 
 class NityaSeva extends StatefulWidget {
   final String title;
@@ -615,7 +614,6 @@ class _NityaSevaState extends State<NityaSeva> {
         children: [
           Scaffold(
             appBar: AppBar(title: Text(widget.title), actions: [
-              // settings button
               IconButton(
                 icon: Icon(
                   Icons.settings,
@@ -629,24 +627,6 @@ class _NityaSevaState extends State<NityaSeva> {
                   );
                 },
               ),
-
-              // menu button
-              CommonWidgets().createPopupMenu([
-                // festival record
-                MyPopupMenuItem(
-                    text: "Festival Record",
-                    icon: Icons.temple_hindu,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => FestivalRecord(
-                                title: "Festival record",
-                                icon:
-                                    'assets/images/LauncherIcons/NityaSeva.png')),
-                      );
-                    }),
-              ]),
             ]),
             body: Padding(
               padding: const EdgeInsets.all(4.0),

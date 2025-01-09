@@ -1,6 +1,6 @@
-import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
+import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
+import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
 
 int CalculateTotalLadduPacksServed(LadduServe serve) {
   int total = 0;

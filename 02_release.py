@@ -103,7 +103,7 @@ def main():
         run_command("flutter clean")
         run_command("flutter pub get")
         run_command("flutter build web")
-        run_command("firebase deploy --only hosting:vkhgaruda")
+        # run_command("firebase deploy --only hosting:vkhgaruda")
         run_command("git checkout *.cache")
 
         print("building for android")

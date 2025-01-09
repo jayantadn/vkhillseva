@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/fb.dart';
+import 'package:vkhillseva/common/const.dart';
+import 'package:vkhillseva/common/fb.dart';
 
 class LadduSettings extends StatefulWidget {
   const LadduSettings({super.key});

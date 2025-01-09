@@ -26,6 +26,28 @@ class _FestivalRecordState extends State<FestivalRecord> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   String _selectedYear = "";
+
+  final List<Map<String, dynamic>> _festivals = [
+    {
+      "name": "Vaikuntha Ekadashi",
+      "icon": "assets/images/VKHillDieties/Govinda.png",
+      "sessions": [
+        {
+          'settings': Session.fromJson({
+            'name': "name",
+            'type': "Kumkum Archana",
+            'defaultAmount': 500,
+            'defaultPaymentMode': "UPI",
+            'icon': "assets/images/VKHillDieties/Govinda.png",
+            'sevakarta': "Guest",
+            'timestamp': DateTime.now().toIso8601String(),
+          }),
+          "numTickets": 100,
+          "sumAmount": 50000,
+        }
+      ]
+    }
+  ];
   final Map<String, List<String>> _sessions = {};
 
   // lists
@@ -58,8 +80,6 @@ class _FestivalRecordState extends State<FestivalRecord> {
     // perform async operations here
     List datesRaw =
         await FB().getListByYear(path: "NityaSeva", year: _selectedYear);
-
-    Utils().fetchFestivalIcons();
 
     // perform sync operations here
     await _lock.synchronized(() async {
@@ -99,7 +119,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
               numTickets++;
             }
             label +=
-                ": tickets - $numTickets, amount - ${Utils().formatIndianCurrency(sumAmount.toString())}";
+                ": tickets - $numTickets, amount - ${Utils().formatIndianCurrency(sumAmount)}";
 
             if (_sessions.containsKey(session.name)) {
               _sessions[session.name]!.add(label);
@@ -143,7 +163,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
     });
   }
 
-  Widget _createFestivalCards(String festival, List<String> sessions) {
+  Widget _createFestivalCards(Map<String, dynamic> festival) {
     return Card(
       child: ListTile(
         title: Column(
@@ -152,13 +172,12 @@ class _FestivalRecordState extends State<FestivalRecord> {
               children: [
                 // image
                 CircleAvatar(
-                  backgroundImage:
-                      AssetImage(Utils().getFestivalIcon(festival)),
+                  backgroundImage: AssetImage(festival['icon']),
                 ),
 
                 // festival name
                 SizedBox(width: 10),
-                Text(festival,
+                Text(festival['name'],
                     style: Theme.of(context).textTheme.headlineMedium),
               ],
             ),
@@ -167,21 +186,48 @@ class _FestivalRecordState extends State<FestivalRecord> {
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: sessions
-              .map((session) => Column(
+          children: [
+            for (var session in festival['sessions'])
+              Column(
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(session,
-                                style: Theme.of(context).textTheme.bodyMedium),
-                          ),
-                        ],
-                      ),
-                      Divider(),
+                      // date
+                      Text(
+                          DateFormat("dd-MMM-yyyy")
+                              .format(session['settings'].timestamp),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(fontWeight: FontWeight.bold)),
+
+                      // seva name
+                      SizedBox(width: 10),
+                      Text(session['settings'].type,
+                          style: Theme.of(context).textTheme.bodyMedium),
+                      Text(session['settings'].timestamp.hour <
+                              Const().morningCutoff
+                          ? " Morning"
+                          : " Evening"),
                     ],
-                  ))
-              .toList(),
+                  ),
+                  Row(
+                    children: [
+                      // tickets
+                      Text("Tickets: ${session['numTickets']}",
+                          style: Theme.of(context).textTheme.bodyMedium),
+
+                      // amount
+                      SizedBox(width: 10),
+                      Text(
+                          "Amount: ${Utils().formatIndianCurrency(session['sumAmount'])}",
+                          style: Theme.of(context).textTheme.bodyMedium),
+                    ],
+                  ),
+                  Divider(),
+                ],
+              ),
+          ],
         ),
         onTap: () {
           // handle tap
@@ -223,8 +269,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
               onRefresh: refresh,
               child: ListView(
                 children: [
-                  for (var entry in _sessions.entries)
-                    _createFestivalCards(entry.key, entry.value),
+                  for (var entry in _festivals) _createFestivalCards(entry),
                 ],
               ),
             ),

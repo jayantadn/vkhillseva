@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:vkhillseva/common/theme.dart';
-import 'package:vkhillseva/home/pin_page.dart';
-import 'package:vkhillseva/nitya_seva/festival.dart';
+import 'package:vkhgaruda/common/theme.dart';
+import 'package:vkhgaruda/home/pin_page.dart';
+import 'package:vkhgaruda/nitya_seva/festival.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {

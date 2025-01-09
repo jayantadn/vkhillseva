@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/fb.dart';
-import 'package:vkhillseva/common/utils.dart';
-import 'package:vkhillseva/nitya_seva/session.dart';
-import 'package:vkhillseva/nitya_seva/ticket_page.dart';
-import 'package:vkhillseva/widgets/loading_overlay.dart';
-import 'package:vkhillseva/common/theme.dart';
+import 'package:vkhgaruda/common/const.dart';
+import 'package:vkhgaruda/common/fb.dart';
+import 'package:vkhgaruda/common/utils.dart';
+import 'package:vkhgaruda/nitya_seva/session.dart';
+import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
+import 'package:vkhgaruda/widgets/loading_overlay.dart';
+import 'package:vkhgaruda/common/theme.dart';
 
 class FestivalRecord extends StatefulWidget {
   final String title;

@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhillseva/common/fb.dart';
-import 'package:vkhillseva/common/local_storage.dart';
+import 'package:vkhgaruda/common/fb.dart';
+import 'package:vkhgaruda/common/local_storage.dart';
 
 class Utils {
   static final Utils _instance = Utils._internal();

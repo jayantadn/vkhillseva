@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
-import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
-import 'package:vkhillseva/nitya_seva/laddu/utils.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/utils.dart';
 import 'package:synchronized/synchronized.dart';
 
 class AvailabilityBar extends StatefulWidget {

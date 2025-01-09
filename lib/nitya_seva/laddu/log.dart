@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
-import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
-import 'package:vkhillseva/nitya_seva/laddu/laddu_calc.dart';
-import 'package:vkhillseva/nitya_seva/laddu/serve.dart';
-import 'package:vkhillseva/nitya_seva/laddu/utils.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/laddu_calc.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/serve.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhillseva/nitya_seva/session.dart';
-import 'package:vkhillseva/nitya_seva/ticket_page.dart';
+import 'package:vkhgaruda/nitya_seva/session.dart';
+import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
 
 class Log extends StatefulWidget {
   final DateTime? session;

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/utils.dart';
-import 'package:vkhillseva/widgets/loading_overlay.dart';
+import 'package:vkhgaruda/common/const.dart';
+import 'package:vkhgaruda/common/utils.dart';
+import 'package:vkhgaruda/widgets/loading_overlay.dart';
 
-import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
-import 'package:vkhillseva/widgets/launcher_tile.dart';
+import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
+import 'package:vkhgaruda/widgets/launcher_tile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});

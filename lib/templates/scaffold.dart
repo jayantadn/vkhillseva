@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhillseva/widgets/loading_overlay.dart';
-import 'package:vkhillseva/common/theme.dart';
+import 'package:vkhgaruda/widgets/loading_overlay.dart';
+import 'package:vkhgaruda/common/theme.dart';
 
 class NityaSeva extends StatefulWidget {
   final String title;

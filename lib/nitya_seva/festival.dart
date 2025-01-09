@@ -88,48 +88,20 @@ class _FestivalRecordState extends State<FestivalRecord> {
       for (var dateRaw in datesRaw) {
         Map<String, dynamic> dateMap = Map<String, dynamic>.from(dateRaw);
 
-        dateMap.forEach((key, valueRaw) async {
+        dateMap.forEach((key, valueRaw) {
           Map<String, dynamic> sessionMap = Map<String, dynamic>.from(valueRaw);
           Map<String, dynamic> sessionJson =
               Map<String, dynamic>.from(sessionMap['Settings']);
           Session session = Session.fromJson(sessionJson);
           if (session.name != "Nitya Seva" && session.name != "Testing") {
-            // session label
-            String label = "";
-            String date = DateFormat("dd-MMM-yyyy").format(session.timestamp);
-            if (session.timestamp.hour < Const().morningCutoff) {
-              label = "$date ${session.type} Morning";
-            } else {
-              label = "$date ${session.type} Evening";
-            }
-
-            // read all tickets for the session
-            String dbDate = DateFormat("yyyy-MM-dd").format(session.timestamp);
-            String dbSession =
-                session.timestamp.toIso8601String().replaceAll(".", "^");
-            List ticketsRaw = await FB()
-                .getList(path: "NityaSeva/$dbDate/$dbSession/Tickets");
-            int numTickets = 0;
-            int sumAmount = 0;
-            for (var ticketRaw in ticketsRaw) {
-              Map<String, dynamic> ticketMap =
-                  Map<String, dynamic>.from(ticketRaw);
-
-              Ticket ticket = Ticket.fromJson(ticketMap);
-              sumAmount += ticket.amount;
-              numTickets++;
-            }
-            label +=
-                ": tickets - $numTickets, amount - ${Utils().formatIndianCurrency(sumAmount)}";
-
             Map<String, dynamic> festival = {
               "name": session.name,
               "icon": Utils().getFestivalIcon(session.name),
               "sessions": [
                 {
                   'settings': session,
-                  "numTickets": numTickets,
-                  "sumAmount": sumAmount,
+                  "numTickets": 0,
+                  "sumAmount": 0,
                 }
               ]
             };
@@ -159,7 +131,8 @@ class _FestivalRecordState extends State<FestivalRecord> {
 
     // sort sessions inside festivals by timestamp
     for (var festival in _festivals) {
-      festival['sessions'].sort(
+      List<Map<String, dynamic>> sessions = festival['sessions'];
+      sessions.sort(
           (a, b) => a['settings'].timestamp.compareTo(b['settings'].timestamp));
     }
 

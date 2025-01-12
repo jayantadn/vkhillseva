@@ -8,6 +8,7 @@ import 'package:vkhillseva/common/datatypes.dart';
 import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/common/toaster.dart';
 import 'package:vkhillseva/common/utils.dart';
+import 'package:vkhillseva/nitya_seva/festival.dart';
 import 'package:vkhillseva/nitya_seva/laddu/laddu.dart';
 import 'package:vkhillseva/nitya_seva/session.dart';
 import 'package:vkhillseva/nitya_seva/tas/tas.dart';
@@ -614,6 +615,7 @@ class _NityaSevaState extends State<NityaSeva> {
         children: [
           Scaffold(
             appBar: AppBar(title: Text(widget.title), actions: [
+              // settings button
               IconButton(
                 icon: Icon(
                   Icons.settings,
@@ -627,6 +629,24 @@ class _NityaSevaState extends State<NityaSeva> {
                   );
                 },
               ),
+
+              // menu button
+              CommonWidgets().createPopupMenu([
+                // festival record
+                MyPopupMenuItem(
+                    text: "Festival Record",
+                    icon: Icons.temple_hindu,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => FestivalRecord(
+                                title: "Festival record",
+                                icon:
+                                    'assets/images/LauncherIcons/NityaSeva.png')),
+                      );
+                    }),
+              ]),
             ]),
             body: Padding(
               padding: const EdgeInsets.all(4.0),

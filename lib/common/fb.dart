@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:intl/intl.dart';
 import 'package:vkhillseva/common/const.dart';
 import 'package:vkhillseva/common/toaster.dart';
 
@@ -90,6 +91,35 @@ class FB {
       DatabaseReference dbref =
           FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
       DataSnapshot snapshot = await dbref.get();
+      if (snapshot.value is List) {
+        return List<dynamic>.from(snapshot.value as List);
+      } else if (snapshot.value is Map) {
+        return List<dynamic>.from((snapshot.value as Map).values);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      Toaster().error("Error getting data: $e");
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> getListByYear(
+      {required String path, required String year}) async {
+    try {
+      DatabaseReference dbref =
+          FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
+
+      // filter for given year
+      DateTime start = DateTime(int.parse(year), 1, 1);
+      DateTime end = DateTime(int.parse(year), 12, 31, 23, 59, 59, 999);
+
+      final Query query = dbref
+          .orderByKey()
+          .startAt(DateFormat("yyyy-MM-dd").format(start))
+          .endAt(DateFormat("yyyy-MM-dd").format(end));
+
+      DataSnapshot snapshot = await query.get();
       if (snapshot.value is List) {
         return List<dynamic>.from(snapshot.value as List);
       } else if (snapshot.value is Map) {

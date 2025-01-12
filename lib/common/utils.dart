@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:vkhillseva/common/fb.dart';
 import 'package:vkhillseva/common/local_storage.dart';
 
 class Utils {
@@ -15,10 +16,11 @@ class Utils {
     // init
   }
 
-  String formatIndianCurrency(String amount) {
+  String formatIndianCurrency(int amount) {
     final formatter =
         NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
-    final number = int.parse(amount.replaceAll(RegExp(r'[^\d]'), ''));
+    final number =
+        int.parse(amount.toString().replaceAll(RegExp(r'[^\d]'), ''));
     return formatter.format(number);
   }
 
@@ -57,6 +59,8 @@ class Utils {
     const Color.fromARGB(255, 248, 139, 175),
     Color.fromARGB(255, 235, 124, 255),
   ];
+
+  List<Map<String, String>> festivalIcons = [];
 
   Color getRandomLightColor() {
     return lightColors[DateTime.now().millisecond % lightColors.length];
@@ -101,5 +105,27 @@ class Utils {
     } else {
       return username;
     }
+  }
+
+  Future<void> fetchFestivalIcons() async {
+    if (festivalIcons.isEmpty) {
+      List sevaListRaw = await FB().getList(path: "Settings/NityaSevaList");
+      for (var sevaRaw in sevaListRaw) {
+        Map<String, dynamic> sevaMap = Map<String, dynamic>.from(sevaRaw);
+        festivalIcons.add({
+          'name': sevaMap['name'],
+          'icon': sevaMap['icon'],
+        });
+      }
+    }
+  }
+
+  String getFestivalIcon(String festival) {
+    for (var seva in festivalIcons) {
+      if (seva['name'] == festival) {
+        return seva['icon'] ?? "assets/images/Logo/KrishnaLilaPark_square.png";
+      }
+    }
+    return "";
   }
 }

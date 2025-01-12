@@ -389,8 +389,7 @@ class _DaySummaryState extends State<DaySummary> {
                         child: Text(
                           _grandTotal.isEmpty
                               ? "0"
-                              : Utils().formatIndianCurrency(
-                                  _grandTotal[1].toString()),
+                              : Utils().formatIndianCurrency(_grandTotal[1]),
                           style:
                               Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     color: Colors.white,
@@ -490,8 +489,8 @@ class _DaySummaryState extends State<DaySummary> {
                   child: Center(
                     child: Text(
                       cellIndex == 0 || row[0] != "Amount"
-                          ? cell.toString()
-                          : Utils().formatIndianCurrency(cell.toString()),
+                          ? cell
+                          : Utils().formatIndianCurrency(int.parse(cell)),
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),

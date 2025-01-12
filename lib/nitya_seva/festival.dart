@@ -198,41 +198,56 @@ class _FestivalRecordState extends State<FestivalRecord> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Column(
-                        children: [
-                          // date
-                          Text(
-                              DateFormat("dd")
-                                  .format(session['settings'].timestamp),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge!
-                                  .copyWith(fontWeight: FontWeight.bold)),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.all(4),
+                        child: Column(
+                          children: [
+                            // date
+                            Text(
+                                DateFormat("dd")
+                                    .format(session['settings'].timestamp),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(fontWeight: FontWeight.bold)),
 
-                          // month
-                          Text(
-                              DateFormat("MMM")
-                                  .format(session['settings'].timestamp),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(fontWeight: FontWeight.bold)),
-                        ],
+                            // month
+                            Text(
+                                DateFormat("MMM")
+                                    .format(session['settings'].timestamp),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
                       ),
                       SizedBox(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(width: 10),
+                          // seva name
                           Row(
                             children: [
                               Text(session['settings'].type,
-                                  style:
-                                      Theme.of(context).textTheme.bodyMedium),
-                              Text(session['settings'].timestamp.hour <
-                                      Const().morningCutoff
-                                  ? " Morning"
-                                  : " Evening"),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(fontWeight: FontWeight.bold)),
+                              Text(
+                                  session['settings'].timestamp.hour <
+                                          Const().morningCutoff
+                                      ? " Morning"
+                                      : " Evening",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(fontWeight: FontWeight.bold)),
                             ],
                           ),
                           Row(

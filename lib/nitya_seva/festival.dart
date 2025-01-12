@@ -168,7 +168,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
     });
   }
 
-  Widget _createFestivalCards(Map<String, dynamic> festival) {
+  Widget _createFestivalCard(Map<String, dynamic> festival) {
     return Card(
       child: ListTile(
         title: Column(
@@ -196,37 +196,62 @@ class _FestivalRecordState extends State<FestivalRecord> {
               Column(
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // date
-                      Text(
-                          DateFormat("dd-MMM-yyyy")
-                              .format(session['settings'].timestamp),
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(fontWeight: FontWeight.bold)),
+                      Column(
+                        children: [
+                          // date
+                          Text(
+                              DateFormat("dd")
+                                  .format(session['settings'].timestamp),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(fontWeight: FontWeight.bold)),
 
-                      // seva name
+                          // month
+                          Text(
+                              DateFormat("MMM")
+                                  .format(session['settings'].timestamp),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
                       SizedBox(width: 10),
-                      Text(session['settings'].type,
-                          style: Theme.of(context).textTheme.bodyMedium),
-                      Text(session['settings'].timestamp.hour <
-                              Const().morningCutoff
-                          ? " Morning"
-                          : " Evening"),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      // tickets
-                      Text("Tickets: ${session['numTickets']}",
-                          style: Theme.of(context).textTheme.bodyMedium),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 10),
+                          Row(
+                            children: [
+                              Text(session['settings'].type,
+                                  style:
+                                      Theme.of(context).textTheme.bodyMedium),
+                              Text(session['settings'].timestamp.hour <
+                                      Const().morningCutoff
+                                  ? " Morning"
+                                  : " Evening"),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              // tickets
+                              Text("Tickets: ${session['numTickets']}",
+                                  style:
+                                      Theme.of(context).textTheme.bodyMedium),
 
-                      // amount
-                      SizedBox(width: 10),
-                      Text(
-                          "Amount: ${Utils().formatIndianCurrency(session['sumAmount'])}",
-                          style: Theme.of(context).textTheme.bodyMedium),
+                              // amount
+                              SizedBox(width: 10),
+                              Text(
+                                  "Amount: ${Utils().formatIndianCurrency(session['sumAmount'])}",
+                                  style:
+                                      Theme.of(context).textTheme.bodyMedium),
+                            ],
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                   Divider(),
@@ -274,7 +299,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
               onRefresh: refresh,
               child: ListView(
                 children: [
-                  for (var entry in _festivals) _createFestivalCards(entry),
+                  for (var entry in _festivals) _createFestivalCard(entry),
                 ],
               ),
             ),

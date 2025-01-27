@@ -8,7 +8,6 @@ import 'package:vkhgaruda/common/toaster.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/common/userdetails.dart';
 
 // ignore: must_be_immutable
 class AuthDialog extends StatefulWidget {

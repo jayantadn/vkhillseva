@@ -116,6 +116,15 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                             ),
                           ),
 
+                          // photo
+                          SizedBox(height: 10),
+                          Center(
+                            child: SizedBox(
+                                width: 150,
+                                child: Image.network(
+                                    widget.userdetails.profilePicUrl)),
+                          ),
+
                           // leave some space at bottom
                           SizedBox(height: 100),
                         ])))),

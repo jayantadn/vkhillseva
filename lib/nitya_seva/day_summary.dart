@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/fb.dart';
-import 'package:vkhillseva/common/utils.dart';
-import 'package:vkhillseva/nitya_seva/session.dart';
-import 'package:vkhillseva/nitya_seva/ticket_page.dart';
+import 'package:vkhgaruda/common/const.dart';
+import 'package:vkhgaruda/common/fb.dart';
+import 'package:vkhgaruda/common/utils.dart';
+import 'package:vkhgaruda/nitya_seva/session.dart';
+import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -262,7 +262,7 @@ class _DaySummaryState extends State<DaySummary> {
           await File('${directory.path}/DaySummary_$date.png').create();
       await imagePath.writeAsBytes(image);
 
-      String user = await Utils().getUsername(context);
+      String user = Utils().getUsername();
       String msg = "Hare Krishna Prabhu,\n\n";
       msg +=
           "Please accept my humble obeisances. All glories to Srila Prabhupada.\n";

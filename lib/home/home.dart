@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/utils.dart';
-import 'package:vkhillseva/widgets/loading_overlay.dart';
+// ignore_for_file: use_build_context_synchronously
 
-import 'package:vkhillseva/nitya_seva/nitya_seva.dart';
-import 'package:vkhillseva/widgets/launcher_tile.dart';
+import 'package:flutter/material.dart';
+import 'package:vkhgaruda/widgets/loading_overlay.dart';
+
+import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
+import 'package:vkhgaruda/widgets/launcher_tile.dart';
+import 'package:vkhgaruda/widgets/welcome.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -17,7 +18,6 @@ class HomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<HomePage> {
   bool _isLoading = true;
-  String _username = "Guest";
 
   // late FirebaseMessaging _firebaseMessaging;
 
@@ -58,8 +58,6 @@ class _MyHomePageState extends State<HomePage> {
   }
 
   Future<void> refresh() async {
-    _username = await Utils().getUsername(context);
-
     setState(() {
       _isLoading = false;
     });
@@ -76,44 +74,10 @@ class _MyHomePageState extends State<HomePage> {
         Center(
             child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                height: 200,
-                width: 200,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/Logo/KrishnaLilaPark_circle.png',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-            Text(
-              'Welcome',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            Text(
-              _username,
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            Text(
-              'ISKCON Vaikuntha Hill',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Text('Garuda v${Const().version}',
-                style: Theme.of(context).textTheme.headlineSmall),
+            //welcome message
+            Welcome(),
+
+            // row of launchers
             SizedBox(height: 50),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -123,7 +87,7 @@ class _MyHomePageState extends State<HomePage> {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: LauncherTile(
                         image: 'assets/images/LauncherIcons/NityaSeva.png',
-                        title: "Nitya Seva",
+                        title: "Nitya\nSeva",
                         callback: LauncherTileCallback(onClick: () {
                           Navigator.push(
                             context,
@@ -135,13 +99,13 @@ class _MyHomePageState extends State<HomePage> {
                   ),
                   LauncherTile(
                     image: 'assets/images/LauncherIcons/Harinaam.png',
-                    title: "Harinaam",
+                    title: "Harinaam\nMantapa",
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: LauncherTile(
                       image: 'assets/images/LauncherIcons/Deepotsava.png',
-                      title: "Deepotsava",
+                      title: "Karthika\nDeepotsava",
                     ),
                   ),
                 ],

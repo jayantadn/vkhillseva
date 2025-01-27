@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:vkhillseva/common/theme.dart';
-import 'package:vkhillseva/home/pin_page.dart';
-import 'package:vkhillseva/nitya_seva/festival.dart';
+import 'package:vkhgaruda/common/theme.dart';
+import 'package:vkhgaruda/home/landing.dart';
+import 'package:vkhgaruda/nitya_seva/festival.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -17,7 +17,7 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  final Widget home = const PinPage(title: "Hare Krishna");
+  final Widget home = const Landing(title: "Hare Krishna");
   final Widget test = const FestivalRecord(
       title: "Festival record",
       icon: 'assets/images/LauncherIcons/NityaSeva.png');

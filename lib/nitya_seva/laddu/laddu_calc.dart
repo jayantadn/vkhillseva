@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
-import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
-import 'package:vkhillseva/nitya_seva/laddu/utils.dart';
-import 'package:vkhillseva/common/toaster.dart';
-import 'package:vkhillseva/common/utils.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/utils.dart';
+import 'package:vkhgaruda/common/toaster.dart';
+import 'package:vkhgaruda/common/utils.dart';
 
 String selectedPurpose = "Others";
 bool selectedPurposeChanged = false;
@@ -171,7 +171,7 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
                 isLoading = true;
               });
 
-              String username = await Utils().getUsername(context);
+              String username = Utils().getUsername();
 
               LadduStock stockNew;
               if (widget.edit) {
@@ -423,7 +423,7 @@ class _ReturnStockDialogState extends State<ReturnStockDialog> {
       return;
     }
 
-    String username = await Utils().getUsername(context);
+    String username = Utils().getUsername();
 
     await FBL().returnLadduStock(
         widget.session,

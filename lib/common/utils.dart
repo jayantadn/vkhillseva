@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhillseva/common/fb.dart';
-import 'package:vkhillseva/common/local_storage.dart';
+import 'package:vkhgaruda/common/fb.dart';
+import 'package:vkhgaruda/common/local_storage.dart';
+import 'package:vkhgaruda/common/userdetails.dart';
 
 class Utils {
   static final Utils _instance = Utils._internal();
@@ -61,50 +63,10 @@ class Utils {
   ];
 
   List<Map<String, String>> festivalIcons = [];
+  UserDetails? _userdetails;
 
   Color getRandomLightColor() {
     return lightColors[DateTime.now().millisecond % lightColors.length];
-  }
-
-  Future<String> getUsername(context) async {
-    String? username = await LS().read('username');
-    if (username == null || username.isEmpty) {
-      // prompt for username
-      TextEditingController usernameController = TextEditingController();
-      username = await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Enter your name'),
-            content: TextField(
-              controller: usernameController,
-              decoration: InputDecoration(hintText: "Username"),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  if (usernameController.text.isEmpty) {
-                    return;
-                  }
-                  Navigator.of(context).pop(usernameController.text);
-                },
-              ),
-            ],
-          );
-        },
-      );
-
-      if (username == null || username.isEmpty) {
-        return "Guest";
-      } else {
-        await LS().write('username', username);
-        return username;
-      }
-    } else {
-      return username;
-    }
   }
 
   Future<void> fetchFestivalIcons() async {
@@ -127,5 +89,18 @@ class Utils {
       }
     }
     return "";
+  }
+
+  Future<void> fetchUserDetails() async {
+    if (_userdetails == null) {
+      final String? u = await LS().read('userdetails');
+      if (u != null) {
+        _userdetails = UserDetails.fromJson(jsonDecode(u));
+      }
+    }
+  }
+
+  String getUsername() {
+    return _userdetails?.name ?? "";
   }
 }

@@ -2,16 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhillseva/widgets/loading_overlay.dart';
-import 'package:vkhillseva/common/theme.dart';
+import 'package:vkhgaruda/widgets/loading_overlay.dart';
+import 'package:vkhgaruda/common/theme.dart';
 
 class NityaSeva extends StatefulWidget {
   final String title;
-  final String icon;
+  final String? icon;
 
-  const NityaSeva({super.key, required this.title, required this.icon});
+  const NityaSeva({super.key, required this.title, this.icon});
 
   @override
+  // ignore: library_private_types_in_public_api
   _NityaSevaState createState() => _NityaSevaState();
 }
 
@@ -19,7 +20,6 @@ class _NityaSevaState extends State<NityaSeva> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  final DateTime _selectedDate = DateTime.now();
 
   // lists
 
@@ -48,6 +48,8 @@ class _NityaSevaState extends State<NityaSeva> {
 
     // perform async operations here
 
+    // refresh all child widgets
+
     // perform sync operations here
     await _lock.synchronized(() async {});
 
@@ -67,13 +69,20 @@ class _NityaSevaState extends State<NityaSeva> {
               title: Text(widget.title),
             ),
             body: RefreshIndicator(
-              onRefresh: refresh,
-              child: ListView(
-                children: [
-                  const Placeholder(),
-                ],
-              ),
-            ),
+                onRefresh: refresh,
+                child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(children: [
+                          // leave some space at top
+                          SizedBox(height: 10),
+
+                          // your widgets here
+
+                          // leave some space at bottom
+                          SizedBox(height: 100),
+                        ])))),
           ),
 
           // circular progress indicator

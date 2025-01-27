@@ -103,20 +103,6 @@ def main():
             else:
                 file.write(line)
 
-    print("dart fix")
-    try:
-        print("Applying dart fix")
-        result = subprocess.run(["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
-        print(result.stdout)
-        if result.returncode != 0:
-            print(result.stderr)
-    except subprocess.CalledProcessError as e:
-        print(f"CalledProcessError: {e}")
-    except FileNotFoundError as e:
-        print(f"FileNotFoundError: {e}")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-
     print("Set the remote for the new branch and push")
     try:
         subprocess.check_output(["git", "push", "-u", "origin", new_branch])

@@ -1,9 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:vkhillseva/nitya_seva/laddu/datatypes.dart';
-import 'package:vkhillseva/nitya_seva/laddu/fbl.dart';
-import 'package:vkhillseva/nitya_seva/laddu/utils.dart';
-import 'package:vkhillseva/common/utils.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
+import 'package:vkhgaruda/nitya_seva/laddu/utils.dart';
+import 'package:vkhgaruda/common/utils.dart';
 import 'package:synchronized/synchronized.dart';
 
 class Summary extends StatefulWidget {

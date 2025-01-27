@@ -1,13 +1,14 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/home/home.dart';
-import 'package:vkhillseva/widgets/loading_overlay.dart';
-import 'package:vkhillseva/common/theme.dart';
+import 'package:vkhgaruda/common/const.dart';
+import 'package:vkhgaruda/home/home.dart';
+import 'package:vkhgaruda/widgets/loading_overlay.dart';
+import 'package:vkhgaruda/common/theme.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:vkhillseva/common/toaster.dart';
+import 'package:vkhgaruda/common/toaster.dart';
+import 'package:vkhgaruda/widgets/welcome.dart';
 
 class PinPage extends StatefulWidget {
   final String title;
@@ -15,6 +16,7 @@ class PinPage extends StatefulWidget {
   const PinPage({super.key, required this.title});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PinPageState createState() => _PinPageState();
 }
 
@@ -63,39 +65,8 @@ class _PinPageState extends State<PinPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // app logo
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Container(
-                            height: 200,
-                            width: 200,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: ClipOval(
-                              child: Image.asset(
-                                'assets/images/Logo/KrishnaLilaPark_circle.png',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        // welcome message
-                        Text(
-                          'ISKCON Vaikuntha Hill',
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                        Text('Seva App v${Const().version}',
-                            style: Theme.of(context).textTheme.headlineSmall),
+                        //welcome message
+                        Welcome(),
 
                         // input pin
                         SizedBox(height: 16),

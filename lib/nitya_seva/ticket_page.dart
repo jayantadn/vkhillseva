@@ -3,17 +3,17 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhillseva/common/const.dart';
-import 'package:vkhillseva/common/fb.dart';
-import 'package:vkhillseva/common/local_storage.dart';
-import 'package:vkhillseva/common/utils.dart';
-import 'package:vkhillseva/nitya_seva/session.dart';
-import 'package:vkhillseva/nitya_seva/session_summary.dart';
-import 'package:vkhillseva/nitya_seva/tally_cash.dart';
-import 'package:vkhillseva/nitya_seva/tally_upi_card.dart';
-import 'package:vkhillseva/widgets/common_widgets.dart';
-import 'package:vkhillseva/widgets/loading_overlay.dart';
-import 'package:vkhillseva/common/theme.dart';
+import 'package:vkhgaruda/common/const.dart';
+import 'package:vkhgaruda/common/fb.dart';
+import 'package:vkhgaruda/common/local_storage.dart';
+import 'package:vkhgaruda/common/utils.dart';
+import 'package:vkhgaruda/nitya_seva/session.dart';
+import 'package:vkhgaruda/nitya_seva/session_summary.dart';
+import 'package:vkhgaruda/nitya_seva/tally_cash.dart';
+import 'package:vkhgaruda/nitya_seva/tally_upi_card.dart';
+import 'package:vkhgaruda/widgets/common_widgets.dart';
+import 'package:vkhgaruda/widgets/loading_overlay.dart';
+import 'package:vkhgaruda/common/theme.dart';
 
 class TicketPage extends StatefulWidget {
   final Session session;
@@ -128,7 +128,7 @@ class _TicketPageState extends State<TicketPage> {
       });
     }
 
-    _username = await Utils().getUsername(context);
+    _username = Utils().getUsername();
 
     // fetch tickets
     String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);

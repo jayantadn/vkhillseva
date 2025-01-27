@@ -1,3 +1,19 @@
+# 2.0.6
+
+# 2.0.5
+- fix: sms authentication for android
+
+# 2.0.4
+- feature: android auth settings
+
+# 2.0.2
+
+# 2.0.1
+
+# 2.0.0
+- feature: signup button
+- feature: sms authentication
+
 # 1.4.2
 - fix: logo updated
 

@@ -1,23 +1,8 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
         android:label="Garuda"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-
-        <service
-            android:name="com.google.firebase.messaging.FirebaseMessagingService"
-            android:exported="true"
-            tools:replace="android:exported">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
         <activity
             android:name=".MainActivity"
             android:exported="true"

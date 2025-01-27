@@ -52,6 +52,19 @@ def main():
             else:
                 file.write(line)
 
+    print("Applying dart fix")
+    try:
+        result = subprocess.run(["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
+        print(result.stdout)
+        if result.returncode != 0:
+            print(result.stderr)
+    except subprocess.CalledProcessError as e:
+        print(f"CalledProcessError: {e}")
+    except FileNotFoundError as e:
+        print(f"FileNotFoundError: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
     print("update the list of icons")
     src_file = 'pubspec.yaml'
     src_contents = "- assets/images/"
@@ -104,12 +117,11 @@ def main():
         run_command("flutter pub get")
         run_command("flutter build web")
         run_command("firebase deploy --only hosting:vkhgaruda")
-        run_command("git checkout *.cache")
 
         print("building for android")
         run_command("flutter build apk")
         apk_path = "build/app/outputs/flutter-apk/app-release.apk"
-        new_apk_path = f"build/app/outputs/flutter-apk/garuda_v{branch_name}.apk"
+        new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{branch_name}.apk"
         if os.path.exists(apk_path):
             if os.path.exists(new_apk_path):
                 os.remove(new_apk_path)
@@ -121,7 +133,7 @@ def main():
         drive_path = "X:/GoogleDrive/PublicRO/Garuda"
         if os.path.exists(drive_path):
             shutil.copy(new_apk_path, drive_path)
-            shutil.copy(os.path.join(drive_path, f'garuda_v{branch_name}.apk'), os.path.join(drive_path, 'garuda_latest.apk'))
+            shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{branch_name}.apk'), os.path.join(drive_path, 'vkhgaruda_latest.apk'))
         else:
             print("ERROR: Google Drive not found in your local system")
     except Exception as e:

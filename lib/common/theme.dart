@@ -156,11 +156,11 @@ ThemeData themeDefault = ThemeData(
   // Checkboxes, Radios, Switches
   checkboxTheme: CheckboxThemeData(
     fillColor: WidgetStateProperty.resolveWith((states) =>
-        states.contains(WidgetState.selected) ? accentColor : Colors.grey),
+        states.contains(WidgetState.selected) ? accentColor : Colors.transparent),
   ),
   radioTheme: RadioThemeData(
     fillColor: WidgetStateProperty.resolveWith((states) =>
-        states.contains(WidgetState.selected) ? accentColor : Colors.grey),
+        states.contains(WidgetState.selected) ? accentColor : Colors.transparent),
   ),
   switchTheme: SwitchThemeData(
     thumbColor: WidgetStateProperty.all(accentColor),

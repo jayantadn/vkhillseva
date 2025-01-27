@@ -25,7 +25,7 @@ class _SummaryState extends State<Summary> {
   dispose() {
     // clear all lists
 
-    // clear all controllers
+    // dispose all controllers
 
     super.dispose();
   }

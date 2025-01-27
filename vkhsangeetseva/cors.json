@@ -1,0 +1,19 @@
+[
+  {
+    "origin": [
+      "http://localhost:34911",
+      "https://vkhillseva.web.app/"
+    ],
+    "method": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ],
+    "maxAgeSeconds": 3600,
+    "responseHeader": [
+      "Content-Type",
+      "Authorization"
+    ]
+  }
+]

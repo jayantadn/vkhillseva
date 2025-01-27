@@ -98,14 +98,15 @@ class _ProfilesState extends State<Profiles> {
                             physics: NeverScrollableScrollPhysics(),
                             itemCount: _performers.length,
                             itemBuilder: (context, index) {
-                              UserDetails performer = _performers[index];
+                              UserDetails userdetails = _performers[index];
                               return Card(
-                                color: performer.fieldOfExpertise == "Vocalist"
-                                    ? Colors.blue[50]
-                                    : Colors.orange[50],
+                                color:
+                                    userdetails.fieldOfExpertise == "Vocalist"
+                                        ? Colors.blue[50]
+                                        : Colors.orange[50],
                                 child: ListTile(
                                   title: Text(
-                                    "${performer.salutation} ${performer.name} (${performer.credentials})",
+                                    "${userdetails.salutation} ${userdetails.name} (${userdetails.credentials})",
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   subtitle: Column(
@@ -114,13 +115,14 @@ class _ProfilesState extends State<Profiles> {
                                     children: [
                                       RichText(
                                         text: TextSpan(
-                                          text: 'Speciality: ',
+                                          text: 'Specialization: ',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black),
                                           children: <TextSpan>[
                                             TextSpan(
-                                              text: performer.skills.join(', '),
+                                              text:
+                                                  userdetails.skills.join(', '),
                                               style: TextStyle(
                                                   fontWeight:
                                                       FontWeight.normal),
@@ -132,10 +134,10 @@ class _ProfilesState extends State<Profiles> {
                                   ),
                                   leading: CircleAvatar(
                                     backgroundImage:
-                                        NetworkImage(performer.profilePicUrl),
+                                        NetworkImage(userdetails.profilePicUrl),
                                   ),
                                   trailing: Icon(
-                                      performer.fieldOfExpertise == "Vocalist"
+                                      userdetails.fieldOfExpertise == "Vocalist"
                                           ? Icons.mic
                                           : Icons.music_note),
                                   onTap: () {
@@ -145,7 +147,7 @@ class _ProfilesState extends State<Profiles> {
                                             builder: (context) =>
                                                 ProfileDetails(
                                                   title: "Profile details",
-                                                  mobile: performer.mobile,
+                                                  userdetails: userdetails,
                                                 )));
                                   },
                                 ),

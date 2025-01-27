@@ -2,16 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/sangeet_seva/user.dart';
 import 'package:vkhgaruda/widgets/loading_overlay.dart';
 import 'package:vkhgaruda/common/theme.dart';
 
 class ProfileDetails extends StatefulWidget {
   final String title;
   final String? icon;
-  final String mobile;
+  final UserDetails userdetails;
 
   const ProfileDetails(
-      {super.key, required this.title, this.icon, required this.mobile});
+      {super.key, required this.title, this.icon, required this.userdetails});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -80,7 +81,27 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                           // leave some space at top
                           SizedBox(height: 10),
 
-                          // your widgets here
+                          // Name
+                          Center(
+                            child: Text(
+                                "${widget.userdetails.salutation} ${widget.userdetails.name}",
+                                style:
+                                    Theme.of(context).textTheme.headlineLarge),
+                          ),
+
+                          // credentials
+                          Center(
+                            child: Text(widget.userdetails.credentials,
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium),
+                          ),
+
+                          // mobile
+                          Center(
+                            child: Text("Mobile: ${widget.userdetails.mobile}",
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall),
+                          ),
 
                           // leave some space at bottom
                           SizedBox(height: 100),

@@ -2,7 +2,8 @@
   {
     "origin": [
       "http://localhost:34911",
-      "https://vkhillseva.web.app/"
+      "https://vkhillseva.web.app/",
+      "https://vkhgaruda.web.app/"
     ],
     "method": [
       "GET",

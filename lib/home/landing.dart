@@ -52,7 +52,7 @@ class _LandingState extends State<Landing> {
     });
 
     // perform async operations here
-    Utils().fetchUserDetails().then((value) {
+    Utils().fetchUserBasics().then((value) {
       setState(() {
         _username = Utils().getUsername();
       });

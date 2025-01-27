@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhgaruda/common/fb.dart';
 import 'package:vkhgaruda/common/local_storage.dart';
-import 'package:vkhgaruda/common/userdetails.dart';
+import 'package:vkhgaruda/widgets/auth.dart';
 
 class Utils {
   static final Utils _instance = Utils._internal();
@@ -63,7 +63,7 @@ class Utils {
   ];
 
   List<Map<String, String>> festivalIcons = [];
-  UserDetails? _userdetails;
+  UserBasics? _userbasics;
 
   Color getRandomLightColor() {
     return lightColors[DateTime.now().millisecond % lightColors.length];
@@ -91,16 +91,29 @@ class Utils {
     return "";
   }
 
-  Future<void> fetchUserDetails() async {
-    if (_userdetails == null) {
-      final String? u = await LS().read('userdetails');
-      if (u != null) {
-        _userdetails = UserDetails.fromJson(jsonDecode(u));
-      }
+  Future<void> fetchUserBasics() async {
+    final String? u = await LS().read('userbasics');
+    if (u != null) {
+      _userbasics = UserBasics.fromJson(jsonDecode(u));
+    } else {
+      _userbasics = null;
     }
   }
 
   String getUsername() {
-    return _userdetails?.name ?? "";
+    return _userbasics?.name ?? "";
+  }
+
+  UserBasics? getUserBasics() {
+    return _userbasics;
+  }
+
+  Widget buildWrappable(Widget child) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: 300,
+      ),
+      child: child,
+    );
   }
 }

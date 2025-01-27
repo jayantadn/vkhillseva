@@ -11,15 +11,16 @@ class LS {
 
   Future<String?> read(String key) async =>
       SharedPreferences.getInstance().then(
-        (prefs) => prefs.getString(key),
+        // ignore: await_only_futures
+        (prefs) async => await prefs.getString(key),
       );
 
   Future<void> write(String key, String value) async =>
       SharedPreferences.getInstance().then(
-        (prefs) => prefs.setString(key, value),
+        (prefs) async => await prefs.setString(key, value),
       );
 
   Future<void> delete(String key) async => SharedPreferences.getInstance().then(
-        (prefs) => prefs.remove(key),
+        (prefs) async => await prefs.remove(key),
       );
 }

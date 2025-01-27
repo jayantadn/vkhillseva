@@ -36,7 +36,7 @@ class _WelcomeState extends State<Welcome> {
   void refresh() async {
     // perform async work here
     if (Utils().getUsername().isEmpty) {
-      await Utils().fetchUserDetails();
+      await Utils().fetchUserBasics();
     }
 
     // perform sync work here

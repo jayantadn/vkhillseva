@@ -10,44 +10,10 @@ import 'package:flutter/foundation.dart'
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/common/userdetails.dart';
 
-class TermsAndConditions extends StatelessWidget {
-  final String title;
-
-  TermsAndConditions({super.key, required this.title});
-
-  final List<String> _terms = [
-    "You might receive an SMS message for verification and standard rates may apply.",
-    "Phone numbers that you provide for authentication will be sent and stored by Google to improve spam and abuse prevention across Google services, including but not limited to Firebase.",
-    "User details will be stored in temple database. This information may be used by temple authorities to contact you later."
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemCount: _terms.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Text(
-                  "${index + 1}. ${_terms[index]}",
-                ),
-              );
-            },
-          )),
-    );
-  }
-}
-
 // ignore: must_be_immutable
 class AuthDialog extends StatefulWidget {
-  void Function() callback;
-  AuthDialog({super.key, required this.callback});
+  void Function()? callback;
+  AuthDialog({super.key, this.callback});
 
   @override
   State<AuthDialog> createState() => _AuthDialogState();
@@ -102,14 +68,15 @@ class _AuthDialogState extends State<AuthDialog> {
 
   void _otpConfirmed(UserCredential userCredential) {
     if (userCredential.user != null) {
-      UserDetails userdetails = UserDetails(
+      UserBasics userbasics = UserBasics(
         name: _nameController.text.trim(),
         mobile: _mobileNumberController.text,
         uid: userCredential.user!.uid,
       );
-      LS().write("userdetails", jsonEncode(userdetails));
+      LS().write("userbasics", jsonEncode(userbasics));
 
-      widget.callback();
+      if (widget.callback != null) widget.callback!();
+
       Toaster().info('Authentication successful');
     } else {
       Toaster().error('Authentication failed');
@@ -392,7 +359,69 @@ class _AuthDialogState extends State<AuthDialog> {
   }
 }
 
-Future<void> smsAuth(BuildContext context, void Function() callback) async {
+class TermsAndConditions extends StatelessWidget {
+  final String title;
+
+  TermsAndConditions({super.key, required this.title});
+
+  final List<String> _terms = [
+    "You might receive an SMS message for verification and standard rates may apply.",
+    "Phone numbers that you provide for authentication will be sent and stored by Google to improve spam and abuse prevention across Google services, including but not limited to Firebase.",
+    "User details will be stored in temple database. This information may be used by temple authorities to contact you later."
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: _terms.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Text(
+                  "${index + 1}. ${_terms[index]}",
+                ),
+              );
+            },
+          )),
+    );
+  }
+}
+
+class UserBasics {
+  final String uid;
+  final String name;
+  final String mobile;
+
+  UserBasics({
+    required this.uid,
+    required this.name,
+    required this.mobile,
+  });
+
+  factory UserBasics.fromJson(Map<String, dynamic> json) {
+    return UserBasics(
+      uid: json['uid'],
+      name: json['name'],
+      mobile: json['mobile'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'uid': uid,
+      'name': name,
+      'mobile': mobile,
+    };
+  }
+}
+
+Future<void> smsAuth(BuildContext context, void Function()? callback) async {
   showDialog(
     context: context,
     barrierDismissible: false,

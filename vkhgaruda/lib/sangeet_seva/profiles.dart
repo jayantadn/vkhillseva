@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/common/const.dart';
 import 'package:vkhgaruda/common/fb.dart';
+import 'package:vkhgaruda/sangeet_seva/profile_details.dart';
 import 'package:vkhgaruda/sangeet_seva/user.dart';
 import 'package:vkhgaruda/widgets/loading_overlay.dart';
 import 'package:vkhgaruda/common/theme.dart';
@@ -25,7 +26,7 @@ class _ProfilesState extends State<Profiles> {
   bool _isLoading = true;
 
   // lists
-  List<UserDetails> _performers = [];
+  final List<UserDetails> _performers = [];
 
   // controllers, listeners and focus nodes
 
@@ -137,6 +138,16 @@ class _ProfilesState extends State<Profiles> {
                                       performer.fieldOfExpertise == "Vocalist"
                                           ? Icons.mic
                                           : Icons.music_note),
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ProfileDetails(
+                                                  title: "Profile details",
+                                                  mobile: performer.mobile,
+                                                )));
+                                  },
                                 ),
                               );
                             },

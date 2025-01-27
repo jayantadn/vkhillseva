@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "vkhillseva",
+    "vkhgaruda": "vkhillseva"
+  },
+  "targets": {
+    "vkhillseva": {
+      "hosting": {
+        "vkhgaruda": [
+          "vkhgaruda"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

@@ -86,6 +86,7 @@ flutter:
   assets:
     - assets/images/Logo/KrishnaLilaPark_circle.png
     - assets/images/Logo/KrishnaLilaPark_square.png
+    - assets/images/Logo/SangeetSeva.png
     - assets/images/LauncherIcons/NityaSeva.png
     - assets/images/LauncherIcons/Deepotsava.png
     - assets/images/LauncherIcons/Harinaam.png

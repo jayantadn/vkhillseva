@@ -1,6 +1,5 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
+import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'package:vkhgaruda/widgets/loading_overlay.dart';
 
 import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
@@ -19,31 +18,9 @@ class HomePage extends StatefulWidget {
 class _MyHomePageState extends State<HomePage> {
   bool _isLoading = true;
 
-  // late FirebaseMessaging _firebaseMessaging;
-
   @override
   void initState() {
     super.initState();
-
-    // initialize firebase messaging
-    // String fcToken = '';
-    // _firebaseMessaging = FirebaseMessaging.instance;
-    // _firebaseMessaging.requestPermission();
-    // _firebaseMessaging.getToken().then((token) {
-    //   fcToken = token!;
-    // });
-    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    //   print("Message received: ${message.notification?.title}");
-    // });
-    // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    //   print("Message clicked: ${message.notification?.title}");
-    // });
-    // FirebaseMessaging.onBackgroundMessage((message) async {
-    //   print("Message in background: ${message.notification?.title}");
-    //   return Future<void>.value();
-    // });
-
-    // MyNotification().send(fcToken, "some title", "some body");
 
     refresh();
   }
@@ -101,6 +78,17 @@ class _MyHomePageState extends State<HomePage> {
                     image: 'assets/images/LauncherIcons/Harinaam.png',
                     title: "Harinaam\nMantapa",
                   ),
+                  LauncherTile(
+                      image: 'assets/images/Logo/SangeetSeva.png',
+                      title: "Sangeet\nSeva",
+                      callback: LauncherTileCallback(onClick: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const SangeetSeva(title: "Sangeet Seva")),
+                        );
+                      })),
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: LauncherTile(

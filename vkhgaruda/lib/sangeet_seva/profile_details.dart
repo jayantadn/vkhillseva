@@ -22,8 +22,6 @@ class ProfileDetails extends StatefulWidget {
 
 class _ProfileDetailsState extends State<ProfileDetails> {
   // scalars
-  final Lock _lock = Lock();
-  bool _isLoading = true;
 
   // lists
 
@@ -32,8 +30,6 @@ class _ProfileDetailsState extends State<ProfileDetails> {
   @override
   initState() {
     super.initState();
-
-    refresh();
   }
 
   @override
@@ -43,23 +39,6 @@ class _ProfileDetailsState extends State<ProfileDetails> {
     // clear all controllers and focus nodes
 
     super.dispose();
-  }
-
-  Future<void> refresh() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // perform async operations here
-
-    // refresh all child widgets
-
-    // perform sync operations here
-    await _lock.synchronized(() async {});
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
@@ -72,13 +51,13 @@ class _ProfileDetailsState extends State<ProfileDetails> {
             appBar: AppBar(
               title: Text(widget.title),
             ),
-            body: RefreshIndicator(
-                onRefresh: refresh,
-                child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(children: [
+            body: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           // leave some space at top
                           SizedBox(height: 10),
 
@@ -90,11 +69,26 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                                     Theme.of(context).textTheme.headlineLarge),
                           ),
 
+                          // type
+                          Center(
+                            child: Text(widget.userdetails.fieldOfExpertise,
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium),
+                          ),
+
                           // credentials
                           Center(
                             child: Text(widget.userdetails.credentials,
                                 style:
-                                    Theme.of(context).textTheme.headlineMedium),
+                                    Theme.of(context).textTheme.headlineSmall),
+                          ),
+
+                          // sangeet sadhana
+                          Center(
+                            child: Text(
+                                "Sangeet sadhana: ${widget.userdetails.experience}",
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall),
                           ),
 
                           // mobile
@@ -117,7 +111,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                           ),
 
                           // photo
-                          SizedBox(height: 10),
+                          SizedBox(height: 20),
                           Center(
                             child: SizedBox(
                                 width: 150,
@@ -125,13 +119,72 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                                     widget.userdetails.profilePicUrl)),
                           ),
 
+                          // Specialization
+                          SizedBox(height: 10),
+                          Text("Specialization:",
+                              style: Theme.of(context).textTheme.headlineSmall),
+                          SizedBox(width: 10),
+                          Text(
+                            widget.userdetails.skills.join(', '),
+                          ),
+
+                          // youtube links
+                          SizedBox(height: 10),
+                          Text("Youtube links:",
+                              style: Theme.of(context).textTheme.headlineSmall),
+                          SizedBox(width: 10),
+                          ...widget.userdetails.youtubeUrls
+                              .map((link) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 5.0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        launchUrl(Uri.parse(link));
+                                      },
+                                      child: Text(link,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineSmall
+                                              ?.copyWith(
+                                                  color: Colors.blue,
+                                                  decoration: TextDecoration
+                                                      .underline)),
+                                    ),
+                                  )),
+
+                          // Audio clips
+                          SizedBox(height: 10),
+                          Text("Audio clips:",
+                              style: Theme.of(context).textTheme.headlineSmall),
+                          SizedBox(width: 10),
+                          ...widget.userdetails.audioClipUrls
+                              .map((link) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 5.0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        launchUrl(Uri.parse(link));
+                                      },
+                                      child: Text(
+                                          Uri.parse(link)
+                                              .pathSegments
+                                              .last
+                                              .split('/')
+                                              .last,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineSmall
+                                              ?.copyWith(
+                                                  color: Colors.blue,
+                                                  decoration: TextDecoration
+                                                      .underline)),
+                                    ),
+                                  )),
+
                           // leave some space at bottom
                           SizedBox(height: 100),
-                        ])))),
+                        ]))),
           ),
-
-          // circular progress indicator
-          if (_isLoading) LoadingOverlay(image: widget.icon)
         ],
       ),
     );

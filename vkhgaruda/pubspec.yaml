@@ -52,6 +52,7 @@ dependencies:
   flutter_typeahead: ^5.2.0
   pdf: ^3.11.1
   printing: ^5.13.4
+  url_launcher: ^6.3.1
   
 
 dev_dependencies:

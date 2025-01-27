@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/sangeet_seva/user.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vkhgaruda/widgets/loading_overlay.dart';
 import 'package:vkhgaruda/common/theme.dart';
 
@@ -98,9 +99,21 @@ class _ProfileDetailsState extends State<ProfileDetails> {
 
                           // mobile
                           Center(
-                            child: Text("Mobile: ${widget.userdetails.mobile}",
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall),
+                            child: GestureDetector(
+                              onTap: () {
+                                launchUrl(Uri.parse(
+                                    "tel:${widget.userdetails.mobile}"));
+                              },
+                              child: Text(
+                                  "Mobile: ${widget.userdetails.mobile}",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall
+                                      ?.copyWith(
+                                          color: Colors.blue,
+                                          decoration:
+                                              TextDecoration.underline)),
+                            ),
                           ),
 
                           // leave some space at bottom

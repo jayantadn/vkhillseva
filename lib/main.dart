@@ -5,6 +5,7 @@ import 'package:vkhgaruda/home/home.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'package:vkhgaruda/nitya_seva/festival.dart';
 import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
+import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const Landing(title: "Hare Krishna");
-  final Widget test = const HomePage(
+  final Widget test = const SangeetSeva(
     title: "Testing",
   );
 

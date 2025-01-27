@@ -2,22 +2,21 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/sangeet_seva/performer_profiles.dart';
 import 'package:vkhgaruda/widgets/loading_overlay.dart';
 import 'package:vkhgaruda/common/theme.dart';
 
-class SangeetSeva extends StatefulWidget {
+class PerformerProfiles extends StatefulWidget {
   final String title;
   final String? icon;
 
-  const SangeetSeva({super.key, required this.title, this.icon});
+  const PerformerProfiles({super.key, required this.title, this.icon});
 
   @override
   // ignore: library_private_types_in_public_api
-  _SangeetSevaState createState() => _SangeetSevaState();
+  _PerformerProfilesState createState() => _PerformerProfilesState();
 }
 
-class _SangeetSevaState extends State<SangeetSeva> {
+class _PerformerProfilesState extends State<PerformerProfiles> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
@@ -68,19 +67,6 @@ class _SangeetSevaState extends State<SangeetSeva> {
           Scaffold(
             appBar: AppBar(
               title: Text(widget.title),
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.group),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PerformerProfiles(
-                              title: 'Performer Profiles', icon: widget.icon)),
-                    );
-                  },
-                )
-              ],
             ),
             body: RefreshIndicator(
                 onRefresh: refresh,

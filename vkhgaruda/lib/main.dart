@@ -4,7 +4,7 @@ import 'package:vkhgaruda/common/theme.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'package:vkhgaruda/nitya_seva/festival.dart';
 import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
-import 'package:vkhgaruda/sangeet_seva/performer_profiles.dart';
+import 'package:vkhgaruda/sangeet_seva/profiles.dart';
 import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'firebase_options.dart';
 
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const Landing(title: "Hare Krishna");
-  final Widget test = const PerformerProfiles(
+  final Widget test = const Profiles(
     title: "Testing",
   );
 

@@ -8,18 +8,18 @@ import 'package:vkhgaruda/sangeet_seva/user.dart';
 import 'package:vkhgaruda/widgets/loading_overlay.dart';
 import 'package:vkhgaruda/common/theme.dart';
 
-class PerformerProfiles extends StatefulWidget {
+class Profiles extends StatefulWidget {
   final String title;
   final String? icon;
 
-  const PerformerProfiles({super.key, required this.title, this.icon});
+  const Profiles({super.key, required this.title, this.icon});
 
   @override
   // ignore: library_private_types_in_public_api
-  _PerformerProfilesState createState() => _PerformerProfilesState();
+  _ProfilesState createState() => _ProfilesState();
 }
 
-class _PerformerProfilesState extends State<PerformerProfiles> {
+class _ProfilesState extends State<Profiles> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;

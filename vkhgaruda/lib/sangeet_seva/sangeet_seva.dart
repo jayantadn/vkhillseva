@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/sangeet_seva/performer_profiles.dart';
+import 'package:vkhgaruda/sangeet_seva/profiles.dart';
 import 'package:vkhgaruda/widgets/loading_overlay.dart';
 import 'package:vkhgaruda/common/theme.dart';
 
@@ -75,7 +75,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => PerformerProfiles(
+                          builder: (context) => Profiles(
                               title: 'Performer Profiles', icon: widget.icon)),
                     );
                   },

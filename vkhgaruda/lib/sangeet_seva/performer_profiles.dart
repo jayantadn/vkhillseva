@@ -104,14 +104,29 @@ class _PerformerProfilesState extends State<PerformerProfiles> {
                                     : Colors.orange[50],
                                 child: ListTile(
                                   title: Text(
-                                    performer.name,
+                                    "${performer.salutation} ${performer.name} (${performer.credentials})",
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   subtitle: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(performer.mobile),
+                                      RichText(
+                                        text: TextSpan(
+                                          text: 'Speciality: ',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: performer.skills.join(', '),
+                                              style: TextStyle(
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                            ),
+                                          ],
+                                        ),
+                                      )
                                     ],
                                   ),
                                   leading: CircleAvatar(

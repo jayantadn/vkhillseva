@@ -311,14 +311,14 @@ class _ProfileState extends State<Profile> {
     });
   }
 
-  String _getFileNameFromUrl(String path) {
-    if (path.isEmpty) return "No files selected";
+  String _getFileNameFromUrl(String url) {
+    if (url.isEmpty) return "No files selected";
 
-    if (path.substring(0, 8) == "https://") {
-      Uri uri = Uri.parse(path);
-      return "Uploaded: ${uri.pathSegments.last.split('/').last}";
+    if (url.substring(0, 8) == "https://") {
+      Uri uri = Uri.parse(url);
+      return uri.pathSegments.last.split('/').last;
     } else {
-      return "Local: ${path.split('/').last}";
+      return "Local: ${url.split('/').last}";
     }
   }
 
@@ -611,6 +611,10 @@ class _ProfileState extends State<Profile> {
                                 if (index == 0 ||
                                     _youtubeLinks[index - 1].isNotEmpty)
                                   TextFormField(
+                                    controller: TextEditingController()
+                                      ..text = (_youtubeLinks[index].isNotEmpty)
+                                          ? _youtubeLinks[index]
+                                          : "",
                                     decoration: InputDecoration(
                                       labelText: index == 0
                                           ? 'Youtube link for your performance'
@@ -619,9 +623,7 @@ class _ProfileState extends State<Profile> {
                                           "e.g. https://www.youtube.com/watch?v=123",
                                     ),
                                     onChanged: (value) {
-                                      setState(() {
-                                        _youtubeLinks[index] = value;
-                                      });
+                                      _youtubeLinks[index] = value;
                                     },
                                   ),
                                 if (index < _youtubeLinks.length - 1)
@@ -669,7 +671,7 @@ class _ProfileState extends State<Profile> {
                                           PlatformFile file =
                                               result.files.first;
 
-                                          // upload audio clips
+                                          // upload to firestore
                                           setState(() {
                                             _isLoading = true;
                                           });

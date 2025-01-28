@@ -269,28 +269,6 @@ class _ProfileState extends State<Profile> {
       _nameController.text = _nameController.text.trim();
     });
 
-    // upload audio clips
-    for (int i = 0; i < _audioClips.length; i++) {
-      if (_audioClips[i].isEmpty) continue;
-
-      if (_audioClips[i].substring(0, 8) == "https://") continue;
-
-      // upload to firestore
-      UserBasics? basics = Utils().getUserBasics();
-      if (basics == null) {
-        Toaster().error('User not found');
-        continue;
-      }
-      String ext = _audioClips[i].split('.').last;
-      String dstPath = "${Const().dbroot}/Users/${basics.mobile}/audio$i.$ext";
-      String url =
-          await FS().uploadFile(srcPath: _audioClips[i], dstPath: dstPath);
-
-      setState(() {
-        _audioClips[i] = url;
-      });
-    }
-
     // create user details object
     UserDetails? details;
     if (userdetails == null) {
@@ -686,13 +664,32 @@ class _ProfileState extends State<Profile> {
                                                   .pickFiles(
                                             type: FileType.audio,
                                           );
+
                                           if (result == null) return;
                                           PlatformFile file =
                                               result.files.first;
 
+                                          // upload audio clips
                                           setState(() {
-                                            _audioClips[index] =
-                                                file.path ?? "";
+                                            _isLoading = true;
+                                          });
+                                          UserBasics? basics =
+                                              Utils().getUserBasics();
+                                          if (basics == null) {
+                                            Toaster().error('User not found');
+                                            return;
+                                          }
+                                          String ext =
+                                              file.name.split('.').last;
+                                          String dstPath =
+                                              "${Const().dbroot}/Users/${basics.mobile}/audio$index.$ext";
+                                          String url = await FS().uploadBytes(
+                                              dstPath: dstPath,
+                                              bytes: file.bytes!);
+
+                                          setState(() {
+                                            _audioClips[index] = url;
+                                            _isLoading = false;
                                           });
                                         },
                                       ),

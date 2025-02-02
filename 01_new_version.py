@@ -20,8 +20,6 @@ def run_command(command):
 def main():
     # Prompt for version type
     version_type = input("Enter version type (1. major, 2. minor, 3. bugfix): ")
-
-    # Set the version variable based on user input
     if version_type == "1":
         version = "major"
     elif version_type == "2":
@@ -32,41 +30,18 @@ def main():
         print("Invalid version type")
         sys.exit(1)
 
-    print("Get the latest remote branch")
-    if len(sys.argv) > 1:
-        latest_branch = sys.argv[1]
+    # choose the project
+    projectid = input("Enter project (1. Garuda, 2. SangeetSeva): ")
+    if projectid == "1":
+        project = "vkhgaruda"
+    elif projectid == "2":
+        project = "vkhsangeetseva"
     else:
-        try:
-            output = subprocess.check_output(["git", "ls-remote", "--heads", "origin"]).decode("utf-8")
-            branches = [line.split("\t")[1].split("refs/heads/")[1] for line in output.splitlines()]
-            branches = [branch for branch in branches if branch.count('.') == 2 and all(part.isdigit() for part in branch.split('.'))]
-            latest_branch = max(branches, key=Version)
-        except subprocess.CalledProcessError:
-            print("Failed to retrieve remote branches")
-
-    print("Increment the version number based on user selection")
-    if version == "major":
-        # Split the latest branch version into major, minor, and bugfix parts
-        major, minor, bugfix = latest_branch.split(".")
-        # Increment the major version and reset minor and bugfix to 0
-        major = str(int(major) + 1)
-        minor = "0"
-        bugfix = "0"
-    elif version == "minor":
-        # Split the latest branch version into major, minor, and bugfix parts
-        major, minor, bugfix = latest_branch.split(".")
-        # Increment the minor version and reset bugfix to 0
-        minor = str(int(minor) + 1)
-        bugfix = "0"
-    elif version == "bugfix":
-        # Split the latest branch version into major, minor, and bugfix parts
-        major, minor, bugfix = latest_branch.split(".")
-        # Increment the bugfix version
-        bugfix = str(int(bugfix) + 1)
-    new_branch = f"{major}.{minor}.{bugfix}"
+        print("Invalid project")
+        sys.exit(1)
 
     print("Read the value of the 'version' key from Const")
-    version_file = 'lib/common/const.dart'
+    version_file = f'{project}/lib/common/const.dart'
     search_string = "  final String version = "
     with open(version_file, 'r') as file:
         lines = file.readlines()
@@ -74,6 +49,28 @@ def main():
             if line.startswith(search_string):
                 version = line.split('=')[1].strip()
                 break
+
+    print("Increment the version number based on user selection")
+    if version == "major":
+        # Split the latest branch version into major, minor, and bugfix parts
+        major, minor, bugfix = version.split(".")
+        # Increment the major version and reset minor and bugfix to 0
+        major = str(int(major) + 1)
+        minor = "0"
+        bugfix = "0"
+    elif version == "minor":
+        # Split the latest branch version into major, minor, and bugfix parts
+        major, minor, bugfix = version.split(".")
+        # Increment the minor version and reset bugfix to 0
+        minor = str(int(minor) + 1)
+        bugfix = "0"
+    elif version == "bugfix":
+        # Split the latest branch version into major, minor, and bugfix parts
+        major, minor, bugfix = version.split(".")
+        # Increment the bugfix version
+        bugfix = str(int(bugfix) + 1)
+    new_branch = f"{major}.{minor}.{bugfix}"
+
 
     print("Checkout a new branch based on the latest branch")
     try:

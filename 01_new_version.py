@@ -19,13 +19,13 @@ def run_command(command):
 
 def main():
     # Prompt for version type
-    version_type = input("Enter version type (1. major, 2. minor, 3. bugfix): ")
-    if version_type == "1":
-        version = "major"
-    elif version_type == "2":
-        version = "minor"
-    elif version_type == "3":
-        version = "bugfix"
+    versionid = input("Enter version type (1. major, 2. minor, 3. bugfix): ")
+    if versionid == "1":
+        version_type = "major"
+    elif versionid == "2":
+        version_type = "minor"
+    elif versionid == "3":
+        version_type = "bugfix"
     else:
         print("Invalid version type")
         sys.exit(1)
@@ -51,20 +51,20 @@ def main():
                 break
 
     print("Increment the version number based on user selection")
-    if version == "major":
+    if version_type == "major":
         # Split the latest branch version into major, minor, and bugfix parts
         major, minor, bugfix = version.split(".")
         # Increment the major version and reset minor and bugfix to 0
         major = str(int(major) + 1)
         minor = "0"
         bugfix = "0"
-    elif version == "minor":
+    elif version_type == "minor":
         # Split the latest branch version into major, minor, and bugfix parts
         major, minor, bugfix = version.split(".")
         # Increment the minor version and reset bugfix to 0
         minor = str(int(minor) + 1)
         bugfix = "0"
-    elif version == "bugfix":
+    elif version_type == "bugfix":
         # Split the latest branch version into major, minor, and bugfix parts
         major, minor, bugfix = version.split(".")
         # Increment the bugfix version

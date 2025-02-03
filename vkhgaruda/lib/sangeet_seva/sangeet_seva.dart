@@ -5,6 +5,7 @@ import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/sangeet_seva/profiles.dart';
 import 'package:vkhgaruda/widgets/loading_overlay.dart';
 import 'package:vkhgaruda/common/theme.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class SangeetSeva extends StatefulWidget {
   final String title;
@@ -59,6 +60,33 @@ class _SangeetSevaState extends State<SangeetSeva> {
     });
   }
 
+  Widget _createCalendarView(BuildContext context) {
+    return TableCalendar(
+      firstDay: DateTime(2024),
+      lastDay: DateTime.now().add(Duration(days: 90)),
+      focusedDay: DateTime.now(),
+      calendarBuilders: CalendarBuilders(
+        defaultBuilder: (context, day, focusedDay) {
+          if (day.weekday == DateTime.saturday ||
+              day.weekday == DateTime.sunday) {
+            return Center(
+              child: CircleAvatar(
+                backgroundColor: Colors.lightGreenAccent,
+                child: Text(
+                  '${day.day}',
+                ),
+              ),
+            );
+          }
+          return null;
+        },
+      ),
+      onDaySelected: (selectedDay, focusedDay) {
+        // handle date selection
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -93,6 +121,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
                           SizedBox(height: 10),
 
                           // your widgets here
+                          _createCalendarView(context),
 
                           // leave some space at bottom
                           SizedBox(height: 100),

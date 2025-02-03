@@ -60,6 +60,40 @@ class _SangeetSevaState extends State<SangeetSeva> {
     });
   }
 
+  Widget _createCalendarDay(
+      {required DateTime day,
+      bool? border,
+      bool? fill,
+      int? greenstars,
+      int? redstars}) {
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: Center(
+        child: Container(
+          decoration: BoxDecoration(
+            border: border == true ? Border.all(color: Colors.grey) : null,
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${day.day}',
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("**"),
+                  Text("**"),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _createCalendarView(BuildContext context) {
     return TableCalendar(
       firstDay: DateTime(2024),
@@ -67,18 +101,10 @@ class _SangeetSevaState extends State<SangeetSeva> {
       focusedDay: DateTime.now(),
       calendarBuilders: CalendarBuilders(
         defaultBuilder: (context, day, focusedDay) {
-          if (day.weekday == DateTime.saturday ||
-              day.weekday == DateTime.sunday) {
-            return Center(
-              child: CircleAvatar(
-                backgroundColor: Colors.lightGreenAccent,
-                child: Text(
-                  '${day.day}',
-                ),
-              ),
-            );
-          }
-          return null;
+          return _createCalendarDay(day: day);
+        },
+        todayBuilder: (context, day, focusedDay) {
+          return _createCalendarDay(day: day, border: true);
         },
       ),
       onDaySelected: (selectedDay, focusedDay) {

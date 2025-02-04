@@ -22,6 +22,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  DateTime? _selectedDay;
 
   // lists
 
@@ -71,6 +72,9 @@ class _SangeetSevaState extends State<SangeetSeva> {
       child: Center(
         child: Container(
           decoration: BoxDecoration(
+            color: (fill != null && fill == true)
+                ? Colors.blue[50]
+                : Colors.transparent,
             border: border == true ? Border.all(color: Colors.grey) : null,
             borderRadius: BorderRadius.circular(8.0),
           ),
@@ -99,6 +103,9 @@ class _SangeetSevaState extends State<SangeetSeva> {
       firstDay: DateTime(2024),
       lastDay: DateTime.now().add(Duration(days: 90)),
       focusedDay: DateTime.now(),
+      selectedDayPredicate: (day) {
+        return isSameDay(_selectedDay ?? DateTime.now(), day);
+      },
       calendarBuilders: CalendarBuilders(
         defaultBuilder: (context, day, focusedDay) {
           return _createCalendarDay(day: day);
@@ -106,9 +113,14 @@ class _SangeetSevaState extends State<SangeetSeva> {
         todayBuilder: (context, day, focusedDay) {
           return _createCalendarDay(day: day, border: true);
         },
+        selectedBuilder: (context, day, focusedDay) {
+          return _createCalendarDay(day: day, border: true, fill: true);
+        },
       ),
       onDaySelected: (selectedDay, focusedDay) {
-        // handle date selection
+        setState(() {
+          _selectedDay = selectedDay;
+        });
       },
     );
   }

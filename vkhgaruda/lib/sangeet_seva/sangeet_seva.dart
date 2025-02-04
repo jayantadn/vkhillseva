@@ -61,6 +61,23 @@ class _SangeetSevaState extends State<SangeetSeva> {
     });
   }
 
+  Future<int> _getNumBookings(DateTime date) async {
+    return Future.delayed(Duration(seconds: 1), () => 0);
+  }
+
+  Future<int> _getNumAvlSlots(DateTime date) async {
+    int numBookings = await _getNumBookings(date);
+
+    int numAvlSlots =
+        (date.weekday == DateTime.saturday || date.weekday == DateTime.sunday)
+            ? 2
+            : 0;
+
+    // TODO: fetch available slots from db
+
+    return numAvlSlots - numBookings;
+  }
+
   Widget _createCalendarDay(
       {required DateTime day,
       bool? border,
@@ -87,8 +104,12 @@ class _SangeetSevaState extends State<SangeetSeva> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("**"),
-                  Text("**"),
+                  Text(
+                    redstars != null ? greenstars.toString() : ' ',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  Text(greenstars != null ? greenstars.toString() : ' ',
+                      style: TextStyle(color: Colors.green)),
                 ],
               )
             ],

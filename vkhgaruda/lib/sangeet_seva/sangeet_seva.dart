@@ -99,6 +99,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
   }
 
   Widget _createCalendarView(BuildContext context) {
+    DateTime now = DateTime.now();
+
     return TableCalendar(
       firstDay: DateTime(2024),
       lastDay: DateTime.now().add(Duration(days: 90)),
@@ -114,7 +116,12 @@ class _SangeetSevaState extends State<SangeetSeva> {
           return _createCalendarDay(day: day, border: true);
         },
         selectedBuilder: (context, day, focusedDay) {
-          return _createCalendarDay(day: day, border: true, fill: true);
+          return _createCalendarDay(
+              day: day,
+              border: now.day == day.day &&
+                  now.month == day.month &&
+                  now.year == day.year,
+              fill: true);
         },
       ),
       onDaySelected: (selectedDay, focusedDay) {

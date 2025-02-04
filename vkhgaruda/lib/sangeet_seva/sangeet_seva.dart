@@ -129,6 +129,9 @@ class _SangeetSevaState extends State<SangeetSeva> {
           _selectedDay = selectedDay;
         });
       },
+      availableCalendarFormats: const {
+        CalendarFormat.month: 'Month',
+      },
     );
   }
 

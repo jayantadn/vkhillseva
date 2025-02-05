@@ -22,9 +22,11 @@ class _SangeetSevaState extends State<SangeetSeva> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  DateTime? _selectedDay;
+  DateTime _selectedDay = DateTime.now();
 
   // lists
+  List<int> _numBookings = [];
+  List<int> _numAvlSlots = [];
 
   // controllers, listeners and focus nodes
 
@@ -32,12 +34,18 @@ class _SangeetSevaState extends State<SangeetSeva> {
   initState() {
     super.initState();
 
+    // set _numBookings and _numAvlSots to 0
+    _numBookings = List<int>.filled(31, 0);
+    _numAvlSlots = List<int>.filled(31, 0);
+
     refresh();
   }
 
   @override
   dispose() {
     // clear all lists
+    _numBookings.clear();
+    _numAvlSlots.clear();
 
     // clear all controllers and focus nodes
 
@@ -50,6 +58,11 @@ class _SangeetSevaState extends State<SangeetSeva> {
     });
 
     // perform async operations here
+    for (int day = 0; day < 31; day++) {
+      DateTime date = DateTime(_selectedDay.year, _selectedDay.month, day + 1);
+      _numBookings[day] = await _getNumBookings(date);
+      _numAvlSlots[day] = await _getNumAvlSlots(date, _numBookings[day]);
+    }
 
     // refresh all child widgets
 
@@ -65,8 +78,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
     return Future.delayed(Duration(seconds: 1), () => 0);
   }
 
-  Future<int> _getNumAvlSlots(DateTime date) async {
-    int numBookings = await _getNumBookings(date);
+  Future<int> _getNumAvlSlots(DateTime date, int? numBookings) async {
+    numBookings ??= await _getNumBookings(date);
 
     int numAvlSlots =
         (date.weekday == DateTime.saturday || date.weekday == DateTime.sunday)

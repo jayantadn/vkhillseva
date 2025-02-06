@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/sangeet_seva/calendar.dart';
 import 'package:vkhgaruda/sangeet_seva/profiles.dart';
 import 'package:vkhgaruda/widgets/loading_overlay.dart';
 import 'package:vkhgaruda/common/theme.dart';
@@ -23,11 +22,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  final Widget _calendar = Calendar();
-
-  // lists
-  List<int> _numBookings = [];
-  List<int> _numAvlSlots = [];
+  DateTime _selectedDay = DateTime.now();
 
   // controllers, listeners and focus nodes
 
@@ -36,8 +31,6 @@ class _SangeetSevaState extends State<SangeetSeva> {
     super.initState();
 
     // set _numBookings and _numAvlSots to 0
-    _numBookings = List<int>.filled(31, 0);
-    _numAvlSlots = List<int>.filled(31, 0);
 
     refresh();
   }
@@ -45,8 +38,6 @@ class _SangeetSevaState extends State<SangeetSeva> {
   @override
   dispose() {
     // clear all lists
-    _numBookings.clear();
-    _numAvlSlots.clear();
 
     // clear all controllers and focus nodes
 
@@ -68,6 +59,123 @@ class _SangeetSevaState extends State<SangeetSeva> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<int> _getTotalSlots({DateTime? date}) async {
+    // TODO: implementation pending
+    await Future.delayed(Duration(seconds: 1));
+    return 0;
+  }
+
+  Widget _createCalendarDay(
+      {required DateTime day,
+      bool? border,
+      bool? fill,
+      int? greenstars,
+      int? redstars}) {
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: Center(
+        child: Container(
+          decoration: BoxDecoration(
+            color: (fill != null && fill == true)
+                ? Colors.blue[50]
+                : Colors.transparent,
+            border: border == true ? Border.all(color: Colors.grey) : null,
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${day.day}',
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    redstars != null ? greenstars.toString() : ' ',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  Text(greenstars != null ? greenstars.toString() : ' ',
+                      style: TextStyle(color: Colors.green)),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _createCalendar() {
+    DateTime now = DateTime.now();
+
+    return TableCalendar(
+      firstDay: DateTime(2024),
+      lastDay: DateTime.now().add(Duration(days: 90)),
+      focusedDay: DateTime.now(),
+      selectedDayPredicate: (day) {
+        return isSameDay(_selectedDay, day);
+      },
+      calendarBuilders: CalendarBuilders(
+        defaultBuilder: (context, day, focusedDay) {
+          return _createCalendarDay(day: day);
+        },
+        todayBuilder: (context, day, focusedDay) {
+          return _createCalendarDay(day: day, border: true);
+        },
+        selectedBuilder: (context, day, focusedDay) {
+          return _createCalendarDay(
+              day: day,
+              border: now.day == day.day &&
+                  now.month == day.month &&
+                  now.year == day.year,
+              fill: true);
+        },
+      ),
+      onDaySelected: (selectedDay, focusedDay) {
+        setState(() {
+          _selectedDay = selectedDay;
+        });
+      },
+      availableCalendarFormats: const {
+        CalendarFormat.month: 'Month',
+      },
+    );
+  }
+
+  Future<void> _addFreeSlot(BuildContext context) async {
+    // get the total number of slots
+    int totalSlots = await _getTotalSlots();
+
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          TextEditingController controller =
+              TextEditingController(text: "Slot ${totalSlots + 1}");
+          return AlertDialog(
+              title: Text('Add a free slot'),
+              content: TextField(
+                controller:
+                    controller, // Assign the controller to the TextField
+                decoration: InputDecoration(hintText: "Slot name"),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('Add'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ]);
+        });
   }
 
   @override
@@ -104,14 +212,14 @@ class _SangeetSevaState extends State<SangeetSeva> {
                           SizedBox(height: 10),
 
                           // your widgets here
-                          _calendar,
+                          _createCalendar(),
 
                           // leave some space at bottom
                           SizedBox(height: 100),
                         ])))),
             floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                // Add your onPressed code here!
+              onPressed: () async {
+                _addFreeSlot(context);
               },
               tooltip: 'Add',
               child: Icon(Icons.add),

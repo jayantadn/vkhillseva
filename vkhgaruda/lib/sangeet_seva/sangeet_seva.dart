@@ -58,11 +58,6 @@ class _SangeetSevaState extends State<SangeetSeva> {
     });
 
     // perform async operations here
-    for (int day = 0; day < 31; day++) {
-      DateTime date = DateTime(_selectedDay.year, _selectedDay.month, day + 1);
-      _numBookings[day] = await _getNumBookings(date);
-      _numAvlSlots[day] = await _getNumAvlSlots(date, _numBookings[day]);
-    }
 
     // refresh all child widgets
 
@@ -72,23 +67,6 @@ class _SangeetSevaState extends State<SangeetSeva> {
     setState(() {
       _isLoading = false;
     });
-  }
-
-  Future<int> _getNumBookings(DateTime date) async {
-    return Future.delayed(Duration(seconds: 1), () => 0);
-  }
-
-  Future<int> _getNumAvlSlots(DateTime date, int? numBookings) async {
-    numBookings ??= await _getNumBookings(date);
-
-    int numAvlSlots =
-        (date.weekday == DateTime.saturday || date.weekday == DateTime.sunday)
-            ? 2
-            : 0;
-
-    // TODO: fetch available slots from db
-
-    return numAvlSlots - numBookings;
   }
 
   Widget _createCalendarDay(
@@ -140,7 +118,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
       lastDay: DateTime.now().add(Duration(days: 90)),
       focusedDay: DateTime.now(),
       selectedDayPredicate: (day) {
-        return isSameDay(_selectedDay ?? DateTime.now(), day);
+        return isSameDay(_selectedDay, day);
       },
       calendarBuilders: CalendarBuilders(
         defaultBuilder: (context, day, focusedDay) {

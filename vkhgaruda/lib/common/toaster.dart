@@ -15,9 +15,9 @@ class Toaster {
         msg: str,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 1,
+        timeInSecForIosWeb: 5,
         backgroundColor: Colors.red,
-	webBgColor: "#FF0000",
+        webBgColor: "#FF0000",
         textColor: Colors.white,
         fontSize: 16.0);
   }

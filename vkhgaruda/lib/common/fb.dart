@@ -133,10 +133,12 @@ class FB {
     }
   }
 
-  Future<void> setValue({required String path, required dynamic value}) async {
+  Future<void> setValue(
+      {String? dbroot, required String path, required dynamic value}) async {
+    dbroot ??= Const().dbroot;
+
     try {
-      DatabaseReference dbref =
-          FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
+      DatabaseReference dbref = FirebaseDatabase.instance.ref("$dbroot/$path");
       await dbref.set(value);
     } catch (e) {
       Toaster().error("Error setting data: $e");
@@ -155,13 +157,14 @@ class FB {
   }
 
   Future<void> addToList({
+    String? dbroot,
     required String path,
     String? child,
     required Map<String, dynamic> data,
   }) async {
+    dbroot ??= Const().dbroot;
     try {
-      DatabaseReference dbref =
-          FirebaseDatabase.instance.ref("${Const().dbroot}/$path");
+      DatabaseReference dbref = FirebaseDatabase.instance.ref("$dbroot/$path");
       if (child != null) {
         if (data['timestamp'] != null) {
           String key = data['timestamp'].toString().replaceAll(".", "^");

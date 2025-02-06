@@ -1,7 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/common/const.dart';
+import 'package:vkhgaruda/common/fb.dart';
+import 'package:vkhgaruda/common/toaster.dart';
 import 'package:vkhgaruda/sangeet_seva/profiles.dart';
 import 'package:vkhgaruda/widgets/loading_overlay.dart';
 import 'package:vkhgaruda/common/theme.dart';
@@ -22,7 +26,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  DateTime _selectedDay = DateTime.now();
+  DateTime _selectedDate = DateTime.now();
 
   // controllers, listeners and focus nodes
 
@@ -116,7 +120,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
       lastDay: DateTime.now().add(Duration(days: 90)),
       focusedDay: DateTime.now(),
       selectedDayPredicate: (day) {
-        return isSameDay(_selectedDay, day);
+        return isSameDay(_selectedDate, day);
       },
       calendarBuilders: CalendarBuilders(
         defaultBuilder: (context, day, focusedDay) {
@@ -136,7 +140,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
       ),
       onDaySelected: (selectedDay, focusedDay) {
         setState(() {
-          _selectedDay = selectedDay;
+          _selectedDate = selectedDay;
         });
       },
       availableCalendarFormats: const {
@@ -146,14 +150,20 @@ class _SangeetSevaState extends State<SangeetSeva> {
   }
 
   Future<void> _addFreeSlot(BuildContext context) async {
+    // validation if selected date is in the past
+    if (_selectedDate.isBefore(DateTime.now().subtract(Duration(days: 1)))) {
+      Toaster().error("Date is in the past");
+      return;
+    }
+
     // get the total number of slots
     int totalSlots = await _getTotalSlots();
 
-    await showDialog(
+    showDialog(
         context: context,
         builder: (BuildContext context) {
           TextEditingController controller =
-              TextEditingController(text: "Slot ${totalSlots + 1}");
+              TextEditingController(text: "Slot${totalSlots + 1}");
           return AlertDialog(
               title: Text('Add a free slot'),
               content: TextField(
@@ -170,8 +180,14 @@ class _SangeetSevaState extends State<SangeetSeva> {
                 ),
                 TextButton(
                   child: Text('Add'),
-                  onPressed: () {
+                  onPressed: () async {
                     Navigator.of(context).pop();
+                    String dbDate =
+                        DateFormat("yyyy-dd-MM").format(_selectedDate);
+                    await FB().addToList(
+                        dbroot: Const().dbrootSangeetSeva,
+                        path: "Slots/$dbDate",
+                        data: {controller.text: ""});
                   },
                 ),
               ]);

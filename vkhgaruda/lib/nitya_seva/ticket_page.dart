@@ -812,7 +812,7 @@ class _TicketPageState extends State<TicketPage> {
                                         path:
                                             "NityaSeva/$dbDate/$dbSession/Tickets/$key");
                                   }
-                                  FB().addToList(
+                                  FB().addMapToList(
                                       path:
                                           "NityaSeva/$dbDate/$dbSession/Tickets",
                                       data: t.toJson());

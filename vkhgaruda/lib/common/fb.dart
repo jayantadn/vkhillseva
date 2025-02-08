@@ -156,7 +156,21 @@ class FB {
     }
   }
 
-  Future<void> addToList({
+  Future<void> addKVToList(
+      {String? dbroot,
+      required String path,
+      required String key,
+      required dynamic value}) async {
+    dbroot ??= Const().dbroot;
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref("$dbroot/$path");
+      await dbref.child(key).set(value);
+    } catch (e) {
+      Toaster().error("Error adding key-value to list: $e");
+    }
+  }
+
+  Future<void> addMapToList({
     String? dbroot,
     required String path,
     String? child,

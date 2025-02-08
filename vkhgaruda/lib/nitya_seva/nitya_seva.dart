@@ -504,7 +504,7 @@ class _NityaSevaState extends State<NityaSeva> {
                                   context: context, errors: errors);
                             }
                             if (errors.isEmpty || ret == 'Proceed') {
-                              FB().addToList(
+                              FB().addMapToList(
                                 path: "NityaSeva/$dbDate",
                                 child: "Settings",
                                 data: newSession.toJson(),

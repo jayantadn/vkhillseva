@@ -184,10 +184,11 @@ class _SangeetSevaState extends State<SangeetSeva> {
                     Navigator.of(context).pop();
                     String dbDate =
                         DateFormat("yyyy-dd-MM").format(_selectedDate);
-                    await FB().addToList(
+                    await FB().addKVToList(
                         dbroot: Const().dbrootSangeetSeva,
                         path: "Slots/$dbDate",
-                        data: {controller.text: ""});
+                        key: controller.text,
+                        value: "");
                   },
                 ),
               ]);

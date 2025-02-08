@@ -66,9 +66,10 @@ class _SangeetSevaState extends State<SangeetSeva> {
   }
 
   Future<int> _getTotalSlots({DateTime? date}) async {
-    // TODO: implementation pending
-    await Future.delayed(Duration(seconds: 1));
-    return 0;
+    String dbDate = DateFormat("yyyy-MM-dd").format(date ?? _selectedDate);
+    List<dynamic> slotList = await FB()
+        .getList(dbroot: Const().dbrootSangeetSeva, path: "Slots/$dbDate");
+    return slotList.length;
   }
 
   Widget _createCalendarDay(
@@ -183,7 +184,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
                   onPressed: () async {
                     Navigator.of(context).pop();
                     String dbDate =
-                        DateFormat("yyyy-dd-MM").format(_selectedDate);
+                        DateFormat("yyyy-MM-dd").format(_selectedDate);
                     await FB().addKVToList(
                         dbroot: Const().dbrootSangeetSeva,
                         path: "Slots/$dbDate",

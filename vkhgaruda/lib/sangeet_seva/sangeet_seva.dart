@@ -62,7 +62,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     });
 
     // perform async operations here
-    _fillAvailabilityIndicators();
+    await _fillAvailabilityIndicators();
 
     // refresh all child widgets
 
@@ -173,7 +173,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     DateTime now = DateTime.now();
 
     return TableCalendar(
-      firstDay: DateTime(2024),
+      firstDay: DateTime.now(),
       lastDay: DateTime.now().add(Duration(days: 90)),
       focusedDay: DateTime.now(),
       selectedDayPredicate: (day) {
@@ -219,15 +219,76 @@ class _SangeetSevaState extends State<SangeetSeva> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          TextEditingController controller =
+          TextEditingController nameController =
               TextEditingController(text: "Slot${totalSlots + 1}");
+          TextEditingController startTimeController =
+              TextEditingController(text: "__:__");
+          TextEditingController endTimeController =
+              TextEditingController(text: "__:__");
+
           return AlertDialog(
               title: Text('Add a free slot'),
-              content: TextField(
-                controller:
-                    controller, // Assign the controller to the TextField
-                decoration: InputDecoration(hintText: "Slot name"),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // slot name
+                    TextField(
+                      controller:
+                          nameController, // Assign the controller to the TextField
+                      decoration: InputDecoration(hintText: "Slot name"),
+                    ),
+
+                    // start time
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(width: 50, child: Text("From:")),
+                        Text(startTimeController.text),
+                        IconButton(
+                          onPressed: () async {
+                            TimeOfDay? picked = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (picked != null) {
+                              // handle start time input
+                            }
+                          },
+                          icon: Icon(Icons.access_time),
+                        ),
+                      ],
+                    ),
+
+                    // end time
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: 50,
+                          child: Text("To:"),
+                        ),
+                        Text(endTimeController.text),
+                        IconButton(
+                          onPressed: () async {
+                            TimeOfDay? picked = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (picked != null) {
+                              // handle start time input
+                            }
+                          },
+                          icon: Icon(Icons.access_time),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
+
+              // buttons
               actions: <Widget>[
                 TextButton(
                   child: Text('Cancel'),
@@ -244,11 +305,16 @@ class _SangeetSevaState extends State<SangeetSeva> {
                     await FB().addKVToList(
                         dbroot: Const().dbrootSangeetSeva,
                         path: "Slots/$dbDate",
-                        key: controller.text,
+                        key: nameController.text,
                         value: "");
 
                     // refresh the availability indicators
                     await _fillAvailabilityIndicators(date: _selectedDate);
+
+                    // clean up
+                    nameController.dispose();
+                    startTimeController.dispose();
+                    endTimeController.dispose();
                   },
                 ),
               ]);

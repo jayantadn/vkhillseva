@@ -14,7 +14,7 @@ def run_command(command):
 
 
 def main():
-    print("get the version number")
+    print("get the branch name")
     branch_name = run_command('git rev-parse --abbrev-ref HEAD')
     branch_name = branch_name.lstrip()
 
@@ -39,64 +39,64 @@ def main():
         file.write('\n')  
         file.write(existing_contents)
 
-    print("Undo main patch for testing")
-    main_file = 'lib/main.dart'
-    search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);'
-    replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);\n'
-    with open(main_file, 'r') as file:
-        lines = file.readlines()
-    with open(main_file, 'w') as file:
-        for line in lines:
-            if search_string in line:
-                file.write(replacement_string)
-            else:
-                file.write(line)
+    # print("Undo main patch for testing")
+    # main_file = 'lib/main.dart'
+    # search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);'
+    # replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);\n'
+    # with open(main_file, 'r') as file:
+    #     lines = file.readlines()
+    # with open(main_file, 'w') as file:
+    #     for line in lines:
+    #         if search_string in line:
+    #             file.write(replacement_string)
+    #         else:
+    #             file.write(line)
 
-    print("Applying dart fix")
-    try:
-        result = subprocess.run(["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
-        print(result.stdout)
-        if result.returncode != 0:
-            print(result.stderr)
-    except subprocess.CalledProcessError as e:
-        print(f"CalledProcessError: {e}")
-    except FileNotFoundError as e:
-        print(f"FileNotFoundError: {e}")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+    # print("Applying dart fix")
+    # try:
+    #     result = subprocess.run(["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
+    #     print(result.stdout)
+    #     if result.returncode != 0:
+    #         print(result.stderr)
+    # except subprocess.CalledProcessError as e:
+    #     print(f"CalledProcessError: {e}")
+    # except FileNotFoundError as e:
+    #     print(f"FileNotFoundError: {e}")
+    # except Exception as e:
+    #     print(f"An unexpected error occurred: {e}")
 
-    print("update the list of icons")
-    src_file = 'pubspec.yaml'
-    src_contents = "- assets/images/"
-    images = []
-    dst_file = 'lib/common/const.dart'
-    dst_start = 'final List<String> icons = ['
-    dst_end = '];'
-    with open(src_file, 'r') as file:
-        src_lines = file.readlines()
-        for line in src_lines:
-            if src_contents in line:
-                image = line.strip()
-                image = image[1:]
-                image = image.strip()
-                images.append(image.strip())
-    with open(dst_file, 'r') as file:
-        dst_lines = file.readlines()
-    with open(dst_file, 'w') as file:
-        flag_start = False
-        for line in dst_lines:
-            if line.strip() == dst_start:
-                flag_start = True
-                file.write(line)
-                for image in images:
-                    file.write(f'      "{image}",\n')
-            else:
-                if(not flag_start):
-                    file.write(line)
-                else:
-                    if line.strip() == dst_end:
-                        file.write(line)
-                        flag_start = False
+    # print("update the list of icons")
+    # src_file = 'pubspec.yaml'
+    # src_contents = "- assets/images/"
+    # images = []
+    # dst_file = 'lib/common/const.dart'
+    # dst_start = 'final List<String> icons = ['
+    # dst_end = '];'
+    # with open(src_file, 'r') as file:
+    #     src_lines = file.readlines()
+    #     for line in src_lines:
+    #         if src_contents in line:
+    #             image = line.strip()
+    #             image = image[1:]
+    #             image = image.strip()
+    #             images.append(image.strip())
+    # with open(dst_file, 'r') as file:
+    #     dst_lines = file.readlines()
+    # with open(dst_file, 'w') as file:
+    #     flag_start = False
+    #     for line in dst_lines:
+    #         if line.strip() == dst_start:
+    #             flag_start = True
+    #             file.write(line)
+    #             for image in images:
+    #                 file.write(f'      "{image}",\n')
+    #         else:
+    #             if(not flag_start):
+    #                 file.write(line)
+    #             else:
+    #                 if line.strip() == dst_end:
+    #                     file.write(line)
+    #                     flag_start = False
     
 
     try:
@@ -112,11 +112,11 @@ def main():
         else:
             print("No changes to commit")
 
-        print("building for web")
-        run_command("flutter clean")
-        run_command("flutter pub get")
-        run_command("flutter build web")
-        run_command("firebase deploy --only hosting:vkhgaruda")
+        # print("building for web")
+        # run_command("flutter clean")
+        # run_command("flutter pub get")
+        # run_command("flutter build web")
+        # run_command("firebase deploy --only hosting:vkhgaruda")
 
         print("building for android")
         run_command("flutter build apk")

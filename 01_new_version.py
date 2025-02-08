@@ -18,6 +18,16 @@ def run_command(command):
     return result.stdout.strip()
 
 def main():
+    # choose the project
+    projectid = input("Enter project (1. Garuda, 2. SangeetSeva): ")
+    if projectid == "1":
+        project = "vkhgaruda"
+    elif projectid == "2":
+        project = "vkhsangeetseva"
+    else:
+        print("Invalid project")
+        sys.exit(1)
+
     # Prompt for version type
     versionid = input("Enter version type (1. major, 2. minor, 3. bugfix): ")
     if versionid == "1":
@@ -30,15 +40,7 @@ def main():
         print("Invalid version type")
         sys.exit(1)
 
-    # choose the project
-    projectid = input("Enter project (1. Garuda, 2. SangeetSeva): ")
-    if projectid == "1":
-        project = "vkhgaruda"
-    elif projectid == "2":
-        project = "vkhsangeetseva"
-    else:
-        print("Invalid project")
-        sys.exit(1)
+
 
     print("Read the value of the 'version' key from Const")
     version_file = f'{project}/lib/common/const.dart'
@@ -69,7 +71,7 @@ def main():
         major, minor, bugfix = version.split(".")
         # Increment the bugfix version
         bugfix = str(int(bugfix) + 1)
-    new_branch = f"{major}.{minor}.{bugfix}"
+    new_branch = f"{project}_{major}.{minor}.{bugfix}"
 
 
     print("Checkout a new branch based on the latest branch")

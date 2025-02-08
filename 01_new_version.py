@@ -91,7 +91,7 @@ def main():
         sys.exit(1)
 
     # print("main patch for testing")
-    main_file = f'{project}lib/main.dart'
+    main_file = f'{project}/lib/main.dart'
     search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);'
     replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);\n'
     with open(main_file, 'r') as file:

@@ -28,6 +28,10 @@ class _SangeetSevaState extends State<SangeetSeva> {
   bool _isLoading = true;
   DateTime _selectedDate = DateTime.now();
 
+  // lists
+  List<int> _bookedSlotsCnt = [];
+  List<int> _avlSlotsCnt = [];
+
   // controllers, listeners and focus nodes
 
   @override
@@ -35,6 +39,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
     super.initState();
 
     // set _numBookings and _numAvlSots to 0
+    _bookedSlotsCnt = List.filled(31, 0);
+    _avlSlotsCnt = List.filled(31, 0);
 
     refresh();
   }
@@ -42,6 +48,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
   @override
   dispose() {
     // clear all lists
+    _bookedSlotsCnt.clear();
+    _avlSlotsCnt.clear();
 
     // clear all controllers and focus nodes
 
@@ -54,6 +62,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     });
 
     // perform async operations here
+    _fillAvailabilityIndicators();
 
     // refresh all child widgets
 
@@ -65,7 +74,29 @@ class _SangeetSevaState extends State<SangeetSeva> {
     });
   }
 
-  Future<int> _getTotalSlots({DateTime? date}) async {
+  Future<void> _fillAvailabilityIndicators({DateTime? date}) async {
+    if (date == null) {
+      // generate for whole month
+      for (int day = 0; day < 31; day++) {
+        DateTime givenDate =
+            DateTime(_selectedDate.year, _selectedDate.month, day + 1);
+        int booked = await _getBookedSlotsCount(date: givenDate);
+        int total = await _getTotalSlotsCount(date: givenDate);
+
+        setState(() {
+          _bookedSlotsCnt[day] = booked;
+          _avlSlotsCnt[day] = total - _bookedSlotsCnt[day];
+        });
+
+        print(
+            "Day: $day, Booked: ${_bookedSlotsCnt[day]}, Avl: ${_avlSlotsCnt[day]}");
+      }
+    } else {
+      // TODO: fill for a single day
+    }
+  }
+
+  Future<int> _getTotalSlotsCount({DateTime? date}) async {
     date ??= _selectedDate;
 
     // get slots from database
@@ -80,12 +111,18 @@ class _SangeetSevaState extends State<SangeetSeva> {
     return slotList.length + (isWeekend ? 2 : 0);
   }
 
-  Widget _createCalendarDay(
-      {required DateTime day,
-      bool? border,
-      bool? fill,
-      int? greenstars,
-      int? redstars}) {
+  Future<int> _getBookedSlotsCount({DateTime? date}) async {
+    date ??= _selectedDate;
+
+    // TODO: implementation pending
+    return 0;
+  }
+
+  Widget _createCalendarDay({
+    required DateTime day,
+    bool? border,
+    bool? fill,
+  }) {
     return Padding(
       padding: const EdgeInsets.all(2.0),
       child: Center(
@@ -106,12 +143,18 @@ class _SangeetSevaState extends State<SangeetSeva> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    redstars != null ? greenstars.toString() : ' ',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  Text(greenstars != null ? greenstars.toString() : ' ',
-                      style: TextStyle(color: Colors.green)),
+                  for (int i = 0; i < _bookedSlotsCnt[day.day - 1]; i++)
+                    Icon(
+                      Icons.circle,
+                      color: Colors.red,
+                      size: 5,
+                    ),
+                  for (int i = 0; i < _avlSlotsCnt[day.day - 1]; i++)
+                    Icon(
+                      Icons.circle,
+                      color: Colors.green,
+                      size: 5,
+                    )
                 ],
               )
             ],
@@ -166,7 +209,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     }
 
     // get the total number of slots
-    int totalSlots = await _getTotalSlots();
+    int totalSlots = await _getTotalSlotsCount();
 
     showDialog(
         context: context,

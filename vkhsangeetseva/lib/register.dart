@@ -72,6 +72,8 @@ class _RegisterState extends State<Register> {
     });
   }
 
+  Widget _createAvlSlotsList(BuildContext context) {}
+
   Widget _createCalendar() {
     DateTime now = DateTime.now();
 
@@ -227,6 +229,7 @@ class _RegisterState extends State<Register> {
                               SizedBox(height: 10),
 
                               _createCalendar(),
+                              _createAvlSlotsList(context),
 
                               // leave some space at bottom
                               SizedBox(height: 100),

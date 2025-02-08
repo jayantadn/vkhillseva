@@ -139,13 +139,11 @@ class _MyHomePageState extends State<HomePage> {
                           if (basics != null) {
                             Map<String, dynamic> userdetailsMap = await FB()
                                 .getJson(
-                                    path:
-                                        "Users/${basics.name}${basics.mobile}",
+                                    path: "Users/${basics.mobile}",
                                     silent: true);
 
                             if (userdetailsMap.isEmpty) {
                               Navigator.push(
-                                // ignore: use_build_context_synchronously
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => Profile(

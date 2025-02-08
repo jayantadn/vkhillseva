@@ -78,11 +78,11 @@ def main():
     print("Checkout a new branch based on the latest branch")
     try:
         create_or_switch_branch(new_branch)
-        # Update the version in const
+        print("Update the version in const")
         with open(version_file, 'w') as file:
             for line in lines:
                 if line.startswith(search_string):
-                    file.write(f'{search_string}"{new_branch}";\n')
+                    file.write(f'{search_string}"{major}.{minor}.{bugfix}";\n')
                 else:
                     file.write(line)
         pass

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhsangeetseva/profile.dart';
+import 'package:vkhsangeetseva/register.dart';
 import 'firebase_options.dart';
 import 'package:vkhsangeetseva/common/theme.dart';
 import 'package:vkhsangeetseva/home.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const HomePage();
-  final Widget test = const Profile(title: "Profile", self: true);
+  final Widget test = const Register(title: "Testing");
 
   // This widget is the root of your application.
   @override
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hare Krishna',
       theme: themeDefault,
-      home: home,
+      home: test,
     );
   }
 }

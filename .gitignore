@@ -50,3 +50,4 @@ app.*.map.json
 # Other files
 docs/.$UI_design.drawio.bkp
 .firebase/hosting.*.cache
+vkhsangeetseva/pubspec.lock

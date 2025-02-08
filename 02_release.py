@@ -39,18 +39,31 @@ def main():
         file.write('\n')  
         file.write(existing_contents)
 
-    # print("Undo main patch for testing")
-    # main_file = 'lib/main.dart'
-    # search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);'
-    # replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);\n'
-    # with open(main_file, 'r') as file:
-    #     lines = file.readlines()
-    # with open(main_file, 'w') as file:
-    #     for line in lines:
-    #         if search_string in line:
-    #             file.write(replacement_string)
-    #         else:
-    #             file.write(line)
+    print("Undo main patch for testing")
+    main_file = 'lib/main.dart'
+    search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);'
+    replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);\n'
+    with open(main_file, 'r') as file:
+        lines = file.readlines()
+    with open(main_file, 'w') as file:
+        for line in lines:
+            if search_string in line:
+                file.write(replacement_string)
+            else:
+                file.write(line)    
+                
+    print("Undo main patch2 for testing")
+    main_file = 'lib/main.dart'
+    search_string = '      home: test,'
+    replacement_string = '      home: home,\n'
+    with open(main_file, 'r') as file:
+        lines = file.readlines()
+    with open(main_file, 'w') as file:
+        for line in lines:
+            if search_string in line:
+                file.write(replacement_string)
+            else:
+                file.write(line)
 
     # print("Applying dart fix")
     # try:

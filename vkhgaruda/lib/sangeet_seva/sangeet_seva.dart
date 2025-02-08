@@ -169,6 +169,40 @@ class _SangeetSevaState extends State<SangeetSeva> {
     );
   }
 
+  Future<void> _addFreeSlot(
+      String name, String startTime, String endTime) async {
+    // validations
+    if (startTime == "__:__" || endTime == "__:__") {
+      Toaster().error("Please enter both start and end time");
+      return;
+    }
+
+    // check if end time is greater than start time
+    final DateFormat timeFormat = DateFormat('hh:mm a');
+    try {
+      final DateTime startDateTime = timeFormat.parse(startTime);
+      final DateTime endDateTime = timeFormat.parse(endTime);
+      if (endDateTime.isBefore(startDateTime)) {
+        Toaster().error("End time should be greater than start time");
+        return;
+      }
+    } catch (e) {
+      // Handle parsing errors
+      Toaster().error('Error parsing time: $e');
+    }
+
+    // add to database
+    String dbDate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+    await FB().addKVToList(
+        dbroot: Const().dbrootSangeetSeva,
+        path: "Slots/$dbDate",
+        key: name,
+        value: {"startTime": startTime, "endTime": endTime});
+
+    // refresh the availability indicators
+    await _fillAvailabilityIndicators(date: _selectedDate);
+  }
+
   Widget _createCalendar() {
     DateTime now = DateTime.now();
 
@@ -206,7 +240,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     );
   }
 
-  Future<void> _addFreeSlot(BuildContext context) async {
+  Future<void> _showFreeSlotDialog(BuildContext context) async {
     // validation if selected date is in the past
     if (_selectedDate.isBefore(DateTime.now().subtract(Duration(days: 1)))) {
       Toaster().error("Date is in the past");
@@ -307,16 +341,9 @@ class _SangeetSevaState extends State<SangeetSeva> {
                     child: Text('Add'),
                     onPressed: () async {
                       Navigator.of(context).pop();
-                      String dbDate =
-                          DateFormat("yyyy-MM-dd").format(_selectedDate);
-                      await FB().addKVToList(
-                          dbroot: Const().dbrootSangeetSeva,
-                          path: "Slots/$dbDate",
-                          key: nameController.text,
-                          value: "");
 
-                      // refresh the availability indicators
-                      await _fillAvailabilityIndicators(date: _selectedDate);
+                      await _addFreeSlot(nameController.text,
+                          startTimeController.text, endTimeController.text);
 
                       // clean up
                       nameController.dispose();
@@ -372,7 +399,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
                         ])))),
             floatingActionButton: FloatingActionButton(
               onPressed: () async {
-                _addFreeSlot(context);
+                _showFreeSlotDialog(context);
               },
               tooltip: 'Add',
               child: Icon(Icons.add),

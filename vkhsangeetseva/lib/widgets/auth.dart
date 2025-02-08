@@ -64,14 +64,14 @@ class _AuthDialogState extends State<AuthDialog> {
     });
   }
 
-  void _otpConfirmed(UserCredential userCredential) {
+  Future<void> _otpConfirmed(UserCredential userCredential) async {
     if (userCredential.user != null) {
       UserBasics userbasics = UserBasics(
         name: _nameController.text.trim(),
         mobile: _mobileNumberController.text,
         uid: userCredential.user!.uid,
       );
-      LS().write("userbasics", jsonEncode(userbasics));
+      await LS().write("userbasics", jsonEncode(userbasics));
 
       if (widget.callback != null) widget.callback!();
 

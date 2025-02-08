@@ -77,7 +77,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
   Future<void> _fillAvailabilityIndicators({DateTime? date}) async {
     if (date == null) {
       // generate for whole month
-      for (int day = 0; day < 31; day++) {
+      int startDay = DateTime.now().day - 1;
+      for (int day = startDay; day < 31; day++) {
         DateTime givenDate =
             DateTime(_selectedDate.year, _selectedDate.month, day + 1);
         int booked = await _getBookedSlotsCount(date: givenDate);
@@ -87,12 +88,16 @@ class _SangeetSevaState extends State<SangeetSeva> {
           _bookedSlotsCnt[day] = booked;
           _avlSlotsCnt[day] = total - _bookedSlotsCnt[day];
         });
-
-        print(
-            "Day: $day, Booked: ${_bookedSlotsCnt[day]}, Avl: ${_avlSlotsCnt[day]}");
       }
     } else {
-      // TODO: fill for a single day
+      // fill for a single day
+      int booked = await _getBookedSlotsCount(date: date);
+      int total = await _getTotalSlotsCount(date: date);
+
+      setState(() {
+        _bookedSlotsCnt[date.day - 1] = booked;
+        _avlSlotsCnt[date.day - 1] = total - _bookedSlotsCnt[date.day - 1];
+      });
     }
   }
 
@@ -241,6 +246,9 @@ class _SangeetSevaState extends State<SangeetSeva> {
                         path: "Slots/$dbDate",
                         key: controller.text,
                         value: "");
+
+                    // refresh the availability indicators
+                    await _fillAvailabilityIndicators(date: _selectedDate);
                   },
                 ),
               ]);

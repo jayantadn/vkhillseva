@@ -51,6 +51,7 @@ def main():
             if line.startswith(search_string):
                 version = line.split('=')[1].strip()
                 break
+    version = version.replace('"', "");
 
     print("Increment the version number based on user selection")
     if version_type == "major":

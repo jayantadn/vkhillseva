@@ -226,98 +226,108 @@ class _SangeetSevaState extends State<SangeetSeva> {
           TextEditingController endTimeController =
               TextEditingController(text: "__:__");
 
-          return AlertDialog(
-              title: Text('Add a free slot'),
-              content: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // slot name
-                    TextField(
-                      controller:
-                          nameController, // Assign the controller to the TextField
-                      decoration: InputDecoration(hintText: "Slot name"),
-                    ),
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                title: Text('Add a free slot'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // slot name
+                      TextField(
+                        controller: nameController,
+                        decoration: InputDecoration(hintText: "Slot name"),
+                      ),
 
-                    // start time
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(width: 50, child: Text("From:")),
-                        Text(startTimeController.text),
-                        IconButton(
-                          onPressed: () async {
-                            TimeOfDay? picked = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.now(),
-                            );
-                            if (picked != null) {
-                              // handle start time input
-                            }
-                          },
-                          icon: Icon(Icons.access_time),
-                        ),
-                      ],
-                    ),
+                      // start time
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(width: 50, child: Text("From:")),
+                          Text(startTimeController.text),
+                          IconButton(
+                            onPressed: () async {
+                              TimeOfDay? picked = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                              );
+                              if (picked != null) {
+                                setState(() {
+                                  startTimeController.text =
+                                      picked.format(context);
+                                });
+                              }
+                            },
+                            icon: Icon(Icons.access_time),
+                          ),
+                        ],
+                      ),
 
-                    // end time
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: 50,
-                          child: Text("To:"),
-                        ),
-                        Text(endTimeController.text),
-                        IconButton(
-                          onPressed: () async {
-                            TimeOfDay? picked = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.now(),
-                            );
-                            if (picked != null) {
-                              // handle start time input
-                            }
-                          },
-                          icon: Icon(Icons.access_time),
-                        ),
-                      ],
-                    ),
-                  ],
+                      // end time
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 50,
+                            child: Text("To:"),
+                          ),
+                          Text(endTimeController.text),
+                          IconButton(
+                            onPressed: () async {
+                              TimeOfDay? picked = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                              );
+                              if (picked != null) {
+                                setState(() {
+                                  endTimeController.text =
+                                      picked.format(context);
+                                });
+                              }
+                            },
+                            icon: Icon(Icons.access_time),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              // buttons
-              actions: <Widget>[
-                TextButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: Text('Add'),
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    String dbDate =
-                        DateFormat("yyyy-MM-dd").format(_selectedDate);
-                    await FB().addKVToList(
-                        dbroot: Const().dbrootSangeetSeva,
-                        path: "Slots/$dbDate",
-                        key: nameController.text,
-                        value: "");
+                // buttons
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('Cancel'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: Text('Add'),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      String dbDate =
+                          DateFormat("yyyy-MM-dd").format(_selectedDate);
+                      await FB().addKVToList(
+                          dbroot: Const().dbrootSangeetSeva,
+                          path: "Slots/$dbDate",
+                          key: nameController.text,
+                          value: "");
 
-                    // refresh the availability indicators
-                    await _fillAvailabilityIndicators(date: _selectedDate);
+                      // refresh the availability indicators
+                      await _fillAvailabilityIndicators(date: _selectedDate);
 
-                    // clean up
-                    nameController.dispose();
-                    startTimeController.dispose();
-                    endTimeController.dispose();
-                  },
-                ),
-              ]);
+                      // clean up
+                      nameController.dispose();
+                      startTimeController.dispose();
+                      endTimeController.dispose();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
         });
   }
 

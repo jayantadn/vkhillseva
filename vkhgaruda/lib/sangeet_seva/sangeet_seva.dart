@@ -66,10 +66,18 @@ class _SangeetSevaState extends State<SangeetSeva> {
   }
 
   Future<int> _getTotalSlots({DateTime? date}) async {
-    String dbDate = DateFormat("yyyy-MM-dd").format(date ?? _selectedDate);
+    date ??= _selectedDate;
+
+    // get slots from database
+    String dbDate = DateFormat("yyyy-MM-dd").format(date);
     List<dynamic> slotList = await FB()
         .getList(dbroot: Const().dbrootSangeetSeva, path: "Slots/$dbDate");
-    return slotList.length;
+
+    // add slots for weekend
+    bool isWeekend =
+        date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
+
+    return slotList.length + (isWeekend ? 2 : 0);
   }
 
   Widget _createCalendarDay(

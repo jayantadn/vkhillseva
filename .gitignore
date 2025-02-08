@@ -32,7 +32,8 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-**/build/
+/vkhgaruda/build/
+/vkhsangeetseva/build/
 
 # Symbolication related
 app.*.symbols

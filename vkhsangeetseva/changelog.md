@@ -1,5 +1,5 @@
-# vkhgaruda_3.2.0
-- feature: slot has a start and end time
+# 1.1.0
+- fix: jump to profile after signup
 
 # "3.1.0
 

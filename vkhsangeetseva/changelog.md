@@ -1,3 +1,6 @@
+# 1.1.0
+- fix: jump to profile after signup
+
 # "3.1.0
 
 # "3.1.0

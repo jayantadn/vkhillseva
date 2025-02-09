@@ -17,6 +17,8 @@ def main():
     print("get the branch name")
     branch_name = run_command('git rev-parse --abbrev-ref HEAD')
     branch_name = branch_name.lstrip()
+    project = branch_name.split('_')[0]
+    version = branch_name.split('_')[1]
 
     print("generate the changelog from git log")
     base_branch = run_command('git merge-base origin/main HEAD')
@@ -30,17 +32,17 @@ def main():
     log_messages = filtered_log_messages
 
     print("write changelog")
-    with open('changelog.md', 'r') as file:
+    with open(f'{project}/changelog.md', 'r') as file:
         existing_contents = file.read()
-    with open('changelog.md', 'w') as file:
-        file.write(f'# {branch_name}\n')
+    with open(f'{project}/changelog.md', 'w') as file:
+        file.write(f'# {version}\n')
         for log_message in log_messages:
             file.write(f'- {log_message}\n')
         file.write('\n')  
         file.write(existing_contents)
 
     print("Undo main patch for testing")
-    main_file = 'lib/main.dart'
+    main_file = f'{project}/lib/main.dart'
     search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);'
     replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);\n'
     with open(main_file, 'r') as file:
@@ -53,7 +55,7 @@ def main():
                 file.write(line)    
                 
     print("Undo main patch2 for testing")
-    main_file = 'lib/main.dart'
+    main_file = f'{project}/lib/main.dart'
     search_string = '      home: test,'
     replacement_string = '      home: home,\n'
     with open(main_file, 'r') as file:

@@ -17,6 +17,8 @@ def main():
     print("get the branch name")
     branch_name = run_command('git rev-parse --abbrev-ref HEAD')
     branch_name = branch_name.lstrip()
+    project = branch_name.split('_')[0]
+    version = branch_name.split('_')[1]
 
     print("generate the changelog from git log")
     base_branch = run_command('git merge-base origin/main HEAD')
@@ -30,17 +32,17 @@ def main():
     log_messages = filtered_log_messages
 
     print("write changelog")
-    with open('changelog.md', 'r') as file:
+    with open(f'{project}/changelog.md', 'r') as file:
         existing_contents = file.read()
-    with open('changelog.md', 'w') as file:
-        file.write(f'# {branch_name}\n')
+    with open(f'{project}/changelog.md', 'w') as file:
+        file.write(f'# {version}\n')
         for log_message in log_messages:
             file.write(f'- {log_message}\n')
         file.write('\n')  
         file.write(existing_contents)
 
     print("Undo main patch for testing")
-    main_file = 'lib/main.dart'
+    main_file = f'{project}/lib/main.dart'
     search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);'
     replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);\n'
     with open(main_file, 'r') as file:
@@ -53,7 +55,7 @@ def main():
                 file.write(line)    
                 
     print("Undo main patch2 for testing")
-    main_file = 'lib/main.dart'
+    main_file = f'{project}/lib/main.dart'
     search_string = '      home: test,'
     replacement_string = '      home: home,\n'
     with open(main_file, 'r') as file:
@@ -131,24 +133,25 @@ def main():
         # run_command("flutter build web")
         # run_command("firebase deploy --only hosting:vkhgaruda")
 
-        print("building for android")
-        run_command("flutter build apk")
-        apk_path = "build/app/outputs/flutter-apk/app-release.apk"
-        new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{branch_name}.apk"
-        if os.path.exists(apk_path):
-            if os.path.exists(new_apk_path):
-                os.remove(new_apk_path)
-            os.rename(apk_path, new_apk_path)
-        else:
-            print("ERROR: APK not found")
+        # print("building for android")
+        # run_command("flutter build apk")
+        # apk_path = "build/app/outputs/flutter-apk/app-release.apk"
+        # new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{branch_name}.apk"
+        # if os.path.exists(apk_path):
+        #     if os.path.exists(new_apk_path):
+        #         os.remove(new_apk_path)
+        #     os.rename(apk_path, new_apk_path)
+        # else:
+        #     print("ERROR: APK not found")
 
-        print("upload apk to my google drive")
-        drive_path = "X:/GoogleDrive/PublicRO/Garuda"
-        if os.path.exists(drive_path):
-            shutil.copy(new_apk_path, drive_path)
-            shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{branch_name}.apk'), os.path.join(drive_path, 'vkhgaruda_latest.apk'))
-        else:
-            print("ERROR: Google Drive not found in your local system")
+        # print("upload apk to my google drive")
+        # drive_path = "X:/GoogleDrive/PublicRO/Garuda"
+        # if os.path.exists(drive_path):
+        #     shutil.copy(new_apk_path, drive_path)
+        #     shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{branch_name}.apk'), os.path.join(drive_path, 'vkhgaruda_latest.apk'))
+        # else:
+        #     print("ERROR: Google Drive not found in your local system")
+
     except Exception as e:
         print("reverting changes")
         run_command(f'git checkout {branch_name}')

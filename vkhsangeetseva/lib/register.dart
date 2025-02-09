@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhsangeetseva/common/const.dart';
 import 'package:vkhsangeetseva/common/fb.dart';
+import 'package:vkhsangeetseva/slot.dart';
 import 'package:vkhsangeetseva/widgets/loading_overlay.dart';
 import 'package:vkhsangeetseva/common/theme.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -60,7 +61,7 @@ class _RegisterState extends State<Register> {
     });
 
     // perform async operations here
-    _fillAvailabilityIndicators();
+    await _fillAvailabilityIndicators();
 
     // refresh all child widgets
 
@@ -72,7 +73,9 @@ class _RegisterState extends State<Register> {
     });
   }
 
-  Widget _createAvlSlotsList(BuildContext context) {}
+  Widget _createAvlSlotsList(BuildContext context) {
+    return Placeholder();
+  }
 
   Widget _createCalendar() {
     DateTime now = DateTime.now();
@@ -164,8 +167,8 @@ class _RegisterState extends State<Register> {
       for (int day = startDay; day < 31; day++) {
         DateTime givenDate =
             DateTime(_selectedDate.year, _selectedDate.month, day + 1);
-        int booked = await _getBookedSlotsCount(date: givenDate);
-        int total = await _getTotalSlotsCount(date: givenDate);
+        int booked = await SlotUtils().getBookedSlotsCount(givenDate);
+        int total = await SlotUtils().getTotalSlotsCount(givenDate);
 
         setState(() {
           _bookedSlotsCnt[day] = booked;
@@ -174,36 +177,14 @@ class _RegisterState extends State<Register> {
       }
     } else {
       // fill for a single day
-      int booked = await _getBookedSlotsCount(date: date);
-      int total = await _getTotalSlotsCount(date: date);
+      int booked = await SlotUtils().getBookedSlotsCount(date);
+      int total = await SlotUtils().getTotalSlotsCount(date);
 
       setState(() {
         _bookedSlotsCnt[date.day - 1] = booked;
         _avlSlotsCnt[date.day - 1] = total - _bookedSlotsCnt[date.day - 1];
       });
     }
-  }
-
-  Future<int> _getTotalSlotsCount({DateTime? date}) async {
-    date ??= _selectedDate;
-
-    // get slots from database
-    String dbDate = DateFormat("yyyy-MM-dd").format(date);
-    List<dynamic> slotList =
-        await FB().getList(dbroot: Const().dbroot, path: "Slots/$dbDate");
-
-    // add slots for weekend
-    bool isWeekend =
-        date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
-
-    return slotList.length + (isWeekend ? 2 : 0);
-  }
-
-  Future<int> _getBookedSlotsCount({DateTime? date}) async {
-    date ??= _selectedDate;
-
-    // TODO: implementation pending
-    return 0;
   }
 
   @override

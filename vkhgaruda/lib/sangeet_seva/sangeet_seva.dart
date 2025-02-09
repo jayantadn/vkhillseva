@@ -7,6 +7,7 @@ import 'package:vkhgaruda/common/const.dart';
 import 'package:vkhgaruda/common/fb.dart';
 import 'package:vkhgaruda/common/toaster.dart';
 import 'package:vkhgaruda/sangeet_seva/profiles.dart';
+import 'package:vkhgaruda/sangeet_seva/slot.dart';
 import 'package:vkhgaruda/widgets/loading_overlay.dart';
 import 'package:vkhgaruda/common/theme.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -81,8 +82,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
       for (int day = startDay; day < 31; day++) {
         DateTime givenDate =
             DateTime(_selectedDate.year, _selectedDate.month, day + 1);
-        int booked = await _getBookedSlotsCount(date: givenDate);
-        int total = await _getTotalSlotsCount(date: givenDate);
+        int booked = await SlotUtils().getBookedSlotsCount(givenDate);
+        int total = await SlotUtils().getTotalSlotsCount(givenDate);
 
         setState(() {
           _bookedSlotsCnt[day] = booked;
@@ -91,36 +92,14 @@ class _SangeetSevaState extends State<SangeetSeva> {
       }
     } else {
       // fill for a single day
-      int booked = await _getBookedSlotsCount(date: date);
-      int total = await _getTotalSlotsCount(date: date);
+      int booked = await SlotUtils().getBookedSlotsCount(date);
+      int total = await SlotUtils().getTotalSlotsCount(date);
 
       setState(() {
         _bookedSlotsCnt[date.day - 1] = booked;
         _avlSlotsCnt[date.day - 1] = total - _bookedSlotsCnt[date.day - 1];
       });
     }
-  }
-
-  Future<int> _getTotalSlotsCount({DateTime? date}) async {
-    date ??= _selectedDate;
-
-    // get slots from database
-    String dbDate = DateFormat("yyyy-MM-dd").format(date);
-    List<dynamic> slotList = await FB()
-        .getList(dbroot: Const().dbrootSangeetSeva, path: "Slots/$dbDate");
-
-    // add slots for weekend
-    bool isWeekend =
-        date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
-
-    return slotList.length + (isWeekend ? 2 : 0);
-  }
-
-  Future<int> _getBookedSlotsCount({DateTime? date}) async {
-    date ??= _selectedDate;
-
-    // TODO: implementation pending
-    return 0;
   }
 
   Widget _createCalendarDay({
@@ -248,7 +227,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     }
 
     // get the total number of slots
-    int totalSlots = await _getTotalSlotsCount();
+    int totalSlots = await SlotUtils().getTotalSlotsCount(_selectedDate);
 
     showDialog(
         context: context,

@@ -176,7 +176,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
         dbroot: Const().dbrootSangeetSeva,
         path: "Slots/$dbDate",
         key: name,
-        value: {"startTime": startTime, "endTime": endTime});
+        value:
+            Slot(name: name, avl: true, from: startTime, to: endTime).toJson());
 
     // refresh the availability indicators
     await _fillAvailabilityIndicators(date: _selectedDate);

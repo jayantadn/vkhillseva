@@ -35,14 +35,14 @@ class SlotUtils {
 class Slot {
   final String name;
   final bool avl;
-  final String startTime;
-  final String endTime;
+  final String from;
+  final String to;
 
   Slot({
     required this.name,
     required this.avl,
-    required this.startTime,
-    required this.endTime,
+    required this.from,
+    required this.to,
   });
 
   // Factory constructor to create a Slot from JSON
@@ -50,8 +50,8 @@ class Slot {
     return Slot(
       name: json['name'] as String,
       avl: json['avl'] as bool,
-      startTime: json['startTime'] as String,
-      endTime: json['endTime'] as String,
+      from: json['from'] as String,
+      to: json['to'] as String,
     );
   }
 
@@ -60,8 +60,8 @@ class Slot {
     return {
       'name': name,
       'avl': avl,
-      'startTime': startTime,
-      'endTime': endTime,
+      'from': from,
+      'to': to,
     };
   }
 }

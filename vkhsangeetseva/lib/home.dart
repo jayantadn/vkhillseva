@@ -142,7 +142,7 @@ class _MyHomePageState extends State<HomePage> {
                                     path: "Users/${basics.mobile}",
                                     silent: true);
 
-                            if (userdetailsMap.isEmpty) {
+                            if (userdetailsMap['name'].isEmpty) {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -152,6 +152,8 @@ class _MyHomePageState extends State<HomePage> {
                                   ),
                                 ),
                               );
+                            } else {
+                              await refresh();
                             }
                           }
 

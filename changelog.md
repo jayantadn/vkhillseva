@@ -1,3 +1,6 @@
+# vkhgaruda_3.2.0
+- feature: slot has a start and end time
+
 # "3.1.0
 
 # "3.1.0

@@ -32,6 +32,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
   // lists
   List<int> _bookedSlotsCnt = [];
   List<int> _avlSlotsCnt = [];
+  final List<Slot> _bookedSlots = [];
+  final List<Slot> _avlSlots = [];
 
   // controllers, listeners and focus nodes
 
@@ -51,6 +53,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
     // clear all lists
     _bookedSlotsCnt.clear();
     _avlSlotsCnt.clear();
+    _bookedSlots.clear();
+    _avlSlots.clear();
 
     // clear all controllers and focus nodes
 
@@ -64,6 +68,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
     // perform async operations here
     await _fillAvailabilityIndicators();
+    await _fillBookingLists(_selectedDate);
 
     // refresh all child widgets
 
@@ -99,6 +104,32 @@ class _SangeetSevaState extends State<SangeetSeva> {
         _bookedSlotsCnt[date.day - 1] = booked;
         _avlSlotsCnt[date.day - 1] = total - _bookedSlotsCnt[date.day - 1];
       });
+    }
+  }
+
+  Future<void> _fillBookingLists(DateTime date) async {
+    _bookedSlots.clear();
+    _avlSlots.clear();
+    String dbDate = DateFormat("yyyy-MM-dd").format(date);
+    List<dynamic> slotsRaw = await FB().getList(path: "Slots/$dbDate");
+
+    // add the slots from database
+    for (var slotRaw in slotsRaw) {
+      Map<String, dynamic> slotMap = Map<String, dynamic>.from(slotRaw);
+      Slot slot = Slot.fromJson(slotMap);
+
+      if (slot.avl) {
+        _avlSlots.add(slot);
+      } else {
+        _bookedSlots.add(slot);
+      }
+    }
+    slotsRaw.clear();
+
+    // add the weekend fixed slots
+    int totalSlots = _avlSlots.length + _bookedSlots.length;
+    for (int i = 2; i > totalSlots; i--) {
+      // _avlSlots.add(Slot(name: "Slot$i", avl: true, from: ""))
     }
   }
 
@@ -148,6 +179,36 @@ class _SangeetSevaState extends State<SangeetSeva> {
     );
   }
 
+  Widget _createSlotDetails(BuildContext context) {
+    return Column(
+      children: [
+        // booked slots
+        ...List.generate(_bookedSlots.length, (index) {
+          Slot slot = _bookedSlots[index];
+          return Card(
+            color: Colors.red[50],
+            child: ListTile(
+              title: Text(slot.name),
+              subtitle: Text('${slot.from} - ${slot.to}'),
+            ),
+          );
+        }),
+
+        // available slots
+        ...List.generate(_avlSlots.length, (index) {
+          Slot slot = _avlSlots[index];
+          return Card(
+            color: Colors.green[50],
+            child: ListTile(
+              title: Text(slot.name),
+              subtitle: Text('${slot.from} - ${slot.to}'),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
   Future<void> _addFreeSlot(
       String name, String startTime, String endTime) async {
     // validations
@@ -183,7 +244,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     await _fillAvailabilityIndicators(date: _selectedDate);
   }
 
-  Widget _createCalendar() {
+  Widget _createCalendar(BuildContext context) {
     DateTime now = DateTime.now();
 
     return TableCalendar(
@@ -372,7 +433,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
                           SizedBox(height: 10),
 
                           // your widgets here
-                          _createCalendar(),
+                          _createCalendar(context),
+                          _createSlotDetails(context),
 
                           // leave some space at bottom
                           SizedBox(height: 100),

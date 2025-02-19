@@ -69,6 +69,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     // perform async operations here
     await _fillAvailabilityIndicators();
     await _fillBookingLists(_selectedDate);
+    await _addWeekendFreeSlots(_selectedDate);
 
     // refresh all child widgets
 
@@ -78,6 +79,27 @@ class _SangeetSevaState extends State<SangeetSeva> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _addWeekendFreeSlots(DateTime date) async {
+    if (date.weekday == 6 || date.weekday == 7) {
+      // fetch the slots for the date
+      String dbDate = DateFormat("yyyy-MM-dd").format(date);
+      List slotsRaw = await FB().getList(path: "Slots/$dbDate");
+      List<Slot> bookedSlots = [];
+      for (var slotRaw in slotsRaw) {
+        Map<String, dynamic> slotMap = Map<String, dynamic>.from(slotRaw);
+        Slot slot = Slot.fromJson(slotMap);
+        bookedSlots.add(slot);
+      }
+
+      // add the weekend slots if not present
+      for (Slot slot in Const().weekendSangeetSevaSlots) {
+        if (!bookedSlots.contains(slot) && !_avlSlots.contains(slot)) {
+          _avlSlots.add(slot);
+        }
+      }
+    }
   }
 
   Future<void> _fillAvailabilityIndicators({DateTime? date}) async {
@@ -209,7 +231,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     );
   }
 
-  Future<void> _addFreeSlot(
+  Future<bool> _addFreeSlot(
       String name, String startTime, String endTime) async {
     // validations
     if (startTime == "__:__" || endTime == "__:__") {
@@ -272,7 +294,10 @@ class _SangeetSevaState extends State<SangeetSeva> {
               fill: true);
         },
       ),
-      onDaySelected: (selectedDay, focusedDay) {
+      onDaySelected: (selectedDay, focusedDay) async {
+        _avlSlots.clear();
+        await _addWeekendFreeSlots(selectedDay);
+
         setState(() {
           _selectedDate = selectedDay;
         });

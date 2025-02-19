@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vkhgaruda/sangeet_seva/slot.dart';
 
 class Const {
   static final Const _instance = Const._internal();
@@ -18,6 +19,21 @@ class Const {
   final int fbListenerDelay = 2; // seconds
   final double toolbarIconSize = 32;
   final int morningCutoff = 14;
+
+  final List<Slot> weekendSangeetSevaSlots = [
+    Slot(
+      name: "MorningSlot",
+      avl: true,
+      from: "10:00 AM",
+      to: "01:00 PM",
+    ),
+    Slot(
+      name: "EveningSlot",
+      avl: true,
+      from: "05:00 PM",
+      to: "08:00 PM",
+    ),
+  ];
 
   final nityaSeva = {
     'amounts': [

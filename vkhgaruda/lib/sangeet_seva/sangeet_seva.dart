@@ -169,12 +169,12 @@ class _SangeetSevaState extends State<SangeetSeva> {
     );
   }
 
-  Future<void> _addFreeSlot(
+  Future<bool> _addFreeSlot(
       String name, String startTime, String endTime) async {
     // validations
     if (startTime == "__:__" || endTime == "__:__") {
       Toaster().error("Please enter both start and end time");
-      return;
+      return false;
     }
 
     // check if end time is greater than start time
@@ -184,7 +184,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
       final DateTime endDateTime = timeFormat.parse(endTime);
       if (endDateTime.isBefore(startDateTime)) {
         Toaster().error("End time should be greater than start time");
-        return;
+        return false;
       }
     } catch (e) {
       // Handle parsing errors
@@ -201,6 +201,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
     // refresh the availability indicators
     await _fillAvailabilityIndicators(date: _selectedDate);
+
+    return true;
   }
 
   Widget _createCalendar() {
@@ -340,15 +342,15 @@ class _SangeetSevaState extends State<SangeetSeva> {
                   TextButton(
                     child: Text('Add'),
                     onPressed: () async {
-                      Navigator.of(context).pop();
-
-                      await _addFreeSlot(nameController.text,
+                      bool success = await _addFreeSlot(nameController.text,
                           startTimeController.text, endTimeController.text);
 
-                      // clean up
-                      nameController.dispose();
-                      startTimeController.dispose();
-                      endTimeController.dispose();
+                      if (success) {
+                        Navigator.of(context).pop();
+                        nameController.dispose();
+                        startTimeController.dispose();
+                        endTimeController.dispose();
+                      }
                     },
                   ),
                 ],

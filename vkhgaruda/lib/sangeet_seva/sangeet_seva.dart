@@ -69,7 +69,6 @@ class _SangeetSevaState extends State<SangeetSeva> {
     // perform async operations here
     await _fillAvailabilityIndicators();
     await _fillBookingLists(_selectedDate);
-    await _addWeekendFreeSlots(_selectedDate);
 
     // refresh all child widgets
 
@@ -133,7 +132,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
     _bookedSlots.clear();
     _avlSlots.clear();
     String dbDate = DateFormat("yyyy-MM-dd").format(date);
-    List<dynamic> slotsRaw = await FB().getList(path: "Slots/$dbDate");
+    List<dynamic> slotsRaw = await FB()
+        .getList(dbroot: Const().dbrootSangeetSeva, path: "Slots/$dbDate");
 
     // add the slots from database
     for (var slotRaw in slotsRaw) {
@@ -149,10 +149,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     slotsRaw.clear();
 
     // add the weekend fixed slots
-    int totalSlots = _avlSlots.length + _bookedSlots.length;
-    for (int i = 2; i > totalSlots; i--) {
-      // _avlSlots.add(Slot(name: "Slot$i", avl: true, from: ""))
-    }
+    await _addWeekendFreeSlots(date);
   }
 
   Widget _createCalendarDay({
@@ -295,8 +292,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
         },
       ),
       onDaySelected: (selectedDay, focusedDay) async {
-        _avlSlots.clear();
-        await _addWeekendFreeSlots(selectedDay);
+        await _fillBookingLists(selectedDay);
 
         setState(() {
           _selectedDate = selectedDay;

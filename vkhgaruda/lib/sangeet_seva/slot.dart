@@ -16,8 +16,8 @@ class SlotUtils {
   Future<int> getTotalSlotsCount(DateTime date) async {
     // get slots from database
     String dbDate = DateFormat("yyyy-MM-dd").format(date);
-    List<dynamic> slotList =
-        await FB().getList(dbroot: Const().dbroot, path: "Slots/$dbDate");
+    List<dynamic> slotList = await FB()
+        .getList(dbroot: Const().dbrootSangeetSeva, path: "Slots/$dbDate");
 
     // add slots for weekend
     bool isWeekend =

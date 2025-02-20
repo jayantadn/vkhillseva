@@ -186,8 +186,10 @@ class _SangeetSevaState extends State<SangeetSeva> {
             Slot(name: name, avl: true, from: startTime, to: endTime).toJson());
 
     // refresh the availability indicators
-    //TODO: await _fillAvailabilityIndicators(date: _selectedDate);
     calendarKey.currentState?.fillAvailabilityIndicators(date: _selectedDate);
+    await _fillBookingLists(_selectedDate);
+
+    setState(() {});
 
     return true;
   }

@@ -19,7 +19,6 @@ def run_command(command):
     return result.stdout.strip()
 
 def main():
-    print("go to rootdir")
     rootdir = run_command('git rev-parse --show-toplevel')
     os.chdir(rootdir)
 

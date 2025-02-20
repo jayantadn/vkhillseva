@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hare Krishna',
       theme: themeDefault,
-      home: test,
+      home: home,
     );
   }
 }

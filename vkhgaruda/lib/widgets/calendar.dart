@@ -6,7 +6,9 @@ import 'package:vkhgaruda/common/const.dart';
 import 'package:vkhgaruda/common/fb.dart';
 
 class Calendar extends StatefulWidget {
-  const Calendar({super.key});
+  final void Function(DateTime) onDaySelected;
+
+  const Calendar({super.key, required this.onDaySelected});
 
   @override
   State<Calendar> createState() => _CalendarState();
@@ -47,7 +49,7 @@ class _CalendarState extends State<Calendar> {
 
   void refresh() async {
     // perform async work here
-    await _fillAvailabilityIndicators();
+    await fillAvailabilityIndicators();
 
     // perform sync work here
     await _lock.synchronized(() async {
@@ -101,13 +103,13 @@ class _CalendarState extends State<Calendar> {
     );
   }
 
-  Future<void> _fillAvailabilityIndicators({DateTime? date}) async {
+  Future<void> fillAvailabilityIndicators({DateTime? date}) async {
     if (date == null) {
       // generate for whole month
       int startDay = DateTime.now().day - 1;
       for (int day = startDay; day < 31; day++) {
         DateTime givenDate =
-            DateTime(_selectedDate.year, _selectedDate.month, day + 1);
+            DateTime(DateTime.now().year, DateTime.now().month, day + 1);
         int booked = await SlotUtils().getBookedSlotsCount(givenDate);
         int total = await SlotUtils().getTotalSlotsCount(givenDate);
 
@@ -156,7 +158,7 @@ class _CalendarState extends State<Calendar> {
         },
       ),
       onDaySelected: (selectedDay, focusedDay) async {
-        // TODO: await _fillBookingLists(selectedDay);
+        widget.onDaySelected(selectedDay);
 
         setState(() {
           _selectedDate = selectedDay;

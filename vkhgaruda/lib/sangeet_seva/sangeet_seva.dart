@@ -187,6 +187,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
     // refresh the availability indicators
     //TODO: await _fillAvailabilityIndicators(date: _selectedDate);
+    calendarKey.currentState?.fillAvailabilityIndicators(date: _selectedDate);
 
     return true;
   }
@@ -342,8 +343,18 @@ class _SangeetSevaState extends State<SangeetSeva> {
                           // leave some space at top
                           SizedBox(height: 10),
 
-                          // your widgets here
-                          Calendar(),
+                          // calendar
+                          Calendar(
+                            key: calendarKey,
+                            onDaySelected: (DateTime date) async {
+                              await _fillBookingLists(date);
+
+                              setState(() {
+                                _selectedDate = date;
+                              });
+                            },
+                          ),
+
                           _createSlotDetails(context),
 
                           // leave some space at bottom

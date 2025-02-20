@@ -101,11 +101,14 @@ class _SangeetSevaState extends State<SangeetSeva> {
   }
 
   Future<void> _fillBookingLists(DateTime date) async {
+    // retrieve slots from db
     _bookedSlots.clear();
     _avlSlots.clear();
     String dbDate = DateFormat("yyyy-MM-dd").format(date);
-    List<dynamic> slotsRaw = await FB()
-        .getList(dbroot: Const().dbrootSangeetSeva, path: "Slots/$dbDate");
+    List<dynamic> slotsRaw = await FB().getList(
+      dbroot: Const().dbrootSangeetSeva,
+      path: "Slots/$dbDate",
+    );
 
     // add the slots from database
     for (var slotRaw in slotsRaw) {
@@ -155,7 +158,10 @@ class _SangeetSevaState extends State<SangeetSeva> {
   }
 
   Future<bool> _addFreeSlot(
-      String name, String startTime, String endTime) async {
+    String name,
+    String startTime,
+    String endTime,
+  ) async {
     // validations
     if (startTime == "__:__" || endTime == "__:__") {
       Toaster().error("Please enter both start and end time");
@@ -179,11 +185,11 @@ class _SangeetSevaState extends State<SangeetSeva> {
     // add to database
     String dbDate = DateFormat("yyyy-MM-dd").format(_selectedDate);
     await FB().addKVToList(
-        dbroot: Const().dbrootSangeetSeva,
-        path: "Slots/$dbDate",
-        key: name,
-        value:
-            Slot(name: name, avl: true, from: startTime, to: endTime).toJson());
+      dbroot: Const().dbrootSangeetSeva,
+      path: "Slots/$dbDate",
+      key: name,
+      value: Slot(name: name, avl: true, from: startTime, to: endTime).toJson(),
+    );
 
     // refresh the availability indicators
     calendarKey.currentState?.fillAvailabilityIndicators(date: _selectedDate);
@@ -205,111 +211,115 @@ class _SangeetSevaState extends State<SangeetSeva> {
     int totalSlots = await SlotUtils().getTotalSlotsCount(_selectedDate);
 
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          TextEditingController nameController =
-              TextEditingController(text: "Slot${totalSlots + 1}");
-          TextEditingController startTimeController =
-              TextEditingController(text: "__:__");
-          TextEditingController endTimeController =
-              TextEditingController(text: "__:__");
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController nameController = TextEditingController(
+          text: "Slot${totalSlots + 1}",
+        );
+        TextEditingController startTimeController = TextEditingController(
+          text: "__:__",
+        );
+        TextEditingController endTimeController = TextEditingController(
+          text: "__:__",
+        );
 
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return AlertDialog(
-                title: Text('Add a free slot'),
-                content: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // slot name
-                      TextField(
-                        controller: nameController,
-                        decoration: InputDecoration(hintText: "Slot name"),
-                      ),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Add a free slot'),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // slot name
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(hintText: "Slot name"),
+                    ),
 
-                      // start time
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(width: 50, child: Text("From:")),
-                          Text(startTimeController.text),
-                          IconButton(
-                            onPressed: () async {
-                              TimeOfDay? picked = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              );
-                              if (picked != null) {
-                                setState(() {
-                                  startTimeController.text =
-                                      picked.format(context);
-                                });
-                              }
-                            },
-                            icon: Icon(Icons.access_time),
-                          ),
-                        ],
-                      ),
+                    // start time
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(width: 50, child: Text("From:")),
+                        Text(startTimeController.text),
+                        IconButton(
+                          onPressed: () async {
+                            TimeOfDay? picked = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (picked != null) {
+                              setState(() {
+                                startTimeController.text = picked.format(
+                                  context,
+                                );
+                              });
+                            }
+                          },
+                          icon: Icon(Icons.access_time),
+                        ),
+                      ],
+                    ),
 
-                      // end time
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: 50,
-                            child: Text("To:"),
-                          ),
-                          Text(endTimeController.text),
-                          IconButton(
-                            onPressed: () async {
-                              TimeOfDay? picked = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              );
-                              if (picked != null) {
-                                setState(() {
-                                  endTimeController.text =
-                                      picked.format(context);
-                                });
-                              }
-                            },
-                            icon: Icon(Icons.access_time),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    // end time
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(width: 50, child: Text("To:")),
+                        Text(endTimeController.text),
+                        IconButton(
+                          onPressed: () async {
+                            TimeOfDay? picked = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (picked != null) {
+                              setState(() {
+                                endTimeController.text = picked.format(context);
+                              });
+                            }
+                          },
+                          icon: Icon(Icons.access_time),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
+              ),
 
-                // buttons
-                actions: <Widget>[
-                  TextButton(
-                    child: Text('Cancel'),
-                    onPressed: () {
+              // buttons
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('Add'),
+                  onPressed: () async {
+                    bool success = await _addFreeSlot(
+                      nameController.text,
+                      startTimeController.text,
+                      endTimeController.text,
+                    );
+
+                    if (success) {
                       Navigator.of(context).pop();
-                    },
-                  ),
-                  TextButton(
-                    child: Text('Add'),
-                    onPressed: () async {
-                      bool success = await _addFreeSlot(nameController.text,
-                          startTimeController.text, endTimeController.text);
-
-                      if (success) {
-                        Navigator.of(context).pop();
-                        nameController.dispose();
-                        startTimeController.dispose();
-                        endTimeController.dispose();
-                      }
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        });
+                      nameController.dispose();
+                      startTimeController.dispose();
+                      endTimeController.dispose();
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -328,40 +338,49 @@ class _SangeetSevaState extends State<SangeetSeva> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => Profiles(
-                              title: 'Performer Profiles', icon: widget.icon)),
+                        builder:
+                            (context) => Profiles(
+                              title: 'Performer Profiles',
+                              icon: widget.icon,
+                            ),
+                      ),
                     );
                   },
-                )
+                ),
               ],
             ),
             body: RefreshIndicator(
-                onRefresh: refresh,
-                child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(children: [
-                          // leave some space at top
-                          SizedBox(height: 10),
+              onRefresh: refresh,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      // leave some space at top
+                      SizedBox(height: 10),
 
-                          // calendar
-                          Calendar(
-                            key: calendarKey,
-                            onDaySelected: (DateTime date) async {
-                              await _fillBookingLists(date);
+                      // calendar
+                      Calendar(
+                        key: calendarKey,
+                        onDaySelected: (DateTime date) async {
+                          await _fillBookingLists(date);
 
-                              setState(() {
-                                _selectedDate = date;
-                              });
-                            },
-                          ),
+                          setState(() {
+                            _selectedDate = date;
+                          });
+                        },
+                      ),
 
-                          _createSlotDetails(context),
+                      _createSlotDetails(context),
 
-                          // leave some space at bottom
-                          SizedBox(height: 100),
-                        ])))),
+                      // leave some space at bottom
+                      SizedBox(height: 100),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             floatingActionButton: FloatingActionButton(
               onPressed: () async {
                 _showFreeSlotDialog(context);
@@ -372,7 +391,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
           ),
 
           // circular progress indicator
-          if (_isLoading) LoadingOverlay(image: widget.icon)
+          if (_isLoading) LoadingOverlay(image: widget.icon),
         ],
       ),
     );

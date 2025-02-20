@@ -4,7 +4,7 @@ import 'package:vkhsangeetseva/common/fb.dart';
 import 'package:vkhsangeetseva/common/local_storage.dart';
 import 'package:vkhsangeetseva/events.dart';
 import 'package:vkhsangeetseva/profile.dart';
-import 'package:vkhsangeetseva/register.dart';
+import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/widgets/auth.dart';
 import 'package:vkhsangeetseva/common/utils.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
@@ -171,7 +171,7 @@ class _MyHomePageState extends State<HomePage> {
                           // ignore: use_build_context_synchronously
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Register(
+                            builder: (context) => Registration(
                               title: "Event Registration",
                             ),
                           ),

@@ -4,24 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhsangeetseva/common/const.dart';
+import 'package:vkhsangeetseva/common/datatypes.dart';
 import 'package:vkhsangeetseva/common/fb.dart';
-import 'package:vkhsangeetseva/slot.dart';
+import 'package:vkhsangeetseva/widgets/calendar.dart';
 import 'package:vkhsangeetseva/widgets/loading_overlay.dart';
 import 'package:vkhsangeetseva/common/theme.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class Register extends StatefulWidget {
+class Registration extends StatefulWidget {
   final String title;
   final String? icon;
 
-  const Register({super.key, required this.title, this.icon});
+  const Registration({super.key, required this.title, this.icon});
 
   @override
   // ignore: library_private_types_in_public_api
-  _RegisterState createState() => _RegisterState();
+  _RegistrationState createState() => _RegistrationState();
 }
 
-class _RegisterState extends State<Register> {
+class _RegistrationState extends State<Registration> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
@@ -30,6 +31,7 @@ class _RegisterState extends State<Register> {
   // lists
   List<int> _bookedSlotsCnt = [];
   List<int> _avlSlotsCnt = [];
+  final List<Slot> _avlSlots = [];
 
   // controllers, listeners and focus nodes
 
@@ -49,6 +51,7 @@ class _RegisterState extends State<Register> {
     // clear all lists
     _bookedSlotsCnt.clear();
     _avlSlotsCnt.clear();
+    _avlSlots.clear();
 
     // clear all controllers and focus nodes
 
@@ -61,7 +64,7 @@ class _RegisterState extends State<Register> {
     });
 
     // perform async operations here
-    await _fillAvailabilityIndicators();
+    await _fillBookingLists(_selectedDate);
 
     // refresh all child widgets
 
@@ -73,8 +76,25 @@ class _RegisterState extends State<Register> {
     });
   }
 
-  Widget _createAvlSlotsList(BuildContext context) {
-    return Placeholder();
+  Future<void> _addWeekendFreeSlots(DateTime date) async {
+    if (date.weekday == 6 || date.weekday == 7) {
+      // fetch the slots for the date
+      String dbDate = DateFormat("yyyy-MM-dd").format(date);
+      List slotsRaw = await FB().getList(path: "Slots/$dbDate");
+      List<Slot> bookedSlots = [];
+      for (var slotRaw in slotsRaw) {
+        Map<String, dynamic> slotMap = Map<String, dynamic>.from(slotRaw);
+        Slot slot = Slot.fromJson(slotMap);
+        bookedSlots.add(slot);
+      }
+
+      // add the weekend slots if not present
+      for (Slot slot in Const().weekendSangeetSevaSlots) {
+        if (!bookedSlots.contains(slot) && !_avlSlots.contains(slot)) {
+          _avlSlots.add(slot);
+        }
+      }
+    }
   }
 
   Widget _createCalendar() {
@@ -160,6 +180,24 @@ class _RegisterState extends State<Register> {
     );
   }
 
+  Widget _createSlotDetails(BuildContext context) {
+    return Column(
+      children: [
+        // available slots
+        ...List.generate(_avlSlots.length, (index) {
+          Slot slot = _avlSlots[index];
+          return Card(
+            color: Colors.green[50],
+            child: ListTile(
+              title: Text(slot.name),
+              subtitle: Text('${slot.from} - ${slot.to}'),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
   Future<void> _fillAvailabilityIndicators({DateTime? date}) async {
     if (date == null) {
       // generate for whole month
@@ -187,6 +225,28 @@ class _RegisterState extends State<Register> {
     }
   }
 
+  Future<void> _fillBookingLists(DateTime date) async {
+    // retrieve slots from db
+    _avlSlots.clear();
+    String dbDate = DateFormat("yyyy-MM-dd").format(date);
+    List<dynamic> slotsRaw =
+        await FB().getList(dbroot: Const().dbroot, path: "Slots/$dbDate");
+
+    // add the slots from database
+    for (var slotRaw in slotsRaw) {
+      Map<String, dynamic> slotMap = Map<String, dynamic>.from(slotRaw);
+      Slot slot = Slot.fromJson(slotMap);
+
+      if (slot.avl) {
+        _avlSlots.add(slot);
+      }
+    }
+    slotsRaw.clear();
+
+    // add the weekend fixed slots
+    await _addWeekendFreeSlots(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -209,8 +269,16 @@ class _RegisterState extends State<Register> {
                               // leave some space at top
                               SizedBox(height: 10),
 
-                              _createCalendar(),
-                              _createAvlSlotsList(context),
+                              Calendar(
+                                  key: calendarKey,
+                                  onDaySelected: (date) async {
+                                    await _fillBookingLists(date);
+
+                                    setState(() {
+                                      _selectedDate = date;
+                                    });
+                                  }),
+                              _createSlotDetails(context),
 
                               // leave some space at bottom
                               SizedBox(height: 100),

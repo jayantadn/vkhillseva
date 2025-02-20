@@ -1,3 +1,4 @@
+import os
 import sys
 import subprocess
 import sys
@@ -18,6 +19,10 @@ def run_command(command):
     return result.stdout.strip()
 
 def main():
+    print("go to rootdir")
+    rootdir = run_command('git rev-parse --show-toplevel')
+    os.chdir(rootdir)
+
     # choose the project
     projectid = input("Enter project (1. Garuda, 2. SangeetSeva): ")
     if projectid == "1":

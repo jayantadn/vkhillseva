@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vkhgaruda/sangeet_seva/slot.dart';
+import 'package:vkhgaruda/common/datatypes.dart';
 
 class Const {
   static final Const _instance = Const._internal();

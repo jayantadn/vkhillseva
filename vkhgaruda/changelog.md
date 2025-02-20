@@ -1,3 +1,6 @@
+# 3.3.0
+- feature: available slots
+
 # "3.1.0
 
 # "3.1.0

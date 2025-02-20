@@ -14,6 +14,11 @@ def run_command(command):
 
 
 def main():
+    print("find rootdir")
+    rootdir = run_command('git rev-parse --show-toplevel')
+    os.chdir(rootdir)
+    
+
     print("get the branch name")
     branch_name = run_command('git rev-parse --abbrev-ref HEAD')
     branch_name = branch_name.lstrip()

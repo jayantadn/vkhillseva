@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vkhgaruda/common/datatypes.dart';
 
 class Const {
   static final Const _instance = Const._internal();
@@ -13,11 +14,26 @@ class Const {
 
   final String dbroot = "VKHILLSEVA_01";
   final String dbrootSangeetSeva = "SANGEETSEVA_01";
-  final String version = "3.2.0";
+  final String version = "3.3.0";
 
   final int fbListenerDelay = 2; // seconds
   final double toolbarIconSize = 32;
   final int morningCutoff = 14;
+
+  final List<Slot> weekendSangeetSevaSlots = [
+    Slot(
+      name: "MorningSlot",
+      avl: true,
+      from: "10:00 AM",
+      to: "01:00 PM",
+    ),
+    Slot(
+      name: "EveningSlot",
+      avl: true,
+      from: "05:00 PM",
+      to: "08:00 PM",
+    ),
+  ];
 
   final nityaSeva = {
     'amounts': [

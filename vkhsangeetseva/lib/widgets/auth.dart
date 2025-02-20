@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vkhsangeetseva/common/local_storage.dart';
-import 'package:vkhsangeetseva/common/toaster.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:synchronized/synchronized.dart';

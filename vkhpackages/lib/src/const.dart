@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vkhsangeetseva/common/datatypes.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class Const {
   static final Const _instance = Const._internal();

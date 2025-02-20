@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhsangeetseva/common/fb.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/common/local_storage.dart';
 import 'package:vkhsangeetseva/widgets/auth.dart';
 

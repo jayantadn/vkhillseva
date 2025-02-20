@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:vkhsangeetseva/common/const.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'dart:io';
 
@@ -17,8 +16,10 @@ class FS {
   }
 
   // returns url
-  Future<String> uploadFile(
-      {required String dstPath, required String srcPath}) async {
+  Future<String> uploadFile({
+    required String dstPath,
+    required String srcPath,
+  }) async {
     String downloadUrl = '';
 
     final storageRef = FirebaseStorage.instance.ref();
@@ -35,8 +36,10 @@ class FS {
   }
 
   // upload bytestream
-  Future<String> uploadBytes(
-      {required String dstPath, required Uint8List bytes}) async {
+  Future<String> uploadBytes({
+    required String dstPath,
+    required Uint8List bytes,
+  }) async {
     String downloadUrl = '';
 
     final storageRef = FirebaseStorage.instance.ref();

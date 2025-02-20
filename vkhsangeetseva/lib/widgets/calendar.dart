@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:vkhsangeetseva/common/const.dart';
-import 'package:vkhsangeetseva/common/fb.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class Calendar extends StatefulWidget {
   final void Function(DateTime) onDaySelected;

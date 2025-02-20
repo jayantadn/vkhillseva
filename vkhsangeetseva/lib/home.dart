@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vkhsangeetseva/common/const.dart';
-import 'package:vkhsangeetseva/common/fb.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/common/local_storage.dart';
 import 'package:vkhsangeetseva/events.dart';
 import 'package:vkhsangeetseva/profile.dart';

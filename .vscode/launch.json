@@ -5,18 +5,41 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "vkhgaruda",
+      "program": "vkhgaruda/lib/main.dart",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "vkhgaruda (profile mode)",
+      "program": "vkhgaruda/lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "vkhgaruda (release mode)",
+      "program": "vkhgaruda/lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    },
+    {
       "name": "vkhsangeetseva",
+      "program": "vkhsangeetseva/lib/main.dart",
       "request": "launch",
       "type": "dart"
     },
     {
       "name": "vkhsangeetseva (profile mode)",
+      "program": "vkhsangeetseva/lib/main.dart",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
       "name": "vkhsangeetseva (release mode)",
+      "program": "vkhsangeetseva/lib/main.dart",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"

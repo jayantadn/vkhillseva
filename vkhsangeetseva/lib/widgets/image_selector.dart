@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhsangeetseva/common/const.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 // ignore: must_be_immutable
 class ImageSelector extends StatefulWidget {

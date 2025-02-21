@@ -4,7 +4,6 @@ import 'package:vkhsangeetseva/events.dart';
 import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
-import 'package:vkhsangeetseva/widgets/loading_overlay.dart';
 import 'package:vkhsangeetseva/widgets/welcome.dart';
 
 class HomePage extends StatefulWidget {

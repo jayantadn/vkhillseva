@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
-import 'package:vkhsangeetseva/widgets/loading_overlay.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:vkhsangeetseva/registration_page2.dart';
 
 class Registration extends StatefulWidget {
   final String title;
@@ -187,6 +187,18 @@ class _RegistrationState extends State<Registration> {
             child: ListTile(
               title: Text(slot.name),
               subtitle: Text('${slot.from} - ${slot.to}'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RegistrationPage2(
+                      title: widget.title,
+                      selectedDate: _selectedDate,
+                      slot: slot,
+                    ),
+                  ),
+                );
+              },
             ),
           );
         }),

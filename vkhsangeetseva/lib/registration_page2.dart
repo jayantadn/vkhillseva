@@ -4,18 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
-class NityaSeva extends StatefulWidget {
+class RegistrationPage2 extends StatefulWidget {
   final String title;
   final String? icon;
+  final DateTime selectedDate;
+  final Slot slot;
 
-  const NityaSeva({super.key, required this.title, this.icon});
+  const RegistrationPage2(
+      {super.key,
+      required this.title,
+      this.icon,
+      required this.selectedDate,
+      required this.slot});
 
   @override
   // ignore: library_private_types_in_public_api
-  _NityaSevaState createState() => _NityaSevaState();
+  _RegistrationPage2State createState() => _RegistrationPage2State();
 }
 
-class _NityaSevaState extends State<NityaSeva> {
+class _RegistrationPage2State extends State<RegistrationPage2> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;

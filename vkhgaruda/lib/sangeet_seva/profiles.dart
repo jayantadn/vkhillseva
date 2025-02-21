@@ -138,7 +138,7 @@ class _ProfilesState extends State<Profiles> {
                                   ),
                                   trailing: Icon(
                                       userdetails.fieldOfExpertise == "Vocalist"
-                                          ? Icons.mic
+                                          ? Icons.record_voice_over
                                           : Icons.music_note),
                                   onTap: () {
                                     Navigator.push(

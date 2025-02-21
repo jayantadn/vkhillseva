@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:vkhsangeetseva/user.dart';
 
 class RegistrationPage2 extends StatefulWidget {
   final String title;
@@ -26,6 +28,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  UserDetails? _mainPerformer;
 
   // lists
 
@@ -54,6 +57,17 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     // perform async operations here
 
+    // fetch form values
+    await Utils().fetchUserBasics();
+    String mobile = Utils().getUserBasics()!.mobile;
+    bool userExists = await FB().pathExists("Users/$mobile");
+    Map<String, dynamic> userdetailsJson = {};
+    if (userExists) {
+      userdetailsJson = await FB().getJson(path: "Users/$mobile");
+    } else {
+      Toaster().error("User not found");
+    }
+
     // refresh all child widgets
 
     // perform sync operations here
@@ -61,6 +75,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     setState(() {
       _isLoading = false;
+
+      if (userdetailsJson.isNotEmpty) {
+        _mainPerformer = UserDetails.fromJson(userdetailsJson);
+      }
     });
   }
 
@@ -79,11 +97,51 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // leave some space at top
                       SizedBox(height: 10),
 
                       // your widgets here
+                      Center(
+                        child: Column(children: [
+                          // date
+                          Text(
+                              DateFormat("EEE, dd MMM, yyyy")
+                                  .format(widget.selectedDate),
+                              style: themeDefault.textTheme.headlineLarge),
+
+                          // slot
+                          Text("${widget.slot.from} - ${widget.slot.to}",
+                              style: themeDefault.textTheme.headlineMedium),
+
+                          // main performer
+                          if (_mainPerformer != null)
+                            Card(
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      _mainPerformer!.profilePicUrl),
+                                ),
+                                title: Text(
+                                    "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        "${_mainPerformer!.credentials}, ${_mainPerformer!.experience} yrs exp"),
+                                    Text(_mainPerformer!.skills.join(', ')),
+                                  ],
+                                ),
+                                trailing: Icon(
+                                    _mainPerformer!.fieldOfExpertise ==
+                                            "Vocalist"
+                                        ? Icons.record_voice_over
+                                        : Icons.music_note),
+                              ),
+                            )
+                        ]),
+                      ),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

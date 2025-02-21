@@ -4,8 +4,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
-import 'package:vkhsangeetseva/common/local_storage.dart';
-import 'package:vkhsangeetseva/widgets/auth.dart';
 
 class Utils {
   static final Utils _instance = Utils._internal();
@@ -19,10 +17,14 @@ class Utils {
   }
 
   String formatIndianCurrency(int amount) {
-    final formatter =
-        NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
-    final number =
-        int.parse(amount.toString().replaceAll(RegExp(r'[^\d]'), ''));
+    final formatter = NumberFormat.currency(
+      locale: 'en_IN',
+      symbol: '₹',
+      decimalDigits: 0,
+    );
+    final number = int.parse(
+      amount.toString().replaceAll(RegExp(r'[^\d]'), ''),
+    );
     return formatter.format(number);
   }
 
@@ -74,10 +76,7 @@ class Utils {
       List sevaListRaw = await FB().getList(path: "Settings/NityaSevaList");
       for (var sevaRaw in sevaListRaw) {
         Map<String, dynamic> sevaMap = Map<String, dynamic>.from(sevaRaw);
-        festivalIcons.add({
-          'name': sevaMap['name'],
-          'icon': sevaMap['icon'],
-        });
+        festivalIcons.add({'name': sevaMap['name'], 'icon': sevaMap['icon']});
       }
     }
   }
@@ -110,9 +109,7 @@ class Utils {
 
   Widget buildWrappable(Widget child) {
     return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: 300,
-      ),
+      constraints: BoxConstraints(maxWidth: 300),
       child: child,
     );
   }

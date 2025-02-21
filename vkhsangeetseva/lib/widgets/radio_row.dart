@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vkhsangeetseva/common/theme.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class RadioRow extends StatefulWidget {
   final List<String> items;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhsangeetseva/registration.dart';
 import 'firebase_options.dart';
-import 'package:vkhsangeetseva/common/theme.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/home.dart';
 
 Future<void> main() async {

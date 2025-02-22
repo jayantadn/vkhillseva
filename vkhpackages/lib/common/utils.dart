@@ -113,4 +113,18 @@ class Utils {
       child: child,
     );
   }
+
+  Widget responsiveBuilder(List<Widget> children) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 20,
+      children: [
+        for (var child in children)
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 300),
+            child: child,
+          ),
+      ],
+    );
+  }
 }

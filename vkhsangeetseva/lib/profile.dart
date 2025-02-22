@@ -412,9 +412,9 @@ class _ProfileState extends State<Profile> {
                         // leave some space at top
                         SizedBox(height: 10),
 
-                        Wrap(spacing: 10, runSpacing: 20, children: [
+                        Utils().responsiveBuilder([
                           // salutation
-                          Utils().buildWrappable(InputDecorator(
+                          InputDecorator(
                             decoration: const InputDecoration(
                               labelText: 'Salutation',
                               contentPadding:
@@ -439,10 +439,10 @@ class _ProfileState extends State<Profile> {
                                 }).toList(),
                               ),
                             ),
-                          )),
+                          ),
 
                           // name
-                          Utils().buildWrappable(TextFormField(
+                          TextFormField(
                             controller: _nameController,
                             decoration: const InputDecoration(
                               labelText: 'Full name',
@@ -456,10 +456,10 @@ class _ProfileState extends State<Profile> {
                               }
                               return null;
                             },
-                          )),
+                          ),
 
                           // mobile
-                          Utils().buildWrappable(TextFormField(
+                          TextFormField(
                             controller: _mobileController,
                             decoration: const InputDecoration(
                               labelText: 'Mobile',
@@ -474,7 +474,7 @@ class _ProfileState extends State<Profile> {
                               }
                               return null;
                             },
-                          )),
+                          ),
                         ]),
 
                         // picture
@@ -506,8 +506,8 @@ class _ProfileState extends State<Profile> {
 
                         // Sangeet credentials
                         SizedBox(height: 20),
-                        Wrap(spacing: 10, runSpacing: 20, children: [
-                          Utils().buildWrappable(TextFormField(
+                        Utils().responsiveBuilder([
+                          TextFormField(
                             controller: _credController,
                             decoration: const InputDecoration(
                                 labelText: 'Sangeet credentials',
@@ -518,10 +518,10 @@ class _ProfileState extends State<Profile> {
                               }
                               return null;
                             },
-                          )),
+                          ),
 
                           // years of sangeet sadhana
-                          Utils().buildWrappable(TextFormField(
+                          TextFormField(
                             controller: _experienceController,
                             decoration: const InputDecoration(
                                 labelText: 'Years of sangeet sadhana',
@@ -532,7 +532,7 @@ class _ProfileState extends State<Profile> {
                               }
                               return null;
                             },
-                          )),
+                          ),
                         ]),
 
                         // field of expertise toggle

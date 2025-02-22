@@ -145,7 +145,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                             ),
 
                           // support team
-                          ...List.generate(_supportingTeam.length, (index) {
+                          Utils().responsiveBuilder(
+                              List.generate(_supportingTeam.length, (index) {
                             var member = _supportingTeam[index];
                             return Card(
                               child: ListTile(
@@ -169,7 +170,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                         : Icons.music_note),
                               ),
                             );
-                          }),
+                          })),
 
                           // add supporting team
                           SizedBox(height: 10),

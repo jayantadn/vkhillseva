@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/user.dart';
 
 class RegistrationPage2 extends StatefulWidget {
@@ -31,6 +32,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   UserDetails? _mainPerformer;
 
   // lists
+  List<UserDetails> _supportingTeam = [];
 
   // controllers, listeners and focus nodes
 
@@ -44,6 +46,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   @override
   dispose() {
     // clear all lists
+    _supportingTeam.clear();
 
     // clear all controllers and focus nodes
 
@@ -129,7 +132,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                        "${_mainPerformer!.credentials}, ${_mainPerformer!.experience} yrs exp"),
+                                        "${_mainPerformer!.credentials}, ${_mainPerformer!.experience} yrs sadhana"),
                                     Text(_mainPerformer!.skills.join(', ')),
                                   ],
                                 ),
@@ -139,7 +142,60 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                         ? Icons.record_voice_over
                                         : Icons.music_note),
                               ),
-                            )
+                            ),
+
+                          // support team
+                          ...List.generate(_supportingTeam.length, (index) {
+                            var member = _supportingTeam[index];
+                            return Card(
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage:
+                                      NetworkImage(member.profilePicUrl),
+                                ),
+                                title:
+                                    Text("${member.salutation} ${member.name}"),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        "${member.credentials}, ${member.experience} yrs sadhana"),
+                                    Text(member.skills.join(', ')),
+                                  ],
+                                ),
+                                trailing: Icon(
+                                    member.fieldOfExpertise == "Vocalist"
+                                        ? Icons.record_voice_over
+                                        : Icons.music_note),
+                              ),
+                            );
+                          }),
+
+                          // add supporting team
+                          SizedBox(height: 10),
+                          ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Profile(
+                                      title: "Supporting team",
+                                      self: false,
+                                      onProfileSaved: (user) {
+                                        setState(() {
+                                          _supportingTeam.add(user);
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Text("Add supporting team")),
+
+                          // add
+                          SizedBox(height: 10),
+                          ElevatedButton(
+                              onPressed: () {}, child: Text("Add guest")),
                         ]),
                       ),
 

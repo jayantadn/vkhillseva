@@ -16,8 +16,14 @@ class Profile extends StatefulWidget {
   final String title;
   final String? icon;
   final bool? self;
+  final Function(UserDetails user)? onProfileSaved;
 
-  const Profile({super.key, required this.title, this.icon, this.self});
+  const Profile(
+      {super.key,
+      required this.title,
+      this.icon,
+      this.self,
+      this.onProfileSaved});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -118,23 +124,27 @@ class _ProfileState extends State<Profile> {
     });
 
     // perform async operations here
-    await Utils().fetchUserBasics();
 
     // fetch form values
-    String mobile = Utils().getUserBasics()!.mobile;
-    bool exists = await FB().pathExists("Users/$mobile");
-    if (exists) {
-      Map<String, dynamic> userdetailsJson =
-          await FB().getJson(path: "Users/$mobile");
-      _userDetailsOld = UserDetails.fromJson(userdetailsJson);
+    if (widget.self != null && widget.self == true) {
+      await Utils().fetchUserBasics();
+      String mobile = Utils().getUserBasics()!.mobile;
+      bool exists = await FB().pathExists("Users/$mobile");
+      if (exists) {
+        Map<String, dynamic> userdetailsJson =
+            await FB().getJson(path: "Users/$mobile");
+        _userDetailsOld = UserDetails.fromJson(userdetailsJson);
+      }
     }
 
     await _lock.synchronized(() async {
       // perform sync operations here
-      UserBasics? basics = Utils().getUserBasics();
-      if (basics != null) {
-        _nameController.text = basics.name;
-        _mobileController.text = basics.mobile;
+      if (widget.self != null && widget.self == true) {
+        UserBasics? basics = Utils().getUserBasics();
+        if (basics != null) {
+          _nameController.text = basics.name;
+          _mobileController.text = basics.mobile;
+        }
       }
 
       if (_userDetailsOld != null) {
@@ -236,11 +246,19 @@ class _ProfileState extends State<Profile> {
       return;
     }
 
-    // validation of performance links
-    if (_youtubeLinks[0].isEmpty && _audioClips[0].isEmpty) {
-      Toaster().error(
-          'Please enter at least one youtube link or upload one audio clip');
+    // validation for profile photo
+    if (_profilePicUrl.isEmpty) {
+      Toaster().error('Please upload your profile picture');
       return;
+    }
+
+    // validation of performance links
+    if (widget.self != null && widget.self == true) {
+      if (_youtubeLinks[0].isEmpty && _audioClips[0].isEmpty) {
+        Toaster().error(
+            'Please enter at least one youtube link or upload one audio clip');
+        return;
+      }
     }
 
     // all abrupt returns before this point
@@ -288,17 +306,26 @@ class _ProfileState extends State<Profile> {
     _userDetailsOld = details;
 
     // Write to local storage
-    UserBasics basics = UserBasics(
-      name: details.name,
-      mobile: details.mobile,
-      uid: Utils().getUserBasics()!.uid,
-    );
-    await LS().write("userbasics", jsonEncode(basics));
+    if (widget.self != null && widget.self == true) {
+      UserBasics basics = UserBasics(
+        name: details.name,
+        mobile: details.mobile,
+        uid: Utils().getUserBasics()!.uid,
+      );
+      await LS().write("userbasics", jsonEncode(basics));
+    }
+
+    // invoke the callback
+    if (widget.onProfileSaved != null) {
+      widget.onProfileSaved!(details);
+    }
 
     Toaster().info('Profile saved');
     setState(() {
       _isLoading = false;
     });
+
+    Navigator.of(context).pop();
   }
 
   String _getFileNameFromUrl(String url) {
@@ -364,7 +391,6 @@ class _ProfileState extends State<Profile> {
 
                       // FIXME: welcome refresh crashes
                       // Navigator.pushReplacement(
-                      //   // ignore: use_build_context_synchronously
                       //   context,
                       //   MaterialPageRoute(
                       //     builder: (context) => HomePage(),
@@ -519,6 +545,7 @@ class _ProfileState extends State<Profile> {
                               });
                             }),
 
+                        // toggle vocal/instrumental skills
                         SizedBox(height: 20),
                         if (_selectedExpertiseType == "Vocalist")
                           InputDecorator(
@@ -593,106 +620,111 @@ class _ProfileState extends State<Profile> {
 
                         // youtube links
                         SizedBox(height: 10),
-                        Column(
-                          children:
-                              List.generate(_youtubeLinks.length, (index) {
-                            return Column(
-                              children: [
-                                if (index == 0 ||
-                                    _youtubeLinks[index - 1].isNotEmpty)
-                                  TextFormField(
-                                    controller: TextEditingController()
-                                      ..text = (_youtubeLinks[index].isNotEmpty)
-                                          ? _youtubeLinks[index]
-                                          : "",
-                                    decoration: InputDecoration(
-                                      labelText: index == 0
-                                          ? 'Youtube link for your performance'
-                                          : 'Another youtube link (optional)',
-                                      hintText:
-                                          "e.g. https://www.youtube.com/watch?v=123",
+                        if (widget.self != null && widget.self == true)
+                          Column(
+                            children:
+                                List.generate(_youtubeLinks.length, (index) {
+                              return Column(
+                                children: [
+                                  if (index == 0 ||
+                                      _youtubeLinks[index - 1].isNotEmpty)
+                                    TextFormField(
+                                      controller: TextEditingController()
+                                        ..text =
+                                            (_youtubeLinks[index].isNotEmpty)
+                                                ? _youtubeLinks[index]
+                                                : "",
+                                      decoration: InputDecoration(
+                                        labelText: index == 0
+                                            ? 'Youtube link for your performance'
+                                            : 'Another youtube link (optional)',
+                                        hintText:
+                                            "e.g. https://www.youtube.com/watch?v=123",
+                                      ),
+                                      onChanged: (value) {
+                                        _youtubeLinks[index] = value;
+                                      },
                                     ),
-                                    onChanged: (value) {
-                                      _youtubeLinks[index] = value;
-                                    },
-                                  ),
-                                if (index < _youtubeLinks.length - 1)
-                                  SizedBox(height: 10),
-                              ],
-                            );
-                          }),
-                        ),
+                                  if (index < _youtubeLinks.length - 1)
+                                    SizedBox(height: 10),
+                                ],
+                              );
+                            }),
+                          ),
 
                         // upload audio clip
                         SizedBox(height: 10),
-                        Text("Upload audio clip of your performance",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge!
-                                .copyWith(color: primaryColor)),
-                        Column(
-                          children: List.generate(_audioClips.length, (index) {
-                            return Column(
-                              children: [
-                                if (index == 0 ||
-                                    _audioClips[index - 1].isNotEmpty)
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          _getFileNameFromUrl(
-                                              _audioClips[index]),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                          softWrap: false,
+                        if (widget.self != null && widget.self == true)
+                          Text("Upload audio clip of your performance",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(color: primaryColor)),
+                        if (widget.self != null && widget.self == true)
+                          Column(
+                            children:
+                                List.generate(_audioClips.length, (index) {
+                              return Column(
+                                children: [
+                                  if (index == 0 ||
+                                      _audioClips[index - 1].isNotEmpty)
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            _getFileNameFromUrl(
+                                                _audioClips[index]),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                            softWrap: false,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      ElevatedButton(
-                                        child: Text("Browse"),
-                                        onPressed: () async {
-                                          FilePickerResult? result =
-                                              await FilePicker.platform
-                                                  .pickFiles(
-                                            type: FileType.audio,
-                                          );
+                                        SizedBox(width: 10),
+                                        ElevatedButton(
+                                          child: Text("Browse"),
+                                          onPressed: () async {
+                                            FilePickerResult? result =
+                                                await FilePicker.platform
+                                                    .pickFiles(
+                                              type: FileType.audio,
+                                            );
 
-                                          if (result == null) return;
-                                          PlatformFile file =
-                                              result.files.first;
+                                            if (result == null) return;
+                                            PlatformFile file =
+                                                result.files.first;
 
-                                          // upload to firestore
-                                          setState(() {
-                                            _isLoading = true;
-                                          });
-                                          UserBasics? basics =
-                                              Utils().getUserBasics();
-                                          if (basics == null) {
-                                            Toaster().error('User not found');
-                                            return;
-                                          }
-                                          String ext =
-                                              file.name.split('.').last;
-                                          String dstPath =
-                                              "${Const().dbroot}/Users/${basics.mobile}/audio$index.$ext";
-                                          String url = await FS().uploadBytes(
-                                              dstPath: dstPath,
-                                              bytes: file.bytes!);
+                                            // upload to firestore
+                                            setState(() {
+                                              _isLoading = true;
+                                            });
+                                            UserBasics? basics =
+                                                Utils().getUserBasics();
+                                            if (basics == null) {
+                                              Toaster().error('User not found');
+                                              return;
+                                            }
+                                            String ext =
+                                                file.name.split('.').last;
+                                            String dstPath =
+                                                "${Const().dbroot}/Users/${basics.mobile}/audio$index.$ext";
+                                            String url = await FS().uploadBytes(
+                                                dstPath: dstPath,
+                                                bytes: file.bytes!);
 
-                                          setState(() {
-                                            _audioClips[index] = url;
-                                            _isLoading = false;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                if (index < _audioClips.length - 1)
-                                  SizedBox(height: 10),
-                              ],
-                            );
-                          }),
-                        ),
+                                            setState(() {
+                                              _audioClips[index] = url;
+                                              _isLoading = false;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  if (index < _audioClips.length - 1)
+                                    SizedBox(height: 10),
+                                ],
+                              );
+                            }),
+                          ),
 
                         // leave some space at bottom
                         SizedBox(height: 100),

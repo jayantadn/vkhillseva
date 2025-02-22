@@ -194,17 +194,13 @@ class _ProfileState extends State<Profile> {
       }
       final bytes = byteData.buffer.asUint8List();
 
-      // upload to firestore
       setState(() {
         _isLoading = true;
       });
 
-      UserBasics? basics = Utils().getUserBasics();
-      if (basics == null) {
-        Toaster().error('User not found');
-        return;
-      }
-      String path = "${Const().dbroot}/Users/${basics.mobile}/profile.png";
+      // upload to firestore
+      String path =
+          "${Const().dbroot}/Users/${_mobileController.text}/profile.png";
       final storageRef = FirebaseStorage.instance.ref();
       final fileRef = storageRef.child(path);
 

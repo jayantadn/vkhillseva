@@ -85,6 +85,50 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     });
   }
 
+  Future<void> _showAddGuestDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Add guest"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                // name
+                TextField(
+                  decoration: InputDecoration(labelText: "Name"),
+                ),
+
+                // honor prasadam
+                CheckboxListTile(
+                  title: Text("Honor Prasadam"),
+                  value: false,
+                  onChanged: (newValue) {
+                    // handle change
+                  },
+                )
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Add"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -196,7 +240,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           // add
                           SizedBox(height: 10),
                           ElevatedButton(
-                              onPressed: () {}, child: Text("Add guest")),
+                              onPressed: () {
+                                _showAddGuestDialog(context);
+                              },
+                              child: Text("Add guest")),
                         ]),
                       ),
 

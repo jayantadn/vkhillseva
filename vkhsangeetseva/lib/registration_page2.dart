@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:vkhsangeetseva/home.dart';
 import 'package:vkhsangeetseva/profile.dart';
 
 class RegistrationPage2 extends StatefulWidget {
@@ -340,10 +341,15 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: () {
+                              // add half filled song
+                              if (_songController.text.isNotEmpty) {
+                                _songs.add(_songController.text);
+                              }
+
                               // validate list of songs
-                              if (_songs.isEmpty) {
+                              if (_songs.length < 5) {
                                 Toaster()
-                                    .error("Please enter at least one song");
+                                    .error("Please enter at least 5 songs");
                                 return;
                               }
 
@@ -357,7 +363,16 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                 guests: _guests,
                                 songs: _songs,
                               );
-                              print(performanceRequest.toJson());
+
+                              // save to firebase
+                              FB().addToList(
+                                  path: "PendingRequests",
+                                  data: performanceRequest.toJson());
+
+                              Navigator.pushReplacement(context,
+                                  MaterialPageRoute(builder: (context) {
+                                return HomePage();
+                              }));
                             },
                             child: Text("Submit"),
                           )

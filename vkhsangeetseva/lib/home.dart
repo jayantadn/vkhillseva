@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
-import 'package:vkhsangeetseva/events.dart';
 import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
@@ -57,13 +57,16 @@ class _MyHomePageState extends State<HomePage> {
         EventRecord event = EventRecord.fromJson(eventMap);
         _events.add(event);
       }
+      _events.sort((a, b) => b.date.compareTo(a.date));
+      if (_events.length > 10) {
+        _events = _events.sublist(0, 10);
+      }
     }
 
     // refresh all child widgets
     if (welcomeKey.currentState != null) {
       await welcomeKey.currentState!.refresh();
     }
-    if (eventsKey.currentState != null) await eventsKey.currentState!.refresh();
 
     // sync operations
     setState(() {
@@ -200,7 +203,43 @@ class _MyHomePageState extends State<HomePage> {
                   SizedBox(
                     height: 10,
                   ),
-                  if (_username.isNotEmpty) Events(key: eventsKey),
+                  if (_username.isNotEmpty)
+                    ...List.generate(_events.length, (index) {
+                      String date =
+                          DateFormat("dd MMM yyyy").format(_events[index].date);
+                      String performers = _events[index].mainPerformer.name;
+                      for (UserDetails performer
+                          in _events[index].supportTeam) {
+                        performers += ", ${performer.name}";
+                      }
+
+                      return Card(
+                        color: _events[index].date.isBefore(DateTime.now())
+                            ? Colors.grey[200]
+                            : (_events[index].status == "Pending"
+                                ? Colors.yellow[50]
+                                : (_events[index].status == "Approved"
+                                    ? Colors.green[50]
+                                    : Colors.red[50])),
+                        child: ListTile(
+                            title: Text(
+                                "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
+                            leading: _events[index].status == "Pending"
+                                ? Icon(Icons.question_mark)
+                                : (_events[index].status == "Approved"
+                                    ? Icon(Icons.check)
+                                    : Icon(Icons.cancel)),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Performers: $performers"),
+                                if (_events[index].noteTemple.isNotEmpty)
+                                  Text(
+                                      "Temple remarks: ${_events[index].noteTemple}"),
+                              ],
+                            )),
+                      );
+                    }),
                 ],
               ),
             ),

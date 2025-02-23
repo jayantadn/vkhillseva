@@ -79,24 +79,29 @@ class EventRecord {
   factory EventRecord.fromJson(Map<String, dynamic> json) {
     return EventRecord(
       date: DateTime.parse(json['date'] as String),
-      notePerformer: json['notePerformer'] as String,
-      noteTemple: json['noteTemple'] as String,
-      status: json['status'] as String,
-      guests: List.generate(json['guests'].length, (index) {
-        dynamic guestRaw = json['guests'][index];
-        Map<String, dynamic> guestMap = Map<String, dynamic>.from(guestRaw);
-        return Guest.fromJson(guestMap);
-      }),
       mainPerformer: UserDetails.fromJson(
           Map<String, dynamic>.from(json['mainPerformer'])),
+      notePerformer: json['notePerformer'] as String,
+      noteTemple: json['noteTemple'] as String,
       slot: Slot.fromJson(Map<String, dynamic>.from(json['slot'])),
       songs: List.generate(json['songs'].length, (index) {
         return json['songs'][index];
       }),
-      supportTeam: List.generate(json['supportTeam'].length, (index) {
-        return UserDetails.fromJson(
-            Map<String, dynamic>.from(json['supportTeam'][index]));
-      }),
+      status: json['status'] as String,
+      guests: json['guests'] == null
+          ? []
+          : List.generate(json['guests'].length, (index) {
+              dynamic guestRaw = json['guests'][index];
+              Map<String, dynamic> guestMap =
+                  Map<String, dynamic>.from(guestRaw);
+              return Guest.fromJson(guestMap);
+            }),
+      supportTeam: json['supportTeam'] == null
+          ? []
+          : List.generate(json['supportTeam'].length, (index) {
+              return UserDetails.fromJson(
+                  Map<String, dynamic>.from(json['supportTeam'][index]));
+            }),
     );
   }
 

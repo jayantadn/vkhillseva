@@ -408,7 +408,7 @@ class _ProfileState extends State<Profile> {
                         // leave some space at top
                         SizedBox(height: 10),
 
-                        Utils().responsiveBuilder([
+                        Utils().responsiveBuilder(context, [
                           // salutation
                           InputDecorator(
                             decoration: const InputDecoration(
@@ -502,7 +502,7 @@ class _ProfileState extends State<Profile> {
 
                         // Sangeet credentials
                         SizedBox(height: 20),
-                        Utils().responsiveBuilder([
+                        Utils().responsiveBuilder(context, [
                           TextFormField(
                             controller: _credController,
                             decoration: const InputDecoration(
@@ -615,7 +615,7 @@ class _ProfileState extends State<Profile> {
                           ),
 
                         // youtube links
-                        SizedBox(height: 10),
+                        SizedBox(height: 20),
                         if (widget.self != null && widget.self == true)
                           Column(
                             children:

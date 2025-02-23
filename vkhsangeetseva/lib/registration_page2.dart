@@ -210,31 +210,33 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                           // support team
                           Utils().responsiveBuilder(
+                              context,
                               List.generate(_supportingTeam.length, (index) {
-                            var member = _supportingTeam[index];
-                            return Card(
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundImage:
-                                      NetworkImage(member.profilePicUrl),
-                                ),
-                                title:
-                                    Text("${member.salutation} ${member.name}"),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                        "${member.credentials}, ${member.experience} yrs sadhana"),
-                                    Text(member.skills.join(', ')),
-                                  ],
-                                ),
-                                trailing: Icon(
-                                    member.fieldOfExpertise == "Vocalist"
-                                        ? Icons.record_voice_over
-                                        : Icons.music_note),
-                              ),
-                            );
-                          })),
+                                var member = _supportingTeam[index];
+                                return Card(
+                                  child: ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundImage:
+                                          NetworkImage(member.profilePicUrl),
+                                    ),
+                                    title: Text(
+                                        "${member.salutation} ${member.name}"),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                            "${member.credentials}, ${member.experience} yrs sadhana"),
+                                        Text(member.skills.join(', ')),
+                                      ],
+                                    ),
+                                    trailing: Icon(
+                                        member.fieldOfExpertise == "Vocalist"
+                                            ? Icons.record_voice_over
+                                            : Icons.music_note),
+                                  ),
+                                );
+                              })),
 
                           // add supporting team
                           SizedBox(height: 10),
@@ -269,14 +271,15 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           Align(
                             alignment: Alignment.centerLeft,
                             child: Utils().responsiveBuilder(
+                                context,
                                 List.generate(_guests.length, (index) {
-                              var guest = _guests[index];
-                              return Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                    "${index + 1}. ${guest.name} ${guest.honorPrasadam ? " (Prasadam)" : ""}"),
-                              );
-                            })),
+                                  var guest = _guests[index];
+                                  return Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                        "${index + 1}. ${guest.name} ${guest.honorPrasadam ? " (Prasadam)" : ""}"),
+                                  );
+                                })),
                           ),
 
                           // add

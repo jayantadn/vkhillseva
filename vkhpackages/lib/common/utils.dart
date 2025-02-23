@@ -107,21 +107,21 @@ class Utils {
     return _userbasics;
   }
 
-  Widget buildWrappable(Widget child) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 300),
-      child: child,
-    );
-  }
+  Widget responsiveBuilder(BuildContext context, List<Widget> children) {
+    double maxWidth = 300;
 
-  Widget responsiveBuilder(List<Widget> children) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    maxWidth = (screenWidth > maxWidth && screenWidth < maxWidth * 2)
+        ? screenWidth
+        : maxWidth;
+
     return Wrap(
       spacing: 10,
       runSpacing: 20,
       children: [
         for (var child in children)
           ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 300),
+            constraints: BoxConstraints(maxWidth: maxWidth),
             child: child,
           ),
       ],

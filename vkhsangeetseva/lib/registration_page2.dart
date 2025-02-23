@@ -33,8 +33,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   // lists
   List<UserDetails> _supportingTeam = [];
+  List<Guest> _guests = [];
 
   // controllers, listeners and focus nodes
+  TextEditingController _guestNameController = TextEditingController();
 
   @override
   initState() {
@@ -47,8 +49,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   dispose() {
     // clear all lists
     _supportingTeam.clear();
+    _guests.clear();
 
     // clear all controllers and focus nodes
+    _guestNameController.dispose();
 
     super.dispose();
   }
@@ -86,6 +90,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   }
 
   Future<void> _showAddGuestDialog(BuildContext context) {
+    _guestNameController.clear();
+    bool honorPrasadam = false;
+
     return showDialog(
       context: context,
       builder: (context) {
@@ -96,15 +103,22 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
               children: [
                 // name
                 TextField(
+                  controller: _guestNameController,
                   decoration: InputDecoration(labelText: "Name"),
                 ),
 
                 // honor prasadam
-                CheckboxListTile(
-                  title: Text("Honor Prasadam"),
-                  value: false,
-                  onChanged: (newValue) {
-                    // handle change
+                StatefulBuilder(
+                  builder: (context, setState) {
+                    return CheckboxListTile(
+                      title: Text("Honor Prasadam"),
+                      value: honorPrasadam,
+                      onChanged: (newValue) {
+                        setState(() {
+                          honorPrasadam = newValue!;
+                        });
+                      },
+                    );
                   },
                 )
               ],
@@ -120,6 +134,12 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
+
+                setState(() {
+                  _guests.add(Guest(
+                      name: _guestNameController.text,
+                      honorPrasadam: honorPrasadam));
+                });
               },
               child: Text("Add"),
             ),
@@ -237,6 +257,24 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                               },
                               child: Text("Add supporting team")),
 
+                          // guests
+                          SizedBox(height: 10),
+                          if (_guests.isNotEmpty)
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text("Guests",
+                                  style: themeDefault.textTheme.headlineSmall),
+                            ),
+
+                          ...List.generate(_guests.length, (index) {
+                            var guest = _guests[index];
+                            return Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                  "${index + 1}. ${guest.name} ${guest.honorPrasadam ? " (Prasadam)" : ""}"),
+                            );
+                          }),
+
                           // add
                           SizedBox(height: 10),
                           ElevatedButton(
@@ -262,4 +300,11 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       ),
     );
   }
+}
+
+class Guest {
+  final String name;
+  final bool honorPrasadam;
+
+  Guest({required this.name, required this.honorPrasadam});
 }

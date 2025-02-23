@@ -82,6 +82,7 @@ ThemeData themeDefault = ThemeData(
       textStyle: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 16.0,
+        decoration: TextDecoration.underline,
       ),
     ),
   ),

@@ -7,7 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
-import 'package:vkhsangeetseva/user.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vkhsangeetseva/widgets/radio_row.dart';
 import 'package:file_picker/file_picker.dart';

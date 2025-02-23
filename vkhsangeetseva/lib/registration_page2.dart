@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/profile.dart';
-import 'package:vkhsangeetseva/user.dart';
 
 class RegistrationPage2 extends StatefulWidget {
   final String title;
@@ -212,7 +211,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                               ),
                             ),
 
-                          // support team
+                          // supporting team
                           Utils().responsiveBuilder(
                               context,
                               List.generate(_supportingTeam.length, (index) {
@@ -244,7 +243,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                           // add supporting team
                           SizedBox(height: 10),
-                          ElevatedButton(
+                          TextButton(
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -261,7 +260,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                   ),
                                 );
                               },
-                              child: Text("Add supporting team")),
+                              child: Text(
+                                "Add supporting team",
+                              )),
 
                           // guests
                           SizedBox(height: 10),
@@ -288,7 +289,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                           // add guest
                           SizedBox(height: 10),
-                          ElevatedButton(
+                          TextButton(
                               onPressed: () {
                                 _showAddGuestDialog(context);
                               },
@@ -299,7 +300,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           Align(
                             alignment: Alignment.centerLeft,
                             child: Text("List of songs",
-                                style: themeDefault.textTheme.headlineMedium),
+                                style: themeDefault.textTheme.headlineSmall),
                           ),
                           ...List.generate(_songs.length, (index) {
                             return Padding(
@@ -309,31 +310,57 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   "${index + 1}. ${_songs[index]}",
-                                  style: Theme.of(context).textTheme.bodyLarge,
                                 ),
                               ),
                             );
                           }),
                           SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: _songController,
-                                  decoration: InputDecoration(
-                                      hintText: "Enter song name"),
+                          if (_songs.length < 10)
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _songController,
+                                    decoration: InputDecoration(
+                                        hintText: "Enter song name"),
+                                  ),
                                 ),
-                              ),
-                              IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _songs.add(_songController.text);
-                                    });
-                                    _songController.clear();
-                                  },
-                                  icon: Icon(Icons.add))
-                            ],
-                          ),
+                                IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _songs.add(_songController.text);
+                                      });
+                                      _songController.clear();
+                                    },
+                                    icon: Icon(Icons.add))
+                              ],
+                            ),
+
+                          // submit button
+                          SizedBox(height: 10),
+                          ElevatedButton(
+                            onPressed: () {
+                              // validate list of songs
+                              if (_songs.isEmpty) {
+                                Toaster()
+                                    .error("Please enter at least one song");
+                                return;
+                              }
+
+                              // populate the data structure
+                              PerformanceRequest performanceRequest =
+                                  PerformanceRequest(
+                                date: widget.selectedDate,
+                                slot: widget.slot,
+                                mainPerformer: _mainPerformer!,
+                                supportTeam: _supportingTeam,
+                                guests: _guests,
+                                songs: _songs,
+                              );
+                              print(performanceRequest.toJson());
+                            },
+                            child: Text("Submit"),
+                          )
                         ]),
                       ),
 
@@ -352,11 +379,4 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       ),
     );
   }
-}
-
-class Guest {
-  final String name;
-  final bool honorPrasadam;
-
-  Guest({required this.name, required this.honorPrasadam});
 }

@@ -1,3 +1,8 @@
+# 1.3.0
+- feature: event registration complete
+- feature: event registration submit
+- fix: upload image
+
 # 1.2.0
 
 # 1.1.0

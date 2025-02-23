@@ -32,11 +32,13 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   UserDetails? _mainPerformer;
 
   // lists
-  List<UserDetails> _supportingTeam = [];
-  List<Guest> _guests = [];
+  final List<UserDetails> _supportingTeam = [];
+  final List<Guest> _guests = [];
+  final List<String> _songs = [];
 
   // controllers, listeners and focus nodes
-  TextEditingController _guestNameController = TextEditingController();
+  final TextEditingController _guestNameController = TextEditingController();
+  final TextEditingController _songController = TextEditingController();
 
   @override
   initState() {
@@ -50,9 +52,11 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     // clear all lists
     _supportingTeam.clear();
     _guests.clear();
+    _songs.clear();
 
     // clear all controllers and focus nodes
     _guestNameController.dispose();
+    _songController.dispose();
 
     super.dispose();
   }
@@ -282,13 +286,54 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                 })),
                           ),
 
-                          // add
+                          // add guest
                           SizedBox(height: 10),
                           ElevatedButton(
                               onPressed: () {
                                 _showAddGuestDialog(context);
                               },
                               child: Text("Add guest")),
+
+                          // list of songs
+                          SizedBox(height: 10),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text("List of songs",
+                                style: themeDefault.textTheme.headlineMedium),
+                          ),
+                          ...List.generate(_songs.length, (index) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "${index + 1}. ${_songs[index]}",
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                            );
+                          }),
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _songController,
+                                  decoration: InputDecoration(
+                                      hintText: "Enter song name"),
+                                ),
+                              ),
+                              IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _songs.add(_songController.text);
+                                    });
+                                    _songController.clear();
+                                  },
+                                  icon: Icon(Icons.add))
+                            ],
+                          ),
                         ]),
                       ),
 

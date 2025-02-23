@@ -14,8 +14,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<HomePage> {
+  // scalars
   bool _isLoading = true;
   String _username = "";
+
+  // lists
+  List<EventRecord> _events = [];
 
   @override
   void initState() {
@@ -27,6 +31,7 @@ class _MyHomePageState extends State<HomePage> {
   @override
   dispose() {
     // clear all lists
+    _events.clear();
 
     // clear all controllers
 
@@ -34,9 +39,57 @@ class _MyHomePageState extends State<HomePage> {
   }
 
   Future<void> refresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     // async operations
+
     // get username from local storage
     await Utils().fetchUserBasics();
+    UserBasics? basics = Utils().getUserBasics();
+
+    // fetch all events
+    if (basics != null) {
+      List eventsRaw = await FB().getList(path: "Events/${basics.mobile}");
+      for (var eventRaw in eventsRaw) {
+        Map<String, dynamic> eventMap = Map<String, dynamic>.from(eventRaw);
+
+        List<Guest> guests = List.generate(eventMap['guests'].length, (index) {
+          dynamic guestRaw = eventMap['guests'][index];
+          Map<String, dynamic> guestMap = Map<String, dynamic>.from(guestRaw);
+          return Guest.fromJson(guestMap);
+        });
+
+        UserDetails mainPerformer = UserDetails.fromJson(
+            Map<String, dynamic>.from(eventMap['mainPerformer']));
+
+        dynamic slotRaw = eventMap['slot'];
+        Map<String, dynamic> slotMap = Map<String, dynamic>.from(slotRaw);
+        Slot slot = Slot.fromJson(slotMap);
+
+        List<String> songs = List.generate(eventMap['songs'].length, (index) {
+          return eventMap['songs'][index];
+        });
+
+        List<UserDetails> supportTeam =
+            List.generate(eventMap['supportTeam'].length, (index) {
+          return UserDetails.fromJson(
+              Map<String, dynamic>.from(eventMap['supportTeam'][index]));
+        });
+
+        EventRecord event = EventRecord(
+            date: DateTime.parse(eventMap['date']),
+            notePerformer: eventMap['notePerformer'],
+            noteTemple: eventMap['noteTemple'],
+            status: eventMap['status'],
+            guests: guests,
+            mainPerformer: mainPerformer,
+            slot: slot,
+            songs: songs,
+            supportTeam: supportTeam);
+      }
+    }
 
     // refresh all child widgets
     if (welcomeKey.currentState != null) {

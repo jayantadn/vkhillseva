@@ -377,8 +377,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                               }
 
                               // populate the data structure
-                              PerformanceRequest performanceRequest =
-                                  PerformanceRequest(
+                              EventRecord performanceRequest = EventRecord(
                                 date: widget.selectedDate,
                                 slot: widget.slot,
                                 mainPerformer: _mainPerformer!,
@@ -396,7 +395,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                               } else {
                                 String mobile = basics.mobile;
                                 FB().addToList(
-                                    path: "EventRecords/$mobile",
+                                    path: "Events/$mobile",
                                     data: performanceRequest.toJson());
                               }
 

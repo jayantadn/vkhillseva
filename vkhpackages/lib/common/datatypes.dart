@@ -53,7 +53,7 @@ class Slot {
   }
 }
 
-class PerformanceRequest {
+class EventRecord {
   final DateTime date;
   final Slot slot;
   final UserDetails mainPerformer;
@@ -64,7 +64,7 @@ class PerformanceRequest {
   final String notePerformer;
   final String noteTemple;
 
-  PerformanceRequest({
+  EventRecord({
     required this.date,
     required this.slot,
     required this.mainPerformer,
@@ -76,8 +76,8 @@ class PerformanceRequest {
     this.noteTemple = '',
   });
 
-  factory PerformanceRequest.fromJson(Map<String, dynamic> json) {
-    return PerformanceRequest(
+  factory EventRecord.fromJson(Map<String, dynamic> json) {
+    return EventRecord(
       date: DateTime.parse(json['date'] as String),
       slot: Slot.fromJson(json['slot'] as Map<String, dynamic>),
       mainPerformer:

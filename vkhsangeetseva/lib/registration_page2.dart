@@ -266,14 +266,18 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                   style: themeDefault.textTheme.headlineSmall),
                             ),
 
-                          ...List.generate(_guests.length, (index) {
-                            var guest = _guests[index];
-                            return Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                  "${index + 1}. ${guest.name} ${guest.honorPrasadam ? " (Prasadam)" : ""}"),
-                            );
-                          }),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Utils().responsiveBuilder(
+                                List.generate(_guests.length, (index) {
+                              var guest = _guests[index];
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                    "${index + 1}. ${guest.name} ${guest.honorPrasadam ? " (Prasadam)" : ""}"),
+                              );
+                            })),
+                          ),
 
                           // add
                           SizedBox(height: 10),

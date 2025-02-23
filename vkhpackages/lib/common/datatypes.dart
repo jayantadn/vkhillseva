@@ -60,6 +60,9 @@ class PerformanceRequest {
   final List<UserDetails> supportTeam;
   final List<Guest> guests;
   final List<String> songs;
+  final String status;
+  final String notePerformer;
+  final String noteTemple;
 
   PerformanceRequest({
     required this.date,
@@ -68,6 +71,9 @@ class PerformanceRequest {
     required this.supportTeam,
     required this.guests,
     required this.songs,
+    this.status = 'Pending',
+    this.notePerformer = '',
+    this.noteTemple = '',
   });
 
   factory PerformanceRequest.fromJson(Map<String, dynamic> json) {
@@ -83,6 +89,9 @@ class PerformanceRequest {
           .map((e) => Guest.fromJson(e as Map<String, dynamic>))
           .toList(),
       songs: List<String>.from(json['songs'] as List<dynamic>),
+      status: json['status'] as String,
+      notePerformer: json['notePerformer'] as String,
+      noteTemple: json['noteTemple'] as String,
     );
   }
 
@@ -94,6 +103,9 @@ class PerformanceRequest {
       'supportTeam': supportTeam.map((e) => e.toJson()).toList(),
       'guests': guests.map((e) => e.toJson()).toList(),
       'songs': songs,
+      'status': status,
+      'notePerformer': notePerformer,
+      'noteTemple': noteTemple,
     };
   }
 }

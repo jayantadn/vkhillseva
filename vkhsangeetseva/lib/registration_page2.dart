@@ -39,6 +39,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   // controllers, listeners and focus nodes
   final TextEditingController _guestNameController = TextEditingController();
   final TextEditingController _songController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
 
   @override
   initState() {
@@ -57,6 +58,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     // clear all controllers and focus nodes
     _guestNameController.dispose();
     _songController.dispose();
+    _noteController.dispose();
 
     super.dispose();
   }
@@ -337,6 +339,27 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                               ],
                             ),
 
+                          // performer note
+                          SizedBox(height: 10),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Note:",
+                                    style:
+                                        themeDefault.textTheme.headlineSmall),
+                                TextField(
+                                  maxLines: 2,
+                                  controller: _noteController,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
                           // submit button
                           SizedBox(height: 10),
                           ElevatedButton(
@@ -362,13 +385,22 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                 supportTeam: _supportingTeam,
                                 guests: _guests,
                                 songs: _songs,
+                                notePerformer: _noteController.text,
                               );
 
                               // save to firebase
-                              FB().addToList(
-                                  path: "PendingRequests",
-                                  data: performanceRequest.toJson());
+                              UserBasics? basics = Utils().getUserBasics();
+                              if (basics == null) {
+                                Toaster().error("Cant access user data");
+                                return;
+                              } else {
+                                String mobile = basics.mobile;
+                                FB().addToList(
+                                    path: "EventRecords/$mobile",
+                                    data: performanceRequest.toJson());
+                              }
 
+                              // go to homepage
                               Navigator.pushReplacement(context,
                                   MaterialPageRoute(builder: (context) {
                                 return HomePage();

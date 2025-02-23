@@ -79,19 +79,24 @@ class EventRecord {
   factory EventRecord.fromJson(Map<String, dynamic> json) {
     return EventRecord(
       date: DateTime.parse(json['date'] as String),
-      slot: Slot.fromJson(json['slot'] as Map<String, dynamic>),
-      mainPerformer:
-          UserDetails.fromJson(json['mainPerformer'] as Map<String, dynamic>),
-      supportTeam: (json['supportTeam'] as List<dynamic>)
-          .map((e) => UserDetails.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      guests: (json['guests'] as List<dynamic>)
-          .map((e) => Guest.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      songs: List<String>.from(json['songs'] as List<dynamic>),
-      status: json['status'] as String,
       notePerformer: json['notePerformer'] as String,
       noteTemple: json['noteTemple'] as String,
+      status: json['status'] as String,
+      guests: List.generate(json['guests'].length, (index) {
+        dynamic guestRaw = json['guests'][index];
+        Map<String, dynamic> guestMap = Map<String, dynamic>.from(guestRaw);
+        return Guest.fromJson(guestMap);
+      }),
+      mainPerformer: UserDetails.fromJson(
+          Map<String, dynamic>.from(json['mainPerformer'])),
+      slot: Slot.fromJson(Map<String, dynamic>.from(json['slot'])),
+      songs: List.generate(json['songs'].length, (index) {
+        return json['songs'][index];
+      }),
+      supportTeam: List.generate(json['supportTeam'].length, (index) {
+        return UserDetails.fromJson(
+            Map<String, dynamic>.from(json['supportTeam'][index]));
+      }),
     );
   }
 

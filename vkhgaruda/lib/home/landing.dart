@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/home/pin_page.dart';
+import 'package:vkhgaruda/home/home.dart';
 import 'package:vkhgaruda/widgets/welcome.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -59,7 +59,7 @@ class _LandingState extends State<Landing> {
           // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(
-            builder: (context) => PinPage(
+            builder: (context) => HomePage(
               title: "Hare Krishna",
             ),
           ),
@@ -104,7 +104,7 @@ class _LandingState extends State<Landing> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PinPage(
+                              builder: (context) => HomePage(
                                 title: "Hare Krishna",
                               ),
                             ),

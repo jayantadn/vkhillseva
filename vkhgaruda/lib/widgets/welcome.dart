@@ -13,6 +13,7 @@ class Welcome extends StatefulWidget {
 GlobalKey<_WelcomeState> summaryKey = GlobalKey<_WelcomeState>();
 
 class _WelcomeState extends State<Welcome> {
+  final String version = '3.0.0';
   final Lock _lock = Lock();
   String _username = '';
 
@@ -67,7 +68,7 @@ class _WelcomeState extends State<Welcome> {
           ),
           child: ClipOval(
             child: Image.asset(
-              'assets/images/Logo/KrishnaLilaPark_circle.png',
+              'assets/images/VKHillDieties/Garuda.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -88,7 +89,7 @@ class _WelcomeState extends State<Welcome> {
         'ISKCON Vaikuntha Hill',
         style: Theme.of(context).textTheme.headlineMedium,
       ),
-      Text('Garuda v${Const().version}',
+      Text('Garuda v$version',
           style: Theme.of(context).textTheme.headlineSmall),
     ]);
   }

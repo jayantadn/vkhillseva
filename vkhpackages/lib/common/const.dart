@@ -12,9 +12,8 @@ class Const {
     // init
   }
 
-  final String dbrootGaruda = "VKHILLSEVA_01";
+  final String dbrootGaruda = "GARUDA_01";
   final String dbrootSangeetSeva = "SANGEETSEVA_01";
-  final String version = "1.2.0";
 
   final int fbListenerDelay = 2; // seconds
   final double toolbarIconSize = 32;

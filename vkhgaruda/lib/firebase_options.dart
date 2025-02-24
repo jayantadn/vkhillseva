@@ -50,26 +50,23 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    databaseURL:
-        'https://garuda-1ba07-default-rtdb.asia-southeast1.firebasedatabase.app/',
     apiKey: 'AIzaSyA_RYw4ZaQs8GD_wJs_bGsNJPjpkKyL4yU',
-    authDomain: 'garuda-1ba07.firebaseapp.com',
-    projectId: 'garuda-1ba07',
-    storageBucket: 'garuda-1ba07.firebasestorage.app',
-    messagingSenderId: '683499127522',
     appId: '1:683499127522:web:97e1618cef14c36dc014bb',
+    messagingSenderId: '683499127522',
+    projectId: 'garuda-1ba07',
+    authDomain: 'garuda-1ba07.firebaseapp.com',
+    databaseURL: 'https://garuda-1ba07-default-rtdb.asia-southeast1.firebasedatabase.app',
+    storageBucket: 'garuda-1ba07.firebasestorage.app',
     measurementId: 'G-32PHS5XD9Z',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    databaseURL:
-        'https://garuda-1ba07-default-rtdb.asia-southeast1.firebasedatabase.app/',
-    apiKey: 'AIzaSyA_RYw4ZaQs8GD_wJs_bGsNJPjpkKyL4yU',
-    authDomain: 'garuda-1ba07.firebaseapp.com',
-    projectId: 'garuda-1ba07',
-    storageBucket: 'garuda-1ba07.firebasestorage.app',
+    apiKey: 'AIzaSyCI14SfgeCZEqo8LOVbTh8fxhNz4KZRk64',
+    appId: '1:683499127522:android:7c0a5293ff4b19c8c014bb',
     messagingSenderId: '683499127522',
-    appId: '1:683499127522:web:97e1618cef14c36dc014bb',
-    measurementId: 'G-32PHS5XD9Z',
+    projectId: 'garuda-1ba07',
+    databaseURL: 'https://garuda-1ba07-default-rtdb.asia-southeast1.firebasedatabase.app',
+    storageBucket: 'garuda-1ba07.firebasestorage.app',
   );
+
 }

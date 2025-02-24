@@ -50,23 +50,26 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBkdNjHCo7gahfjEJRcGz64EQwsIkQYkFY',
-    appId: '1:129760746257:web:46f4e6fa1a22ce7deb8ab0',
-    messagingSenderId: '129760746257',
-    projectId: 'vkhillseva',
-    authDomain: 'vkhillseva.firebaseapp.com',
-    databaseURL: 'https://vkhillseva-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'vkhillseva.firebasestorage.app',
-    measurementId: 'G-QVKKNHS8ZS',
+    databaseURL:
+        'https://garuda-1ba07-default-rtdb.asia-southeast1.firebasedatabase.app/',
+    apiKey: 'AIzaSyA_RYw4ZaQs8GD_wJs_bGsNJPjpkKyL4yU',
+    authDomain: 'garuda-1ba07.firebaseapp.com',
+    projectId: 'garuda-1ba07',
+    storageBucket: 'garuda-1ba07.firebasestorage.app',
+    messagingSenderId: '683499127522',
+    appId: '1:683499127522:web:97e1618cef14c36dc014bb',
+    measurementId: 'G-32PHS5XD9Z',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAcKPvG97ruORaBB0Qc8sVe4et9mjxe_V4',
-    appId: '1:129760746257:android:790024f3a0cd91aeeb8ab0',
-    messagingSenderId: '129760746257',
-    projectId: 'vkhillseva',
-    databaseURL: 'https://vkhillseva-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'vkhillseva.firebasestorage.app',
+    databaseURL:
+        'https://garuda-1ba07-default-rtdb.asia-southeast1.firebasedatabase.app/',
+    apiKey: 'AIzaSyA_RYw4ZaQs8GD_wJs_bGsNJPjpkKyL4yU',
+    authDomain: 'garuda-1ba07.firebaseapp.com',
+    projectId: 'garuda-1ba07',
+    storageBucket: 'garuda-1ba07.firebasestorage.app',
+    messagingSenderId: '683499127522',
+    appId: '1:683499127522:web:97e1618cef14c36dc014bb',
+    measurementId: 'G-32PHS5XD9Z',
   );
-
 }

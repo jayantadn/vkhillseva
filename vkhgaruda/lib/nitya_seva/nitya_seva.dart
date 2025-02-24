@@ -3,23 +3,17 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/datatypes.dart';
-import 'package:vkhgaruda/common/fb.dart';
-import 'package:vkhgaruda/common/toaster.dart';
-import 'package:vkhgaruda/common/utils.dart';
 import 'package:vkhgaruda/nitya_seva/festival.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/laddu.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/tas/tas.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
 import 'package:vkhgaruda/widgets/common_widgets.dart';
-import 'package:vkhgaruda/widgets/loading_overlay.dart';
-import 'package:vkhgaruda/common/theme.dart';
 import 'package:vkhgaruda/nitya_seva/day_summary.dart';
 import 'package:vkhgaruda/widgets/date_header.dart';
 import 'package:vkhgaruda/widgets/launcher_tile.dart';
 import 'package:vkhgaruda/home/settings.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class NityaSeva extends StatefulWidget {
   final String title;
@@ -51,7 +45,7 @@ class _NityaSevaState extends State<NityaSeva> {
     // listed to database events
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
     FB().listenForChange(
-        "NityaSeva/$dbDate",
+        "${Const().dbrootGaruda}/NityaSeva/$dbDate",
         FBCallbacks(
           // add
           add: (data) {
@@ -146,7 +140,8 @@ class _NityaSevaState extends State<NityaSeva> {
 
     // fetch festival sevas from db
     _sevaList.clear();
-    dynamic data = await FB().getValue(path: "Settings/NityaSevaList");
+    dynamic data = await FB()
+        .getValue(path: "${Const().dbrootGaruda}/Settings/NityaSevaList");
     if (data != null) {
       for (var element in List<dynamic>.from(data)) {
         Map<String, dynamic> map = Map<String, dynamic>.from(element);
@@ -157,7 +152,8 @@ class _NityaSevaState extends State<NityaSeva> {
     // fetch session details from db
     _sessions.clear();
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
-    List<dynamic> sessions = await FB().getList(path: "NityaSeva/$dbDate");
+    List<dynamic> sessions =
+        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
     for (var session in sessions) {
       Map<String, dynamic> map = Map<String, dynamic>.from(session as Map);
       if (map['Settings'] != null) {
@@ -253,7 +249,9 @@ class _NityaSevaState extends State<NityaSeva> {
           });
 
           // delete in server
-          FB().deleteValue(path: "NityaSeva/$dbDate/${session.name}");
+          FB().deleteValue(
+              path:
+                  "${Const().dbrootGaruda}/NityaSeva/$dbDate/${session.name}");
 
           Toaster().info("Session deleted");
         }
@@ -505,7 +503,8 @@ class _NityaSevaState extends State<NityaSeva> {
                             }
                             if (errors.isEmpty || ret == 'Proceed') {
                               FB().addMapToList(
-                                path: "NityaSeva/$dbDate",
+                                path:
+                                    "${Const().dbrootGaruda}/NityaSeva/$dbDate",
                                 child: "Settings",
                                 data: newSession.toJson(),
                               );
@@ -530,7 +529,8 @@ class _NityaSevaState extends State<NityaSeva> {
                                 .toIso8601String()
                                 .replaceAll(".", "^");
                             FB().editJson(
-                                path: "NityaSeva/$dbDate/$dbTimestamp/Settings",
+                                path:
+                                    "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbTimestamp/Settings",
                                 json: newSession.toJson());
                           }
 
@@ -586,7 +586,9 @@ class _NityaSevaState extends State<NityaSeva> {
                       String dbTimestamp = session.timestamp
                           .toIso8601String()
                           .replaceAll(".", "^");
-                      FB().deleteValue(path: "NityaSeva/$dbDate/$dbTimestamp");
+                      FB().deleteValue(
+                          path:
+                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbTimestamp");
 
                       // close the dialog
                       Navigator.of(context).pop();

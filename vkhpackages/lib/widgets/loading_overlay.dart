@@ -31,7 +31,7 @@ class LoadingOverlay extends StatelessWidget {
                 height: size,
                 child: ClipOval(
                   child: Image.asset(
-                    image ?? 'assets/images/Logo/SangeetSeva.png',
+                    image ?? 'assets/images/Logo/KrishnaLilaPark_circle.png',
                     fit: BoxFit.cover,
                   ),
                 ),

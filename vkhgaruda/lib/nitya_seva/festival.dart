@@ -3,13 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/fb.dart';
-import 'package:vkhgaruda/common/utils.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
-import 'package:vkhgaruda/widgets/loading_overlay.dart';
-import 'package:vkhgaruda/common/theme.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class FestivalRecord extends StatefulWidget {
   final String title;
@@ -77,8 +73,8 @@ class _FestivalRecordState extends State<FestivalRecord> {
     });
 
     // perform async operations here
-    List datesRaw =
-        await FB().getListByYear(path: "NityaSeva", year: _selectedYear);
+    List datesRaw = await FB().getListByYear(
+        path: "${Const().dbrootGaruda}/NityaSeva", year: _selectedYear);
 
     await Utils().fetchFestivalIcons();
 
@@ -143,8 +139,9 @@ class _FestivalRecordState extends State<FestivalRecord> {
         String dbDate = DateFormat("yyyy-MM-dd").format(session.timestamp);
         String dbSession =
             session.timestamp.toIso8601String().replaceAll(".", "^");
-        List ticketsRaw =
-            await FB().getList(path: "NityaSeva/$dbDate/$dbSession/Tickets");
+        List ticketsRaw = await FB().getList(
+            path:
+                "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets");
         int numTickets = 0;
         int sumAmount = 0;
         for (var ticketRaw in ticketsRaw) {

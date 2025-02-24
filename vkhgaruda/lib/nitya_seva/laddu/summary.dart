@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/utils.dart';
-import 'package:vkhgaruda/common/utils.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class Summary extends StatefulWidget {
   const Summary({super.key});

@@ -2,12 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/common/utils.dart';
 import 'package:vkhgaruda/home/pin_page.dart';
-import 'package:vkhgaruda/widgets/auth.dart';
-import 'package:vkhgaruda/widgets/loading_overlay.dart';
-import 'package:vkhgaruda/common/theme.dart';
 import 'package:vkhgaruda/widgets/welcome.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class Landing extends StatefulWidget {
   final String title;

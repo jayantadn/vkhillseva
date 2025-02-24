@@ -76,7 +76,10 @@ class Utils {
       List sevaListRaw = await FB().getList(path: "Settings/NityaSevaList");
       for (var sevaRaw in sevaListRaw) {
         Map<String, dynamic> sevaMap = Map<String, dynamic>.from(sevaRaw);
-        festivalIcons.add({'name': sevaMap['name'], 'icon': sevaMap['icon']});
+        festivalIcons.add({
+          'name': sevaMap['name'],
+          'icon': sevaMap['icon'],
+        });
       }
     }
   }

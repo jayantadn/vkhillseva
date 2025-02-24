@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/datatypes.dart';
-import 'package:vkhgaruda/common/fb.dart';
 import 'package:vkhgaruda/widgets/image_selector.dart';
-import 'package:vkhgaruda/widgets/loading_overlay.dart';
-import 'package:vkhgaruda/common/theme.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class FestivalSettingsPage extends StatefulWidget {
   final String title;
@@ -43,7 +39,8 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
     });
 
     // fetch festival list from db
-    var data = await FB().getValue(path: "Settings/NityaSevaList");
+    var data = await FB()
+        .getValue(path: "${Const().dbrootGaruda}/Settings/NityaSevaList");
     if (data != null) {
       List<dynamic> values = data as List;
       _festivals.clear();
@@ -180,7 +177,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                 });
                 _festivals.sort((a, b) => a.name.compareTo(b.name));
                 FB().setValue(
-                    path: "Settings/NityaSevaList",
+                    path: "${Const().dbrootGaruda}/Settings/NityaSevaList",
                     value: _festivals.map((e) => e.toJson()).toList());
 
                 Navigator.of(context).pop();
@@ -218,7 +215,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                   }
                 });
                 await FB().setValue(
-                    path: "Settings/NityaSevaList",
+                    path: "${Const().dbrootGaruda}/Settings/NityaSevaList",
                     value: _festivals.map((e) => e.toJson()).toList());
 
                 // ignore: use_build_context_synchronously

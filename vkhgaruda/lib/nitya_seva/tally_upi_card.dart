@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/common/fb.dart';
-import 'package:vkhgaruda/common/local_storage.dart';
-import 'package:vkhgaruda/common/theme.dart';
-import 'package:vkhgaruda/common/toaster.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class TallyUpiCardPage extends StatefulWidget {
   const TallyUpiCardPage({super.key});
@@ -45,8 +42,9 @@ class _TallyNotesPageState extends State<TallyUpiCardPage> {
         String dbDate = DateFormat("yyyy-MM-dd").format(_timestampSlot!);
         String dbSession =
             _timestampSlot!.toIso8601String().replaceAll(".", "^");
-        List ticketsRaw =
-            await FB().getList(path: "NityaSeva/$dbDate/$dbSession/Tickets");
+        List ticketsRaw = await FB().getList(
+            path:
+                "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets");
         for (var t in ticketsRaw) {
           Map<String, dynamic> ticket = Map<String, dynamic>.from(t);
           sevatickets.add(Ticket.fromJson(ticket));
@@ -62,7 +60,9 @@ class _TallyNotesPageState extends State<TallyUpiCardPage> {
 
         // set the _money values
         FB()
-            .getValue(path: "NityaSeva/$dbDate/$dbSession/TallyUpiCard")
+            .getValue(
+                path:
+                    "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/TallyUpiCard")
             .then((value) {
           if (value != null && value.isNotEmpty) {
             _controller400.text = value['400'].toString();
@@ -203,7 +203,8 @@ class _TallyNotesPageState extends State<TallyUpiCardPage> {
                   String dbSession =
                       _timestampSlot!.toIso8601String().replaceAll(".", "^");
                   FB().setJson(
-                      path: "NityaSeva/$dbDate/$dbSession/TallyUpiCard",
+                      path:
+                          "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/TallyUpiCard",
                       json: json);
                 } else {
                   Toaster().error('Unable to save');

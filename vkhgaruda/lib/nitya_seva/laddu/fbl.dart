@@ -1,9 +1,7 @@
 import 'dart:async';
-
+import 'package:vkhpackages/vkhpackages.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/toaster.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
@@ -49,8 +47,8 @@ class FBL {
 
   Future<List<Session>> readPushpanjaliSlotsByDate(DateTime date) async {
     String dbDate = DateFormat('yyyy-MM-dd').format(date);
-    final dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/NityaSeva/$dbDate');
+    final dbRef = FirebaseDatabase.instance
+        .ref('${Const().dbrootGaruda}/NityaSeva/$dbDate');
 
     // final dbRef = FirebaseDatabase.instance
     //     .ref('record_db${Const().dbVersion}/sevaSlots');
@@ -76,7 +74,7 @@ class FBL {
     String dbDate = DateFormat('yyyy-MM-dd').format(timestampSlot);
     String dbSession = timestampSlot.toIso8601String().replaceAll('.', '^');
     final dbRef = FirebaseDatabase.instance
-        .ref('${Const().dbroot}/NityaSeva/$dbDate/$dbSession/Tickets');
+        .ref('${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets');
 
     DataSnapshot snapshot = await dbRef.get();
     if (snapshot.exists) {
@@ -266,7 +264,8 @@ class FBL {
   Future<void> listenForChange(String path, FBLCallbacks callbacks) async {
     bool initialLoad = true;
 
-    final dbRef = FirebaseDatabase.instance.ref('${Const().dbroot}/$path');
+    final dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/$path');
 
     _sevaTicketAddedSubscription = dbRef.onChildAdded.listen((event) {
       if (!initialLoad) callbacks.onChange("ADD", event.snapshot.value);
@@ -477,7 +476,7 @@ class FBL {
 
   Future<DateTime> readLatestLadduSession() async {
     final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva');
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva');
 
     DateTime endDate = DateTime.now();
     DateTime startDate = endDate.subtract(Duration(days: 30));
@@ -504,7 +503,7 @@ class FBL {
   Future<List<DateTime>> readLadduSessions(
       DateTime startDate, DateTime endDate) async {
     final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva');
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva');
 
     final Query query = dbRef
         .orderByKey()
@@ -527,7 +526,7 @@ class FBL {
   Future<LadduReturn> readLadduReturnStatus(DateTime session) {
     String a = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('${Const().dbroot}/LadduSeva/$a/returned');
+        .ref('${Const().dbrootGaruda}/LadduSeva/$a/returned');
 
     return dbRef.get().then((snapshot) {
       if (snapshot.exists) {
@@ -582,7 +581,7 @@ class FBL {
   ) async {
     String a = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$a');
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva/$a');
 
     // set return status
     DatabaseReference refRet = dbRef.child('returned');
@@ -611,7 +610,7 @@ class FBL {
   Future<bool> editLadduStock(DateTime session, LadduStock stock) async {
     String a = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$a');
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva/$a');
 
     // Add a new laddu stock
     DateTime timestamp = stock.timestamp;
@@ -635,7 +634,7 @@ class FBL {
   Future<void> editLadduReturn(DateTime session, LadduReturn lr) async {
     String a = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('${Const().dbroot}/LadduSeva/$a/returned');
+        .ref('${Const().dbrootGaruda}/LadduSeva/$a/returned');
 
     // set return status
     DatabaseReference refRet = dbRef.child('count');
@@ -648,7 +647,7 @@ class FBL {
   Future<bool> editLadduServe(DateTime session, LadduServe serve) async {
     String s = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$s');
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva/$s');
 
     // edit laddu stock
     DateTime timestamp = serve.timestamp;
@@ -672,7 +671,7 @@ class FBL {
   Future<bool> deleteLadduStock(DateTime session, LadduStock stock) async {
     String a = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$a');
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva/$a');
 
     // delete laddu stock
     DateTime timestamp = stock.timestamp;
@@ -696,7 +695,7 @@ class FBL {
   Future<bool> deleteLadduServe(DateTime session, LadduServe serve) async {
     String a = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$a');
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva/$a');
 
     // delete laddu serve
     DateTime timestamp = serve.timestamp;
@@ -719,8 +718,8 @@ class FBL {
 
   Future<List<LadduStock>> readLadduStocks(DateTime session) async {
     String a = session.toIso8601String().replaceAll(".", "^");
-    final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$a/stocks');
+    final DatabaseReference dbRef = FirebaseDatabase.instance
+        .ref('${Const().dbrootGaruda}/LadduSeva/$a/stocks');
 
     DataSnapshot snapshot = await dbRef.get();
 
@@ -738,8 +737,8 @@ class FBL {
 
   Future<List<LadduStock>> readLadduStocksByDateRange(
       DateTime startDate, DateTime endDate) async {
-    final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/stocks');
+    final DatabaseReference dbRef = FirebaseDatabase.instance
+        .ref('${Const().dbrootGaruda}/LadduSeva/stocks');
 
     final Query query = dbRef
         .orderByKey()
@@ -763,7 +762,7 @@ class FBL {
 
   Future<DateTime> addLadduSession() async {
     final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva');
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva');
 
     DateTime timestamp = DateTime.now();
     DatabaseReference ref =
@@ -781,7 +780,7 @@ class FBL {
   Future<bool> addLadduServe(DateTime session, LadduServe dist) async {
     String s = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$s');
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva/$s');
 
     // Add a new laddu distribution
     DateTime timestamp = dist.timestamp;
@@ -799,8 +798,8 @@ class FBL {
 
   Future<List<LadduServe>> readLadduServes(DateTime session) async {
     String s = session.toIso8601String().replaceAll(".", "^");
-    final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbroot}/LadduSeva/$s/serves');
+    final DatabaseReference dbRef = FirebaseDatabase.instance
+        .ref('${Const().dbrootGaruda}/LadduSeva/$s/serves');
 
     DataSnapshot snapshot;
     snapshot = await dbRef.get();
@@ -820,7 +819,7 @@ class FBL {
   Future<void> returnLadduStock(DateTime session, LadduReturn lr) async {
     String s = session.toIso8601String().replaceAll(".", "^");
     final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('${Const().dbroot}/LadduSeva/$s/returned');
+        .ref('${Const().dbrootGaruda}/LadduSeva/$s/returned');
 
     await dbRef.update({
       'count': lr.count,

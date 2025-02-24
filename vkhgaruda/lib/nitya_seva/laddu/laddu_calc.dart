@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/utils.dart';
-import 'package:vkhgaruda/common/toaster.dart';
-import 'package:vkhgaruda/common/utils.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 String selectedPurpose = "Others";
 bool selectedPurposeChanged = false;

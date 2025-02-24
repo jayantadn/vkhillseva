@@ -56,45 +56,32 @@ class _CalendarState extends State<Calendar> {
     });
   }
 
-  Widget _createCalendarDay({
-    required DateTime day,
-    bool? border,
-    bool? fill,
-  }) {
+  Widget _createCalendarDay({required DateTime day, bool? border, bool? fill}) {
     return Padding(
       padding: const EdgeInsets.all(2.0),
       child: Center(
         child: Container(
           decoration: BoxDecoration(
-            color: (fill != null && fill == true)
-                ? Colors.blue[50]
-                : Colors.transparent,
+            color:
+                (fill != null && fill == true)
+                    ? Colors.blue[50]
+                    : Colors.transparent,
             border: border == true ? Border.all(color: Colors.grey) : null,
             borderRadius: BorderRadius.circular(8.0),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                '${day.day}',
-              ),
+              Text('${day.day}'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   for (int i = 0; i < _bookedSlotsCnt[day.day - 1]; i++)
-                    Icon(
-                      Icons.circle,
-                      color: Colors.red,
-                      size: 5,
-                    ),
+                    Icon(Icons.circle, color: Colors.red, size: 5),
                   for (int i = 0; i < _avlSlotsCnt[day.day - 1]; i++)
-                    Icon(
-                      Icons.circle,
-                      color: Colors.green,
-                      size: 5,
-                    )
+                    Icon(Icons.circle, color: Colors.green, size: 5),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -107,8 +94,11 @@ class _CalendarState extends State<Calendar> {
       // generate for whole month
       int startDay = DateTime.now().day - 1;
       for (int day = startDay; day < 31; day++) {
-        DateTime givenDate =
-            DateTime(DateTime.now().year, DateTime.now().month, day + 1);
+        DateTime givenDate = DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          day + 1,
+        );
         int booked = await SlotUtils().getBookedSlotsCount(givenDate);
         int total = await SlotUtils().getTotalSlotsCount(givenDate);
 
@@ -149,11 +139,13 @@ class _CalendarState extends State<Calendar> {
         },
         selectedBuilder: (context, day, focusedDay) {
           return _createCalendarDay(
-              day: day,
-              border: now.day == day.day &&
-                  now.month == day.month &&
-                  now.year == day.year,
-              fill: true);
+            day: day,
+            border:
+                now.day == day.day &&
+                now.month == day.month &&
+                now.year == day.year,
+            fill: true,
+          );
         },
       ),
       onDaySelected: (selectedDay, focusedDay) async {
@@ -166,9 +158,7 @@ class _CalendarState extends State<Calendar> {
       onPageChanged: (focusedDay) async {
         // TODO: rfresh availability indicators
       },
-      availableCalendarFormats: const {
-        CalendarFormat.month: 'Month',
-      },
+      availableCalendarFormats: const {CalendarFormat.month: 'Month'},
     );
   }
 }
@@ -187,8 +177,10 @@ class SlotUtils {
   Future<int> getTotalSlotsCount(DateTime date) async {
     // get slots from database
     String dbDate = DateFormat("yyyy-MM-dd").format(date);
-    List<dynamic> slotList =
-        await FB().getList(dbroot: Const().dbroot, path: "Slots/$dbDate");
+    List<dynamic> slotList = await FB().getList(
+      dbroot: Const().dbrootSangeetSeva,
+      path: "Slots/$dbDate",
+    );
 
     // add slots for weekend
     bool isWeekend =

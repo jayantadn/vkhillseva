@@ -5,14 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/fb.dart';
-import 'package:vkhgaruda/common/utils.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class DaySummary extends StatefulWidget {
   final DateTime date;
@@ -53,7 +51,7 @@ class _DaySummaryState extends State<DaySummary> {
 // listed to database events
     String dbDate = DateFormat('yyyy-MM-dd').format(widget.date);
     FB().listenForChange(
-        "NityaSeva/$dbDate",
+        "${Const().dbrootGaruda}/NityaSeva/$dbDate",
         FBCallbacks(
           // add
           add: (data) {
@@ -121,7 +119,8 @@ class _DaySummaryState extends State<DaySummary> {
   void refresh() async {
     // async work
     String dbDate = DateFormat("yyyy-MM-dd").format(widget.date);
-    List sessionsList = await FB().getList(path: "NityaSeva/$dbDate");
+    List sessionsList =
+        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
     List<Session> sessions = [];
     for (var sessionRaw in sessionsList) {
       if (sessionRaw['Settings'] == null) {
@@ -201,7 +200,9 @@ class _DaySummaryState extends State<DaySummary> {
 
           // loop through each ticket
           FB()
-              .getList(path: "NityaSeva/$dbDate/$dbSession/Tickets")
+              .getList(
+                  path:
+                      "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets")
               .then((tickets) {
             setState(() {
               // async work in another thread

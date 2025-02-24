@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/common/fb.dart';
-import 'package:vkhgaruda/common/local_storage.dart';
-import 'package:vkhgaruda/common/theme.dart';
-import 'package:vkhgaruda/common/toaster.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class TallyCashPage extends StatefulWidget {
   const TallyCashPage({super.key});
@@ -50,8 +47,9 @@ class _TallyNotesPageState extends State<TallyCashPage> {
         String dbDate = DateFormat("yyyy-MM-dd").format(_timestampSlot!);
         String dbSession =
             _timestampSlot!.toIso8601String().replaceAll(".", "^");
-        List ticketsRaw =
-            await FB().getList(path: "NityaSeva/$dbDate/$dbSession/Tickets");
+        List ticketsRaw = await FB().getList(
+            path:
+                "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets");
         for (var t in ticketsRaw) {
           Map<String, dynamic> ticket = Map<String, dynamic>.from(t);
           sevatickets.add(Ticket.fromJson(ticket));
@@ -67,7 +65,9 @@ class _TallyNotesPageState extends State<TallyCashPage> {
 
         // set the _cash values
         FB()
-            .getValue(path: "NityaSeva/$dbDate/$dbSession/TallyCash")
+            .getValue(
+                path:
+                    "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/TallyCash")
             .then((value) {
           if (value != null && value.isNotEmpty) {
             _cash = Map<String, int>.from(value as Map);
@@ -169,7 +169,10 @@ class _TallyNotesPageState extends State<TallyCashPage> {
       // write to db
       String dbDate = DateFormat("yyyy-MM-dd").format(_timestampSlot!);
       String dbSession = _timestampSlot!.toIso8601String().replaceAll(".", "^");
-      FB().setJson(path: "NityaSeva/$dbDate/$dbSession/TallyCash", json: json);
+      FB().setJson(
+          path:
+              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/TallyCash",
+          json: json);
     } else {
       Toaster().error('Unable to save');
     }

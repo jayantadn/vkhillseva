@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/utils.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({super.key});

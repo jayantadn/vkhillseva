@@ -3,11 +3,8 @@ import 'package:crypto/crypto.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vkhgaruda/common/const.dart';
 import 'package:vkhgaruda/home/home.dart';
-import 'package:vkhgaruda/widgets/loading_overlay.dart';
-import 'package:vkhgaruda/common/theme.dart';
-import 'package:vkhgaruda/common/toaster.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class ChangePin extends StatefulWidget {
   final String title;
@@ -137,7 +134,7 @@ class _ChangePinState extends State<ChangePin> {
                         var bytes = utf8.encode(_oldPinController.text);
                         var digest = sha256.convert(bytes);
                         DatabaseReference dbref = FirebaseDatabase.instance
-                            .ref("${Const().dbroot}/Config");
+                            .ref("${Const().dbrootGaruda}/Config");
                         DataSnapshot snapshot =
                             await dbref.child("PinHash").get();
                         if (snapshot.value != digest.toString()) {

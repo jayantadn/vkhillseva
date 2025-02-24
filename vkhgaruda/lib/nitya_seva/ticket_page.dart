@@ -3,17 +3,12 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/fb.dart';
-import 'package:vkhgaruda/common/local_storage.dart';
-import 'package:vkhgaruda/common/utils.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/session_summary.dart';
 import 'package:vkhgaruda/nitya_seva/tally_cash.dart';
 import 'package:vkhgaruda/nitya_seva/tally_upi_card.dart';
 import 'package:vkhgaruda/widgets/common_widgets.dart';
-import 'package:vkhgaruda/widgets/loading_overlay.dart';
-import 'package:vkhgaruda/common/theme.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class TicketPage extends StatefulWidget {
   final Session session;
@@ -45,7 +40,7 @@ class _TicketPageState extends State<TicketPage> {
     String sessionKey =
         widget.session.timestamp.toIso8601String().replaceAll(".", "^");
     FB().listenForChange(
-        "NityaSeva/$dbDate/$sessionKey/Tickets",
+        "${Const().dbrootGaruda}/NityaSeva/$dbDate/$sessionKey/Tickets",
         FBCallbacks(
           // add
           add: (data) {
@@ -134,8 +129,8 @@ class _TicketPageState extends State<TicketPage> {
     String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
     String dbSession =
         widget.session.timestamp.toIso8601String().replaceAll(".", "^");
-    List ticketsJson =
-        await FB().getList(path: "NityaSeva/$dbDate/$dbSession/Tickets");
+    List ticketsJson = await FB().getList(
+        path: "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets");
     await _lock.synchronized(() async {
       _tickets.clear();
       for (var t in ticketsJson) {
@@ -362,7 +357,8 @@ class _TicketPageState extends State<TicketPage> {
 
     // check if ticket is not from latest session
     String dbDate = DateFormat("yyyy-MM-dd").format(now);
-    var sessionsList = await FB().getList(path: "NityaSeva/$dbDate");
+    var sessionsList =
+        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
     List<Session> sessions = [];
     for (var sessionRaw in sessionsList) {
       Map<String, dynamic> s =
@@ -413,7 +409,8 @@ class _TicketPageState extends State<TicketPage> {
 
     // check if ticket is created in the correct session
     String dbDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-    var sessionsList = await FB().getList(path: "NityaSeva/$dbDate");
+    var sessionsList =
+        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
     if (sessionsList.isEmpty) {
       errors.add("No sessions found for today");
     } else {
@@ -463,7 +460,9 @@ class _TicketPageState extends State<TicketPage> {
           String dbSession =
               widget.session.timestamp.toIso8601String().replaceAll(".", "^");
           String key = ticket.timestamp.toIso8601String().replaceAll(".", "^");
-          FB().deleteValue(path: "NityaSeva/$dbDate/$dbSession/Tickets/$key");
+          FB().deleteValue(
+              path:
+                  "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key");
         }));
   }
 
@@ -810,11 +809,11 @@ class _TicketPageState extends State<TicketPage> {
                                         .replaceAll(".", "^");
                                     FB().deleteValue(
                                         path:
-                                            "NityaSeva/$dbDate/$dbSession/Tickets/$key");
+                                            "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key");
                                   }
                                   FB().addMapToList(
                                       path:
-                                          "NityaSeva/$dbDate/$dbSession/Tickets",
+                                          "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets",
                                       data: t.toJson());
 
                                   // post validations

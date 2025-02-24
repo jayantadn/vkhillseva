@@ -3,12 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/fb.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
-import 'package:vkhgaruda/widgets/loading_overlay.dart';
-import 'package:vkhgaruda/common/theme.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class SessionSummary extends StatefulWidget {
   final String title;
@@ -211,8 +208,8 @@ class _SessionSummaryState extends State<SessionSummary> {
     String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
     String dbSession =
         widget.session.timestamp.toIso8601String().replaceAll(".", "^");
-    List ticketsJson =
-        await FB().getList(path: "NityaSeva/$dbDate/$dbSession/Tickets");
+    List ticketsJson = await FB().getList(
+        path: "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets");
 
     await _lock.synchronized(() async {
       _listEntries.clear();

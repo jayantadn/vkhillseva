@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vkhgaruda/widgets/loading_overlay.dart';
-import 'package:vkhgaruda/common/theme.dart';
 import 'package:vkhgaruda/home/festival_settings_page.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class Settings extends StatefulWidget {
   final String title;

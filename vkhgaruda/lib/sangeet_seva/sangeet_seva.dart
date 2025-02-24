@@ -3,14 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/datatypes.dart';
-import 'package:vkhgaruda/common/fb.dart';
-import 'package:vkhgaruda/common/toaster.dart';
 import 'package:vkhgaruda/sangeet_seva/profiles.dart';
-import 'package:vkhgaruda/widgets/calendar.dart';
-import 'package:vkhgaruda/widgets/loading_overlay.dart';
-import 'package:vkhgaruda/common/theme.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class SangeetSeva extends StatefulWidget {
   final String title;
@@ -83,7 +77,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
     if (date.weekday == 6 || date.weekday == 7) {
       // fetch the slots for the date
       String dbDate = DateFormat("yyyy-MM-dd").format(date);
-      List slotsRaw = await FB().getList(path: "Slots/$dbDate");
+      List slotsRaw =
+          await FB().getList(path: "${Const().dbrootGaruda}/Slots/$dbDate");
       List<Slot> bookedSlots = [];
       for (var slotRaw in slotsRaw) {
         Map<String, dynamic> slotMap = Map<String, dynamic>.from(slotRaw);
@@ -107,7 +102,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     String dbDate = DateFormat("yyyy-MM-dd").format(date);
     List<dynamic> slotsRaw = await FB().getList(
       dbroot: Const().dbrootSangeetSeva,
-      path: "Slots/$dbDate",
+      path: "${Const().dbrootGaruda}/Slots/$dbDate",
     );
 
     // add the slots from database
@@ -186,7 +181,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     String dbDate = DateFormat("yyyy-MM-dd").format(_selectedDate);
     await FB().addKVToList(
       dbroot: Const().dbrootSangeetSeva,
-      path: "Slots/$dbDate",
+      path: "${Const().dbrootGaruda}/Slots/$dbDate",
       key: name,
       value: Slot(name: name, avl: true, from: startTime, to: endTime).toJson(),
     );
@@ -338,11 +333,10 @@ class _SangeetSevaState extends State<SangeetSeva> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder:
-                            (context) => Profiles(
-                              title: 'Performer Profiles',
-                              icon: widget.icon,
-                            ),
+                        builder: (context) => Profiles(
+                          title: 'Performer Profiles',
+                          icon: widget.icon,
+                        ),
                       ),
                     );
                   },

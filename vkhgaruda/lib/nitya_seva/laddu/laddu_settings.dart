@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vkhgaruda/common/const.dart';
-import 'package:vkhgaruda/common/fb.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class LadduSettings extends StatefulWidget {
   const LadduSettings({super.key});
@@ -64,14 +63,16 @@ class _LadduSettingsState extends State<LadduSettings> {
   Future<void> _refresh() async {
     // load settings from fb
     List pushpanjaliTicketsRaw = await FB().getValue(
-      path: "Settings/LadduDistribution/LadduPackMultiplier/Pushpanjali",
+      path:
+          "${Const().dbrootGaruda}/Settings/LadduDistribution/LadduPackMultiplier/Pushpanjali",
     );
     _pushpanjaliTickets.clear();
     for (var ticket in pushpanjaliTicketsRaw) {
       _pushpanjaliTickets.add(Map<String, int>.from(ticket));
     }
     List otherSevaTicketsRaw = await FB().getValue(
-      path: "Settings/LadduDistribution/LadduPackMultiplier/OtherSevas",
+      path:
+          "${Const().dbrootGaruda}/Settings/LadduDistribution/LadduPackMultiplier/OtherSevas",
     );
     _otherSevaTickets.clear();
     for (var ticket in otherSevaTicketsRaw) {
@@ -248,10 +249,12 @@ class _LadduSettingsState extends State<LadduSettings> {
     }
 
     FB().setValue(
-        path: "Settings/LadduDistribution/LadduPackMultiplier/Pushpanjali",
+        path:
+            "${Const().dbrootGaruda}/Settings/LadduDistribution/LadduPackMultiplier/Pushpanjali",
         value: _pushpanjaliTickets);
     FB().setValue(
-        path: "Settings/LadduDistribution/LadduPackMultiplier/OtherSevas",
+        path:
+            "${Const().dbrootGaruda}/Settings/LadduDistribution/LadduPackMultiplier/OtherSevas",
         value: _otherSevaTickets);
 
     Navigator.pop(context);

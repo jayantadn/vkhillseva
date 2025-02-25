@@ -91,20 +91,7 @@ def main():
         print("ERROR: Failed to create new branch")
         sys.exit(1)
 
-    # print("main patch for testing - multi line")
-    main_file = f'{project}/lib/main.dart'
-    search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);'
-    replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);\n'
-    with open(main_file, 'r') as file:
-        lines = file.readlines()
-    with open(main_file, 'w') as file:
-        for line in lines:
-            if search_string in line:
-                file.write(replacement_string)
-            else:
-                file.write(line)
-
-    # print("main patch for testing - single line")
+    print("main patch for testing - single line")
     main_file = f'{project}/lib/main.dart'
     search_string = '      home: home,'
     replacement_string = '      home: test,\n'

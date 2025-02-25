@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Hare Krishna',
+      title: 'Sangeet Seva',
       theme: themeDefault,
       home: home,
     );

@@ -51,8 +51,8 @@ class _ProfilesState extends State<Profiles> {
     // perform async operations here
     _performers.clear();
     List<dynamic> usersRawList = await FB().getList(
-        path: "${Const().dbrootGaruda}/Users",
-        dbroot: Const().dbrootSangeetSeva);
+      path: "${Const().dbrootSangeetSeva}/Users",
+    );
     for (var userRaw in usersRawList) {
       Map<String, dynamic> userJson = Map<String, dynamic>.from(userRaw);
       UserDetails user = UserDetails.fromJson(userJson);

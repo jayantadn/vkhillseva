@@ -199,7 +199,7 @@ class FB {
     required dynamic value,
   }) async {
     try {
-      DatabaseReference dbref = FirebaseDatabase.instance.ref("path");
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
       await dbref.child(key).set(value);
     } catch (e) {
       Toaster().error("Error adding key-value to list: $e");

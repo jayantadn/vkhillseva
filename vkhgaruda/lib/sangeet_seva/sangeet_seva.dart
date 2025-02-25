@@ -77,8 +77,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
     if (date.weekday == 6 || date.weekday == 7) {
       // fetch the slots for the date
       String dbDate = DateFormat("yyyy-MM-dd").format(date);
-      List slotsRaw =
-          await FB().getList(path: "${Const().dbrootGaruda}/Slots/$dbDate");
+      List slotsRaw = await FB()
+          .getList(path: "${Const().dbrootSangeetSeva}/Slots/$dbDate");
       List<Slot> bookedSlots = [];
       for (var slotRaw in slotsRaw) {
         Map<String, dynamic> slotMap = Map<String, dynamic>.from(slotRaw);
@@ -101,8 +101,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     _avlSlots.clear();
     String dbDate = DateFormat("yyyy-MM-dd").format(date);
     List<dynamic> slotsRaw = await FB().getList(
-      dbroot: Const().dbrootSangeetSeva,
-      path: "${Const().dbrootGaruda}/Slots/$dbDate",
+      path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
     );
 
     // add the slots from database
@@ -180,14 +179,13 @@ class _SangeetSevaState extends State<SangeetSeva> {
     // add to database
     String dbDate = DateFormat("yyyy-MM-dd").format(_selectedDate);
     await FB().addKVToList(
-      dbroot: Const().dbrootSangeetSeva,
-      path: "${Const().dbrootGaruda}/Slots/$dbDate",
+      path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
       key: name,
       value: Slot(name: name, avl: true, from: startTime, to: endTime).toJson(),
     );
 
     // refresh the availability indicators
-    calendarKey.currentState?.fillAvailabilityIndicators(date: _selectedDate);
+    calendarKey.currentState!.fillAvailabilityIndicators(date: _selectedDate);
     await _fillBookingLists(_selectedDate);
 
     setState(() {});

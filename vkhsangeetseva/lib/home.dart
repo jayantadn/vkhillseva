@@ -18,6 +18,7 @@ class _MyHomePageState extends State<HomePage> {
   // scalars
   bool _isLoading = true;
   String _username = "";
+  final int _maxEvents = 5;
 
   // lists
   List<EventRecord> _events = [];
@@ -52,15 +53,16 @@ class _MyHomePageState extends State<HomePage> {
 
     // fetch all events
     if (basics != null) {
-      List eventsRaw = await FB().getList(path: "Events/${basics.mobile}");
+      List eventsRaw = await FB().getList(
+          path: "${Const().dbrootSangeetSeva}/Events/${basics.mobile}");
       for (var eventRaw in eventsRaw) {
         Map<String, dynamic> eventMap = Map<String, dynamic>.from(eventRaw);
         EventRecord event = EventRecord.fromJson(eventMap);
         _events.add(event);
       }
       _events.sort((a, b) => b.date.compareTo(a.date));
-      if (_events.length > 10) {
-        _events = _events.sublist(0, 10);
+      if (_events.length > _maxEvents) {
+        _events = _events.sublist(0, _maxEvents);
       }
     }
 
@@ -159,7 +161,8 @@ class _MyHomePageState extends State<HomePage> {
                           if (basics != null) {
                             Map<String, dynamic> userdetailsMap = await FB()
                                 .getJson(
-                                    path: "Users/${basics.mobile}",
+                                    path:
+                                        "${Const().dbrootSangeetSeva}/Users/${basics.mobile}",
                                     silent: true);
 
                             if (userdetailsMap['name'].isEmpty) {

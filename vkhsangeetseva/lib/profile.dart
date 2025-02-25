@@ -128,10 +128,11 @@ class _ProfileState extends State<Profile> {
     if (widget.self != null && widget.self == true) {
       await Utils().fetchUserBasics();
       String mobile = Utils().getUserBasics()!.mobile;
-      bool exists = await FB().pathExists("Users/$mobile");
+      bool exists =
+          await FB().pathExists("${Const().dbrootSangeetSeva}/Users/$mobile");
       if (exists) {
-        Map<String, dynamic> userdetailsJson =
-            await FB().getJson(path: "Users/$mobile");
+        Map<String, dynamic> userdetailsJson = await FB()
+            .getJson(path: "${Const().dbrootSangeetSeva}/Users/$mobile");
         _userDetailsOld = UserDetails.fromJson(userdetailsJson);
       }
     }
@@ -294,7 +295,7 @@ class _ProfileState extends State<Profile> {
     }
 
     // write to database
-    String dbpath = "Users/${details.mobile}";
+    String dbpath = "${Const().dbrootSangeetSeva}/Users/${details.mobile}";
     await FB().setJson(path: dbpath, json: details.toJson());
 
     // update old details

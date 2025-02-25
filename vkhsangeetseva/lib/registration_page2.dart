@@ -73,10 +73,12 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     // fetch form values
     await Utils().fetchUserBasics();
     String mobile = Utils().getUserBasics()!.mobile;
-    bool userExists = await FB().pathExists("Users/$mobile");
+    bool userExists =
+        await FB().pathExists("${Const().dbrootSangeetSeva}/Users/$mobile");
     Map<String, dynamic> userdetailsJson = {};
     if (userExists) {
-      userdetailsJson = await FB().getJson(path: "Users/$mobile");
+      userdetailsJson = await FB()
+          .getJson(path: "${Const().dbrootSangeetSeva}/Users/$mobile");
     } else {
       Toaster().error("User not found");
     }
@@ -395,7 +397,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                               } else {
                                 String mobile = basics.mobile;
                                 FB().addToList(
-                                    path: "Events/$mobile",
+                                    path:
+                                        "${Const().dbrootSangeetSeva}/Events/$mobile",
                                     data: performanceRequest.toJson());
                               }
 

@@ -91,7 +91,19 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     setState(() {
       _isLoading = false;
 
-      if (userdetailsJson.isNotEmpty) {
+      if (userdetailsJson.isEmpty) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return Profile(
+            title: "Profile",
+            self: true,
+            onProfileSaved: (user) {
+              setState(() {
+                _mainPerformer = user;
+              });
+            },
+          );
+        }));
+      } else {
         _mainPerformer = UserDetails.fromJson(userdetailsJson);
       }
     });
@@ -356,6 +368,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                   controller: _noteController,
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(),
+                                    hintText: "optional note for performer",
                                   ),
                                 ),
                               ],

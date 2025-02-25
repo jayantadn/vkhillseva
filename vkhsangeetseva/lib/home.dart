@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
+import 'package:vkhsangeetseva/version.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
 import 'package:vkhsangeetseva/widgets/welcome.dart';
 
@@ -15,7 +16,6 @@ class HomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<HomePage> {
   // scalars
-  final String _version = "1.0.0";
   bool _isLoading = true;
   String _username = "";
 
@@ -256,7 +256,7 @@ class _MyHomePageState extends State<HomePage> {
           top: 10,
           right: 10,
           child: Text(
-            "v$_version}",
+            "v$version}",
             style: Theme.of(context)
                 .textTheme
                 .bodySmall!

@@ -19,9 +19,6 @@ def run_command(command):
     return result.stdout.strip()
 
 def main():
-    rootdir = run_command('git rev-parse --show-toplevel')
-    os.chdir(rootdir)
-
     # choose the project
     projectid = input("Enter project (1. Garuda, 2. SangeetSeva): ")
     if projectid == "1":
@@ -46,9 +43,9 @@ def main():
 
 
 
-    print("Read the value of the 'version' key from Const")
-    version_file = f'{project}/lib/common/const.dart'
-    search_string = "  final String version = "
+    print("Read the value of the 'version' key")
+    version_file = f'{project}/lib/version.dart'
+    search_string = "final String version = "
     with open(version_file, 'r') as file:
         lines = file.readlines()
         for line in lines:
@@ -56,6 +53,7 @@ def main():
                 version = line.split('=')[1].strip()
                 break
     version = version.replace('"', "");
+    version = version.replace(';', "");
 
     print("Increment the version number based on user selection")
     if version_type == "major":
@@ -82,19 +80,18 @@ def main():
     print("Checkout a new branch based on the latest branch")
     try:
         create_or_switch_branch(new_branch)
-        print("Update the version in const")
+        print("Update the version")
         with open(version_file, 'w') as file:
             for line in lines:
                 if line.startswith(search_string):
                     file.write(f'{search_string}"{major}.{minor}.{bugfix}";\n')
                 else:
                     file.write(line)
-        pass
     except subprocess.CalledProcessError:
         print("ERROR: Failed to create new branch")
         sys.exit(1)
 
-    # print("main patch for testing")
+    # print("main patch for testing - multi line")
     main_file = f'{project}/lib/main.dart'
     search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);'
     replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);\n'
@@ -107,6 +104,19 @@ def main():
             else:
                 file.write(line)
 
+    # print("main patch for testing - single line")
+    main_file = f'{project}/lib/main.dart'
+    search_string = '      home: home,'
+    replacement_string = '      home: test,\n'
+    with open(main_file, 'r') as file:
+        lines = file.readlines()
+    with open(main_file, 'w') as file:
+        for line in lines:
+            if search_string in line:
+                file.write(replacement_string)
+            else:
+                file.write(line)
+    
     print("Set the remote for the new branch and push")
     try:
         subprocess.check_output(["git", "push", "-u", "origin", new_branch])

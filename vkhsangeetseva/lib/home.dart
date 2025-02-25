@@ -165,7 +165,8 @@ class _MyHomePageState extends State<HomePage> {
                                         "${Const().dbrootSangeetSeva}/Users/${basics.mobile}",
                                     silent: true);
 
-                            if (userdetailsMap['name'].isEmpty) {
+                            if (userdetailsMap['name'] == null ||
+                                userdetailsMap['name'].isEmpty) {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "garuda-1ba07"
+  },
+  "targets": {
+    "garuda-1ba07": {
+      "hosting": {
+        "govindasangeetseva": [
+          "govindasangeetseva"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

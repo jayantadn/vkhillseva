@@ -199,7 +199,7 @@ class _ProfileState extends State<Profile> {
 
       // upload to firestore
       String path =
-          "${Const().dbroot}/Users/${_mobileController.text}/profile.png";
+          "${Const().dbrootSangeetSeva}/Users/${_mobileController.text}/profile.png";
       final storageRef = FirebaseStorage.instance.ref();
       final fileRef = storageRef.child(path);
 
@@ -701,7 +701,7 @@ class _ProfileState extends State<Profile> {
                                             String ext =
                                                 file.name.split('.').last;
                                             String dstPath =
-                                                "${Const().dbroot}/Users/${basics.mobile}/audio$index.$ext";
+                                                "${Const().dbrootSangeetSeva}/Users/${basics.mobile}/audio$index.$ext";
                                             String url = await FS().uploadBytes(
                                                 dstPath: dstPath,
                                                 bytes: file.bytes!);

@@ -237,8 +237,8 @@ class _RegistrationState extends State<Registration> {
     // retrieve slots from db
     _avlSlots.clear();
     String dbDate = DateFormat("yyyy-MM-dd").format(date);
-    List<dynamic> slotsRaw =
-        await FB().getList(dbroot: Const().dbroot, path: "Slots/$dbDate");
+    List<dynamic> slotsRaw = await FB()
+        .getList(dbroot: Const().dbrootSangeetSeva, path: "Slots/$dbDate");
 
     // add the slots from database
     for (var slotRaw in slotsRaw) {

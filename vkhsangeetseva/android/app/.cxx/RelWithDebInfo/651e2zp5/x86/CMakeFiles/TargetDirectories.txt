@@ -1,0 +1,2 @@
+X:/GitRepos/vkhillseva/vkhsangeetseva/android/app/.cxx/RelWithDebInfo/651e2zp5/x86/CMakeFiles/edit_cache.dir
+X:/GitRepos/vkhillseva/vkhsangeetseva/android/app/.cxx/RelWithDebInfo/651e2zp5/x86/CMakeFiles/rebuild_cache.dir

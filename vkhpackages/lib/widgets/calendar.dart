@@ -178,8 +178,7 @@ class SlotUtils {
     // get slots from database
     String dbDate = DateFormat("yyyy-MM-dd").format(date);
     List<dynamic> slotList = await FB().getList(
-      dbroot: Const().dbrootSangeetSeva,
-      path: "Slots/$dbDate",
+      path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
     );
 
     // add slots for weekend

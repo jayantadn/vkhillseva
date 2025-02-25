@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/version.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Welcome extends StatefulWidget {
@@ -13,7 +14,6 @@ class Welcome extends StatefulWidget {
 GlobalKey<_WelcomeState> summaryKey = GlobalKey<_WelcomeState>();
 
 class _WelcomeState extends State<Welcome> {
-  final String version = '3.0.0';
   final Lock _lock = Lock();
   String _username = '';
 

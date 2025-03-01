@@ -15,7 +15,7 @@ class FestivalSettings {
 
 class Slot {
   final String name;
-  final bool avl;
+  bool avl;
   final String from;
   final String to;
 

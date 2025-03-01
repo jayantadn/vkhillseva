@@ -181,15 +181,23 @@ class SlotUtils {
       path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
     );
 
-    // add slots for weekend
-    bool isWeekend =
-        date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
-
-    return slotList.length + (isWeekend ? 2 : 0);
+    return slotList.length + (Utils().isDateWeekend(date) ? 2 : 0);
   }
 
   Future<int> getBookedSlotsCount(DateTime date) async {
-    // TODO: implementation pending
-    return 0;
+    String dbDate = DateFormat("yyyy-MM-dd").format(date);
+    List<dynamic> slotList = await FB().getList(
+      path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
+    );
+
+    int cnt = 0;
+    for (var slotRaw in slotList) {
+      Slot slot = Utils().convertRawToDatatype(slotRaw, Slot.fromJson);
+      if (slot.avl == false) {
+        cnt++;
+      }
+    }
+
+    return cnt;
   }
 }

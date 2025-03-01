@@ -98,6 +98,23 @@ class _RequestDetailsState extends State<RequestDetails> {
         path: "${Const().dbrootSangeetSeva}/PendingRequests",
         value: pendingRequestsRaw);
 
+    // mark the availability of the slot
+    if (action == "Approve") {
+      widget.eventRecord.slot.avl = false;
+      String dbdate = DateFormat("yyyy-MM-dd").format(widget.eventRecord.date);
+      String dbpath = "${Const().dbrootSangeetSeva}/Slots/$dbdate";
+      if (await FB().pathExists(dbpath)) {
+        // TODO
+      } else {
+        if (Utils().isDateWeekend(widget.eventRecord.date)) {
+          FB().setJson(
+              path: dbpath, json: {"Slot1": widget.eventRecord.slot.toJson()});
+        } else {
+          Toaster().error("Invalid slot");
+        }
+      }
+    }
+
     // callback
     widget.callback(action);
   }

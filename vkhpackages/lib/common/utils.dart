@@ -136,4 +136,8 @@ class Utils {
     Map<String, dynamic> map = Map<String, dynamic>.from(raw);
     return fromJson(map);
   }
+
+  bool isDateWeekend(DateTime date) {
+    return date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
+  }
 }

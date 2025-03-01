@@ -76,10 +76,7 @@ class Utils {
       List sevaListRaw = await FB().getList(path: "Settings/NityaSevaList");
       for (var sevaRaw in sevaListRaw) {
         Map<String, dynamic> sevaMap = Map<String, dynamic>.from(sevaRaw);
-        festivalIcons.add({
-          'name': sevaMap['name'],
-          'icon': sevaMap['icon'],
-        });
+        festivalIcons.add({'name': sevaMap['name'], 'icon': sevaMap['icon']});
       }
     }
   }
@@ -114,9 +111,10 @@ class Utils {
     double maxWidth = 300;
 
     final double screenWidth = MediaQuery.of(context).size.width;
-    maxWidth = (screenWidth > maxWidth && screenWidth < maxWidth * 2)
-        ? screenWidth
-        : maxWidth;
+    maxWidth =
+        (screenWidth > maxWidth && screenWidth < maxWidth * 2)
+            ? screenWidth
+            : maxWidth;
 
     return Wrap(
       spacing: 10,
@@ -129,5 +127,9 @@ class Utils {
           ),
       ],
     );
+  }
+
+  Map<String, dynamic> convertRawToJson(dynamic raw) {
+    return Map<String, dynamic>.from(raw);
   }
 }

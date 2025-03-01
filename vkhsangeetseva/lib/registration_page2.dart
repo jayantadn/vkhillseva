@@ -128,7 +128,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       Toaster().error("Cant access user data");
       return;
     } else {
-      String mobile = basics.mobile;
+      mobile = basics.mobile;
       index = await FB().addToList(
           listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
           data: performanceRequest.toJson());

@@ -102,7 +102,8 @@ class FB {
       DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
       DataSnapshot snapshot = await dbref.get();
       if (snapshot.value is List) {
-        return List<dynamic>.from(snapshot.value as List);
+        List ret = List<dynamic>.from(snapshot.value as List);
+        return ret;
       } else if (snapshot.value is Map) {
         return List<dynamic>.from((snapshot.value as Map).values);
       } else {

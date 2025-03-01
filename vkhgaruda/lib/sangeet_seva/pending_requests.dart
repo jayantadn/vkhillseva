@@ -139,6 +139,12 @@ class _PendingRequestsState extends State<PendingRequests> {
                         );
                       }),
 
+                      // empty message
+                      if (_linkedEventRecords.isEmpty)
+                        Center(
+                          child: Text("No pending requests"),
+                        ),
+
                       // leave some space at bottom
                       SizedBox(height: 100),
                     ],

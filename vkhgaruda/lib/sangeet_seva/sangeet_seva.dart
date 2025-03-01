@@ -22,6 +22,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   DateTime _selectedDate = DateTime.now();
+  int _pendingUsers = 0;
 
   // lists
   List<int> _bookedSlotsCnt = [];
@@ -325,6 +326,50 @@ class _SangeetSevaState extends State<SangeetSeva> {
             appBar: AppBar(
               title: Text(widget.title),
               actions: [
+                // pending users
+                Stack(children: [
+                  IconButton(
+                    icon: Icon(Icons.notifications),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Profiles(
+                            title: 'Performer Profiles',
+                            icon: widget.icon,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  if (_pendingUsers > 0)
+                    Positioned(
+                      right: 10,
+                      bottom: 10,
+                      child: Container(
+                        padding: EdgeInsets.only(left: 4, right: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: 10,
+                          minHeight: 10,
+                        ),
+                        child: Text(
+                          '$_pendingUsers',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    )
+                ]),
+
+                // registered users
                 IconButton(
                   icon: Icon(Icons.group),
                   onPressed: () {

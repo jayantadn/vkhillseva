@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Garuda',
       theme: themeDefault,
-      home: home,
+      home: test,
     );
   }
 }

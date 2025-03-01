@@ -52,57 +52,61 @@ class _MyHomePageState extends State<HomePage> {
       ),
       body: Stack(children: [
         Center(
-            child: Column(
-          children: [
-            //welcome message
-            Welcome(),
+            child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              //welcome message
+              Welcome(),
 
-            // row of launchers
-            SizedBox(height: 50),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: LauncherTile(
-                        image: 'assets/images/LauncherIcons/NityaSeva.png',
-                        title: "Nitya\nSeva",
+              // row of launchers
+              SizedBox(height: 50),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: LauncherTile(
+                          image: 'assets/images/LauncherIcons/NityaSeva.png',
+                          title: "Nitya\nSeva",
+                          callback: LauncherTileCallback(onClick: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const NityaSeva(title: "Nitya Seva")),
+                            );
+                          })),
+                    ),
+                    LauncherTile(
+                      image: 'assets/images/LauncherIcons/Harinaam.png',
+                      title: "Harinaam\nMantapa",
+                    ),
+                    LauncherTile(
+                        image: 'assets/images/Logo/SangeetSeva.png',
+                        title: "Sangeet\nSeva",
                         callback: LauncherTileCallback(onClick: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    const NityaSeva(title: "Nitya Seva")),
+                                    const SangeetSeva(title: "Sangeet Seva")),
                           );
                         })),
-                  ),
-                  LauncherTile(
-                    image: 'assets/images/LauncherIcons/Harinaam.png',
-                    title: "Harinaam\nMantapa",
-                  ),
-                  LauncherTile(
-                      image: 'assets/images/Logo/SangeetSeva.png',
-                      title: "Sangeet\nSeva",
-                      callback: LauncherTileCallback(onClick: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const SangeetSeva(title: "Sangeet Seva")),
-                        );
-                      })),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: LauncherTile(
-                      image: 'assets/images/LauncherIcons/Deepotsava.png',
-                      title: "Karthika\nDeepotsava",
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: LauncherTile(
+                        image: 'assets/images/LauncherIcons/Deepotsava.png',
+                        title: "Karthika\nDeepotsava",
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            )
-          ],
+              SizedBox(height: 100),
+            ],
+          ),
         )),
 
         // circular progress indicator

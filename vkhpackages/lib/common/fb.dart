@@ -165,7 +165,7 @@ class FB {
     }
   }
 
-  Future<void> addToList({
+  Future<void> addToListOld({
     required String path,
     String? child,
     required Map<String, dynamic> data,
@@ -189,6 +189,25 @@ class FB {
       }
     } catch (e) {
       Toaster().error("Error adding data to list: $e");
+    }
+  }
+
+  Future<int> addToList({required String path, required dynamic data}) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
+      DataSnapshot snap = await dbref.get();
+      if (snap.value == null) {
+        await dbref.set([data]);
+        return 0;
+      } else {
+        List<dynamic> list = List<dynamic>.from(snap.value as List);
+        list.add(data);
+        await dbref.set(list);
+        return list.length - 1;
+      }
+    } catch (e) {
+      Toaster().error("Error adding data to list: $e");
+      return -1;
     }
   }
 

@@ -22,7 +22,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   DateTime _selectedDate = DateTime.now();
-  int _pendingUsers = 0;
+  int _pendingRequests = 0;
 
   // lists
   List<int> _bookedSlotsCnt = [];
@@ -63,6 +63,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
     // perform async operations here
     await _fillBookingLists(_selectedDate);
+    _pendingRequests = await _getPendingRequestsCount();
 
     // refresh all child widgets
 
@@ -72,6 +73,48 @@ class _SangeetSevaState extends State<SangeetSeva> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<bool> _addFreeSlot(
+    String name,
+    String startTime,
+    String endTime,
+  ) async {
+    // validations
+    if (startTime == "__:__" || endTime == "__:__") {
+      Toaster().error("Please enter both start and end time");
+      return false;
+    }
+
+    // check if end time is greater than start time
+    final DateFormat timeFormat = DateFormat('hh:mm a');
+    try {
+      final DateTime startDateTime = timeFormat.parse(startTime);
+      final DateTime endDateTime = timeFormat.parse(endTime);
+      if (endDateTime.isBefore(startDateTime)) {
+        Toaster().error("End time should be greater than start time");
+        return false;
+      }
+    } catch (e) {
+      // Handle parsing errors
+      Toaster().error('Error parsing time: $e');
+    }
+
+    // add to database
+    String dbDate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+    await FB().addKVToList(
+      path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
+      key: name,
+      value: Slot(name: name, avl: true, from: startTime, to: endTime).toJson(),
+    );
+
+    // refresh the availability indicators
+    calendarKey.currentState!.fillAvailabilityIndicators(date: _selectedDate);
+    await _fillBookingLists(_selectedDate);
+
+    setState(() {});
+
+    return true;
   }
 
   Future<void> _addWeekendFreeSlots(DateTime date) async {
@@ -152,46 +195,10 @@ class _SangeetSevaState extends State<SangeetSeva> {
     );
   }
 
-  Future<bool> _addFreeSlot(
-    String name,
-    String startTime,
-    String endTime,
-  ) async {
-    // validations
-    if (startTime == "__:__" || endTime == "__:__") {
-      Toaster().error("Please enter both start and end time");
-      return false;
-    }
+  Future<int> _getPendingRequestsCount() async {
+    int pendingRequests = 0;
 
-    // check if end time is greater than start time
-    final DateFormat timeFormat = DateFormat('hh:mm a');
-    try {
-      final DateTime startDateTime = timeFormat.parse(startTime);
-      final DateTime endDateTime = timeFormat.parse(endTime);
-      if (endDateTime.isBefore(startDateTime)) {
-        Toaster().error("End time should be greater than start time");
-        return false;
-      }
-    } catch (e) {
-      // Handle parsing errors
-      Toaster().error('Error parsing time: $e');
-    }
-
-    // add to database
-    String dbDate = DateFormat("yyyy-MM-dd").format(_selectedDate);
-    await FB().addKVToList(
-      path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
-      key: name,
-      value: Slot(name: name, avl: true, from: startTime, to: endTime).toJson(),
-    );
-
-    // refresh the availability indicators
-    calendarKey.currentState!.fillAvailabilityIndicators(date: _selectedDate);
-    await _fillBookingLists(_selectedDate);
-
-    setState(() {});
-
-    return true;
+    return pendingRequests;
   }
 
   Future<void> _showFreeSlotDialog(BuildContext context) async {
@@ -342,7 +349,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
                       );
                     },
                   ),
-                  if (_pendingUsers > 0)
+                  if (_pendingRequests > 0)
                     Positioned(
                       right: 10,
                       bottom: 10,
@@ -357,7 +364,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
                           minHeight: 10,
                         ),
                         child: Text(
-                          '$_pendingUsers',
+                          '$_pendingRequests',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 12,

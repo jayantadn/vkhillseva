@@ -11,13 +11,15 @@ class RequestDetails extends StatefulWidget {
   final String? icon;
   final Map<String, dynamic> pendingRequest;
   final EventRecord eventRecord;
+  final void Function(String action) callback;
 
   const RequestDetails(
       {super.key,
       required this.title,
       this.icon,
       required this.pendingRequest,
-      required this.eventRecord});
+      required this.eventRecord,
+      required this.callback});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -74,12 +76,30 @@ class _RequestDetailsState extends State<RequestDetails> {
     List eventsRaw = await FB().getList(path: path);
 
     EventRecord event =
-        Utils().convertRawToMap(eventsRaw[index], EventRecord.fromJson);
+        Utils().convertRawToDatatype(eventsRaw[index], EventRecord.fromJson);
     event.status = action == "Approve" ? "Approved" : "Rejected";
     event.noteTemple = _noteController.text;
 
     eventsRaw[index] = event.toJson();
     await FB().setValue(path: path, value: eventsRaw);
+
+    // loop through all pending requests, remove the matching one
+    List pendingRequestsRaw = await FB()
+        .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
+    for (var pendingRequestRaw in pendingRequestsRaw) {
+      Map<String, dynamic> pendingRequest =
+          Map<String, dynamic>.from(pendingRequestRaw);
+      if (pendingRequest['path'] == path && pendingRequest['index'] == index) {
+        pendingRequestsRaw.remove(pendingRequestRaw);
+        break;
+      }
+    }
+    await FB().setValue(
+        path: "${Const().dbrootSangeetSeva}/PendingRequests",
+        value: pendingRequestsRaw);
+
+    // callback
+    widget.callback(action);
   }
 
   void _showDialog(String action) {

@@ -66,7 +66,7 @@ class _PendingRequestsState extends State<PendingRequests> {
       List pendingRequestsPerUserRaw = await FB().getList(path: path);
       var pendingRequestPerUserRaw = pendingRequestsPerUserRaw[index];
       EventRecord pendingRequest = Utils()
-          .convertRawToMap(pendingRequestPerUserRaw, EventRecord.fromJson);
+          .convertRawToDatatype(pendingRequestPerUserRaw, EventRecord.fromJson);
 
       _linkedEventRecords.add(pendingRequest);
     }
@@ -125,6 +125,12 @@ class _PendingRequestsState extends State<PendingRequests> {
                                 title: "Request Details",
                                 pendingRequest: _pendingRequests[index],
                                 eventRecord: _linkedEventRecords[index],
+                                callback: (String action) {
+                                  setState(() {
+                                    _linkedEventRecords.removeAt(index);
+                                    _pendingRequests.removeAt(index);
+                                  });
+                                },
                               );
                             }));
                           },

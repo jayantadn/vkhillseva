@@ -129,7 +129,10 @@ class Utils {
     );
   }
 
-  T convertRawToMap<T>(Map raw, T Function(Map<String, dynamic>) fromJson) {
+  T convertRawToDatatype<T>(
+    Map raw,
+    T Function(Map<String, dynamic>) fromJson,
+  ) {
     Map<String, dynamic> map = Map<String, dynamic>.from(raw);
     return fromJson(map);
   }

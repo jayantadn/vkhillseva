@@ -198,6 +198,11 @@ class _SangeetSevaState extends State<SangeetSeva> {
   Future<int> _getPendingRequestsCount() async {
     int pendingRequests = 0;
 
+    // get the list of pending requests
+    List<dynamic> pendingRequestsRaw = await FB()
+        .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
+    pendingRequests = pendingRequestsRaw.length;
+
     return pendingRequests;
   }
 

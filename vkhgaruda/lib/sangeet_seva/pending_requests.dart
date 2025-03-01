@@ -65,8 +65,8 @@ class _PendingRequestsState extends State<PendingRequests> {
 
       List pendingRequestsPerUserRaw = await FB().getList(path: path);
       var pendingRequestPerUserRaw = pendingRequestsPerUserRaw[index];
-      EventRecord pendingRequest = EventRecord.fromJson(
-          Utils().convertRawToJson(pendingRequestPerUserRaw));
+      EventRecord pendingRequest = Utils()
+          .convertRawToMap(pendingRequestPerUserRaw, EventRecord.fromJson);
 
       _linkedEventRecords.add(pendingRequest);
     }

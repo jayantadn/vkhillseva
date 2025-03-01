@@ -5,17 +5,11 @@ class FestivalSettings {
   FestivalSettings({required this.name, required this.icon});
 
   factory FestivalSettings.fromJson(Map<String, dynamic> json) {
-    return FestivalSettings(
-      name: json['name'],
-      icon: json['icon'],
-    );
+    return FestivalSettings(name: json['name'], icon: json['icon']);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'icon': icon,
-    };
+    return {'name': name, 'icon': icon};
   }
 }
 
@@ -44,12 +38,7 @@ class Slot {
 
   // Method to convert Slot to JSON
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'avl': avl,
-      'from': from,
-      'to': to,
-    };
+    return {'name': name, 'avl': avl, 'from': from, 'to': to};
   }
 }
 
@@ -60,9 +49,9 @@ class EventRecord {
   final List<UserDetails> supportTeam;
   final List<Guest> guests;
   final List<String> songs;
-  final String status;
+  String status;
   final String notePerformer;
-  final String noteTemple;
+  String noteTemple;
 
   EventRecord({
     required this.date,
@@ -80,7 +69,8 @@ class EventRecord {
     return EventRecord(
       date: DateTime.parse(json['date'] as String),
       mainPerformer: UserDetails.fromJson(
-          Map<String, dynamic>.from(json['mainPerformer'])),
+        Map<String, dynamic>.from(json['mainPerformer']),
+      ),
       notePerformer: json['notePerformer'] as String,
       noteTemple: json['noteTemple'] as String,
       slot: Slot.fromJson(Map<String, dynamic>.from(json['slot'])),
@@ -88,20 +78,24 @@ class EventRecord {
         return json['songs'][index];
       }),
       status: json['status'] as String,
-      guests: json['guests'] == null
-          ? []
-          : List.generate(json['guests'].length, (index) {
-              dynamic guestRaw = json['guests'][index];
-              Map<String, dynamic> guestMap =
-                  Map<String, dynamic>.from(guestRaw);
-              return Guest.fromJson(guestMap);
-            }),
-      supportTeam: json['supportTeam'] == null
-          ? []
-          : List.generate(json['supportTeam'].length, (index) {
-              return UserDetails.fromJson(
-                  Map<String, dynamic>.from(json['supportTeam'][index]));
-            }),
+      guests:
+          json['guests'] == null
+              ? []
+              : List.generate(json['guests'].length, (index) {
+                dynamic guestRaw = json['guests'][index];
+                Map<String, dynamic> guestMap = Map<String, dynamic>.from(
+                  guestRaw,
+                );
+                return Guest.fromJson(guestMap);
+              }),
+      supportTeam:
+          json['supportTeam'] == null
+              ? []
+              : List.generate(json['supportTeam'].length, (index) {
+                return UserDetails.fromJson(
+                  Map<String, dynamic>.from(json['supportTeam'][index]),
+                );
+              }),
     );
   }
 
@@ -134,10 +128,7 @@ class Guest {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'honorPrasadam': honorPrasadam,
-    };
+    return {'name': name, 'honorPrasadam': honorPrasadam};
   }
 }
 
@@ -176,12 +167,14 @@ class UserDetails {
       experience: json['experience'],
       fieldOfExpertise: json['fieldOfExpertise'],
       skills: json['skills'] == null ? [] : List<String>.from(json['skills']),
-      youtubeUrls: json['youtubeUrls'] == null
-          ? []
-          : List<String>.from(json['youtubeUrls']),
-      audioClipUrls: json['audioClipUrls'] == null
-          ? []
-          : List<String>.from(json['audioClipUrls']),
+      youtubeUrls:
+          json['youtubeUrls'] == null
+              ? []
+              : List<String>.from(json['youtubeUrls']),
+      audioClipUrls:
+          json['audioClipUrls'] == null
+              ? []
+              : List<String>.from(json['audioClipUrls']),
     );
   }
 

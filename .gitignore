@@ -46,6 +46,7 @@ app.*.map.json
 /**/android/app/debug
 /**/android/app/profile
 /**/android/app/release
+/**/android/app/.cxx/
 
 # Other files
 docs/.$UI_design.drawio.bkp
@@ -54,3 +55,4 @@ vkhsangeetseva/pubspec.lock
 vkhgaruda/pubspec.lock
 vkhsangeetseva/docs/.$UI_design.drawio.bkp
 vkhgaruda/android/app/.cxx/Debug/t3d5f411/hash_key.txt
+vkhgaruda/android/app/.cxx/Debug/t3d5f411/arm64-v8a/configure_fingerprint.bin

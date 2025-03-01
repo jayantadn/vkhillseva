@@ -68,62 +68,32 @@ class _RequestDetailsState extends State<RequestDetails> {
     });
   }
 
-  void _showRejectDialog() {
-    _noteController.clear();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Reject request"),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Are you sure you want to reject this request?"),
-                SizedBox(height: 10),
-                Text("Note:", style: themeDefault.textTheme.headlineSmall),
-                TextField(
-                  maxLines: 2,
-                  controller: _noteController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text("Cancel"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text("Reject"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+  Future<void> _performAction(String action) async {
+    String path = widget.pendingRequest['path'];
+    int index = widget.pendingRequest['index'];
+    List eventsRaw = await FB().getList(path: path);
+
+    EventRecord event =
+        Utils().convertRawToMap(eventsRaw[index], EventRecord.fromJson);
+    event.status = action == "Approve" ? "Approved" : "Rejected";
+    event.noteTemple = _noteController.text;
+
+    eventsRaw[index] = event.toJson();
+    await FB().setValue(path: path, value: eventsRaw);
   }
 
-  void _showApproveDialog() {
+  void _showDialog(String action) {
     _noteController.clear();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Approve request"),
+          title: Text("$action request"),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Are you sure you want to approve this request?"),
+                Text("Are you sure you want to $action this request?"),
                 SizedBox(height: 10),
                 Text("Note:", style: themeDefault.textTheme.headlineSmall),
                 TextField(
@@ -144,10 +114,16 @@ class _RequestDetailsState extends State<RequestDetails> {
               },
             ),
             TextButton(
-              child: Text("Approve"),
-              onPressed: () {
+              child: Text(action),
+              onPressed: () async {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
+
+                if (action == "Approve") {
+                  await _performAction("Approve");
+                } else {
+                  await _performAction("Reject");
+                }
               },
             ),
           ],
@@ -169,13 +145,17 @@ class _RequestDetailsState extends State<RequestDetails> {
                 // reject button
                 IconButton(
                   icon: Icon(Icons.close),
-                  onPressed: _showRejectDialog,
+                  onPressed: () {
+                    _showDialog("Reject");
+                  },
                 ),
 
                 // approve button
                 IconButton(
                   icon: Icon(Icons.check),
-                  onPressed: _showApproveDialog,
+                  onPressed: () {
+                    _showDialog("Approve");
+                  },
                 ),
               ],
             ),

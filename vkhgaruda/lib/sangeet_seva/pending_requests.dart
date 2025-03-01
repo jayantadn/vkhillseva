@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/sangeet_seva/request_details.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class PendingRequests extends StatefulWidget {
@@ -22,7 +23,8 @@ class _PendingRequestsState extends State<PendingRequests> {
   bool _isLoading = true;
 
   // lists
-  final List<EventRecord> _pendingRequests = [];
+  final List<Map<String, dynamic>> _pendingRequests = [];
+  final List<EventRecord> _linkedEventRecords = [];
 
   // controllers, listeners and focus nodes
 
@@ -36,7 +38,7 @@ class _PendingRequestsState extends State<PendingRequests> {
   @override
   dispose() {
     // clear all lists
-    _pendingRequests.clear();
+    _linkedEventRecords.clear();
 
     // clear all controllers and focus nodes
 
@@ -51,7 +53,7 @@ class _PendingRequestsState extends State<PendingRequests> {
     // perform async operations here
 
     // fetch pending requests
-    _pendingRequests.clear();
+    _linkedEventRecords.clear();
     List<dynamic> pendingRequestLinks = await FB()
         .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
     for (var pendingRequestLinkRaw in pendingRequestLinks) {
@@ -59,13 +61,14 @@ class _PendingRequestsState extends State<PendingRequests> {
           Map<String, dynamic>.from(pendingRequestLinkRaw);
       String path = pendingRequestLink['path'];
       int index = pendingRequestLink['index'];
+      _pendingRequests.add({'path': path, 'index': index});
 
       List pendingRequestsPerUserRaw = await FB().getList(path: path);
       var pendingRequestPerUserRaw = pendingRequestsPerUserRaw[index];
       EventRecord pendingRequest = EventRecord.fromJson(
           Utils().convertRawToJson(pendingRequestPerUserRaw));
 
-      _pendingRequests.add(pendingRequest);
+      _linkedEventRecords.add(pendingRequest);
     }
 
     // refresh all child widgets
@@ -89,13 +92,7 @@ class _PendingRequestsState extends State<PendingRequests> {
       leading: CircleAvatar(
           backgroundImage:
               NetworkImage(pendingRequest.mainPerformer.profilePicUrl)),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(performer),
-          Text(pendingRequest.notePerformer),
-        ],
-      ),
+      subtitle: Text(performer),
     ));
   }
 
@@ -119,8 +116,21 @@ class _PendingRequestsState extends State<PendingRequests> {
                       SizedBox(height: 10),
 
                       // your widgets here
-                      ...List.generate(_pendingRequests.length, (index) {
-                        _createPendingRequestCard(pendingRequest[index]);
+                      ...List.generate(_linkedEventRecords.length, (index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return RequestDetails(
+                                title: "Request Details",
+                                pendingRequest: _pendingRequests[index],
+                                eventRecord: _linkedEventRecords[index],
+                              );
+                            }));
+                          },
+                          child: _createPendingRequestCard(
+                              _linkedEventRecords[index]),
+                        );
                       }),
 
                       // leave some space at bottom

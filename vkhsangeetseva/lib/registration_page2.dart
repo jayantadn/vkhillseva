@@ -30,6 +30,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   UserDetails? _mainPerformer;
+  final _minSongs = 4;
 
   // lists
   final List<UserDetails> _supportingTeam = [];
@@ -104,8 +105,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     }
 
     // validate list of songs
-    if (_songs.length < 5) {
-      Toaster().error("Please enter at least 5 songs");
+    if (_songs.length < _minSongs) {
+      Toaster().error("Please enter at least $_minSongs songs");
       return;
     }
 

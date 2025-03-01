@@ -8,41 +8,47 @@
       "name": "vkhgaruda",
       "program": "vkhgaruda/lib/main.dart",
       "request": "launch",
-      "type": "dart"
+      "type": "dart",
+      "args": ["--web-port=8080"]
     },
     {
       "name": "vkhgaruda (profile mode)",
       "program": "vkhgaruda/lib/main.dart",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "profile"
+      "flutterMode": "profile",
+      "args": ["--web-port=8080"]
     },
     {
       "name": "vkhgaruda (release mode)",
       "program": "vkhgaruda/lib/main.dart",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "release"
+      "flutterMode": "release",
+      "args": ["--web-port=8080"]
     },
     {
       "name": "vkhsangeetseva",
       "program": "vkhsangeetseva/lib/main.dart",
       "request": "launch",
-      "type": "dart"
+      "type": "dart",
+      "args": ["--web-port=8081"]
     },
     {
       "name": "vkhsangeetseva (profile mode)",
       "program": "vkhsangeetseva/lib/main.dart",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "profile"
+      "flutterMode": "profile",
+      "args": ["--web-port=8081"]
     },
     {
       "name": "vkhsangeetseva (release mode)",
       "program": "vkhsangeetseva/lib/main.dart",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "release"
+      "flutterMode": "release",
+      "args": ["--web-port=8081"]
     }
   ]
 }

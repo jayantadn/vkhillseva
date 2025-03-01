@@ -49,11 +49,11 @@ class _LandingState extends State<Landing> {
     });
 
     // perform async operations here
-    Utils().fetchUserBasics().then((value) {
-      setState(() {
-        _username = Utils().getUsername();
-      });
+    await Utils().fetchUserBasics();
+    _username = Utils().getUsername();
 
+    // perform sync operations here
+    await _lock.synchronized(() async {
       if (_username.isNotEmpty) {
         Navigator.pushReplacement(
           // ignore: use_build_context_synchronously
@@ -66,9 +66,6 @@ class _LandingState extends State<Landing> {
         );
       }
     });
-
-    // perform sync operations here
-    await _lock.synchronized(() async {});
 
     setState(() {
       _isLoading = false;

@@ -13,6 +13,7 @@ class Const {
   }
 
   final String dbrootGaruda = "GARUDA_01";
+  final String dbrootTAS = "TAS_01";
   final String dbrootSangeetSeva = "SANGEETSEVA_01";
 
   final int fbListenerDelay = 2; // seconds
@@ -21,18 +22,8 @@ class Const {
   final int maxImageSize = 500; // kB
 
   final List<Slot> weekendSangeetSevaSlots = [
-    Slot(
-      name: "MorningSlot",
-      avl: true,
-      from: "10:00 AM",
-      to: "01:00 PM",
-    ),
-    Slot(
-      name: "EveningSlot",
-      avl: true,
-      from: "05:00 PM",
-      to: "08:00 PM",
-    ),
+    Slot(name: "MorningSlot", avl: true, from: "10:00 AM", to: "01:00 PM"),
+    Slot(name: "EveningSlot", avl: true, from: "05:00 PM", to: "08:00 PM"),
   ];
 
   final nityaSeva = {
@@ -43,10 +34,10 @@ class Const {
           "sevas": [
             {
               "name": "Pushpanjali",
-              "icon": "assets/images/NityaSeva/vishnu_pushpanjali.png"
-            }
-          ]
-        }
+              "icon": "assets/images/NityaSeva/vishnu_pushpanjali.png",
+            },
+          ],
+        },
       },
       {
         "500": {
@@ -54,18 +45,18 @@ class Const {
           "sevas": [
             {
               "name": "Tulasi Archana Seva",
-              "icon": "assets/images/NityaSeva/tas.png"
+              "icon": "assets/images/NityaSeva/tas.png",
             },
             {
               "name": "Jala-dana Seva",
-              "icon": "assets/images/NityaSeva/JalaDana.png"
+              "icon": "assets/images/NityaSeva/JalaDana.png",
             },
             {
               "name": "Sudharshana Chakra Puja",
-              "icon": "assets/images/VKHillDieties/Sudarshana.png"
-            }
-          ]
-        }
+              "icon": "assets/images/VKHillDieties/Sudarshana.png",
+            },
+          ],
+        },
       },
       {
         "1000": {
@@ -73,30 +64,30 @@ class Const {
           "sevas": [
             {
               "name": "Mandir-marjana Seva",
-              "icon": "assets/images/Logo/KrishnaLilaPark_square.png"
+              "icon": "assets/images/Logo/KrishnaLilaPark_square.png",
             },
             {
               "name": "Naivedya Seva",
-              "icon": "assets/images/NityaSeva/laddu.png"
+              "icon": "assets/images/NityaSeva/laddu.png",
             },
             {
               "name": "Sadhu Seva",
-              "icon": "assets/images/NityaSeva/sadhu_seva.png"
+              "icon": "assets/images/NityaSeva/sadhu_seva.png",
             },
             {
               "name": "Shringara Seva",
-              "icon": "assets/images/VKHillDieties/Govinda.png"
+              "icon": "assets/images/VKHillDieties/Govinda.png",
             },
             {
               "name": "Trikala Puja",
-              "icon": "assets/images/LauncherIcons/NityaSeva.png"
+              "icon": "assets/images/LauncherIcons/NityaSeva.png",
             },
             {
               "name": "Tulasi Hara Seva",
-              "icon": "assets/images/NityaSeva/tulasi_garland.png"
+              "icon": "assets/images/NityaSeva/tulasi_garland.png",
             },
-          ]
-        }
+          ],
+        },
       },
       {
         "2500": {
@@ -104,24 +95,24 @@ class Const {
           "sevas": [
             {
               "name": "Gita-Dana Seva",
-              "icon": "assets/images/NityaSeva/gita.png"
+              "icon": "assets/images/NityaSeva/gita.png",
             },
             {
               "name": "Pushpalankara Seva",
-              "icon": "assets/images/NityaSeva/flower_garland.png"
+              "icon": "assets/images/NityaSeva/flower_garland.png",
             },
             {
               "name": "Sadhu Bhojana Seva",
-              "icon": "assets/images/NityaSeva/sadhu_bhojana.png"
+              "icon": "assets/images/NityaSeva/sadhu_bhojana.png",
             },
             {
               "name": "Shodashopachara Seva",
-              "icon": "assets/images/NityaSeva/ShodashopacharaSeva.png"
+              "icon": "assets/images/NityaSeva/ShodashopacharaSeva.png",
             },
-          ]
-        }
+          ],
+        },
       },
-    ]
+    ],
   };
 
   final paymentModes = {

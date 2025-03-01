@@ -1,7 +1,10 @@
 [
   {
     "origin": [
-      "http://localhost:58430",
+      "http://localhost:8080",
+      "http://localhost:8081",
+      "https://vkhillseva.web.app/",
+      "https://vkhgaruda.web.app/",
       "https://vkhillgaruda.web.app/",
       "https://govindasangeetseva.web.app/"
     ],

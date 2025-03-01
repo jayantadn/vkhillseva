@@ -58,7 +58,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
           FestivalSettings(name: _festivals[i].name, icon: _festivals[i].icon);
     }
     FB().setValue(
-        path: "Settings/NityaSevaList",
+        path: "${Const().dbrootGaruda}/Settings/NityaSevaList",
         value: _festivals.map((e) => e.toJson()).toList());
 
     setState(() {

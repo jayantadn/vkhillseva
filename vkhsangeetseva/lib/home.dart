@@ -51,6 +51,25 @@ class _MyHomePageState extends State<HomePage> {
     await Utils().fetchUserBasics();
     UserBasics? basics = Utils().getUserBasics();
 
+    // set profile if not set
+    if (basics != null) {
+      Map<String, dynamic> userdetailsMap = await FB().getJson(
+          path: "${Const().dbrootSangeetSeva}/Users/${basics.mobile}",
+          silent: true);
+
+      if (userdetailsMap.isEmpty || userdetailsMap['name'].isEmpty) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Profile(
+              title: "Profile",
+              self: true,
+            ),
+          ),
+        );
+      }
+    }
+
     // fetch all events
     if (basics != null) {
       List eventsRaw = await FB().getList(
@@ -155,33 +174,7 @@ class _MyHomePageState extends State<HomePage> {
                       ),
                       onPressed: () {
                         smsAuth(context, () async {
-                          // get the user details
-                          await Utils().fetchUserBasics();
-                          UserBasics? basics = Utils().getUserBasics();
-                          if (basics != null) {
-                            Map<String, dynamic> userdetailsMap = await FB()
-                                .getJson(
-                                    path:
-                                        "${Const().dbrootSangeetSeva}/Users/${basics.mobile}",
-                                    silent: true);
-
-                            if (userdetailsMap['name'] == null ||
-                                userdetailsMap['name'].isEmpty) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Profile(
-                                    title: "Profile",
-                                    self: true,
-                                  ),
-                                ),
-                              );
-                            } else {
-                              await refresh();
-                            }
-                          }
-
-                          refresh();
+                          await refresh();
                         });
                       },
                       child: Text('Signup / Login'),
@@ -233,7 +226,7 @@ class _MyHomePageState extends State<HomePage> {
                                 ? Icon(Icons.question_mark)
                                 : (_events[index].status == "Approved"
                                     ? Icon(Icons.check)
-                                    : Icon(Icons.cancel)),
+                                    : Icon(Icons.close)),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -260,7 +253,7 @@ class _MyHomePageState extends State<HomePage> {
           top: 10,
           right: 10,
           child: Text(
-            "v$version}",
+            "v$version",
             style: Theme.of(context)
                 .textTheme
                 .bodySmall!

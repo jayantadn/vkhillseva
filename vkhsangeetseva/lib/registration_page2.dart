@@ -73,10 +73,12 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     // fetch form values
     await Utils().fetchUserBasics();
     String mobile = Utils().getUserBasics()!.mobile;
-    bool userExists = await FB().pathExists("Users/$mobile");
+    bool userExists =
+        await FB().pathExists("${Const().dbrootSangeetSeva}/Users/$mobile");
     Map<String, dynamic> userdetailsJson = {};
     if (userExists) {
-      userdetailsJson = await FB().getJson(path: "Users/$mobile");
+      userdetailsJson = await FB()
+          .getJson(path: "${Const().dbrootSangeetSeva}/Users/$mobile");
     } else {
       Toaster().error("User not found");
     }
@@ -127,14 +129,18 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       return;
     } else {
       String mobile = basics.mobile;
-      index = await FB()
-          .addToList(path: "Events/$mobile", data: performanceRequest.toJson());
+      index = await FB().addToList(
+          listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
+          data: performanceRequest.toJson());
     }
 
     // add to pending requests
     FB().addToList(
-        path: "${Const().dbrootSangeetSeva}/PendingRequests",
-        data: "${Const().dbrootSangeetSeva}/Events/$mobile/$index");
+        listpath: "${Const().dbrootSangeetSeva}/PendingRequests",
+        data: {
+          "path": "${Const().dbrootSangeetSeva}/Events/$mobile",
+          "index": index
+        });
 
     // go to homepage
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {

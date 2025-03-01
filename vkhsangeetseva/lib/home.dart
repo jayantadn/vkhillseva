@@ -52,8 +52,9 @@ class _MyHomePageState extends State<HomePage> {
 
     // set profile if not set
     if (basics != null) {
-      Map<String, dynamic> userdetailsMap =
-          await FB().getJson(path: "Users/${basics.mobile}", silent: true);
+      Map<String, dynamic> userdetailsMap = await FB().getJson(
+          path: "${Const().dbrootSangeetSeva}/Users/${basics.mobile}",
+          silent: true);
 
       if (userdetailsMap.isEmpty || userdetailsMap['name'].isEmpty) {
         Navigator.push(
@@ -70,7 +71,8 @@ class _MyHomePageState extends State<HomePage> {
 
     // fetch all events
     if (basics != null) {
-      List eventsRaw = await FB().getList(path: "Events/${basics.mobile}");
+      List eventsRaw = await FB().getList(
+          path: "${Const().dbrootSangeetSeva}/Events/${basics.mobile}");
       for (var eventRaw in eventsRaw) {
         Map<String, dynamic> eventMap = Map<String, dynamic>.from(eventRaw);
         EventRecord event = EventRecord.fromJson(eventMap);

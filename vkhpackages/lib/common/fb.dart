@@ -192,9 +192,12 @@ class FB {
     }
   }
 
-  Future<int> addToList({required String path, required dynamic data}) async {
+  Future<int> addToList({
+    required String listpath,
+    required dynamic data,
+  }) async {
     try {
-      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(listpath);
       DataSnapshot snap = await dbref.get();
       if (snap.value == null) {
         await dbref.set([data]);

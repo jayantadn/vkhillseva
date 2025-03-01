@@ -225,7 +225,7 @@ class _MyHomePageState extends State<HomePage> {
                                 ? Icon(Icons.question_mark)
                                 : (_events[index].status == "Approved"
                                     ? Icon(Icons.check)
-                                    : Icon(Icons.cancel)),
+                                    : Icon(Icons.close)),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [

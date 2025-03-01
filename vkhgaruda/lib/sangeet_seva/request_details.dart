@@ -32,6 +32,7 @@ class _RequestDetailsState extends State<RequestDetails> {
   // lists
 
   // controllers, listeners and focus nodes
+  final TextEditingController _noteController = TextEditingController();
 
   @override
   initState() {
@@ -45,6 +46,7 @@ class _RequestDetailsState extends State<RequestDetails> {
     // clear all lists
 
     // clear all controllers and focus nodes
+    _noteController.dispose();
 
     super.dispose();
   }
@@ -66,6 +68,94 @@ class _RequestDetailsState extends State<RequestDetails> {
     });
   }
 
+  void _showRejectDialog() {
+    _noteController.clear();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Reject request"),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Are you sure you want to reject this request?"),
+                SizedBox(height: 10),
+                Text("Note:", style: themeDefault.textTheme.headlineSmall),
+                TextField(
+                  maxLines: 2,
+                  controller: _noteController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Reject"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showApproveDialog() {
+    _noteController.clear();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Approve request"),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Are you sure you want to approve this request?"),
+                SizedBox(height: 10),
+                Text("Note:", style: themeDefault.textTheme.headlineSmall),
+                TextField(
+                  maxLines: 2,
+                  controller: _noteController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Approve"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -73,7 +163,22 @@ class _RequestDetailsState extends State<RequestDetails> {
       child: Stack(
         children: [
           Scaffold(
-            appBar: AppBar(title: Text(widget.title)),
+            appBar: AppBar(
+              title: Text(widget.title),
+              actions: [
+                // reject button
+                IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: _showRejectDialog,
+                ),
+
+                // approve button
+                IconButton(
+                  icon: Icon(Icons.check),
+                  onPressed: _showApproveDialog,
+                ),
+              ],
+            ),
             body: RefreshIndicator(
               onRefresh: refresh,
               child: SingleChildScrollView(

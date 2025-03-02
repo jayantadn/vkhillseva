@@ -182,11 +182,14 @@ class SlotUtils {
     );
 
     int cnt = slotListRaw.length;
-    for (Slot slotw in Const().weekendSangeetSevaSlots) {
-      for (var slotRaw in slotListRaw) {
-        Slot slot = Utils().convertRawToDatatype(slotRaw, Slot.fromJson);
-        if (slot.from != slotw.from && slot.to != slotw.to) {
-          cnt++;
+    if (Utils().isDateWeekend(date)) {
+      for (Slot slotw in Const().weekendSangeetSevaSlots) {
+        cnt++;
+        for (var slotRaw in slotListRaw) {
+          Slot slot = Utils().convertRawToDatatype(slotRaw, Slot.fromJson);
+          if (slot.from != slotw.from && slot.to != slotw.to) {
+            cnt--;
+          }
         }
       }
     }

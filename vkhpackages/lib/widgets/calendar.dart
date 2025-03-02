@@ -177,11 +177,21 @@ class SlotUtils {
   Future<int> getTotalSlotsCount(DateTime date) async {
     // get slots from database
     String dbDate = DateFormat("yyyy-MM-dd").format(date);
-    List<dynamic> slotList = await FB().getList(
+    List<dynamic> slotListRaw = await FB().getList(
       path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
     );
 
-    return slotList.length + (Utils().isDateWeekend(date) ? 2 : 0);
+    int cnt = slotListRaw.length;
+    for (Slot slotw in Const().weekendSangeetSevaSlots) {
+      for (var slotRaw in slotListRaw) {
+        Slot slot = Utils().convertRawToDatatype(slotRaw, Slot.fromJson);
+        if (slot.from != slotw.from && slot.to != slotw.to) {
+          cnt++;
+        }
+      }
+    }
+
+    return cnt;
   }
 
   Future<int> getBookedSlotsCount(DateTime date) async {

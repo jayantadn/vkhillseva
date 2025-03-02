@@ -340,47 +340,50 @@ class _SangeetSevaState extends State<SangeetSeva> {
               title: Text(widget.title),
               actions: [
                 // pending users
-                Stack(children: [
-                  IconButton(
-                    icon: Icon(Icons.notifications),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PendingRequests(
-                            title: 'Pending requests',
-                            icon: widget.icon,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  if (_pendingRequests > 0)
-                    Positioned(
-                      right: 10,
-                      bottom: 10,
-                      child: Container(
-                        padding: EdgeInsets.only(left: 4, right: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        constraints: BoxConstraints(
-                          minWidth: 10,
-                          minHeight: 10,
-                        ),
-                        child: Text(
-                          '$_pendingRequests',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PendingRequests(
+                          title: 'Pending requests',
+                          icon: widget.icon,
                         ),
                       ),
-                    )
-                ]),
+                    );
+                  },
+                  child: Stack(children: [
+                    IconButton(
+                      icon: Icon(Icons.notifications),
+                      onPressed: () {},
+                    ),
+                    if (_pendingRequests > 0)
+                      Positioned(
+                        right: 10,
+                        bottom: 10,
+                        child: Container(
+                          padding: EdgeInsets.only(left: 4, right: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 10,
+                            minHeight: 10,
+                          ),
+                          child: Text(
+                            '$_pendingRequests',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                  ]),
+                ),
 
                 // registered users
                 IconButton(

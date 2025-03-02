@@ -67,6 +67,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     _pendingRequests = await _getPendingRequestsCount();
 
     // refresh all child widgets
+    calendarKey.currentState!.refresh();
 
     // perform sync operations here
     await _lock.synchronized(() async {});

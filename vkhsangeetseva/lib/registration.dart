@@ -87,8 +87,12 @@ class _RegistrationState extends State<Registration> {
 
       // add the weekend slots if not present
       for (Slot slot in Const().weekendSangeetSevaSlots) {
-        if (!bookedSlots.contains(slot) && !_avlSlots.contains(slot)) {
-          _avlSlots.add(slot);
+        _avlSlots.add(slot);
+        for (Slot bookedSlot in bookedSlots) {
+          if (slot.from == bookedSlot.from && slot.to == bookedSlot.to) {
+            _avlSlots.remove(slot);
+            break;
+          }
         }
       }
     }

@@ -21,6 +21,8 @@ class Const {
   final int morningCutoff = 14;
   final int maxImageSize = 500; // kB
 
+  final String version = "4.0.0";
+
   final List<Slot> weekendSangeetSevaSlots = [
     Slot(name: "MorningSlot", avl: true, from: "10:00 AM", to: "01:00 PM"),
     Slot(name: "EveningSlot", avl: true, from: "05:00 PM", to: "08:00 PM"),

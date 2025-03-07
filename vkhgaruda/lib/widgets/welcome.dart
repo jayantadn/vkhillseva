@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/version.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Welcome extends StatefulWidget {
@@ -89,7 +88,7 @@ class _WelcomeState extends State<Welcome> {
         'ISKCON Vaikuntha Hill',
         style: Theme.of(context).textTheme.headlineMedium,
       ),
-      Text('Garuda v$version',
+      Text('Garuda v${Const().version}',
           style: Theme.of(context).textTheme.headlineSmall),
     ]);
   }

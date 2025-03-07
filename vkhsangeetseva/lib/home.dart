@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
-import 'package:vkhsangeetseva/version.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
 import 'package:vkhsangeetseva/widgets/welcome.dart';
 
@@ -253,7 +252,7 @@ class _MyHomePageState extends State<HomePage> {
           top: 10,
           right: 10,
           child: Text(
-            "v$version",
+            "v${Const().version}",
             style: Theme.of(context)
                 .textTheme
                 .bodySmall!

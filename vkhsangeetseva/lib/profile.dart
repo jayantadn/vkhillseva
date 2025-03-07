@@ -506,7 +506,7 @@ class _ProfileState extends State<Profile> {
                           TextFormField(
                             controller: _credController,
                             decoration: const InputDecoration(
-                                labelText: 'Sangeet credentials',
+                                labelText: 'Academic details for sangeet',
                                 hintText: "e.g. MA in music"),
                             validator: (value) {
                               if (value == null || value.isEmpty) {

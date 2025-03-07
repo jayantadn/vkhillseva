@@ -30,6 +30,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   UserDetails? _mainPerformer;
+  final _minSongs = 4;
 
   // lists
   final List<UserDetails> _supportingTeam = [];
@@ -107,6 +108,57 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         _mainPerformer = UserDetails.fromJson(userdetailsJson);
       }
     });
+  }
+
+  Future<void> _onSubmit() async {
+    // add half filled song
+    if (_songController.text.isNotEmpty) {
+      _songs.add(_songController.text);
+    }
+
+    // validate list of songs
+    if (_songs.length < _minSongs) {
+      Toaster().error("Please enter at least $_minSongs songs");
+      return;
+    }
+
+    // populate the data structure
+    EventRecord performanceRequest = EventRecord(
+      date: widget.selectedDate,
+      slot: widget.slot,
+      mainPerformer: _mainPerformer!,
+      supportTeam: _supportingTeam,
+      guests: _guests,
+      songs: _songs,
+      notePerformer: _noteController.text,
+    );
+
+    // save to firebase
+    UserBasics? basics = Utils().getUserBasics();
+    String mobile = "";
+    int index = 0;
+    if (basics == null) {
+      Toaster().error("Cant access user data");
+      return;
+    } else {
+      mobile = basics.mobile;
+      index = await FB().addToList(
+          listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
+          data: performanceRequest.toJson());
+    }
+
+    // add to pending requests
+    FB().addToList(
+        listpath: "${Const().dbrootSangeetSeva}/PendingRequests",
+        data: {
+          "path": "${Const().dbrootSangeetSeva}/Events/$mobile",
+          "index": index
+        });
+
+    // go to homepage
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return HomePage();
+    }));
   }
 
   Future<void> _showAddGuestDialog(BuildContext context) {
@@ -378,49 +430,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           // submit button
                           SizedBox(height: 10),
                           ElevatedButton(
-                            onPressed: () {
-                              // add half filled song
-                              if (_songController.text.isNotEmpty) {
-                                _songs.add(_songController.text);
-                              }
-
-                              // validate list of songs
-                              if (_songs.length < 5) {
-                                Toaster()
-                                    .error("Please enter at least 5 songs");
-                                return;
-                              }
-
-                              // populate the data structure
-                              EventRecord performanceRequest = EventRecord(
-                                date: widget.selectedDate,
-                                slot: widget.slot,
-                                mainPerformer: _mainPerformer!,
-                                supportTeam: _supportingTeam,
-                                guests: _guests,
-                                songs: _songs,
-                                notePerformer: _noteController.text,
-                              );
-
-                              // save to firebase
-                              UserBasics? basics = Utils().getUserBasics();
-                              if (basics == null) {
-                                Toaster().error("Cant access user data");
-                                return;
-                              } else {
-                                String mobile = basics.mobile;
-                                FB().addToList(
-                                    path:
-                                        "${Const().dbrootSangeetSeva}/Events/$mobile",
-                                    data: performanceRequest.toJson());
-                              }
-
-                              // go to homepage
-                              Navigator.pushReplacement(context,
-                                  MaterialPageRoute(builder: (context) {
-                                return HomePage();
-                              }));
-                            },
+                            onPressed: _onSubmit,
                             child: Text("Submit"),
                           )
                         ]),

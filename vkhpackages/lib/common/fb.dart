@@ -102,7 +102,8 @@ class FB {
       DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
       DataSnapshot snapshot = await dbref.get();
       if (snapshot.value is List) {
-        return List<dynamic>.from(snapshot.value as List);
+        List ret = List<dynamic>.from(snapshot.value as List);
+        return ret;
       } else if (snapshot.value is Map) {
         return List<dynamic>.from((snapshot.value as Map).values);
       } else {
@@ -165,7 +166,7 @@ class FB {
     }
   }
 
-  Future<void> addToList({
+  Future<void> addToListOld({
     required String path,
     String? child,
     required Map<String, dynamic> data,
@@ -189,6 +190,28 @@ class FB {
       }
     } catch (e) {
       Toaster().error("Error adding data to list: $e");
+    }
+  }
+
+  Future<int> addToList({
+    required String listpath,
+    required dynamic data,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(listpath);
+      DataSnapshot snap = await dbref.get();
+      if (snap.value == null) {
+        await dbref.set([data]);
+        return 0;
+      } else {
+        List<dynamic> list = List<dynamic>.from(snap.value as List);
+        list.add(data);
+        await dbref.set(list);
+        return list.length - 1;
+      }
+    } catch (e) {
+      Toaster().error("Error adding data to list: $e");
+      return -1;
     }
   }
 

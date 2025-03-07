@@ -177,19 +177,40 @@ class SlotUtils {
   Future<int> getTotalSlotsCount(DateTime date) async {
     // get slots from database
     String dbDate = DateFormat("yyyy-MM-dd").format(date);
+    List<dynamic> slotListRaw = await FB().getList(
+      path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
+    );
+
+    int cnt = slotListRaw.length;
+    if (Utils().isDateWeekend(date)) {
+      for (Slot slotw in Const().weekendSangeetSevaSlots) {
+        cnt++;
+        for (var slotRaw in slotListRaw) {
+          Slot slot = Utils().convertRawToDatatype(slotRaw, Slot.fromJson);
+          if (slot.from != slotw.from && slot.to != slotw.to) {
+            cnt--;
+          }
+        }
+      }
+    }
+
+    return cnt;
+  }
+
+  Future<int> getBookedSlotsCount(DateTime date) async {
+    String dbDate = DateFormat("yyyy-MM-dd").format(date);
     List<dynamic> slotList = await FB().getList(
       path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
     );
 
-    // add slots for weekend
-    bool isWeekend =
-        date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
+    int cnt = 0;
+    for (var slotRaw in slotList) {
+      Slot slot = Utils().convertRawToDatatype(slotRaw, Slot.fromJson);
+      if (slot.avl == false) {
+        cnt++;
+      }
+    }
 
-    return slotList.length + (isWeekend ? 2 : 0);
-  }
-
-  Future<int> getBookedSlotsCount(DateTime date) async {
-    // TODO: implementation pending
-    return 0;
+    return cnt;
   }
 }

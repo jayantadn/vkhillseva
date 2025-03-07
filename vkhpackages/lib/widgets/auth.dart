@@ -91,8 +91,8 @@ class _AuthDialogState extends State<AuthDialog> {
     );
 
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential);
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithCredential(phoneAuthCredential);
       // ignore: use_build_context_synchronously
       Navigator.of(context).pop();
 
@@ -109,8 +109,9 @@ class _AuthDialogState extends State<AuthDialog> {
     }
 
     try {
-      UserCredential userCredential =
-          await _confirmationResult!.confirm(_otpController.text);
+      UserCredential userCredential = await _confirmationResult!.confirm(
+        _otpController.text,
+      );
       _otpConfirmed(userCredential);
 
       // ignore: use_build_context_synchronously
@@ -123,8 +124,9 @@ class _AuthDialogState extends State<AuthDialog> {
   Future<void> _triggerVerificationWeb(context) async {
     FirebaseAuth auth = FirebaseAuth.instance;
 
-    _confirmationResult =
-        await auth.signInWithPhoneNumber("+91${_mobileNumberController.text}");
+    _confirmationResult = await auth.signInWithPhoneNumber(
+      "+91${_mobileNumberController.text}",
+    );
 
     _otpController.clear();
     _otpFocusNode.requestFocus();
@@ -210,17 +212,16 @@ class _AuthDialogState extends State<AuthDialog> {
     return AlertDialog(
       title: Text('Registration'),
       content: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Stack(children: [
+        scrollDirection: Axis.vertical,
+        child: Stack(
+          children: [
             // dialog contents
             Column(
               children: [
                 // name
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Full name',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Full name'),
                 ),
 
                 // mobile number field
@@ -245,9 +246,7 @@ class _AuthDialogState extends State<AuthDialog> {
                   TextFormField(
                     controller: _otpController,
                     focusNode: _otpFocusNode,
-                    decoration: const InputDecoration(
-                      labelText: 'OTP',
-                    ),
+                    decoration: const InputDecoration(labelText: 'OTP'),
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -272,8 +271,11 @@ class _AuthDialogState extends State<AuthDialog> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => TermsAndConditions(
-                                    title: "Terms & Conditions")),
+                              builder:
+                                  (context) => TermsAndConditions(
+                                    title: "Terms & Conditions",
+                                  ),
+                            ),
                           );
                         },
                         child: RichText(
@@ -301,11 +303,10 @@ class _AuthDialogState extends State<AuthDialog> {
             ),
 
             // circular progress indicator
-            if (_isLoading)
-              Center(
-                child: CircularProgressIndicator(),
-              ),
-          ])),
+            if (_isLoading) Center(child: CircularProgressIndicator()),
+          ],
+        ),
+      ),
       actions: <Widget>[
         // cancel button
         TextButton(
@@ -317,10 +318,7 @@ class _AuthDialogState extends State<AuthDialog> {
 
         // verify button
         if (!_verified && !_isLoading)
-          TextButton(
-            onPressed: _verify,
-            child: Text('Verify'),
-          ),
+          TextButton(onPressed: _verify, child: Text('Verify')),
 
         // submit OTP button
         if (_verified && !_isLoading)
@@ -364,28 +362,25 @@ class TermsAndConditions extends StatelessWidget {
   final List<String> _terms = [
     "You might receive an SMS message for verification and standard rates may apply.",
     "Phone numbers that you provide for authentication will be sent and stored by Google to improve spam and abuse prevention across Google services, including but not limited to Firebase.",
-    "User details will be stored in temple database. This information may be used by temple authorities to contact you later."
+    "User details will be stored in temple database. This information may be used by temple authorities to contact you later.",
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
+      appBar: AppBar(title: Text(title)),
       body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemCount: _terms.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Text(
-                  "${index + 1}. ${_terms[index]}",
-                ),
-              );
-            },
-          )),
+        padding: const EdgeInsets.all(8.0),
+        child: ListView.builder(
+          itemCount: _terms.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Text("${index + 1}. ${_terms[index]}"),
+            );
+          },
+        ),
+      ),
     );
   }
 }
@@ -395,11 +390,7 @@ class UserBasics {
   final String name;
   final String mobile;
 
-  UserBasics({
-    required this.uid,
-    required this.name,
-    required this.mobile,
-  });
+  UserBasics({required this.uid, required this.name, required this.mobile});
 
   factory UserBasics.fromJson(Map<String, dynamic> json) {
     return UserBasics(
@@ -410,16 +401,12 @@ class UserBasics {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'uid': uid,
-      'name': name,
-      'mobile': mobile,
-    };
+    return {'uid': uid, 'name': name, 'mobile': mobile};
   }
 }
 
 Future<void> smsAuth(BuildContext context, void Function()? callback) async {
-  showDialog(
+  await showDialog(
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {

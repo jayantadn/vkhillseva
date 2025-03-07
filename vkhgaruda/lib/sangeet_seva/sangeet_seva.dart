@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/sangeet_seva/pending_requests.dart';
 import 'package:vkhgaruda/sangeet_seva/profiles.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -22,6 +23,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   DateTime _selectedDate = DateTime.now();
+  int _pendingRequests = 0;
 
   // lists
   List<int> _bookedSlotsCnt = [];
@@ -62,8 +64,10 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
     // perform async operations here
     await _fillBookingLists(_selectedDate);
+    _pendingRequests = await _getPendingRequestsCount();
 
     // refresh all child widgets
+    calendarKey.currentState!.refresh();
 
     // perform sync operations here
     await _lock.synchronized(() async {});
@@ -71,6 +75,48 @@ class _SangeetSevaState extends State<SangeetSeva> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<bool> _addFreeSlot(
+    String name,
+    String startTime,
+    String endTime,
+  ) async {
+    // validations
+    if (startTime == "__:__" || endTime == "__:__") {
+      Toaster().error("Please enter both start and end time");
+      return false;
+    }
+
+    // check if end time is greater than start time
+    final DateFormat timeFormat = DateFormat('hh:mm a');
+    try {
+      final DateTime startDateTime = timeFormat.parse(startTime);
+      final DateTime endDateTime = timeFormat.parse(endTime);
+      if (endDateTime.isBefore(startDateTime)) {
+        Toaster().error("End time should be greater than start time");
+        return false;
+      }
+    } catch (e) {
+      // Handle parsing errors
+      Toaster().error('Error parsing time: $e');
+    }
+
+    // add to database
+    String dbDate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+    await FB().addKVToList(
+      path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
+      key: name,
+      value: Slot(name: name, avl: true, from: startTime, to: endTime).toJson(),
+    );
+
+    // refresh the availability indicators
+    calendarKey.currentState!.fillAvailabilityIndicators(date: _selectedDate);
+    await _fillBookingLists(_selectedDate);
+
+    setState(() {});
+
+    return true;
   }
 
   Future<void> _addWeekendFreeSlots(DateTime date) async {
@@ -88,8 +134,12 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
       // add the weekend slots if not present
       for (Slot slot in Const().weekendSangeetSevaSlots) {
-        if (!bookedSlots.contains(slot) && !_avlSlots.contains(slot)) {
-          _avlSlots.add(slot);
+        _avlSlots.add(slot);
+        for (Slot bookedSlot in bookedSlots) {
+          if (slot.from == bookedSlot.from && slot.to == bookedSlot.to) {
+            _avlSlots.remove(slot);
+            break;
+          }
         }
       }
     }
@@ -151,46 +201,15 @@ class _SangeetSevaState extends State<SangeetSeva> {
     );
   }
 
-  Future<bool> _addFreeSlot(
-    String name,
-    String startTime,
-    String endTime,
-  ) async {
-    // validations
-    if (startTime == "__:__" || endTime == "__:__") {
-      Toaster().error("Please enter both start and end time");
-      return false;
-    }
+  Future<int> _getPendingRequestsCount() async {
+    int pendingRequests = 0;
 
-    // check if end time is greater than start time
-    final DateFormat timeFormat = DateFormat('hh:mm a');
-    try {
-      final DateTime startDateTime = timeFormat.parse(startTime);
-      final DateTime endDateTime = timeFormat.parse(endTime);
-      if (endDateTime.isBefore(startDateTime)) {
-        Toaster().error("End time should be greater than start time");
-        return false;
-      }
-    } catch (e) {
-      // Handle parsing errors
-      Toaster().error('Error parsing time: $e');
-    }
+    // get the list of pending requests
+    List<dynamic> pendingRequestsRaw = await FB()
+        .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
+    pendingRequests = pendingRequestsRaw.length;
 
-    // add to database
-    String dbDate = DateFormat("yyyy-MM-dd").format(_selectedDate);
-    await FB().addKVToList(
-      path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
-      key: name,
-      value: Slot(name: name, avl: true, from: startTime, to: endTime).toJson(),
-    );
-
-    // refresh the availability indicators
-    calendarKey.currentState!.fillAvailabilityIndicators(date: _selectedDate);
-    await _fillBookingLists(_selectedDate);
-
-    setState(() {});
-
-    return true;
+    return pendingRequests;
   }
 
   Future<void> _showFreeSlotDialog(BuildContext context) async {
@@ -325,6 +344,53 @@ class _SangeetSevaState extends State<SangeetSeva> {
             appBar: AppBar(
               title: Text(widget.title),
               actions: [
+                // pending users
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PendingRequests(
+                          title: 'Pending requests',
+                          icon: widget.icon,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Stack(children: [
+                    IconButton(
+                      icon: Icon(Icons.notifications),
+                      onPressed: () {},
+                    ),
+                    if (_pendingRequests > 0)
+                      Positioned(
+                        right: 10,
+                        bottom: 10,
+                        child: Container(
+                          padding: EdgeInsets.only(left: 4, right: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 10,
+                            minHeight: 10,
+                          ),
+                          child: Text(
+                            '$_pendingRequests',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                  ]),
+                ),
+
+                // registered users
                 IconButton(
                   icon: Icon(Icons.group),
                   onPressed: () {

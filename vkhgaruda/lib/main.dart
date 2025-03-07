@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhgaruda/home/landing.dart';
+import 'package:vkhgaruda/sangeet_seva/pending_requests.dart';
+import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const Landing(title: "Hare Krishna");
-  final Widget test = const Placeholder();
+  final Widget test = const PendingRequests(title: "testing");
 
   // This widget is the root of your application.
   @override

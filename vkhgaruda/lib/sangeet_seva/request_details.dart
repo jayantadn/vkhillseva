@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/sangeet_seva/profile_details.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class RequestDetails extends StatefulWidget {
@@ -227,6 +228,18 @@ class _RequestDetailsState extends State<RequestDetails> {
                           // main performer
                           Card(
                             child: ListTile(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProfileDetails(
+                                        title: "Main performer",
+                                        icon: widget.icon,
+                                        userdetails:
+                                            widget.eventRecord.mainPerformer),
+                                  ),
+                                );
+                              },
                               leading: CircleAvatar(
                                 backgroundImage: NetworkImage(widget
                                     .eventRecord.mainPerformer.profilePicUrl),
@@ -260,6 +273,17 @@ class _RequestDetailsState extends State<RequestDetails> {
                                     widget.eventRecord.supportTeam[index];
                                 return Card(
                                   child: ListTile(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ProfileDetails(
+                                              title: "Supporting team",
+                                              icon: widget.icon,
+                                              userdetails: member),
+                                        ),
+                                      );
+                                    },
                                     leading: CircleAvatar(
                                       backgroundImage:
                                           NetworkImage(member.profilePicUrl),

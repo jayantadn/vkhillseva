@@ -97,10 +97,6 @@ class _ProfilesState extends State<Profiles> {
                             itemBuilder: (context, index) {
                               UserDetails userdetails = _performers[index];
                               return Card(
-                                color:
-                                    userdetails.fieldOfExpertise == "Vocalist"
-                                        ? Colors.blue[50]
-                                        : Colors.orange[50],
                                 child: ListTile(
                                   title: Text(
                                     "${userdetails.salutation} ${userdetails.name} (${userdetails.credentials})",

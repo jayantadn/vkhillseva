@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
@@ -24,6 +25,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
   bool _isLoading = true;
   DateTime _selectedDate = DateTime.now();
   int _pendingRequests = 0;
+  DateTime _lastCallbackInvoked = DateTime.now();
 
   // lists
   List<int> _bookedSlotsCnt = [];
@@ -32,6 +34,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
   final List<Slot> _avlSlots = [];
 
   // controllers, listeners and focus nodes
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {
@@ -40,6 +43,55 @@ class _SangeetSevaState extends State<SangeetSeva> {
     // set _numBookings and _numAvlSots to 0
     _bookedSlotsCnt = List.filled(31, 0);
     _avlSlotsCnt = List.filled(31, 0);
+
+// listed to database events
+    FB().listenForChange(
+        "${Const().dbrootSangeetSeva}/PendingRequests",
+        FBCallbacks(
+          // add
+          add: (data) {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+            }
+
+            // process the received data
+            _incrementPendingRequests();
+          },
+
+          // edit
+          edit: () {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              refresh();
+            }
+          },
+
+          // delete
+          delete: (data) async {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              // process the received data
+              _decrementPendingRequests();
+
+              List eventsRaw = await FB().getList(path: data['path']);
+              var eventRaw = eventsRaw[data['index']];
+              EventRecord event =
+                  Utils().convertRawToDatatype(eventRaw, EventRecord.fromJson);
+              calendarKey.currentState!
+                  .fillAvailabilityIndicators(date: event.date);
+            }
+          },
+
+          // get listeners
+          getListeners: (listeners) {
+            _listeners = listeners;
+          },
+        ));
 
     refresh();
   }
@@ -53,6 +105,9 @@ class _SangeetSevaState extends State<SangeetSeva> {
     _avlSlots.clear();
 
     // clear all controllers and focus nodes
+    for (var element in _listeners) {
+      element.cancel();
+    }
 
     super.dispose();
   }
@@ -143,6 +198,18 @@ class _SangeetSevaState extends State<SangeetSeva> {
         }
       }
     }
+  }
+
+  void _decrementPendingRequests() {
+    setState(() {
+      _pendingRequests--;
+    });
+  }
+
+  void _incrementPendingRequests() {
+    setState(() {
+      _pendingRequests++;
+    });
   }
 
   Future<void> _fillBookingLists(DateTime date) async {
@@ -345,27 +412,37 @@ class _SangeetSevaState extends State<SangeetSeva> {
               title: Text(widget.title),
               actions: [
                 // pending users
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PendingRequests(
-                          title: 'Pending requests',
-                          icon: widget.icon,
+                Stack(children: [
+                  IconButton(
+                    icon: Icon(Icons.notifications),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PendingRequests(
+                            title: 'Pending requests',
+                            icon: widget.icon,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  child: Stack(children: [
-                    IconButton(
-                      icon: Icon(Icons.notifications),
-                      onPressed: () {},
-                    ),
-                    if (_pendingRequests > 0)
-                      Positioned(
-                        right: 10,
-                        bottom: 10,
+                      );
+                    },
+                  ),
+                  if (_pendingRequests > 0)
+                    Positioned(
+                      right: 10,
+                      bottom: 10,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PendingRequests(
+                                title: 'Pending requests',
+                                icon: widget.icon,
+                              ),
+                            ),
+                          );
+                        },
                         child: Container(
                           padding: EdgeInsets.only(left: 4, right: 4),
                           decoration: BoxDecoration(
@@ -386,9 +463,9 @@ class _SangeetSevaState extends State<SangeetSeva> {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                      )
-                  ]),
-                ),
+                      ),
+                    )
+                ]),
 
                 // registered users
                 IconButton(

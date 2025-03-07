@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/sangeet_seva/profile_details.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class RequestDetails extends StatefulWidget {
@@ -83,6 +82,27 @@ class _RequestDetailsState extends State<RequestDetails> {
     eventsRaw[index] = event.toJson();
     await FB().setValue(path: path, value: eventsRaw);
 
+    // mark the availability of the slot
+    if (action == "Approve") {
+      widget.eventRecord.slot.avl = false;
+      String dbdate = DateFormat("yyyy-MM-dd").format(widget.eventRecord.date);
+      String dbpath = "${Const().dbrootSangeetSeva}/Slots/$dbdate";
+      if (await FB().pathExists(dbpath)) {
+        List slotsRaw = await FB().getList(path: dbpath);
+        String dbpathNew =
+            "${Const().dbrootSangeetSeva}/Slots/$dbdate/Slot${slotsRaw.length + 1}";
+        await FB()
+            .setJson(path: dbpathNew, json: widget.eventRecord.slot.toJson());
+      } else {
+        if (Utils().isDateWeekend(widget.eventRecord.date)) {
+          await FB().setJson(
+              path: dbpath, json: {"Slot1": widget.eventRecord.slot.toJson()});
+        } else {
+          Toaster().error("Invalid slot");
+        }
+      }
+    }
+
     // loop through all pending requests, remove the matching one
     List pendingRequestsRaw = await FB()
         .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
@@ -97,23 +117,6 @@ class _RequestDetailsState extends State<RequestDetails> {
     await FB().setValue(
         path: "${Const().dbrootSangeetSeva}/PendingRequests",
         value: pendingRequestsRaw);
-
-    // mark the availability of the slot
-    if (action == "Approve") {
-      widget.eventRecord.slot.avl = false;
-      String dbdate = DateFormat("yyyy-MM-dd").format(widget.eventRecord.date);
-      String dbpath = "${Const().dbrootSangeetSeva}/Slots/$dbdate";
-      if (await FB().pathExists(dbpath)) {
-        // TODO
-      } else {
-        if (Utils().isDateWeekend(widget.eventRecord.date)) {
-          FB().setJson(
-              path: dbpath, json: {"Slot1": widget.eventRecord.slot.toJson()});
-        } else {
-          Toaster().error("Invalid slot");
-        }
-      }
-    }
 
     // callback
     widget.callback(action);

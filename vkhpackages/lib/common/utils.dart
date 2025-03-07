@@ -140,4 +140,11 @@ class Utils {
   bool isDateWeekend(DateTime date) {
     return date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
   }
+
+  Future<UserDetails> getUserDetails(String mobile) async {
+    var userDetailsRaw = await FB().getValue(
+      path: "${Const().dbrootSangeetSeva}/Users/$mobile",
+    );
+    return convertRawToDatatype(userDetailsRaw, UserDetails.fromJson);
+  }
 }

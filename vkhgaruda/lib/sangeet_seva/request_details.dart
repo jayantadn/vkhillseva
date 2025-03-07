@@ -30,8 +30,10 @@ class _RequestDetailsState extends State<RequestDetails> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  UserDetails? _mainPerformer;
 
   // lists
+  List<UserDetails> _supportTeam = [];
 
   // controllers, listeners and focus nodes
   final TextEditingController _noteController = TextEditingController();
@@ -46,6 +48,7 @@ class _RequestDetailsState extends State<RequestDetails> {
   @override
   dispose() {
     // clear all lists
+    _supportTeam.clear();
 
     // clear all controllers and focus nodes
     _noteController.dispose();
@@ -59,6 +62,12 @@ class _RequestDetailsState extends State<RequestDetails> {
     });
 
     // perform async operations here
+    _mainPerformer =
+        await Utils().getUserDetails(widget.eventRecord.mainPerformerMobile);
+    for (String supportMobile in widget.eventRecord.supportTeamMobiles) {
+      UserDetails support = await Utils().getUserDetails(supportMobile);
+      _supportTeam.add(support);
+    }
 
     // refresh all child widgets
 
@@ -228,49 +237,52 @@ class _RequestDetailsState extends State<RequestDetails> {
                           // main performer
                           Card(
                             child: ListTile(
-                              onTap: () {
+                              onTap: () async {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ProfileDetails(
                                         title: "Main performer",
                                         icon: widget.icon,
-                                        userdetails:
-                                            widget.eventRecord.mainPerformer),
+                                        userdetails: _mainPerformer!),
                                   ),
                                 );
                               },
-                              leading: CircleAvatar(
-                                backgroundImage: NetworkImage(widget
-                                    .eventRecord.mainPerformer.profilePicUrl),
-                              ),
-                              title: Text(
-                                  "${widget.eventRecord.mainPerformer.salutation} ${widget.eventRecord.mainPerformer.name}"),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                      "${widget.eventRecord.mainPerformer.credentials}, ${widget.eventRecord.mainPerformer.experience} yrs sadhana"),
-                                  Text(widget.eventRecord.mainPerformer.skills
-                                      .join(', ')),
-                                ],
-                              ),
-                              trailing: Icon(widget.eventRecord.mainPerformer
-                                          .fieldOfExpertise ==
-                                      "Vocalist"
-                                  ? Icons.record_voice_over
-                                  : Icons.music_note),
+                              leading: _mainPerformer == null
+                                  ? Text("")
+                                  : CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                          _mainPerformer!.profilePicUrl),
+                                    ),
+                              title: _mainPerformer == null
+                                  ? Text("")
+                                  : Text(
+                                      "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
+                              subtitle: _mainPerformer == null
+                                  ? Text("")
+                                  : Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                            "${_mainPerformer!.credentials}, ${_mainPerformer!.experience} yrs sadhana"),
+                                        Text(_mainPerformer!.skills.join(', ')),
+                                      ],
+                                    ),
+                              trailing: _mainPerformer == null
+                                  ? Text("")
+                                  : Icon(_mainPerformer!.fieldOfExpertise ==
+                                          "Vocalist"
+                                      ? Icons.record_voice_over
+                                      : Icons.music_note),
                             ),
                           ),
 
                           // supporting team
                           Utils().responsiveBuilder(
                               context,
-                              List.generate(
-                                  widget.eventRecord.supportTeam.length,
-                                  (index) {
-                                var member =
-                                    widget.eventRecord.supportTeam[index];
+                              List.generate(_supportTeam.length, (index) {
+                                var member = _supportTeam[index];
                                 return Card(
                                   child: ListTile(
                                     onTap: () {

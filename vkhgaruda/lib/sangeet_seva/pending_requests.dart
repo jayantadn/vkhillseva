@@ -25,6 +25,7 @@ class _PendingRequestsState extends State<PendingRequests> {
   // lists
   final List<Map<String, dynamic>> _pendingRequests = [];
   final List<EventRecord> _linkedEventRecords = [];
+  final List<UserDetails> _mainPerformers = [];
 
   // controllers, listeners and focus nodes
 
@@ -39,6 +40,8 @@ class _PendingRequestsState extends State<PendingRequests> {
   dispose() {
     // clear all lists
     _linkedEventRecords.clear();
+    _pendingRequests.clear();
+    _mainPerformers.clear();
 
     // clear all controllers and focus nodes
 
@@ -71,6 +74,14 @@ class _PendingRequestsState extends State<PendingRequests> {
       _linkedEventRecords.add(pendingRequest);
     }
 
+    // fetch main performers
+    _mainPerformers.clear();
+    for (EventRecord pendingRequest in _linkedEventRecords) {
+      UserDetails mainPerformer =
+          await Utils().getUserDetails(pendingRequest.mainPerformerMobile);
+      _mainPerformers.add(mainPerformer);
+    }
+
     // refresh all child widgets
 
     // perform sync operations here
@@ -81,17 +92,17 @@ class _PendingRequestsState extends State<PendingRequests> {
     });
   }
 
-  Widget _createPendingRequestCard(EventRecord pendingRequest) {
+  Widget _createPendingRequestCard(EventRecord pendingRequest, int index) {
     String title = DateFormat("dd MMM, yyyy").format(pendingRequest.date);
     title += " (${pendingRequest.slot.from} - ${pendingRequest.slot.to})";
-    String performer =
-        "${pendingRequest.mainPerformer.salutation} ${pendingRequest.mainPerformer.name}";
+    String performer = _mainPerformers[index].name;
+    String profilePicUrl = _mainPerformers[index].profilePicUrl;
+    Utils().getUserDetails(pendingRequest.mainPerformerMobile);
+
     return Card(
         child: ListTile(
       title: Text(title),
-      leading: CircleAvatar(
-          backgroundImage:
-              NetworkImage(pendingRequest.mainPerformer.profilePicUrl)),
+      leading: CircleAvatar(backgroundImage: NetworkImage(profilePicUrl)),
       subtitle: Text(performer),
     ));
   }
@@ -135,7 +146,7 @@ class _PendingRequestsState extends State<PendingRequests> {
                             }));
                           },
                           child: _createPendingRequestCard(
-                              _linkedEventRecords[index]),
+                              _linkedEventRecords[index], index),
                         );
                       }),
 

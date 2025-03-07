@@ -19,16 +19,6 @@ def run_command(command):
     return result.stdout.strip()
 
 def main():
-    # choose the project
-    projectid = input("Enter project (1. Garuda, 2. SangeetSeva): ")
-    if projectid == "1":
-        project = "vkhgaruda"
-    elif projectid == "2":
-        project = "vkhsangeetseva"
-    else:
-        print("Invalid project")
-        sys.exit(1)
-
     # Prompt for version type
     versionid = input("Enter version type (1. major, 2. minor, 3. bugfix): ")
     if versionid == "1":
@@ -44,8 +34,8 @@ def main():
 
 
     print("Read the value of the 'version' key")
-    version_file = f'{project}/lib/version.dart'
-    search_string = "final String version = "
+    version_file = f'vkhpackages/lib/common/const.dart'
+    search_string = "  final String version = "
     with open(version_file, 'r') as file:
         lines = file.readlines()
         for line in lines:
@@ -74,7 +64,7 @@ def main():
         major, minor, bugfix = version.split(".")
         # Increment the bugfix version
         bugfix = str(int(bugfix) + 1)
-    new_branch = f"{project}_{major}.{minor}.{bugfix}"
+    new_branch = f"{major}.{minor}.{bugfix}"
 
 
     print("Checkout a new branch based on the latest branch")
@@ -90,20 +80,8 @@ def main():
     except subprocess.CalledProcessError:
         print("ERROR: Failed to create new branch")
         sys.exit(1)
+  
 
-    print("main patch for testing - single line")
-    main_file = f'{project}/lib/main.dart'
-    search_string = '      home: home,'
-    replacement_string = '      home: test,\n'
-    with open(main_file, 'r') as file:
-        lines = file.readlines()
-    with open(main_file, 'w') as file:
-        for line in lines:
-            if search_string in line:
-                file.write(replacement_string)
-            else:
-                file.write(line)
-    
     print("Set the remote for the new branch and push")
     try:
         subprocess.check_output(["git", "push", "-u", "origin", new_branch])

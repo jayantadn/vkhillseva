@@ -126,8 +126,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     EventRecord performanceRequest = EventRecord(
       date: widget.selectedDate,
       slot: widget.slot,
-      mainPerformer: _mainPerformer!,
-      supportTeam: _supportingTeam,
+      mainPerformerMobile: _mainPerformer!.mobile,
+      supportTeamMobiles: List.generate(_supportingTeam.length, (index) {
+        return _supportingTeam[index].mobile;
+      }),
       guests: _guests,
       songs: _songs,
       notePerformer: _noteController.text,

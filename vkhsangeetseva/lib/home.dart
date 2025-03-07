@@ -205,11 +205,11 @@ class _MyHomePageState extends State<HomePage> {
                     ...List.generate(_events.length, (index) {
                       String date =
                           DateFormat("dd MMM yyyy").format(_events[index].date);
-                      String performers = _events[index].mainPerformer.name;
-                      for (UserDetails performer
-                          in _events[index].supportTeam) {
-                        performers += ", ${performer.name}";
-                      }
+                      String performers = _events[index].mainPerformerMobile;
+                      // for (UserDetails performer
+                      //     in _events[index].supportTeamMobiles) {
+                      //   performers += ", ${performer.name}";
+                      // }
 
                       return Card(
                         color: _events[index].date.isBefore(DateTime.now())

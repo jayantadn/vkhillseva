@@ -45,8 +45,8 @@ class Slot {
 class EventRecord {
   final DateTime date;
   final Slot slot;
-  final UserDetails mainPerformer;
-  final List<UserDetails> supportTeam;
+  final String mainPerformerMobile;
+  final List<String> supportTeamMobiles;
   final List<Guest> guests;
   final List<String> songs;
   String status;
@@ -56,8 +56,8 @@ class EventRecord {
   EventRecord({
     required this.date,
     required this.slot,
-    required this.mainPerformer,
-    required this.supportTeam,
+    required this.mainPerformerMobile,
+    required this.supportTeamMobiles,
     required this.guests,
     required this.songs,
     this.status = 'Pending',
@@ -68,9 +68,8 @@ class EventRecord {
   factory EventRecord.fromJson(Map<String, dynamic> json) {
     return EventRecord(
       date: DateTime.parse(json['date'] as String),
-      mainPerformer: UserDetails.fromJson(
-        Map<String, dynamic>.from(json['mainPerformer']),
-      ),
+      mainPerformerMobile: json['mainPerformer'] as String,
+
       notePerformer: json['notePerformer'] as String,
       noteTemple: json['noteTemple'] as String,
       slot: Slot.fromJson(Map<String, dynamic>.from(json['slot'])),
@@ -88,13 +87,11 @@ class EventRecord {
                 );
                 return Guest.fromJson(guestMap);
               }),
-      supportTeam:
+      supportTeamMobiles:
           json['supportTeam'] == null
               ? []
               : List.generate(json['supportTeam'].length, (index) {
-                return UserDetails.fromJson(
-                  Map<String, dynamic>.from(json['supportTeam'][index]),
-                );
+                return json['supportTeam'][index] as String;
               }),
     );
   }
@@ -103,8 +100,8 @@ class EventRecord {
     return {
       'date': date.toIso8601String(),
       'slot': slot.toJson(),
-      'mainPerformer': mainPerformer.toJson(),
-      'supportTeam': supportTeam.map((e) => e.toJson()).toList(),
+      'mainPerformer': mainPerformerMobile,
+      'supportTeam': supportTeamMobiles.map((e) => e).toList(),
       'guests': guests.map((e) => e.toJson()).toList(),
       'songs': songs,
       'status': status,

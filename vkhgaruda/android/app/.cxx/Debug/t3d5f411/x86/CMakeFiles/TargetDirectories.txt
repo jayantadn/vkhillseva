@@ -1,2 +1,0 @@
-X:/GitRepos/vkhillseva/vkhgaruda/android/app/.cxx/Debug/t3d5f411/x86/CMakeFiles/edit_cache.dir
-X:/GitRepos/vkhillseva/vkhgaruda/android/app/.cxx/Debug/t3d5f411/x86/CMakeFiles/rebuild_cache.dir

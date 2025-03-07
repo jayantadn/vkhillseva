@@ -89,14 +89,19 @@ class _CalendarState extends State<Calendar> {
     );
   }
 
-  Future<void> fillAvailabilityIndicators({DateTime? date}) async {
+  Future<void> fillAvailabilityIndicators({
+    DateTime? date,
+    DateTime? focusedDay,
+  }) async {
     if (date == null) {
+      focusedDay ??= DateTime.now();
+
       // generate for whole month
-      int startDay = DateTime.now().day - 1;
+      int startDay = focusedDay.day - 1;
       for (int day = startDay; day < 31; day++) {
         DateTime givenDate = DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
+          focusedDay.year,
+          focusedDay.month,
           day + 1,
         );
         int booked = await SlotUtils().getBookedSlotsCount(givenDate);
@@ -126,7 +131,7 @@ class _CalendarState extends State<Calendar> {
     return TableCalendar(
       firstDay: DateTime.now(),
       lastDay: DateTime.now().add(Duration(days: 90)),
-      focusedDay: DateTime.now(),
+      focusedDay: _selectedDate,
       selectedDayPredicate: (day) {
         return isSameDay(_selectedDate, day);
       },
@@ -156,7 +161,13 @@ class _CalendarState extends State<Calendar> {
         });
       },
       onPageChanged: (focusedDay) async {
-        // TODO: rfresh availability indicators
+        setState(() {
+          _selectedDate = focusedDay;
+          _avlSlotsCnt = List.filled(31, 0);
+          _bookedSlotsCnt = List.filled(31, 0);
+        });
+
+        await fillAvailabilityIndicators(focusedDay: focusedDay);
       },
       availableCalendarFormats: const {CalendarFormat.month: 'Month'},
     );

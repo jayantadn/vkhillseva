@@ -35,6 +35,15 @@
       "**/.*",
       "**/node_modules/**"
     ]
+  },
+  {
+    "target": "testgaruda",
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
   }
 ]
 }

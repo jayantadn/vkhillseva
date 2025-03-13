@@ -16,18 +16,28 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final notificationSettings =
+  setupFirebaseMessaging();
+
+  runApp(MyApp());
+}
+
+Future<void> setupFirebaseMessaging() async {
+  // Explicitly enable FCM auto-init
+  FirebaseMessaging.instance.setAutoInitEnabled(true);
+
+  NotificationSettings settings =
       await FirebaseMessaging.instance.requestPermission(
     alert: true,
     announcement: false,
     badge: true,
     carPlay: false,
     criticalAlert: false,
-    provisional: true,
+    provisional: false, // actively asks the user to enable notifications
     sound: true,
   );
+  print('User granted permission: ${settings.authorizationStatus}');
 
-  // For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
+  // For Apple platforms, ensure the APNS token is available before making any FCM plugin API calls
   if (Platform.isIOS) {
     final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
     if (apnsToken != null) {
@@ -35,13 +45,13 @@ Future<void> main() async {
     }
   }
 
-  // get the FCM token
+  // Get the FCM token
   String? fcmToken;
   if (kIsWeb) {
-    // On web platforms, pass your VAPID public key to getToken()
     fcmToken = await FirebaseMessaging.instance.getToken(
-        vapidKey:
-            "BN_4zt5SxVFHklPyCjAgba14nCWGI3sJC4x_EZZ4b8LfVAtsabkkIFz4Vqr_uF39Xh_lq7HDLqmHsH0vR1ZYXPc");
+      vapidKey:
+          "BN_4zt5SxVFHklPyCjAgba14nCWGI3sJC4x_EZZ4b8LfVAtsabkkIFz4Vqr_uF39Xh_lq7HDLqmHsH0vR1ZYXPc",
+    );
   } else {
     fcmToken = await FirebaseMessaging.instance.getToken();
   }
@@ -60,7 +70,17 @@ Future<void> main() async {
     Toaster().error("Error refreshing FCM token: $err");
   });
 
-  runApp(MyApp());
+  // Listen for incoming messages
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
+
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+      print('Notification title: ${message.notification?.title}');
+      print('Notification body: ${message.notification?.body}');
+    }
+  });
 }
 
 class MyApp extends StatelessWidget {

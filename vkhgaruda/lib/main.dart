@@ -35,7 +35,6 @@ Future<void> setupFirebaseMessaging() async {
     provisional: false, // actively asks the user to enable notifications
     sound: true,
   );
-  print('User granted permission: ${settings.authorizationStatus}');
 
   // Get the FCM token
   String? fcmToken;
@@ -55,7 +54,6 @@ Future<void> setupFirebaseMessaging() async {
 
     fcmToken = await FirebaseMessaging.instance.getToken();
   }
-  print("FCM Token: $fcmToken");
 
   // Listen for FCM token refresh but ignore first call at startup
   bool isFirstRun = true;
@@ -64,7 +62,6 @@ Future<void> setupFirebaseMessaging() async {
       isFirstRun = false;
       return; // Ignore first token refresh event since we already fetched it
     }
-    print("Updated FCM Token: $newToken");
     // Send the updated token to your backend server if needed
   }).onError((err) {
     Toaster().error("Error refreshing FCM token: $err");
@@ -72,9 +69,6 @@ Future<void> setupFirebaseMessaging() async {
 
   // Listen for foreground incoming messages
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Got a message whilst in the foreground!');
-    print('Message data: ${message.data}');
-
     if (message.notification != null) {
       Toaster().info('${message.notification?.body}');
     }
@@ -86,9 +80,8 @@ Future<void> setupFirebaseMessaging() async {
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Handling a background message: ${message.messageId}");
   if (message.notification != null) {
-    print('Background Notification body: ${message.notification?.body}');
+    // do something
   }
 }
 

@@ -76,7 +76,7 @@ Future<void> setupFirebaseMessaging() async {
     print('Message data: ${message.data}');
 
     if (message.notification != null) {
-      print('Notification body: ${message.notification?.body}');
+      Toaster().info('${message.notification?.body}');
     }
   });
 

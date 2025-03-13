@@ -37,14 +37,6 @@ Future<void> setupFirebaseMessaging() async {
   );
   print('User granted permission: ${settings.authorizationStatus}');
 
-  // For Apple platforms, ensure the APNS token is available before making any FCM plugin API calls
-  if (Platform.isIOS) {
-    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-    if (apnsToken != null) {
-      // APNS token is available, make FCM plugin API requests...
-    }
-  }
-
   // Get the FCM token
   String? fcmToken;
   if (kIsWeb) {
@@ -53,6 +45,14 @@ Future<void> setupFirebaseMessaging() async {
           "BN_4zt5SxVFHklPyCjAgba14nCWGI3sJC4x_EZZ4b8LfVAtsabkkIFz4Vqr_uF39Xh_lq7HDLqmHsH0vR1ZYXPc",
     );
   } else {
+    // For Apple platforms, ensure the APNS token is available before making any FCM plugin API calls
+    if (Platform.isIOS) {
+      final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+      if (apnsToken != null) {
+        // APNS token is available, make FCM plugin API requests...
+      }
+    }
+
     fcmToken = await FirebaseMessaging.instance.getToken();
   }
   print("FCM Token: $fcmToken");
@@ -70,17 +70,26 @@ Future<void> setupFirebaseMessaging() async {
     Toaster().error("Error refreshing FCM token: $err");
   });
 
-  // Listen for incoming messages
+  // Listen for foreground incoming messages
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Got a message whilst in the foreground!');
     print('Message data: ${message.data}');
 
     if (message.notification != null) {
-      print('Message also contained a notification: ${message.notification}');
-      print('Notification title: ${message.notification?.title}');
       print('Notification body: ${message.notification?.body}');
     }
   });
+
+  // Listen for background incoming messages
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+}
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("Handling a background message: ${message.messageId}");
+  if (message.notification != null) {
+    print('Background Notification body: ${message.notification?.body}');
+  }
 }
 
 class MyApp extends StatelessWidget {

@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhgaruda/home/landing.dart';
@@ -11,6 +15,50 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final notificationSettings =
+      await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: true,
+    sound: true,
+  );
+
+  // For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
+  if (Platform.isIOS) {
+    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+    if (apnsToken != null) {
+      // APNS token is available, make FCM plugin API requests...
+    }
+  }
+
+  // get the FCM token
+  String? fcmToken;
+  if (kIsWeb) {
+    // On web platforms, pass your VAPID public key to getToken()
+    fcmToken = await FirebaseMessaging.instance.getToken(
+        vapidKey:
+            "BN_4zt5SxVFHklPyCjAgba14nCWGI3sJC4x_EZZ4b8LfVAtsabkkIFz4Vqr_uF39Xh_lq7HDLqmHsH0vR1ZYXPc");
+  } else {
+    fcmToken = await FirebaseMessaging.instance.getToken();
+  }
+  print("FCM Token: $fcmToken");
+
+  // Listen for FCM token refresh but ignore first call at startup
+  bool isFirstRun = true;
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+    if (isFirstRun) {
+      isFirstRun = false;
+      return; // Ignore first token refresh event since we already fetched it
+    }
+    print("Updated FCM Token: $newToken");
+    // Send the updated token to your backend server if needed
+  }).onError((err) {
+    Toaster().error("Error refreshing FCM token: $err");
+  });
 
   runApp(MyApp());
 }

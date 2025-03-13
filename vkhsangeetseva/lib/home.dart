@@ -118,6 +118,8 @@ class _MyHomePageState extends State<HomePage> {
       // Get the device token
       String? token = await messaging.getToken();
       print('FCM Token: $token');
+      await FB().addToList(
+          listpath: "${Const().dbrootSangeetSeva}/FCMTokens", data: token);
 
       // Listen for foreground messages
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {

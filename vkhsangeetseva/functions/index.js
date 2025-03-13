@@ -18,21 +18,18 @@ const logger = require("firebase-functions/logger");
 //   response.send("Hello from Firebase!");
 // });
 
-const functions = require('firebase-functions');
+const functions = require('firebase-functions/v1');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-exports.sendApprovalNotification = functions.firestore
-    .document('registrations/{registrationId}')
+exports.sendApprovalNotification = functions.database
+    .ref('/SANGEETSEVA_01/PendingRequests')
     .onUpdate(async (change, context) => {
-      const newValue = change.after.data();
-      const previousValue = change.before.data();
-
-      if (newValue.status === 'approved' && previousValue.status !== 'approved') {
-        const userId = newValue.userId;
-        const userDoc = await admin.firestore().collection('users').doc(userId).get();
-        const user = userDoc.data();
-        const token = user.fcmToken;
+      
+        const tokensRef = admin.database().ref('/SANGEETSEVA_01/FCMTokens');
+        const tokensSnapshot = await tokensRef.once('value');
+        const tokens = tokensSnapshot.val();
+        const token = tokens ? Object.values(tokens)[0] : null;
 
         if (token) {
           const payload = {
@@ -56,6 +53,5 @@ exports.sendApprovalNotification = functions.firestore
           console.log('No token found for user:', userId);
           return { error: 'No token found' };
         }
-      }
+      });
       return null;
-    });

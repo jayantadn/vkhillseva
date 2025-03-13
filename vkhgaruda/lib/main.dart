@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhgaruda/home/landing.dart';
+import 'package:vkhgaruda/home/notification.dart';
 import 'package:vkhgaruda/sangeet_seva/pending_requests.dart';
 import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'firebase_options.dart';
@@ -19,70 +20,6 @@ Future<void> main() async {
   setupFirebaseMessaging();
 
   runApp(MyApp());
-}
-
-Future<void> setupFirebaseMessaging() async {
-  // Explicitly enable FCM auto-init
-  FirebaseMessaging.instance.setAutoInitEnabled(true);
-
-  NotificationSettings settings =
-      await FirebaseMessaging.instance.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false, // actively asks the user to enable notifications
-    sound: true,
-  );
-
-  // Get the FCM token
-  String? fcmToken;
-  if (kIsWeb) {
-    fcmToken = await FirebaseMessaging.instance.getToken(
-      vapidKey:
-          "BN_4zt5SxVFHklPyCjAgba14nCWGI3sJC4x_EZZ4b8LfVAtsabkkIFz4Vqr_uF39Xh_lq7HDLqmHsH0vR1ZYXPc",
-    );
-  } else {
-    // For Apple platforms, ensure the APNS token is available before making any FCM plugin API calls
-    if (Platform.isIOS) {
-      final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-      if (apnsToken != null) {
-        // APNS token is available, make FCM plugin API requests...
-      }
-    }
-
-    fcmToken = await FirebaseMessaging.instance.getToken();
-  }
-
-  // Listen for FCM token refresh but ignore first call at startup
-  bool isFirstRun = true;
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-    if (isFirstRun) {
-      isFirstRun = false;
-      return; // Ignore first token refresh event since we already fetched it
-    }
-    // Send the updated token to your backend server if needed
-  }).onError((err) {
-    Toaster().error("Error refreshing FCM token: $err");
-  });
-
-  // Listen for foreground incoming messages
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    if (message.notification != null) {
-      Toaster().info('${message.notification?.body}');
-    }
-  });
-
-  // Listen for background incoming messages
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-}
-
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  if (message.notification != null) {
-    // do something
-  }
 }
 
 class MyApp extends StatelessWidget {

@@ -77,9 +77,9 @@ class _PendingRequestsState extends State<PendingRequests> {
     // fetch main performers
     _mainPerformers.clear();
     for (EventRecord pendingRequest in _linkedEventRecords) {
-      UserDetails mainPerformer =
+      UserDetails? mainPerformer =
           await Utils().getUserDetails(pendingRequest.mainPerformerMobile);
-      _mainPerformers.add(mainPerformer);
+      if (mainPerformer != null) _mainPerformers.add(mainPerformer);
     }
 
     // refresh all child widgets

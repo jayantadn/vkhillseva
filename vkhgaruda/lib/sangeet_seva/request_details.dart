@@ -65,8 +65,8 @@ class _RequestDetailsState extends State<RequestDetails> {
     _mainPerformer =
         await Utils().getUserDetails(widget.eventRecord.mainPerformerMobile);
     for (String supportMobile in widget.eventRecord.supportTeamMobiles) {
-      UserDetails support = await Utils().getUserDetails(supportMobile);
-      _supportTeam.add(support);
+      UserDetails? support = await Utils().getUserDetails(supportMobile);
+      if (support != null) _supportTeam.add(support);
     }
 
     // refresh all child widgets

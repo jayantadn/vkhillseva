@@ -66,6 +66,28 @@ Future<String?> setupFirebaseMessaging() async {
   return fcmToken;
 }
 
+Future<String> getFcmToken() async {
+  String? fcmToken;
+  if (kIsWeb) {
+    fcmToken = await FirebaseMessaging.instance.getToken(
+      vapidKey:
+          "BN_4zt5SxVFHklPyCjAgba14nCWGI3sJC4x_EZZ4b8LfVAtsabkkIFz4Vqr_uF39Xh_lq7HDLqmHsH0vR1ZYXPc",
+    );
+  } else {
+    // For Apple platforms, ensure the APNS token is available before making any FCM plugin API calls
+    if (Platform.isIOS) {
+      final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+      if (apnsToken != null) {
+        // APNS token is available, make FCM plugin API requests...
+      }
+    }
+
+    fcmToken = await FirebaseMessaging.instance.getToken();
+  }
+
+  return fcmToken!;
+}
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.notification != null) {

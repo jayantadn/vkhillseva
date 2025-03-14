@@ -175,13 +175,6 @@ class _MyHomePageState extends State<HomePage> {
                         smsAuth(context, () async {
                           // auth complete
                           await refresh();
-
-                          String? fcmToken = await setupFirebaseMessaging();
-                          if (fcmToken == null) {
-                            Toaster().error("FCM token not available");
-                          } else {
-                            print("FCM token: $fcmToken");
-                          }
                         });
                       },
                       child: Text('Signup / Login'),

@@ -257,7 +257,7 @@ class _ProfileState extends State<Profile> {
       }
     }
 
-    // all abrupt returns before this point
+    // no abrupt returns before this point
     setState(() {
       _isLoading = true;
     });
@@ -294,9 +294,16 @@ class _ProfileState extends State<Profile> {
       details = userdetails;
     }
 
+    // set the FCM token
+    String? fcmToken = await setupFirebaseMessaging();
+    if (fcmToken == null) {
+      Toaster().error("FCM token not available");
+    } else {
+      details.fcmToken = fcmToken;
+    }
+
     // write to database
-    String dbpath = "${Const().dbrootSangeetSeva}/Users/${details.mobile}";
-    await FB().setJson(path: dbpath, json: details.toJson());
+    await Utils().setUserDetails(details);
 
     // update old details
     _userDetailsOld = details;
@@ -335,35 +342,6 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  Future<void> _onBack(BuildContext context) async {
-    // check if form has been modified
-    UserDetails details = UserDetails(
-      salutation: _salutation,
-      name: _nameController.text,
-      mobile: _mobileController.text,
-      profilePicUrl: _profilePicUrl,
-      credentials: _credController.text,
-      experience: _experienceController.text,
-      fieldOfExpertise: _selectedExpertiseType,
-      skills: _selectedExpertiseType == "Vocalist"
-          ? _selectedVocalSkills
-          : _selectedInstrumentalSkills,
-      youtubeUrls: _youtubeLinks,
-      audioClipUrls: _audioClips,
-    );
-
-    // FIXME: _AssertionError ('package:flutter/src/widgets/navigator.dart': Failed assertion: line 5387 pos 12: '!_debugLocked': is not true.)
-    // Navigator.pop(context);
-
-    if (_userDetailsOld == null && !details.isEmpty()) {
-      await _save(userdetails: details);
-    }
-
-    if (_userDetailsOld != null && details != _userDetailsOld!) {
-      await _save(userdetails: details);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -384,14 +362,6 @@ class _ProfileState extends State<Profile> {
                     icon: Icon(Icons.save),
                     onPressed: () async {
                       await _save();
-
-                      // FIXME: welcome refresh crashes
-                      // Navigator.pushReplacement(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => HomePage(),
-                      //   ),
-                      // );
                     },
                   )
                 ],

@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhsangeetseva/registration.dart';
@@ -12,7 +13,41 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  setupFirebaseMessagingSS();
+
   runApp(MyApp());
+}
+
+Future<void> setupFirebaseMessagingSS() async {
+  // set FCM token
+  UserBasics? basics = Utils().getUserBasics();
+  if (basics != null) {
+    UserDetails? details = await Utils().getUserDetails(basics.mobile);
+    if (details != null) {
+      // set the FCM token
+      String? fcmToken = await setupFirebaseMessaging();
+      if (fcmToken != null && fcmToken.isNotEmpty) {
+        if (fcmToken != details.fcmToken) {
+          details.fcmToken = fcmToken;
+          Utils().setUserDetails(details);
+        }
+      }
+    }
+  }
+
+  // register for FCM token changes
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    UserBasics? basics = Utils().getUserBasics();
+    if (basics != null) {
+      UserDetails? details = await Utils().getUserDetails(basics.mobile);
+      if (details != null) {
+        details.fcmToken = newToken;
+        Utils().setUserDetails(details);
+      }
+    }
+  }).onError((err) {
+    Toaster().error("Error refreshing FCM token: $err");
+  });
 }
 
 class MyApp extends StatelessWidget {

@@ -140,6 +140,7 @@ class UserDetails {
   final List<String> skills;
   final List<String> youtubeUrls;
   final List<String> audioClipUrls;
+  String? fcmToken;
 
   UserDetails({
     required this.salutation,
@@ -152,6 +153,7 @@ class UserDetails {
     required this.skills,
     required this.youtubeUrls,
     required this.audioClipUrls,
+    this.fcmToken,
   });
 
   factory UserDetails.fromJson(Map<String, dynamic> json) {
@@ -172,6 +174,7 @@ class UserDetails {
           json['audioClipUrls'] == null
               ? []
               : List<String>.from(json['audioClipUrls']),
+      fcmToken: json['fcmToken'],
     );
   }
 
@@ -187,6 +190,7 @@ class UserDetails {
       'skills': skills,
       'youtubeUrls': youtubeUrls,
       'audioClipUrls': audioClipUrls,
+      'fcmToken': fcmToken,
     };
   }
 
@@ -202,6 +206,7 @@ class UserDetails {
         other.credentials == credentials &&
         other.experience == experience &&
         other.fieldOfExpertise == fieldOfExpertise &&
+        other.fcmToken == fcmToken &&
         other.youtubeUrls.every((url) => youtubeUrls.contains(url)) &&
         other.audioClipUrls.length == audioClipUrls.length &&
         other.audioClipUrls.every((url) => audioClipUrls.contains(url));
@@ -217,6 +222,7 @@ class UserDetails {
         experience.hashCode ^
         fieldOfExpertise.hashCode ^
         skills.hashCode ^
+        fcmToken.hashCode ^
         youtubeUrls.hashCode ^
         audioClipUrls.hashCode;
   }
@@ -245,6 +251,7 @@ class UserDetails {
         credentials.isEmpty ||
         experience.isEmpty ||
         fieldOfExpertise.isEmpty ||
+        fcmToken == null ||
         skills.isEmpty ||
         youtubeUrls.isEmpty ||
         audioClipUrls.isEmpty;

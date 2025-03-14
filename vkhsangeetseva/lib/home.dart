@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -26,8 +25,6 @@ class _MyHomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    _configureMessaging();
 
     refresh();
   }
@@ -97,56 +94,6 @@ class _MyHomePageState extends State<HomePage> {
       _username = Utils().getUsername();
       _isLoading = false;
     });
-  }
-
-  Future<void> _configureMessaging() async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission!');
-
-      // Get the device token
-      String? token = await messaging.getToken();
-      print('FCM Token: $token');
-      await FB().addToList(
-          listpath: "${Const().dbrootSangeetSeva}/FCMTokens", data: token);
-
-      // Listen for foreground messages
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        print('Got a message whilst in the foreground!');
-        print('Message data: ${message.data}');
-
-        if (message.notification != null) {
-          print(
-              'Message also contained a notification: ${message.notification}');
-          // Display notification in the UI
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(
-                    message.notification!.body ?? 'Notification Received')),
-          );
-        }
-      });
-
-      // Handle background/terminated messages (optional)
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        print('Message clicked!');
-        // Handle the message when the app is opened from a terminated state
-        // Navigate to a specific screen or perform an action
-      });
-    } else {
-      print('User declined or has not accepted permission');
-    }
   }
 
   Future<void> _logout() async {
@@ -226,7 +173,15 @@ class _MyHomePageState extends State<HomePage> {
                       ),
                       onPressed: () {
                         smsAuth(context, () async {
+                          // auth complete
                           await refresh();
+
+                          String? fcmToken = await setupFirebaseMessaging();
+                          if (fcmToken == null) {
+                            Toaster().error("FCM token not available");
+                          } else {
+                            print("FCM token: $fcmToken");
+                          }
                         });
                       },
                       child: Text('Signup / Login'),

@@ -6,12 +6,11 @@ import 'package:vkhpackages/common/toaster.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-Future<void> setupFirebaseMessaging() async {
+Future<String?> setupFirebaseMessaging() async {
   // Explicitly enable FCM auto-init
   FirebaseMessaging.instance.setAutoInitEnabled(true);
 
-  NotificationSettings settings =
-      await FirebaseMessaging.instance.requestPermission(
+  await FirebaseMessaging.instance.requestPermission(
     alert: true,
     announcement: false,
     badge: true,
@@ -39,19 +38,20 @@ Future<void> setupFirebaseMessaging() async {
 
     fcmToken = await FirebaseMessaging.instance.getToken();
   }
-  print("FCM token: $fcmToken");
 
   // Listen for FCM token refresh but ignore first call at startup
   bool isFirstRun = true;
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-    if (isFirstRun) {
-      isFirstRun = false;
-      return; // Ignore first token refresh event since we already fetched it
-    }
-    // Send the updated token to your backend server if needed
-  }).onError((err) {
-    Toaster().error("Error refreshing FCM token: $err");
-  });
+  FirebaseMessaging.instance.onTokenRefresh
+      .listen((newToken) {
+        if (isFirstRun) {
+          isFirstRun = false;
+          return; // Ignore first token refresh event since we already fetched it
+        }
+        // Send the updated token to your backend server if needed
+      })
+      .onError((err) {
+        Toaster().error("Error refreshing FCM token: $err");
+      });
 
   // Listen for foreground incoming messages
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -62,6 +62,8 @@ Future<void> setupFirebaseMessaging() async {
 
   // Listen for background incoming messages
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  return fcmToken;
 }
 
 @pragma('vm:entry-point')
@@ -72,21 +74,18 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 Future<void> sendPushNotification(
-    String fcmToken, String title, String body) async {
+  String fcmToken,
+  String title,
+  String body,
+) async {
   const String functionUrl =
       "https://us-central1-garuda-1ba07.cloudfunctions.net/sendNotification";
 
   try {
     final response = await http.post(
       Uri.parse(functionUrl),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode({
-        "fcmToken": fcmToken,
-        "title": title,
-        "body": body,
-      }),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"fcmToken": fcmToken, "title": title, "body": body}),
     );
 
     if (response.statusCode == 200) {

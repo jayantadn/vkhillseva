@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhgaruda/home/landing.dart';
-import 'package:vkhgaruda/home/notification.dart';
+import 'package:vkhpackages/common/notification.dart';
 import 'package:vkhgaruda/sangeet_seva/pending_requests.dart';
 import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'firebase_options.dart';

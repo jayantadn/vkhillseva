@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
             add: (data) {},
             edit: () {},
             delete: (deletedData) async {
-              await _onPendingStatusChange(deletedData);
+              await refresh(); // full refresh is required because the index is jumbled
             }));
 
     refresh();
@@ -170,21 +170,6 @@ class _HomePageState extends State<HomePage> {
     });
 
     Navigator.pop(context);
-  }
-
-  Future<void> _onPendingStatusChange(deletedData) async {
-    num index = _events.length - deletedData['index'] - 1;
-    if (index >= 0 && index < _events.length) {
-      List events = await FB().getList(path: deletedData['path']);
-      if (events.isNotEmpty) {
-        EventRecord event = Utils().convertRawToDatatype(
-            events[deletedData['index']], EventRecord.fromJson);
-
-        setState(() {
-          _events[index.toInt()] = event;
-        });
-      }
-    }
   }
 
   Future<void> _setupFirebaseMessaging(UserDetails details) async {

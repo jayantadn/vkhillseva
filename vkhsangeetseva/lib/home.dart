@@ -36,6 +36,15 @@ class _HomePageState extends State<HomePage> {
   initState() {
     super.initState();
 
+    FB().listenForChange(
+        "${Const().dbrootSangeetSeva}/PendingRequests",
+        FBCallbacks(
+            add: (data) {},
+            edit: () {},
+            delete: (deletedData) async {
+              await _onPendingStatusChange(deletedData);
+            }));
+
     refresh();
   }
 
@@ -99,9 +108,6 @@ class _HomePageState extends State<HomePage> {
         _events.add(event);
       }
       _events.sort((a, b) => b.date.compareTo(a.date));
-      if (_events.length > _maxEvents) {
-        _events = _events.sublist(0, _maxEvents);
-      }
     }
 
     // refresh all child widgets
@@ -125,6 +131,21 @@ class _HomePageState extends State<HomePage> {
     });
 
     Navigator.pop(context);
+  }
+
+  Future<void> _onPendingStatusChange(deletedData) async {
+    num index = _events.length - deletedData['index'] - 1;
+    if (index >= 0 && index < _events.length) {
+      List events = await FB().getList(path: deletedData['path']);
+      if (events.isNotEmpty) {
+        EventRecord event = Utils().convertRawToDatatype(
+            events[deletedData['index']], EventRecord.fromJson);
+
+        setState(() {
+          _events[index.toInt()] = event;
+        });
+      }
+    }
   }
 
   Future<void> _setupFirebaseMessaging(UserDetails details) async {
@@ -254,10 +275,13 @@ class _HomePageState extends State<HomePage> {
                           height: 10,
                         ),
                         if (_username.isNotEmpty)
-                          ...List.generate(_events.length, (index) {
+                          // clip number of events to display
+                          ...List.generate(
+                              _events.length > _maxEvents
+                                  ? _maxEvents
+                                  : _events.length, (index) {
                             String date = DateFormat("dd MMM yyyy")
                                 .format(_events[index].date);
-
                             return Card(
                               color:
                                   _events[index].date.isBefore(DateTime.now())

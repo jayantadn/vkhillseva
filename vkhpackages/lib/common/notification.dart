@@ -100,16 +100,7 @@ class Notifications {
       fcmToken = await FirebaseMessaging.instance.getToken();
     }
 
-    return fcmToken!;
-  }
-
-  @pragma('vm:entry-point')
-  Future<void> _firebaseMessagingBackgroundHandler(
-    RemoteMessage message,
-  ) async {
-    if (message.notification != null) {
-      // do something
-    }
+    return fcmToken ?? "";
   }
 
   Future<void> sendPushNotification({
@@ -145,5 +136,12 @@ class Notifications {
     } catch (e) {
       Toaster().error("Error sending notification: $e");
     }
+  }
+}
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  if (message.notification != null) {
+    // do something
   }
 }

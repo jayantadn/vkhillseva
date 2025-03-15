@@ -10,7 +10,7 @@ class Welcome extends StatefulWidget {
 }
 
 // ignore: library_private_types_in_public_api
-GlobalKey<_WelcomeState> welcomeKey = GlobalKey<_WelcomeState>();
+final GlobalKey<_WelcomeState> welcomeKey = GlobalKey<_WelcomeState>();
 
 class _WelcomeState extends State<Welcome> {
   final Lock _lock = Lock();

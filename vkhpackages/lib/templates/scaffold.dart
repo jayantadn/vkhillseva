@@ -73,17 +73,19 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // leave some space at top
-                      SizedBox(height: 10),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        // leave some space at top
+                        SizedBox(height: 10),
 
-                      // your widgets here
+                        // your widgets here
+                        const Placeholder(),
 
-                      // leave some space at bottom
-                      SizedBox(height: 100),
-                    ],
+                        // leave some space at bottom
+                        SizedBox(height: 100),
+                      ],
+                    ),
                   ),
                 ),
               ),

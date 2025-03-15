@@ -153,106 +153,146 @@ class _HomePageState extends State<HomePage> {
       child: Stack(
         children: [
           Scaffold(
-            appBar: AppBar(title: Text(widget.title)),
+            appBar: AppBar(
+              title: Text(widget.title),
+              actions: [
+                // profile button
+                if (_username.isNotEmpty)
+                  IconButton(
+                    icon: Icon(Icons.person),
+                    onPressed: () {
+                      Navigator.push(
+                        // ignore: use_build_context_synchronously
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Profile(
+                            title: "Profile",
+                            self: true,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                // logout button
+                if (_username.isNotEmpty)
+                  IconButton(
+                    icon: Icon(Icons.logout),
+                    onPressed: () async {
+                      CommonWidgets().confirm(
+                          context: context,
+                          msg: "Are you sure you want to logout?",
+                          callbacks: ConfirmationCallbacks(
+                              onConfirm: _logout,
+                              onCancel: () {
+                                Navigator.pop(context);
+                              }));
+                    },
+                  ),
+              ],
+            ),
             body: RefreshIndicator(
               onRefresh: refresh,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // leave some space at top
-                      SizedBox(height: 10),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        // leave some space at top
+                        SizedBox(height: 10),
 
-                      // your widgets here
-                      // welcome banner
-                      Welcome(key: welcomeKey),
+                        // your widgets here
+                        // welcome banner
+                        Welcome(key: welcomeKey),
 
-                      SizedBox(
-                        height: 10,
-                      ),
+                        SizedBox(
+                          height: 10,
+                        ),
 
-                      // sms authentication
-                      if (_username.isEmpty)
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors
-                                .deepOrange, // Change the background color here
+                        // sms authentication
+                        if (_username.isEmpty)
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors
+                                  .deepOrange, // Change the background color here
+                            ),
+                            onPressed: () {
+                              smsAuth(context, () async {
+                                // auth complete
+                                await refresh();
+                              });
+                            },
+                            child: Text('Signup / Login'),
                           ),
-                          onPressed: () {
-                            smsAuth(context, () async {
-                              // auth complete
-                              await refresh();
-                            });
-                          },
-                          child: Text('Signup / Login'),
-                        ),
 
-                      // register for events
-                      if (_username.isNotEmpty)
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              // ignore: use_build_context_synchronously
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Registration(
-                                  title: "Event Registration",
+                        // register for events
+                        if (_username.isNotEmpty)
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                // ignore: use_build_context_synchronously
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Registration(
+                                    title: "Event Registration",
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                          child: Text('Register for an Event'),
+                              );
+                            },
+                            child: Text('Register for an Event'),
+                          ),
+
+                        // view registered events
+                        SizedBox(
+                          height: 10,
                         ),
+                        if (_username.isNotEmpty)
+                          ...List.generate(_events.length, (index) {
+                            String date = DateFormat("dd MMM yyyy")
+                                .format(_events[index].date);
+                            String performers =
+                                _events[index].mainPerformerMobile;
+                            // for (UserDetails performer
+                            //     in _events[index].supportTeamMobiles) {
+                            //   performers += ", ${performer.name}";
+                            // }
 
-                      // view registered events
-                      SizedBox(
-                        height: 10,
-                      ),
-                      if (_username.isNotEmpty)
-                        ...List.generate(_events.length, (index) {
-                          String date = DateFormat("dd MMM yyyy")
-                              .format(_events[index].date);
-                          String performers =
-                              _events[index].mainPerformerMobile;
-                          // for (UserDetails performer
-                          //     in _events[index].supportTeamMobiles) {
-                          //   performers += ", ${performer.name}";
-                          // }
+                            return Card(
+                              color:
+                                  _events[index].date.isBefore(DateTime.now())
+                                      ? Colors.grey[200]
+                                      : (_events[index].status == "Pending"
+                                          ? Colors.yellow[50]
+                                          : (_events[index].status == "Approved"
+                                              ? Colors.green[50]
+                                              : Colors.red[50])),
+                              child: ListTile(
+                                  title: Text(
+                                      "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
+                                  leading: _events[index].status == "Pending"
+                                      ? Icon(Icons.question_mark)
+                                      : (_events[index].status == "Approved"
+                                          ? Icon(Icons.check)
+                                          : Icon(Icons.close)),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Performers: $performers"),
+                                      if (_events[index].noteTemple.isNotEmpty)
+                                        Text(
+                                            "Temple remarks: ${_events[index].noteTemple}"),
+                                    ],
+                                  )),
+                            );
+                          }),
 
-                          return Card(
-                            color: _events[index].date.isBefore(DateTime.now())
-                                ? Colors.grey[200]
-                                : (_events[index].status == "Pending"
-                                    ? Colors.yellow[50]
-                                    : (_events[index].status == "Approved"
-                                        ? Colors.green[50]
-                                        : Colors.red[50])),
-                            child: ListTile(
-                                title: Text(
-                                    "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
-                                leading: _events[index].status == "Pending"
-                                    ? Icon(Icons.question_mark)
-                                    : (_events[index].status == "Approved"
-                                        ? Icon(Icons.check)
-                                        : Icon(Icons.close)),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("Performers: $performers"),
-                                    if (_events[index].noteTemple.isNotEmpty)
-                                      Text(
-                                          "Temple remarks: ${_events[index].noteTemple}"),
-                                  ],
-                                )),
-                          );
-                        }),
-
-                      // leave some space at bottom
-                      SizedBox(height: 100),
-                    ],
+                        // leave some space at bottom
+                        SizedBox(height: 100),
+                      ],
+                    ),
                   ),
                 ),
               ),

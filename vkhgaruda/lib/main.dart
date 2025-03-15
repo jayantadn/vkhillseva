@@ -15,8 +15,6 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  Notifications().setupFirebaseMessaging();
-
   runApp(MyApp());
 }
 

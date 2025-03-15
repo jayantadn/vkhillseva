@@ -96,9 +96,10 @@ class _RequestDetailsState extends State<RequestDetails> {
     String mobile = widget.eventRecord.mainPerformerMobile;
     String fcmToken = await Utils().getFcmToken(mobile);
     Notifications().sendPushNotification(
-      fcmToken,
-      "Request $action",
-      "Your request for ${DateFormat("EEE, dd MMM, yyyy").format(widget.eventRecord.date)} has been $action",
+      fcmToken: fcmToken,
+      title: action == "Approve" ? "Request approved" : "Request rejected",
+      body:
+          "Your request for ${DateFormat("EEE, dd MMM, yyyy").format(widget.eventRecord.date)} has been ${action == 'Approve' ? 'approved' : 'rejected'}",
     );
 
     // mark the availability of the slot

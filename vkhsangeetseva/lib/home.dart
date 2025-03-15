@@ -1,20 +1,26 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:intl/intl.dart';
 import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
 import 'package:vkhsangeetseva/widgets/welcome.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String title;
+
+  const HomePage({super.key, required this.title});
 
   @override
-  State<HomePage> createState() => _MyHomePageState();
+  // ignore: library_private_types_in_public_api
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> {
   // scalars
   bool _isLoading = true;
   String _username = "";
@@ -23,8 +29,10 @@ class _MyHomePageState extends State<HomePage> {
   // lists
   List<EventRecord> _events = [];
 
+  // controllers, listeners and focus nodes
+
   @override
-  void initState() {
+  initState() {
     super.initState();
 
     refresh();
@@ -35,7 +43,7 @@ class _MyHomePageState extends State<HomePage> {
     // clear all lists
     _events.clear();
 
-    // clear all controllers
+    // clear all controllers and focus nodes
 
     super.dispose();
   }
@@ -77,6 +85,7 @@ class _MyHomePageState extends State<HomePage> {
 
     // fetch all events
     if (basics != null) {
+      _events.clear();
       List eventsRaw = await FB().getList(
           path: "${Const().dbrootSangeetSeva}/Events/${basics.mobile}");
       for (var eventRaw in eventsRaw) {
@@ -139,158 +148,124 @@ class _MyHomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Hare Krishna'),
-        actions: [
-          // profile button
-          if (_username.isNotEmpty)
-            IconButton(
-              icon: Icon(Icons.person),
-              onPressed: () {
-                Navigator.push(
-                  // ignore: use_build_context_synchronously
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Profile(
-                      title: "Profile",
-                      self: true,
-                    ),
-                  ),
-                );
-              },
-            ),
+    return Theme(
+      data: themeDefault,
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(title: Text(widget.title)),
+            body: RefreshIndicator(
+              onRefresh: refresh,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // leave some space at top
+                      SizedBox(height: 10),
 
-          // logout button
-          if (_username.isNotEmpty)
-            IconButton(
-              icon: Icon(Icons.logout),
-              onPressed: () async {
-                CommonWidgets().confirm(
-                    context: context,
-                    msg: "Are you sure you want to logout?",
-                    callbacks: ConfirmationCallbacks(
-                        onConfirm: _logout,
-                        onCancel: () {
-                          Navigator.pop(context);
-                        }));
-              },
-            ),
-        ],
-      ),
-      body: Stack(children: [
-        RefreshIndicator(
-          onRefresh: refresh,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // welcome banner
-                  Welcome(key: welcomeKey),
+                      // your widgets here
+                      // welcome banner
+                      Welcome(key: welcomeKey),
 
-                  SizedBox(
-                    height: 10,
-                  ),
-
-                  // sms authentication
-                  if (_username.isEmpty)
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors
-                            .deepOrange, // Change the background color here
+                      SizedBox(
+                        height: 10,
                       ),
-                      onPressed: () {
-                        smsAuth(context, () async {
-                          // auth complete
-                          await refresh();
-                        });
-                      },
-                      child: Text('Signup / Login'),
-                    ),
 
-                  // register for events
-                  if (_username.isNotEmpty)
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          // ignore: use_build_context_synchronously
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Registration(
-                              title: "Event Registration",
-                            ),
+                      // sms authentication
+                      if (_username.isEmpty)
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors
+                                .deepOrange, // Change the background color here
                           ),
-                        );
-                      },
-                      child: Text('Register for an Event'),
-                    ),
+                          onPressed: () {
+                            smsAuth(context, () async {
+                              // auth complete
+                              await refresh();
+                            });
+                          },
+                          child: Text('Signup / Login'),
+                        ),
 
-                  // view registered events
-                  SizedBox(
-                    height: 10,
+                      // register for events
+                      if (_username.isNotEmpty)
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              // ignore: use_build_context_synchronously
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Registration(
+                                  title: "Event Registration",
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text('Register for an Event'),
+                        ),
+
+                      // view registered events
+                      SizedBox(
+                        height: 10,
+                      ),
+                      if (_username.isNotEmpty)
+                        ...List.generate(_events.length, (index) {
+                          String date = DateFormat("dd MMM yyyy")
+                              .format(_events[index].date);
+                          String performers =
+                              _events[index].mainPerformerMobile;
+                          // for (UserDetails performer
+                          //     in _events[index].supportTeamMobiles) {
+                          //   performers += ", ${performer.name}";
+                          // }
+
+                          return Card(
+                            color: _events[index].date.isBefore(DateTime.now())
+                                ? Colors.grey[200]
+                                : (_events[index].status == "Pending"
+                                    ? Colors.yellow[50]
+                                    : (_events[index].status == "Approved"
+                                        ? Colors.green[50]
+                                        : Colors.red[50])),
+                            child: ListTile(
+                                title: Text(
+                                    "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
+                                leading: _events[index].status == "Pending"
+                                    ? Icon(Icons.question_mark)
+                                    : (_events[index].status == "Approved"
+                                        ? Icon(Icons.check)
+                                        : Icon(Icons.close)),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Performers: $performers"),
+                                    if (_events[index].noteTemple.isNotEmpty)
+                                      Text(
+                                          "Temple remarks: ${_events[index].noteTemple}"),
+                                  ],
+                                )),
+                          );
+                        }),
+
+                      // leave some space at bottom
+                      SizedBox(height: 100),
+                    ],
                   ),
-                  if (_username.isNotEmpty)
-                    ...List.generate(_events.length, (index) {
-                      String date =
-                          DateFormat("dd MMM yyyy").format(_events[index].date);
-                      String performers = _events[index].mainPerformerMobile;
-                      // for (UserDetails performer
-                      //     in _events[index].supportTeamMobiles) {
-                      //   performers += ", ${performer.name}";
-                      // }
-
-                      return Card(
-                        color: _events[index].date.isBefore(DateTime.now())
-                            ? Colors.grey[200]
-                            : (_events[index].status == "Pending"
-                                ? Colors.yellow[50]
-                                : (_events[index].status == "Approved"
-                                    ? Colors.green[50]
-                                    : Colors.red[50])),
-                        child: ListTile(
-                            title: Text(
-                                "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
-                            leading: _events[index].status == "Pending"
-                                ? Icon(Icons.question_mark)
-                                : (_events[index].status == "Approved"
-                                    ? Icon(Icons.check)
-                                    : Icon(Icons.close)),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Performers: $performers"),
-                                if (_events[index].noteTemple.isNotEmpty)
-                                  Text(
-                                      "Temple remarks: ${_events[index].noteTemple}"),
-                              ],
-                            )),
-                      );
-                    }),
-                ],
+                ),
               ),
             ),
           ),
-        ),
 
-        // circular progress indicator
-        if (_isLoading)
-          LoadingOverlay(image: 'assets/images/Logo/SangeetSeva.png'),
-
-        // version number at top right corner
-        Positioned(
-          top: 10,
-          right: 10,
-          child: Text(
-            "v${Const().version}",
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall!
-                .copyWith(color: Colors.grey),
-          ),
-        ),
-      ]),
+          // circular progress indicator
+          if (_isLoading)
+            LoadingOverlay(
+              image: "assets/images/Logo/KrishnaLilaPark_circle.png",
+            ),
+        ],
+      ),
     );
   }
 }

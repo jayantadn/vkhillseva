@@ -28,7 +28,6 @@ class RegistrationPage2 extends StatefulWidget {
 
 class _RegistrationPage2State extends State<RegistrationPage2> {
   // scalars
-  final Lock _lock = Lock();
   bool _isLoading = true;
   UserDetails? _mainPerformer;
   final _minSongs = 4;
@@ -88,7 +87,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     // refresh all child widgets
 
     // perform sync operations here
-    await _lock.synchronized(() async {});
 
     setState(() {
       _isLoading = false;
@@ -164,7 +162,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     // go to homepage
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomePage();
+      return HomePage(title: "Hare Krishna");
     }));
   }
 

@@ -19,7 +19,7 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
-  final Widget home = const HomePage();
+  final Widget home = const HomePage(title: "Hare Krishna");
   final Widget test = RegistrationPage2(
       title: "Testing",
       selectedDate: DateTime.now(),

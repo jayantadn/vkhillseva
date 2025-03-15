@@ -67,7 +67,10 @@ class Notifications {
     // Listen for foreground incoming messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (message.notification != null) {
-        Toaster().info('${message.notification?.body}');
+        Toaster().notify(
+          header: '${message.notification?.body}',
+          body: '${message.notification?.body}',
+        );
       }
     });
 
@@ -108,11 +111,11 @@ class Notifications {
     }
   }
 
-  Future<void> sendPushNotification(
-    String fcmToken,
-    String title,
-    String body,
-  ) async {
+  Future<void> sendPushNotification({
+    required String fcmToken,
+    required title,
+    required String body,
+  }) async {
     const String functionUrl =
         "https://us-central1-garuda-1ba07.cloudfunctions.net/sendNotification";
 
@@ -124,12 +127,11 @@ class Notifications {
       );
 
       if (response.statusCode == 200) {
-        print("Notifications sent successfully!");
       } else {
-        print("Failed to send notification: ${response.body}");
+        Toaster().error("Failed to send notification: ${response.body}");
       }
     } catch (e) {
-      print("Error sending notification: $e");
+      Toaster().error("Error sending notification: $e");
     }
   }
 }

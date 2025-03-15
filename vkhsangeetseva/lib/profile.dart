@@ -295,7 +295,7 @@ class _ProfileState extends State<Profile> {
     }
 
     // set the FCM token
-    String? fcmToken = await setupFirebaseMessaging();
+    String? fcmToken = await Notifications().setupFirebaseMessaging();
     if (fcmToken == null) {
       Toaster().error("FCM token not available");
     } else {

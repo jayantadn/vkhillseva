@@ -95,7 +95,7 @@ class _RequestDetailsState extends State<RequestDetails> {
     // notify the user
     String mobile = widget.eventRecord.mainPerformerMobile;
     String fcmToken = await Utils().getFcmToken(mobile);
-    sendPushNotification(
+    Notifications().sendPushNotification(
       fcmToken,
       "Request $action",
       "Your request for ${DateFormat("EEE, dd MMM, yyyy").format(widget.eventRecord.date)} has been $action",

@@ -114,7 +114,7 @@ class _MyHomePageState extends State<HomePage> {
   }
 
   Future<void> _setupFirebaseMessaging(UserDetails details) async {
-    String? fcmToken = await setupFirebaseMessaging();
+    String? fcmToken = await Notifications().setupFirebaseMessaging();
     if (fcmToken != null && fcmToken.isNotEmpty) {
       if (fcmToken != details.fcmToken) {
         details.fcmToken = fcmToken;

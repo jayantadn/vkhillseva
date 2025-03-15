@@ -22,7 +22,12 @@ exports.sendNotification = functions.https.onRequest((req, res) => {
                 notification: {
                     title: title,
                     body: body,
-                    image: image || undefined, // Ensure image is inside `notification`
+                    image: image || undefined, 
+                },
+                webpush: {
+                    notification: {
+                        icon: image
+                    },
                 },
                 android: {
                     notification: {
@@ -32,7 +37,7 @@ exports.sendNotification = functions.https.onRequest((req, res) => {
                 apns: {
                     payload: {
                         aps: {
-                            "mutable-content": 1, // Required for images on iOS
+                            "mutable-content": 1, 
                         },
                     },
                     fcm_options: {

@@ -116,15 +116,26 @@ class Notifications {
     required String fcmToken,
     required title,
     required String body,
+    String? imageUrl,
   }) async {
     const String functionUrl =
         "https://us-central1-garuda-1ba07.cloudfunctions.net/sendNotification";
 
     try {
+      final Map<String, dynamic> payload = {
+        "fcmToken": fcmToken,
+        "title": title,
+        "body": body,
+      };
+
+      if (imageUrl != null) {
+        payload["image"] = imageUrl;
+      }
+
       final response = await http.post(
         Uri.parse(functionUrl),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"fcmToken": fcmToken, "title": title, "body": body}),
+        body: jsonEncode(payload),
       );
 
       if (response.statusCode == 200) {

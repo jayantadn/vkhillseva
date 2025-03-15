@@ -9,7 +9,7 @@ exports.sendNotification = functions.https.onRequest((req, res) => {
     
     cors(req, res, async () => {  // Enable CORS
         try {
-            const { fcmToken, title, body } = req.body;
+            const { fcmToken, title, body, image } = req.body;
 
             if (!fcmToken || !title || !body) {
                 return res.status(400).json({ error: "Missing required fields" });
@@ -19,8 +19,26 @@ exports.sendNotification = functions.https.onRequest((req, res) => {
 
             const message = {
                 token: fcmToken,
-                notification: { title, body },
-                data: { click_action: "FLUTTER_NOTIFICATION_CLICK" },
+                notification: {
+                    title: title,
+                    body: body,
+                    image: image || undefined, // Ensure image is inside `notification`
+                },
+                android: {
+                    notification: {
+                        image: image || undefined,
+                    },
+                },
+                apns: {
+                    payload: {
+                        aps: {
+                            "mutable-content": 1, // Required for images on iOS
+                        },
+                    },
+                    fcm_options: {
+                        image: image || undefined,
+                    },
+                },
             };
 
             await admin.messaging().send(message);

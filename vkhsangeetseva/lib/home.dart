@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
-import 'package:vkhsangeetseva/widgets/welcome.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -28,7 +27,7 @@ class _HomePageState extends State<HomePage> {
   static bool _isFcmSetup = false;
 
   // lists
-  List<EventRecord> _events = [];
+  final List<EventRecord> _events = [];
 
   // controllers, listeners and focus nodes
 
@@ -110,16 +109,57 @@ class _HomePageState extends State<HomePage> {
       _events.sort((a, b) => b.date.compareTo(a.date));
     }
 
-    // refresh all child widgets
-    if (welcomeKey.currentState != null) {
-      await welcomeKey.currentState!.refresh();
-    }
-
     // sync operations
     setState(() {
       _username = Utils().getUsername();
       _isLoading = false;
     });
+  }
+
+  Widget _createWelcome() {
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Container(
+          height: 200,
+          width: 200,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: Image.asset(
+              'assets/images/Logo/SangeetSeva.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ),
+      Text(
+        'Welcome',
+        style: Theme.of(context).textTheme.headlineSmall,
+      ),
+      Text(
+        _username.isEmpty ? 'Guest' : _username,
+        style: Theme.of(context).textTheme.headlineSmall,
+      ),
+      SizedBox(
+        height: 8,
+      ),
+      Text(
+        'ISKCON Vaikuntha Hill',
+        style: Theme.of(context).textTheme.headlineMedium,
+      ),
+      Text('Govinda Sangeet Seva',
+          style: Theme.of(context).textTheme.headlineLarge),
+    ]);
   }
 
   Future<void> _logout() async {
@@ -231,7 +271,7 @@ class _HomePageState extends State<HomePage> {
 
                         // your widgets here
                         // welcome banner
-                        Welcome(key: welcomeKey),
+                        _createWelcome(),
 
                         SizedBox(
                           height: 10,

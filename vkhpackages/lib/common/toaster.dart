@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -36,8 +37,15 @@ class Toaster {
   }
 
   void notify({required String header, required String body}) {
+    String msg = '';
+    if (kIsWeb) {
+      msg = "<b>$header</b><br>$body";
+    } else {
+      msg = body;
+    }
+
     Fluttertoast.showToast(
-      msg: "<b>$header</b><br>$body",
+      msg: msg,
       toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.TOP,
       timeInSecForIosWeb: 5,

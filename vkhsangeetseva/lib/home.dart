@@ -257,12 +257,6 @@ class _HomePageState extends State<HomePage> {
                           ...List.generate(_events.length, (index) {
                             String date = DateFormat("dd MMM yyyy")
                                 .format(_events[index].date);
-                            String performers =
-                                _events[index].mainPerformerMobile;
-                            // for (UserDetails performer
-                            //     in _events[index].supportTeamMobiles) {
-                            //   performers += ", ${performer.name}";
-                            // }
 
                             return Card(
                               color:
@@ -285,7 +279,11 @@ class _HomePageState extends State<HomePage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text("Performers: $performers"),
+                                      Text(_events[index].status == "Pending"
+                                          ? "Waiting for approval"
+                                          : (_events[index].status == "Approved"
+                                              ? "Request is approved"
+                                              : "Request is rejected")),
                                       if (_events[index].noteTemple.isNotEmpty)
                                         Text(
                                             "Temple remarks: ${_events[index].noteTemple}"),

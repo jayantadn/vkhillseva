@@ -100,6 +100,10 @@ class _LandingState extends State<Landing> {
                         ),
                         if (_username.isEmpty)
                           ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors
+                                  .deepOrange, // Change the background color here
+                            ),
                             onPressed: () {
                               smsAuth(context, () {
                                 Navigator.pushReplacement(

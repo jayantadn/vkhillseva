@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:vkhpackages/widgets/util_widgets.dart';
 import 'package:vkhsangeetseva/home.dart';
 import 'package:vkhsangeetseva/profile.dart';
 
@@ -156,6 +157,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           "path": "${Const().dbrootSangeetSeva}/Events/$mobile",
           "index": index
         });
+
+    // show success message
+    UtilWidgets().showMessage(context,
+        "Your request has been submitted.\nYou will be notified once your request is approved");
 
     // go to homepage
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {

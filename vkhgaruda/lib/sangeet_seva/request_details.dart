@@ -92,6 +92,17 @@ class _RequestDetailsState extends State<RequestDetails> {
     eventsRaw[index] = event.toJson();
     await FB().setValue(path: path, value: eventsRaw);
 
+    // notify the user
+    String mobile = widget.eventRecord.mainPerformerMobile;
+    String fcmToken = await Utils().getFcmToken(mobile);
+    sendPushNotification(
+      fcmToken,
+      "Request $action",
+      "Your request for ${DateFormat("EEE, dd MMM, yyyy").format(widget.eventRecord.date)} has been $action",
+    );
+    print("Notification sent to $fcmToken");
+    return;
+
     // mark the availability of the slot
     if (action == "Approve") {
       widget.eventRecord.slot.avl = false;

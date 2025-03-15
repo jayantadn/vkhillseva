@@ -100,8 +100,7 @@ Future<void> sendPushNotification(
   String title,
   String body,
 ) async {
-  const String functionUrl =
-      "https://us-central1-garuda-1ba07.cloudfunctions.net/sendNotification";
+  const String functionUrl = "https://sendnotification-26lx7cfwtq-uc.a.run.app";
 
   try {
     final response = await http.post(

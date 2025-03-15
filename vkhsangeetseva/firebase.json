@@ -36,6 +36,15 @@
         "**/.*",
         "**/node_modules/**"
       ]
+    },
+    {
+      "target": "testsangeetseva",
+      "public": "build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
     }
   ],
   "functions": [

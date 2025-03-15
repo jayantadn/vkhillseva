@@ -100,8 +100,6 @@ class _RequestDetailsState extends State<RequestDetails> {
       "Request $action",
       "Your request for ${DateFormat("EEE, dd MMM, yyyy").format(widget.eventRecord.date)} has been $action",
     );
-    print("Notification sent to $fcmToken");
-    return;
 
     // mark the availability of the slot
     if (action == "Approve") {

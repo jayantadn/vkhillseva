@@ -18,6 +18,7 @@ class Notifications {
   }
 
   Future<String?> setupFirebaseMessaging() async {
+    print("Setting up Firebase Messaging...");
     // Explicitly enable FCM auto-init
     FirebaseMessaging.instance.setAutoInitEnabled(true);
 
@@ -68,7 +69,7 @@ class Notifications {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (message.notification != null) {
         Toaster().notify(
-          header: '${message.notification?.body}',
+          header: '${message.notification?.title}',
           body: '${message.notification?.body}',
         );
       }

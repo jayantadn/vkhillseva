@@ -25,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = true;
   String _username = "";
   final int _maxEvents = 5;
+  static bool _isFcmSetup = false;
 
   // lists
   List<EventRecord> _events = [];
@@ -78,8 +79,12 @@ class _HomePageState extends State<HomePage> {
       } else {
         // profile is already set
         // setup firebase messaging
-        await _setupFirebaseMessaging(
-            Utils().convertRawToDatatype(userdetailsMap, UserDetails.fromJson));
+        // this should be done only once per app startup
+        if (_isFcmSetup == false) {
+          _isFcmSetup = true;
+          await _setupFirebaseMessaging(Utils()
+              .convertRawToDatatype(userdetailsMap, UserDetails.fromJson));
+        }
       }
     }
 

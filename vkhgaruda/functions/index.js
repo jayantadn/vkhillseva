@@ -5,6 +5,8 @@ const cors = require("cors")({ origin: true });  // Allow CORS
 admin.initializeApp();
 
 exports.sendNotification = functions.https.onRequest((req, res) => {
+    
+    
     cors(req, res, async () => {  // Enable CORS
         try {
             const { fcmToken, title, body } = req.body;
@@ -12,6 +14,8 @@ exports.sendNotification = functions.https.onRequest((req, res) => {
             if (!fcmToken || !title || !body) {
                 return res.status(400).json({ error: "Missing required fields" });
             }
+
+            console.log(`Sending notification: ${body}`);
 
             const message = {
                 token: fcmToken,

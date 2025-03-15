@@ -22,26 +22,10 @@ exports.sendNotification = functions.https.onRequest((req, res) => {
                 notification: {
                     title: title,
                     body: body,
-                    image: image || undefined, 
                 },
                 webpush: {
                     notification: {
                         icon: image
-                    },
-                },
-                android: {
-                    notification: {
-                        image: image || undefined,
-                    },
-                },
-                apns: {
-                    payload: {
-                        aps: {
-                            "mutable-content": 1, 
-                        },
-                    },
-                    fcm_options: {
-                        image: image || undefined,
                     },
                 },
             };

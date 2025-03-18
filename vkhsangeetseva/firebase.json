@@ -35,7 +35,13 @@
         "firebase.json",
         "**/.*",
         "**/node_modules/**"
-      ]
+      ],
+      "rewrites": [
+      {
+        "source": "/version.json",
+        "destination": "/version.json"
+      }
+    ]      
     },
     {
       "target": "testsangeetseva",
@@ -44,7 +50,13 @@
         "firebase.json",
         "**/.*",
         "**/node_modules/**"
-      ]
+      ],
+      "rewrites": [
+      {
+        "source": "/version.json",
+        "destination": "/version.json"
+      }
+    ]      
     }
   ],
   "functions": [

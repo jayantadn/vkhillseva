@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:math';
-
+import 'dart:js_interop'; // Add this import
+import 'package:flutter/foundation.dart';
+import 'package:web/web.dart'; //
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -14,6 +17,42 @@ class Utils {
 
   Utils._internal() {
     // init
+  }
+
+  Future<String> checkForUpdates(String appname) async {
+    String version = "";
+
+    if (kIsWeb) {
+      String versionUrl = "https://$appname.web.app/version.json";
+      const String localVersionKey = "app_version";
+
+      try {
+        final response = await http.get(
+          Uri.parse(versionUrl),
+          headers: {'Cache-Control': 'no-cache'},
+        );
+
+        if (response.statusCode == 200) {
+          final remoteVersion = json.decode(response.body)['version'];
+          String? localVersion = await LS().read(localVersionKey);
+
+          if (localVersion != null && localVersion != remoteVersion) {
+            // Force refresh the web app using JS interop
+            Toaster().info("Updating app");
+            Future.delayed(Duration(milliseconds: 500), () {
+              jsReloadPage();
+            });
+          }
+
+          LS().write(localVersionKey, remoteVersion);
+          version = remoteVersion;
+        }
+      } catch (e) {
+        // print("Error checking version: $e");
+      }
+    }
+
+    return version;
   }
 
   T convertRawToDatatype<T>(
@@ -170,3 +209,7 @@ class Utils {
     return date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
   }
 }
+
+// Add this helper function for JS interop
+@JS('location.reload')
+external void jsReloadPage();

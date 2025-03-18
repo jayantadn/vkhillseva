@@ -24,6 +24,7 @@ class _HomePageState extends State<HomePage> {
   String _username = "";
   final int _maxEvents = 5;
   static bool _isFcmSetup = false;
+  String _version = "";
 
   // lists
   final List<EventRecord> _events = [];
@@ -62,6 +63,9 @@ class _HomePageState extends State<HomePage> {
     });
 
     // async operations
+
+    // check for updates
+    _version = await Utils().checkForUpdates("govindasangeetseva");
 
     // get username from local storage
     await Utils().fetchUserBasics();
@@ -355,6 +359,18 @@ class _HomePageState extends State<HomePage> {
             LoadingOverlay(
               image: "assets/images/Logo/KrishnaLilaPark_circle.png",
             ),
+
+          Positioned(
+            top: 60,
+            right: 20,
+            child: Text(
+              "v$_version",
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall!
+                  .copyWith(color: Colors.grey),
+            ),
+          ),
         ],
       ),
     );

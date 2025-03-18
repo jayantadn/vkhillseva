@@ -15,6 +15,7 @@ GlobalKey<_WelcomeState> summaryKey = GlobalKey<_WelcomeState>();
 class _WelcomeState extends State<Welcome> {
   final Lock _lock = Lock();
   String _username = '';
+  String _version = "";
 
   @override
   void initState() {
@@ -34,6 +35,10 @@ class _WelcomeState extends State<Welcome> {
 
   void refresh() async {
     // perform async work here
+
+    // get version
+    _version = await Utils().checkForUpdates("vkhillgaruda");
+
     if (Utils().getUsername().isEmpty) {
       await Utils().fetchUserBasics();
     }
@@ -88,7 +93,7 @@ class _WelcomeState extends State<Welcome> {
         'ISKCON Vaikuntha Hill',
         style: Theme.of(context).textTheme.headlineMedium,
       ),
-      Text('Garuda v${Const().version}',
+      Text('Garuda v$_version',
           style: Theme.of(context).textTheme.headlineSmall),
     ]);
   }

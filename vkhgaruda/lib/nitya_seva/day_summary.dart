@@ -116,8 +116,8 @@ class _DaySummaryState extends State<DaySummary> {
     super.dispose();
   }
 
-  void refresh() async {
-    // async work
+  Future<void> refresh() async {
+    // perform async work here
     String dbDate = DateFormat("yyyy-MM-dd").format(widget.date);
     List sessionsList =
         await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
@@ -130,11 +130,23 @@ class _DaySummaryState extends State<DaySummary> {
           Map<String, dynamic>.from(sessionRaw['Settings']);
       sessions.add(Session.fromJson(s));
     }
+    if (sessions.isEmpty) {
+      return;
+    }
     sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    // sychronized work
+    // fetch ticket details for each session
+    dynamic ticketsList = [];
+    for (Session session in sessions) {
+      String dbSession =
+          session.timestamp.toIso8601String().replaceAll(".", "^");
+      dynamic tickets = await FB().getList(
+          path: "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets");
+      ticketsList.add(tickets);
+    }
+
     await _lock.synchronized(() async {
-      if (!mounted) return;
+      // perform sync work here
       setState(() {
         // clear everything
         _amountTableHeaderRow.clear();
@@ -152,10 +164,6 @@ class _DaySummaryState extends State<DaySummary> {
             _countModePercentage[key] = 0;
           }
         });
-
-        if (sessions.isEmpty) {
-          return;
-        }
 
         // loop through each session
         for (Session session in sessions) {
@@ -195,62 +203,46 @@ class _DaySummaryState extends State<DaySummary> {
             }
           }
 
-          String dbSession =
-              session.timestamp.toIso8601String().replaceAll(".", "^");
-
           // loop through each ticket
-          FB()
-              .getList(
-                  path:
-                      "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets")
-              .then((tickets) {
-            setState(() {
-              // async work in another thread
-              for (var ticket in tickets) {
-                // find the index for the amount
-                Map<String, dynamic> ticketJson =
-                    Map<String, dynamic>.from(ticket);
-                Ticket ticketTyped = Ticket.fromJson(ticketJson);
-                int index = _amountTableTicketRow.indexWhere(
-                    (row) => row[0] == ticketTyped.amount.toString());
+          dynamic tickets = ticketsList[indexSession];
+          for (var ticket in tickets) {
+            // find the index for the amount
+            Map<String, dynamic> ticketJson = Map<String, dynamic>.from(ticket);
+            Ticket ticketTyped = Ticket.fromJson(ticketJson);
+            int index = _amountTableTicketRow
+                .indexWhere((row) => row[0] == ticketTyped.amount.toString());
 
-                // add count to the index
-                _amountTableTicketRow[index][indexSession + 1] =
-                    (int.parse(_amountTableTicketRow[index][indexSession + 1]) +
-                            1)
-                        .toString();
+            // add count to the index
+            _amountTableTicketRow[index][indexSession + 1] =
+                (int.parse(_amountTableTicketRow[index][indexSession + 1]) + 1)
+                    .toString();
 
-                // add count to the total row
-                _amountTableTotalRow[0][indexSession + 1] =
-                    (int.parse(_amountTableTotalRow[0][indexSession + 1]) + 1)
-                        .toString();
-                _amountTableTotalRow[1][indexSession + 1] =
-                    (int.parse(_amountTableTotalRow[1][indexSession + 1]) +
-                            ticketTyped.amount)
-                        .toString();
+            // add count to the total row
+            _amountTableTotalRow[0][indexSession + 1] =
+                (int.parse(_amountTableTotalRow[0][indexSession + 1]) + 1)
+                    .toString();
+            _amountTableTotalRow[1][indexSession + 1] =
+                (int.parse(_amountTableTotalRow[1][indexSession + 1]) +
+                        ticketTyped.amount)
+                    .toString();
 
-                // add count to the grand total
-                _grandTotal[0] += 1;
-                _grandTotal[1] += ticketTyped.amount;
+            // add count to the grand total
+            _grandTotal[0] += 1;
+            _grandTotal[1] += ticketTyped.amount;
 
-                // add count to the mode
-                _countMode[ticketTyped.mode] =
-                    _countMode[ticketTyped.mode]! + 1;
-                Const().paymentModes.forEach((key, value) {
-                  if (key != 'Gift') {
-                    _countModePercentage[key] = _grandTotal[0] == 0
-                        ? 0
-                        : ((_countMode[key]! / _grandTotal[0]) * 100).round();
-                  }
-                });
+            // add count to the mode
+            _countMode[ticketTyped.mode] = _countMode[ticketTyped.mode]! + 1;
+            Const().paymentModes.forEach((key, value) {
+              if (key != 'Gift') {
+                _countModePercentage[key] = _grandTotal[0] == 0
+                    ? 0
+                    : ((_countMode[key]! / _grandTotal[0]) * 100).round();
               }
             });
-          });
+          }
         }
       });
     });
-
-    sessions.clear();
   }
 
   Future<void> _shareDaySummary(BuildContext context) async {

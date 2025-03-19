@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
-import 'dart:js_interop'; // Add this import
-import 'package:flutter/foundation.dart';
-import 'package:web/web.dart'; //
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:http/http.dart' as http;
+
+// export 'js.dart' if (kIsWeb) 'stub.dart';
 
 class Utils {
   static final Utils _instance = Utils._internal();
@@ -40,7 +40,7 @@ class Utils {
             // Force refresh the web app using JS interop
             Toaster().info("Updating app");
             Future.delayed(Duration(milliseconds: 500), () {
-              jsReloadPage();
+              // jsReloadPage();
             });
           }
 
@@ -209,7 +209,3 @@ class Utils {
     return date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
   }
 }
-
-// Add this helper function for JS interop
-@JS('location.reload')
-external void jsReloadPage();

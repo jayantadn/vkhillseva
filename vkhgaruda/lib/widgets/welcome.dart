@@ -37,7 +37,7 @@ class _WelcomeState extends State<Welcome> {
     // perform async work here
 
     // get version
-    _version = await Utils().checkForUpdates("vkhillgaruda");
+    // _version = await Utils().checkForUpdates("vkhillgaruda");
 
     if (Utils().getUsername().isEmpty) {
       await Utils().fetchUserBasics();
@@ -93,8 +93,9 @@ class _WelcomeState extends State<Welcome> {
         'ISKCON Vaikuntha Hill',
         style: Theme.of(context).textTheme.headlineMedium,
       ),
-      Text('Garuda v$_version',
-          style: Theme.of(context).textTheme.headlineSmall),
+      if (_version.isNotEmpty)
+        Text('Garuda v$_version',
+            style: Theme.of(context).textTheme.headlineSmall),
     ]);
   }
 }

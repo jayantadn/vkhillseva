@@ -32,83 +32,55 @@ class Const {
         "400": {
           'color': Colors.blue,
           "sevas": [
-            {
-              "name": "Pushpanjali",
-              "icon": "assets/images/NityaSeva/vishnu_pushpanjali.png",
-            },
+            {"name": "Pushpanjali"},
           ],
+          "obsolete": true,
         },
       },
       {
         "500": {
-          'color': Colors.deepOrange,
+          'color': Colors.cyanAccent,
           "sevas": [
-            {
-              "name": "Tulasi Archana Seva",
-              "icon": "assets/images/NityaSeva/tas.png",
-            },
-            {
-              "name": "Jala-dana Seva",
-              "icon": "assets/images/NityaSeva/JalaDana.png",
-            },
-            {
-              "name": "Sudharshana Chakra Puja",
-              "icon": "assets/images/VKHillDieties/Sudarshana.png",
-            },
+            {"name": "Tulasi Archana Seva"},
+            {"name": "Jala-dana Seva"},
+            {"name": "Sudharshana Chakra Puja"},
           ],
+          "obsolete": false,
+        },
+      },
+      {
+        "600": {
+          'color': Colors.yellow,
+          "sevas": [
+            {"name": "Tulasi Archana Seva"},
+            {"name": "Jala-dana Seva"},
+            {"name": "Sudharshana Chakra Puja"},
+          ],
+          "obsolete": false,
         },
       },
       {
         "1000": {
-          'color': Colors.green,
+          'color': Colors.lightGreenAccent,
           "sevas": [
-            {
-              "name": "Mandir-marjana Seva",
-              "icon": "assets/images/Logo/KrishnaLilaPark_square.png",
-            },
-            {
-              "name": "Naivedya Seva",
-              "icon": "assets/images/NityaSeva/laddu.png",
-            },
-            {
-              "name": "Sadhu Seva",
-              "icon": "assets/images/NityaSeva/sadhu_seva.png",
-            },
-            {
-              "name": "Shringara Seva",
-              "icon": "assets/images/VKHillDieties/Govinda.png",
-            },
-            {
-              "name": "Trikala Puja",
-              "icon": "assets/images/LauncherIcons/NityaSeva.png",
-            },
-            {
-              "name": "Tulasi Hara Seva",
-              "icon": "assets/images/NityaSeva/tulasi_garland.png",
-            },
+            {"name": "Mandir-marjana Seva"},
+            {"name": "Naivedya Seva"},
+            {"name": "Sadhu Seva"},
+            {"name": "Shringara Seva"},
+            {"name": "Trikala Puja"},
+            {"name": "Tulasi Hara Seva"},
           ],
+          "obsolete": false,
         },
       },
       {
         "2500": {
-          'color': Colors.pink,
+          'color': Colors.pink[200],
           "sevas": [
-            {
-              "name": "Gita-Dana Seva",
-              "icon": "assets/images/NityaSeva/gita.png",
-            },
-            {
-              "name": "Pushpalankara Seva",
-              "icon": "assets/images/NityaSeva/flower_garland.png",
-            },
-            {
-              "name": "Sadhu Bhojana Seva",
-              "icon": "assets/images/NityaSeva/sadhu_bhojana.png",
-            },
-            {
-              "name": "Shodashopachara Seva",
-              "icon": "assets/images/NityaSeva/ShodashopacharaSeva.png",
-            },
+            {"name": "Gita-Dana Seva"},
+            {"name": "Pushpalankara Seva"},
+            {"name": "Sadhu Bhojana Seva"},
+            {"name": "Shodashopachara Seva"},
           ],
         },
       },

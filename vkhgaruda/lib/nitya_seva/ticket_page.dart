@@ -546,6 +546,11 @@ class _TicketPageState extends State<TicketPage> {
                           child: Row(
                             children: [
                               ...Const().nityaSeva['amounts']!.map((seva) {
+                                // skip obsolete seva amounts
+                                if (seva.values.first['obsolete'] == true) {
+                                  return Container();
+                                }
+
                                 return Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: GestureDetector(
@@ -588,12 +593,7 @@ class _TicketPageState extends State<TicketPage> {
                                           seva.keys.first,
                                           style: Theme.of(context)
                                               .textTheme
-                                              .bodyLarge!
-                                              .copyWith(
-                                                  color: amount.toString() ==
-                                                          seva.keys.first
-                                                      ? Colors.white
-                                                      : primaryColor),
+                                              .bodyLarge,
                                         ),
                                       ),
                                     ),

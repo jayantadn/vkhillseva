@@ -75,7 +75,7 @@ class Const {
       },
       {
         "2500": {
-          'color': Colors.pink[200],
+          'color': Colors.pink[100],
           "sevas": [
             {"name": "Gita-Dana Seva"},
             {"name": "Pushpalankara Seva"},

@@ -80,6 +80,9 @@ def set_value_in_file(filepath, search_string, value):
             if search_string in line:
                 key, _ = line.split('=', 1)
                 file.write(f'{key}={value}\n')
+            elif ':' in line:
+                key, _ = line.split(':', 1)
+                file.write(f'{key}: {value}\n')
             else:
                 file.write(line)   
     os.chdir(curdir)
@@ -91,25 +94,28 @@ def get_value_from_file(filepath, search_string):
     with open(filepath, 'r') as file:
         lines = file.readlines()
     for line in lines:
+        if line.startswith("#"):
+            continue
         if search_string in line:
             if '=' in line:
                 _, value = line.split('=', 1)
                 ret = value.strip()
+                break
             elif ':' in line:
                 key, value = line.split(':', 1)
                 ret = value.strip()
-            break
+                break
     return ret
     os.chdir(curdir)
 
 def main():
     global rootdir
+    rootdir = run_command('git rev-parse --show-toplevel')
 
     set_parameters()
     set_hosting_site()
 
     print("Changing directory to app folder")
-    rootdir = run_command('git rev-parse --show-toplevel')
     os.chdir(rootdir)
     try:
         os.chdir(app)

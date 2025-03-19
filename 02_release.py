@@ -163,6 +163,7 @@ def main():
                 file.write(line)
 
     print("Applying dart fix")
+    os.chdir(f"{rootdir}/{app}")
     try:
         result = subprocess.run(["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
         print(result.stdout)

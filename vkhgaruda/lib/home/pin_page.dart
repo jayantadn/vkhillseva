@@ -76,7 +76,6 @@ class _PinPageState extends State<PinPage> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Enter pin',
-                          counterText: '',
                         ),
                         controller: _controller,
                       ),

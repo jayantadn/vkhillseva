@@ -2,9 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
-import 'package:vkhpackages/widgets/util_widgets.dart';
 import 'package:vkhsangeetseva/home.dart';
 import 'package:vkhsangeetseva/profile.dart';
 

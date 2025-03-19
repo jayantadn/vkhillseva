@@ -1,4 +1,4 @@
-library vkhpackages;
+library;
 
 export 'common/toaster.dart';
 export 'common/datatypes.dart';

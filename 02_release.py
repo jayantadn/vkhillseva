@@ -84,6 +84,24 @@ def set_value_in_file(filepath, search_string, value):
                 file.write(line)   
     os.chdir(curdir)
 
+def get_value_from_file(filepath, search_string):
+    ret = ""
+    curdir = os.getcwd()
+    os.chdir(rootdir)
+    with open(filepath, 'r') as file:
+        lines = file.readlines()
+    for line in lines:
+        if search_string in line:
+            if '=' in line:
+                _, value = line.split('=', 1)
+                ret = value.strip()
+            elif ':' in line:
+                key, value = line.split(':', 1)
+                ret = value.strip()
+            break
+    return ret
+    os.chdir(curdir)
+
 def main():
     global rootdir
 
@@ -102,32 +120,37 @@ def main():
     print("get the branch name")
     branch_name = run_command('git rev-parse --abbrev-ref HEAD')
     branch_name = branch_name.lstrip()
-    version = branch_name
+    if branch_name == 'main':
+        value = get_value_from_file(f"{app}/pubspec.yaml", "version")
+        version = value.split('+')[0]
+    else:
+        version = branch_name
 
-    print("generate the changelog from git log")
-    base_branch = run_command('git merge-base origin/main HEAD')
-    logs = run_command(f'git log {base_branch}..HEAD --pretty=%B')
-    log_messages = logs.split('\n\n')
-    filtered_log_messages = []
-    for log_message in log_messages:
-        first_line = log_message.split('\n')[0]
-        if first_line.startswith("feature:") or first_line.startswith("fix:"):
-            filtered_log_messages.append(log_message)
-    log_messages = filtered_log_messages
-    log_messages.reverse()
-
-    print("write changelog")
-    with open('changelog.md', 'r') as file:
-        existing_contents = file.read()
-    with open('changelog.md', 'w') as file:
-        file.write(f'# {version}\n')
+    if branch_name != "main":
+        print("generate the changelog from git log")
+        base_branch = run_command('git merge-base origin/main HEAD')
+        logs = run_command(f'git log {base_branch}..HEAD --pretty=%B')
+        log_messages = logs.split('\n\n')
+        filtered_log_messages = []
         for log_message in log_messages:
-            file.write(f'- {log_message}\n')
-        file.write('\n')  
-        file.write(existing_contents)
+            first_line = log_message.split('\n')[0]
+            if first_line.startswith("feature:") or first_line.startswith("fix:"):
+                filtered_log_messages.append(log_message)
+        log_messages = filtered_log_messages
+        log_messages.reverse()
+
+        print("write changelog")
+        with open('changelog.md', 'r') as file:
+            existing_contents = file.read()
+        with open('changelog.md', 'w') as file:
+            file.write(f'# {version}\n')
+            for log_message in log_messages:
+                file.write(f'- {log_message}\n')
+            file.write('\n')  
+            file.write(existing_contents)
                 
-    print("Undo main patch2 for testing")
-    main_file = 'lib/main.dart'
+    print("Undo main patch for testing")
+    main_file = f'{rootdir}/{app}/lib/main.dart'
     search_string = '      home: test,'
     replacement_string = '      home: home,\n'
     with open(main_file, 'r') as file:
@@ -189,19 +212,23 @@ def main():
     prefix = ""
     if(reltype == 'test'):
         prefix = "TEST/"
-    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootGaruda", f"\"{prefix}GARUDA_01\";" )
-    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootSangeetSeva", f"\"{prefix}SANGEETSEVA_01\";" )
+    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootGaruda", f" \"{prefix}GARUDA_01\";" )
+    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootSangeetSeva", f" \"{prefix}SANGEETSEVA_01\";" )
 
     try:
         print("commit all changes and push to git")
         if run_command('git status --porcelain'):
             run_command('git add -A')
-            run_command(f'git commit -m "release {branch_name}"')
+            if branch_name == "main":
+                run_command('git commit -m "post release changes"')
+            else:
+                run_command(f'git commit -m "release {branch_name}"')
             run_command('git push origin')
-            run_command('git checkout main')
-            run_command('git pull')
-            run_command(f'git merge {branch_name}')
-            run_command('git push origin')
+            if branch_name != "main":
+                run_command('git checkout main')
+                run_command('git pull')
+                run_command(f'git merge {branch_name}')
+                run_command('git push origin')
         else:
             print("No changes to commit")
 
@@ -209,7 +236,7 @@ def main():
         run_command("flutter clean")
         run_command("flutter pub get")
         run_command("flutter build web")
-        run_command("firebase deploy --only hosting:vkhgaruda")
+        run_command(f"firebase deploy --only hosting:{hostingsite}")
 
         print("building for android")
         run_command("flutter build apk")

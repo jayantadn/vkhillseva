@@ -37,7 +37,7 @@ class _ProfileState extends State<Profile> {
   late String _salutation;
   String _selectedExpertiseType = "Vocalist";
   UserDetails? _userDetailsOld;
-  bool _backEnabled = false;
+  final bool _backEnabled = false;
 
   // lists
   final List<String> _salutations = [

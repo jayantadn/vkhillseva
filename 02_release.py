@@ -3,6 +3,11 @@ import sys
 import os
 import shutil
 
+app = ""
+reltype = ""
+hostingsite = ""
+rootdir = ""
+
 def run_command(command):
     print(f"Running command: {command}")
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -11,12 +16,90 @@ def run_command(command):
         sys.exit(1)
     return result.stdout.strip()
 
+def set_parameters():
+    global app
+    global reltype
+    if len(sys.argv) == 3:
+        app = sys.argv[1]
+        reltype = sys.argv[2]
+    else:
+        appid = input("Enter the app name: 1. Garuda 2. Sangeet Seva ")
+        if appid == '1':
+            app = 'vkhgaruda'
+        elif appid == '2':
+            app = 'vkhsangeetseva'
+        else:
+            print("Invalid app id")
+            sys.exit(1)
+        relid = input("Enter the release type: 1. Release 2. Test ")
+        if relid == '1':
+            reltype = 'release'
+        elif relid == '2':
+            reltype = 'test'
+        else:
+            print("Invalid release type")
+            sys.exit(1)
+    print(f"App: {app}")
+    print(f"Release type: {reltype}")
+    
+def set_hosting_site():
+    global hostingsite
+    if(app == 'vkhgaruda' and reltype == 'release'):
+        hostingsite = 'vkhillgaruda'
+    elif(app == 'vkhgaruda' and reltype == 'test'):
+        hostingsite = 'testgaruda'    
+    if(app == 'vkhsangeetseva' and reltype == 'release'):
+        hostingsite = 'govindasangetseva'
+    elif(app == 'vkhsangeetseva' and reltype == 'test'):
+        hostingsite = 'testsangeetseva'
+    else:
+        print("Hosting site could not be determined")
+        sys.exit(1)
+    print(f"Hosting site: {hostingsite}")
 
+def replace_string_in_file(file, search_string, replacement_string):
+    curdir = os.getcwd()
+    os.chdir(rootdir)
+    with open(file, 'r') as file:
+        lines = file.readlines()
+    with open(file, 'w') as file:
+        for line in lines:
+            if search_string in line:
+                file.write(replacement_string)
+            else:
+                file.write(line)   
+    os.chdir(curdir)
+
+def set_value_in_file(file, search_string, value):
+    curdir = os.getcwd()
+    os.chdir(rootdir)
+    with open(file, 'r') as file:
+        lines = file.readlines()
+    with open(file, 'w') as file:
+        for line in lines:
+            if search_string in line:
+                key, _ = line.split('=', 1)
+                file.write(f'{key}={value}\n')
+            else:
+                file.write(line)   
+    os.chdir(curdir)
 
 def main():
+    global rootdir
+
+    set_parameters()
+    set_hosting_site()
+
     rootdir = run_command('git rev-parse --show-toplevel')
     os.chdir(rootdir)
 
+    print("Changing directory to app folder")
+    try:
+        os.chdir('app')
+    except FileNotFoundError:
+        print(f"Error: '{app}' directory not found.")
+        sys.exit(1)
+        
     print("get the branch name")
     branch_name = run_command('git rev-parse --abbrev-ref HEAD')
     branch_name = branch_name.lstrip()
@@ -33,11 +116,12 @@ def main():
         if first_line.startswith("feature:") or first_line.startswith("fix:"):
             filtered_log_messages.append(log_message)
     log_messages = filtered_log_messages
+    log_messages.reverse()
 
     print("write changelog")
-    with open(f'{project}/changelog.md', 'r') as file:
+    with open('changelog.md', 'r') as file:
         existing_contents = file.read()
-    with open(f'{project}/changelog.md', 'w') as file:
+    with open('changelog.md', 'w') as file:
         file.write(f'# {version}\n')
         for log_message in log_messages:
             file.write(f'- {log_message}\n')
@@ -70,18 +154,18 @@ def main():
             else:
                 file.write(line)
 
-    # print("Applying dart fix")
-    # try:
-    #     result = subprocess.run(["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
-    #     print(result.stdout)
-    #     if result.returncode != 0:
-    #         print(result.stderr)
-    # except subprocess.CalledProcessError as e:
-    #     print(f"CalledProcessError: {e}")
-    # except FileNotFoundError as e:
-    #     print(f"FileNotFoundError: {e}")
-    # except Exception as e:
-    #     print(f"An unexpected error occurred: {e}")
+    print("Applying dart fix")
+    try:
+        result = subprocess.run(["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
+        print(result.stdout)
+        if result.returncode != 0:
+            print(result.stderr)
+    except subprocess.CalledProcessError as e:
+        print(f"CalledProcessError: {e}")
+    except FileNotFoundError as e:
+        print(f"FileNotFoundError: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
 
     # print("update the list of icons")
     # src_file = 'pubspec.yaml'
@@ -116,6 +200,12 @@ def main():
     #                     file.write(line)
     #                     flag_start = False
     
+    print("set database path")
+    prefix = ""
+    if(reltype == 'test'):
+        prefix = "TEST/"
+    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootGaruda", f"\"{prefix}GARUDA_01\"" )
+    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootSangeetSeva", f"\"{prefix}SANGEETSEVA_01\"" )
 
     try:
         print("commit all changes and push to git")
@@ -130,30 +220,30 @@ def main():
         else:
             print("No changes to commit")
 
-        # print("building for web")
-        # run_command("flutter clean")
-        # run_command("flutter pub get")
-        # run_command("flutter build web")
-        # run_command("firebase deploy --only hosting:vkhgaruda")
+        print("building for web")
+        run_command("flutter clean")
+        run_command("flutter pub get")
+        run_command("flutter build web")
+        run_command("firebase deploy --only hosting:vkhgaruda")
 
-        # print("building for android")
-        # run_command("flutter build apk")
-        # apk_path = "build/app/outputs/flutter-apk/app-release.apk"
-        # new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{branch_name}.apk"
-        # if os.path.exists(apk_path):
-        #     if os.path.exists(new_apk_path):
-        #         os.remove(new_apk_path)
-        #     os.rename(apk_path, new_apk_path)
-        # else:
-        #     print("ERROR: APK not found")
+        print("building for android")
+        run_command("flutter build apk")
+        apk_path = "build/app/outputs/flutter-apk/app-release.apk"
+        new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{branch_name}.apk"
+        if os.path.exists(apk_path):
+            if os.path.exists(new_apk_path):
+                os.remove(new_apk_path)
+            os.rename(apk_path, new_apk_path)
+        else:
+            print("ERROR: APK not found")
 
-        # print("upload apk to my google drive")
-        # drive_path = "X:/GoogleDrive/PublicRO/Garuda"
-        # if os.path.exists(drive_path):
-        #     shutil.copy(new_apk_path, drive_path)
-        #     shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{branch_name}.apk'), os.path.join(drive_path, 'vkhgaruda_latest.apk'))
-        # else:
-        #     print("ERROR: Google Drive not found in your local system")
+        print("upload apk to my google drive")
+        drive_path = "X:/GoogleDrive/PublicRO/Garuda"
+        if os.path.exists(drive_path):
+            shutil.copy(new_apk_path, drive_path)
+            shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{branch_name}.apk'), os.path.join(drive_path, 'vkhgaruda_latest.apk'))
+        else:
+            print("ERROR: Google Drive not found in your local system")
 
     except Exception as e:
         print("reverting changes")

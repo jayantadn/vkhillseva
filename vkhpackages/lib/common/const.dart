@@ -13,7 +13,6 @@ class Const {
   }
 
   final String dbrootGaruda = "TEST/GARUDA_01";
-  final String dbrootTAS = "TEST/TAS_01";
   final String dbrootSangeetSeva = "TEST/SANGEETSEVA_01";
 
   final int fbListenerDelay = 2; // seconds

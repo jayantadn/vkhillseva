@@ -749,17 +749,6 @@ class _TicketPageState extends State<TicketPage> {
                                   // close the dialog
                                   Navigator.pop(context);
 
-                                  // fetch the icon
-                                  List sevas = Const()
-                                      .nityaSeva['amounts']!
-                                      .firstWhere((element) =>
-                                          element.keys.first ==
-                                          amount.toString())
-                                      .values
-                                      .first['sevas'] as List;
-                                  String icon = sevas.firstWhere((element) =>
-                                      element['name'] == sevaName)['icon'];
-
                                   // create ticket
                                   Ticket t = Ticket(
                                     timestamp: ticket == null
@@ -771,7 +760,6 @@ class _TicketPageState extends State<TicketPage> {
                                         int.parse(ticketNumberController.text),
                                     user: _username,
                                     note: noteController.text,
-                                    image: icon,
                                     seva: sevaName,
                                   );
 
@@ -992,7 +980,6 @@ class Ticket {
   final int ticketNumber;
   final String user;
   final String note;
-  final String image;
   final String seva;
 
   Ticket(
@@ -1002,7 +989,6 @@ class Ticket {
       required this.ticketNumber,
       required this.user,
       required this.note,
-      required this.image,
       required this.seva});
 
   factory Ticket.fromJson(Map<String, dynamic> json) {
@@ -1013,7 +999,6 @@ class Ticket {
       ticketNumber: json['ticketNumber'],
       user: json['user'],
       note: json['note'],
-      image: json['image'],
       seva: json['seva'],
     );
   }
@@ -1026,7 +1011,6 @@ class Ticket {
       'ticketNumber': ticketNumber,
       'user': user,
       'note': note,
-      'image': image,
       'seva': seva,
     };
   }

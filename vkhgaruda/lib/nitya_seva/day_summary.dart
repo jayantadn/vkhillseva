@@ -241,6 +241,11 @@ class _DaySummaryState extends State<DaySummary> {
             });
           }
         }
+
+        // remove empty rows
+        _amountTableTicketRow.removeWhere((row) {
+          return row.sublist(1).every((element) => element == "0");
+        });
       });
     });
   }

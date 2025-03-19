@@ -34,6 +34,21 @@ def set_parameters():
             sys.exit(1)
     print(f"Release type: {reltype}")
     
+def set_hosting_site(app):
+    global hostingsite
+    if(app == 'vkhgaruda' and reltype == 'release'):
+        hostingsite = 'vkhillgaruda'
+    elif(app == 'vkhgaruda' and reltype == 'test'):
+        hostingsite = 'testgaruda'    
+    elif(app == 'vkhsangeetseva' and reltype == 'release'):
+        hostingsite = 'govindasangetseva'
+    elif(app == 'vkhsangeetseva' and reltype == 'test'):
+        hostingsite = 'testsangeetseva'
+    else:
+        print("Hosting site could not be determined")
+        sys.exit(1)
+    print(f"Hosting site: {hostingsite}")
+
 def replace_string_in_file(file, search_string, replacement_string):
     curdir = os.getcwd()
     os.chdir(rootdir)
@@ -215,6 +230,7 @@ def release(app):
         run_command("flutter clean")
         run_command("flutter pub get")
         run_command("flutter build web")
+        set_hosting_site(app)
         run_command(f"firebase deploy --only hosting:{hostingsite}")
 
         if reltype == 'release':

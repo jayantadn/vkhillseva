@@ -23,27 +23,7 @@ class _FestivalRecordState extends State<FestivalRecord> {
   bool _isLoading = true;
   String _selectedYear = "";
 
-  final List<Map<String, dynamic>> _festivals = [
-    {
-      "name": "Vaikuntha Ekadashi",
-      "icon": "assets/images/VKHillDieties/Govinda.png",
-      "sessions": [
-        {
-          'settings': Session.fromJson({
-            'name': "name",
-            'type': "Kumkum Archana",
-            'defaultAmount': 500,
-            'defaultPaymentMode': "UPI",
-            'icon': "assets/images/VKHillDieties/Govinda.png",
-            'sevakarta': "Guest",
-            'timestamp': DateTime.now().toIso8601String(),
-          }),
-          "numTickets": 100,
-          "sumAmount": 50000,
-        }
-      ]
-    }
-  ];
+  final List<Map<String, dynamic>> _festivals = [];
 
   // lists
 
@@ -173,9 +153,10 @@ class _FestivalRecordState extends State<FestivalRecord> {
             Row(
               children: [
                 // image
-                CircleAvatar(
-                  backgroundImage: AssetImage(festival['icon']),
-                ),
+                if (festival['icon'].isNotEmpty)
+                  CircleAvatar(
+                    backgroundImage: AssetImage(festival['icon']),
+                  ),
 
                 // festival name
                 SizedBox(width: 10),

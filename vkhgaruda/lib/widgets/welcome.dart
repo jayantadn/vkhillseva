@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({super.key});
@@ -35,8 +36,10 @@ class _WelcomeState extends State<Welcome> {
 
   void refresh() async {
     // perform async work here
-
+    final packageInfo = await PackageInfo.fromPlatform();
+    _version = packageInfo.version;
     // get version
+
     // _version = await Utils().checkForUpdates("vkhillgaruda");
 
     if (Utils().getUsername().isEmpty) {

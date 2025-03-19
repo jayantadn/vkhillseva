@@ -188,16 +188,6 @@ class _NityaSevaState extends State<NityaSeva> {
       }
     }
 
-    // validate duplicate session name
-    for (var element in _sessions) {
-      if (element.name == session.name &&
-          element.type == session.type &&
-          isRecent) {
-        errors.add("Duplicate session name");
-        break;
-      }
-    }
-
     // check if session is created for today
     if (_selectedDate.day != now.day ||
         _selectedDate.month != now.month ||

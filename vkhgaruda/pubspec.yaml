@@ -57,6 +57,7 @@ dependencies:
     path: ../vkhpackages
   firebase_messaging: ^15.2.4
   fluttertoast: ^8.2.12
+  package_info_plus: ^8.3.0
   
 
 dev_dependencies:

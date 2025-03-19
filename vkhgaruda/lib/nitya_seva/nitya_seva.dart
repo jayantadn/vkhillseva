@@ -652,7 +652,7 @@ class _NityaSevaState extends State<NityaSeva> {
         children: [
           Scaffold(
             appBar: AppBar(title: Text(widget.title), actions: [
-              // settings button
+              // add session button
               IconButton(
                 icon: Icon(
                   Icons.add,
@@ -663,6 +663,20 @@ class _NityaSevaState extends State<NityaSeva> {
 
               // menu button
               CommonWidgets().createPopupMenu([
+                // laddu
+                MyPopupMenuItem(
+                    text: "Laddu seva",
+                    icon: Icons
+                        .card_giftcard, // Replace with an appropriate IconData
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LadduMain(),
+                        ),
+                      );
+                    }),
+
                 // festival record
                 MyPopupMenuItem(
                     text: "Festival Record",
@@ -675,6 +689,18 @@ class _NityaSevaState extends State<NityaSeva> {
                                 title: "Festival record",
                                 icon:
                                     'assets/images/LauncherIcons/NityaSeva.png')),
+                      );
+                    }),
+
+                // settings
+                MyPopupMenuItem(
+                    text: "Settings",
+                    icon: Icons.settings,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Settings(title: 'Settings')),
                       );
                     }),
               ]),

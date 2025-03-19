@@ -23,10 +23,10 @@ class _SummaryState extends State<Summary> {
   final Color colorPrimary =
       ColorScheme.fromSeed(seedColor: const Color(0xFF3B4043)).primary;
   final _ticketColors = {
-    '400': Colors.blue[300],
-    '400variant': Colors.blue[900],
-    '500': Colors.yellow[600],
-    '500variant': Colors.yellow[900],
+    '500': Colors.blue[300],
+    '500variant': Colors.blue[900],
+    '600': Colors.yellow[600],
+    '600variant': Colors.yellow[900],
     '1000': Colors.green[300],
     '1000variant': Colors.green[900],
     '2500': Colors.pink[200],
@@ -208,11 +208,11 @@ class _SummaryState extends State<Summary> {
               children: List.generate(barLabels.length, (index) {
                 Color barColor;
                 switch (barLabels[index]) {
-                  case "Seva 400":
-                    barColor = _ticketColors['400']!;
-                    break;
                   case "Seva 500":
                     barColor = _ticketColors['500']!;
+                    break;
+                  case "Seva 600":
+                    barColor = _ticketColors['600']!;
                     break;
                   case "Seva 1000":
                     barColor = _ticketColors['1000']!;

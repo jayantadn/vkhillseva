@@ -14,11 +14,10 @@ class _LadduSettingsState extends State<LadduSettings> {
 
   bool _isLoading = true;
 
-  // ignore: prefer_final_fields
-  List<Map<String, int>> _pushpanjaliTickets = [
+  final List<Map<String, int>> _pushpanjaliTickets = [
     // do not delete the default values
-    {'amount': 400, 'ladduPacks': 1},
     {'amount': 500, 'ladduPacks': 1},
+    {'amount': 600, 'ladduPacks': 1},
     {'amount': 1000, 'ladduPacks': 2},
     {'amount': 2500, 'ladduPacks': 3},
   ];

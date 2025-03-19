@@ -82,6 +82,7 @@ class Const {
             {"name": "Sadhu Bhojana Seva"},
             {"name": "Shodashopachara Seva"},
           ],
+          "obsolete": false,
         },
       },
     ],

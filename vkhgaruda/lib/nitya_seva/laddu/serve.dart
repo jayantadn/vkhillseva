@@ -28,8 +28,8 @@ class _ServeState extends State<Serve> {
 
   final List<Map<String, int>> _pushpanjaliTickets = [
     // do not delete the default values
-    {'amount': 400, 'ladduPacks': 1},
     {'amount': 500, 'ladduPacks': 1},
+    {'amount': 600, 'ladduPacks': 1},
     {'amount': 1000, 'ladduPacks': 2},
     {'amount': 2500, 'ladduPacks': 3},
   ];
@@ -56,10 +56,10 @@ class _ServeState extends State<Serve> {
     List amountsList = Const().nityaSeva['amounts'] as List;
     for (var amountRaw in amountsList) {
       Map<String, dynamic> amountMap = Map<String, dynamic>.from(amountRaw);
-      pushpanjaliTickets.add(int.parse(amountMap.keys.first));
+      if (amountMap.values.first['obsolete'] == false) {
+        pushpanjaliTickets.add(int.parse(amountMap.keys.first));
+      }
     }
-    // List<int?> pushpanjaliTickets =
-    // _pushpanjaliTickets.map((e) => e['amount']).toList();
 
     // default populate the controllers
     _controllersPushpanjali = List.generate(

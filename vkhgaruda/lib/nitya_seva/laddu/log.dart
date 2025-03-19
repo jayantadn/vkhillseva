@@ -207,7 +207,7 @@ class _LogState extends State<Log> {
                     builder: (context) => Serve(
                           serve: serve,
                           slot: Session(
-                              defaultAmount: 400,
+                              defaultAmount: 500,
                               defaultPaymentMode: 'UPI',
                               type: "Pushpanjali",
                               icon:

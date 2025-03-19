@@ -29,16 +29,18 @@ class _ServiceSelectDialogState extends State<ServiceSelect> {
         .readPushpanjaliSlotsByDate(DateTime.now().subtract(Duration(days: 1)));
     slots.addAll(slotsYest);
 
-    setState(() {
-      services = slots.map((e) {
-        String day = DateFormat("EEE").format(e.timestamp);
-        String sessionTiming =
-            e.timestamp.hour < Const().morningCutoff ? "MNG" : "EVE";
-        String type = e.type == "Pushpanjali" ? "PP" : "KK";
-        return "$day - $type $sessionTiming ${e.name}";
-      }).toList();
-      status = services.isEmpty ? "empty" : "loaded";
-    });
+    if (mounted) {
+      setState(() {
+        services = slots.map((e) {
+          String day = DateFormat("EEE").format(e.timestamp);
+          String sessionTiming =
+              e.timestamp.hour < Const().morningCutoff ? "MNG" : "EVE";
+          String type = e.type == "Pushpanjali" ? "PP" : "KK";
+          return "$day - $type $sessionTiming ${e.name}";
+        }).toList();
+        status = services.isEmpty ? "empty" : "loaded";
+      });
+    }
   }
 
   @override

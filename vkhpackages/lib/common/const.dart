@@ -30,7 +30,7 @@ class Const {
     'amounts': [
       {
         "400": {
-          'color': Colors.blue,
+          'color': Colors.cyan,
           "sevas": [
             {"name": "Pushpanjali"},
           ],
@@ -39,7 +39,7 @@ class Const {
       },
       {
         "500": {
-          'color': Colors.cyanAccent,
+          'color': Colors.lightBlueAccent,
           "sevas": [
             {"name": "Tulasi Archana Seva"},
             {"name": "Jala-dana Seva"},
@@ -75,7 +75,7 @@ class Const {
       },
       {
         "2500": {
-          'color': Colors.pinkAccent[100],
+          'color': Colors.pink[100],
           "sevas": [
             {"name": "Gita-Dana Seva"},
             {"name": "Pushpalankara Seva"},

@@ -219,6 +219,7 @@ class _SessionSummaryState extends State<SessionSummary> {
       }
     });
 
+    _items.clear();
     _populateTable();
 
     setState(() {
@@ -246,7 +247,7 @@ class _SessionSummaryState extends State<SessionSummary> {
       }
     }
 
-    return Colors.grey;
+    return Colors.grey[300] ?? Colors.grey;
   }
 
   List<Widget> _getListOfRows(List<String> rows) {
@@ -286,6 +287,11 @@ class _SessionSummaryState extends State<SessionSummary> {
               child: ListView.builder(
                 itemCount: _items.length, // Number of _items in the list
                 itemBuilder: (BuildContext context, int index) {
+                  // skip if no tickets sold
+                  if (_items[index][3].contains("Tickets sold:   0")) {
+                    return Container();
+                  }
+
                   return Container(
                     margin: const EdgeInsets.symmetric(
                         horizontal: 8.0,
@@ -317,8 +323,6 @@ class _SessionSummaryState extends State<SessionSummary> {
                           child: Text(
                             _items[index][0],
                             style: const TextStyle(
-                              color:
-                                  backgroundColor, // Text color for the title
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
                             ),

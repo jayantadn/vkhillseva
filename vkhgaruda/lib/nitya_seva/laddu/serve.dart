@@ -429,6 +429,7 @@ class _ServeState extends State<Serve> {
       await FBL().readLadduStocks(session).then((stocks) {
         for (LadduStock stock in stocks) {
           available += stock.count;
+          available += stock.carry ?? 0;
         }
       });
       await FBL().readLadduServes(session).then((serves) {
@@ -490,11 +491,13 @@ class _ServeState extends State<Serve> {
 
     // calculate balance
     int totalProcured = 0;
+    int totalCarry = 0;
     int totalServed = 0;
     DateTime session = await FBL().readLatestLadduSession();
     await FBL().readLadduStocks(session).then((stocks) {
       for (LadduStock stock in stocks) {
         totalProcured += stock.count;
+        totalCarry += stock.carry ?? 0;
       }
     });
     await FBL().readLadduServes(session).then((serves) {
@@ -512,6 +515,7 @@ class _ServeState extends State<Serve> {
     if (widget.serve != null) {
       now = widget.serve!.timestamp;
     }
+    await Utils().fetchUserBasics();
     String username = Utils().getUsername();
     LadduServe ladduServe = LadduServe(
       timestamp: now,
@@ -521,7 +525,7 @@ class _ServeState extends State<Serve> {
       packsMisc: packsMisc,
       note: _controllerNote.text,
       title: _controllerTitle.text,
-      balance: totalProcured - totalServed,
+      balance: available - totalServed,
       pushpanjaliSlot: widget.slot!.timestamp,
       available: available,
     );
@@ -605,63 +609,68 @@ class _ServeState extends State<Serve> {
               textAlign: TextAlign.center, // Center the text
             ),
 
-            SizedBox(height: 16.0), // Add space between children
-
             // note
-            TextField(
-              onChanged: (value) {
-                // Handle the changes in the text field
-              },
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-                hintText: 'Enter a note', // Add a hint text to the text field
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                onChanged: (value) {
+                  // Handle the changes in the text field
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+                  hintText: 'Enter a note', // Add a hint text to the text field
+                ),
+                controller: _controllerNote,
               ),
-              controller: _controllerNote,
             ),
 
-            SizedBox(height: 16.0), // Add space between children
-
             // serve button
-            ElevatedButton(
-              onPressed: _isLoading ? null : _onpressServe,
-              child: _isLoading
-                  ? CircularProgressIndicator()
-                  : Text(widget.serve != null ? 'Update' : 'Serve'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _onpressServe,
+                child: _isLoading
+                    ? CircularProgressIndicator()
+                    : Text(widget.serve != null ? 'Update' : 'Serve'),
+              ),
             ),
 
             // delete button
-            SizedBox(height: 16.0),
             if (widget.serve != null)
-              ElevatedButton(
-                onPressed: _isLoading
-                    ? null
-                    : () async {
-                        bool? confirm = await _createConfirmDialog();
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          bool? confirm = await _createConfirmDialog();
 
-                        if (confirm == true) {
-                          setState(() {
-                            _isLoading = true;
-                          });
+                          if (confirm == true) {
+                            setState(() {
+                              _isLoading = true;
+                            });
 
-                          DateTime session =
-                              await FBL().readLatestLadduSession();
-                          await FBL().deleteLadduServe(session, widget.serve!);
+                            DateTime session =
+                                await FBL().readLatestLadduSession();
+                            await FBL()
+                                .deleteLadduServe(session, widget.serve!);
 
-                          setState(() {
-                            _isLoading = false;
-                          });
+                            setState(() {
+                              _isLoading = false;
+                            });
 
-                          Navigator.pop(context);
-                        }
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.red, // Set the background color to red
+                            Navigator.pop(context);
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Colors.red, // Set the background color to red
+                  ),
+                  child:
+                      _isLoading ? CircularProgressIndicator() : Text('Delete'),
                 ),
-                child:
-                    _isLoading ? CircularProgressIndicator() : Text('Delete'),
               ),
 
             // leave some gaps at the bottom

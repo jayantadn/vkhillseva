@@ -21,9 +21,9 @@ class AddEditStockDialog extends StatefulWidget {
 
 class _AddEditStockDialogState extends State<AddEditStockDialog> {
   String from = "";
-  int procured = 0;
-  bool isLoading = false;
-  String sessionName = '';
+  int _procured = 0;
+  int _carry = 0;
+  bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -31,7 +31,7 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
     super.initState();
     if (widget.edit && widget.stock != null) {
       from = widget.stock!.from;
-      procured = widget.stock!.count;
+      _procured = widget.stock!.count;
     }
   }
 
@@ -61,13 +61,13 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
               },
             ),
 
-            // text input for packs procured
+            // text input for packs _procured
             SizedBox(height: 8.0),
             TextFormField(
               decoration: InputDecoration(labelText: 'Packs procured'),
               keyboardType: TextInputType.number,
               onChanged: (value) {
-                if (value.isNotEmpty) procured = int.parse(value);
+                if (value.isNotEmpty) _procured = int.parse(value);
               },
               controller: TextEditingController(
                 text: widget.edit ? widget.stock!.count.toString() : '',
@@ -83,7 +83,19 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
               },
             ),
 
-            if (isLoading)
+            // text input for carry over
+            SizedBox(height: 8.0),
+            TextFormField(
+                decoration: InputDecoration(labelText: 'Carry over'),
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  if (value.isNotEmpty) _carry = int.parse(value);
+                },
+                controller: TextEditingController(
+                  text: widget.edit ? widget.stock!.carry.toString() : '',
+                )),
+
+            if (_isLoading)
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: CircularProgressIndicator(),
@@ -133,13 +145,13 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
 
               if (confirm == true) {
                 setState(() {
-                  isLoading = true;
+                  _isLoading = true;
                 });
 
                 await FBL().deleteLadduStock(session, widget.stock!);
 
                 setState(() {
-                  isLoading = false;
+                  _isLoading = false;
                 });
 
                 Navigator.pop(context);
@@ -153,7 +165,7 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
           ),
 
         // cancel button
-        ElevatedButton(
+        OutlinedButton(
           onPressed: () {
             Navigator.pop(context);
           },
@@ -168,9 +180,10 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
               setState(() {
-                isLoading = true;
+                _isLoading = true;
               });
 
+              await Utils().fetchUserBasics();
               String username = Utils().getUsername();
 
               LadduStock stockNew;
@@ -179,14 +192,16 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
                   timestamp: widget.stock!.timestamp,
                   user: widget.stock!.user,
                   from: from,
-                  count: procured,
+                  count: _procured,
+                  carry: _carry,
                 );
               } else {
                 stockNew = LadduStock(
                   timestamp: DateTime.now(),
                   user: username,
                   from: from,
-                  count: procured,
+                  count: _procured,
+                  carry: _carry,
                 );
               }
 
@@ -211,7 +226,7 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
               }
 
               setState(() {
-                isLoading = false;
+                _isLoading = false;
               });
 
               if (status) {
@@ -263,8 +278,10 @@ Future<void> returnStock(BuildContext context, {LadduReturn? lr}) async {
   }
 
   // sum of all stocks
-  int totalStock =
-      stocks.fold(0, (previousValue, element) => previousValue + element.count);
+  int totalStock = stocks.fold(
+      0,
+      (previousValue, element) =>
+          previousValue + element.count + (element.carry ?? 0));
 
   // sum of all distributions
   int totalServe = 0;
@@ -423,6 +440,7 @@ class _ReturnStockDialogState extends State<ReturnStockDialog> {
       return;
     }
 
+    await Utils().fetchUserBasics();
     String username = Utils().getUsername();
 
     await FBL().returnLadduStock(

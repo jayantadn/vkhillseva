@@ -22,6 +22,7 @@ class _AvailabilityBarState extends State<AvailabilityBar> {
 
   // primitive local variables
   int total_procured = 0;
+  int total_carry = 0;
   int total_served = 0;
   int procured_today = 0;
   int distributed_today = 0;
@@ -37,8 +38,10 @@ class _AvailabilityBarState extends State<AvailabilityBar> {
       List<LadduServe> serves = await FBL().readLadduServes(session);
 
       total_procured = 0;
+      total_carry = 0;
       for (var stock in stocks) {
         total_procured += stock.count;
+        total_carry += stock.carry ?? 0;
       }
 
       total_served = 0;
@@ -54,12 +57,12 @@ class _AvailabilityBarState extends State<AvailabilityBar> {
   }
 
   Widget _getAvailabilityBar(BuildContext context) {
-    int currentStock = total_procured - total_served;
+    int currentStock = (total_procured + total_carry) - total_served;
 
     Color progressColor;
-    if (currentStock / total_procured < 0.2) {
+    if (currentStock / (total_procured + total_carry) < 0.2) {
       progressColor = Colors.redAccent;
-    } else if (currentStock / total_procured < 0.5) {
+    } else if (currentStock / (total_procured + total_carry) < 0.5) {
       progressColor = Colors.amber;
     } else {
       progressColor = Colors.lightGreen;
@@ -100,8 +103,9 @@ class _AvailabilityBarState extends State<AvailabilityBar> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: LinearProgressIndicator(
-                  value:
-                      total_procured == 0 ? 0 : currentStock / total_procured,
+                  value: (total_procured + total_carry) == 0
+                      ? 0
+                      : currentStock / (total_procured + total_carry),
                   minHeight: 30, // Increased the height to 30
                   color: progressColor,
                 ),

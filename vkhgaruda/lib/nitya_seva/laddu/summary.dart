@@ -34,6 +34,7 @@ class _SummaryState extends State<Summary> {
   };
 
   int total_procured = 0;
+  int total_carry = 0;
   int total_served = 0;
 
   LadduReturn? lr;
@@ -60,8 +61,10 @@ class _SummaryState extends State<Summary> {
       sessionTitle = await CalculateSessionTitle(session);
 
       total_procured = 0;
+      total_carry = 0;
       for (var stock in stocks) {
         total_procured += stock.count;
+        total_carry += stock.carry ?? 0;
       }
 
       pieSections = [];
@@ -379,6 +382,15 @@ class _SummaryState extends State<Summary> {
                   child: Text("Total laddu packs procured = $total_procured"),
                 ),
               ),
+
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("Carried from previous session = $total_carry"),
+                ),
+              ),
+
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Align(
@@ -398,13 +410,14 @@ class _SummaryState extends State<Summary> {
                 ),
 
                 // calculate missing if any
-                if (total_procured != total_served + lr!.count) ...[
+                if ((total_procured + total_carry) !=
+                    (total_served + lr!.count)) ...[
                   Padding(
                     padding: const EdgeInsets.only(left: 16.0),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Total laddu packs missing = ${((total_procured - total_served - lr!.count).abs())}",
+                        "Untracked laddu packs = ${(((total_procured + total_carry) - (total_served + lr!.count)))}",
                         style: TextStyle(color: Colors.red),
                       ),
                     ),

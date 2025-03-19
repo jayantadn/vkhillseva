@@ -40,9 +40,7 @@ class Const {
         "500": {
           'color': Colors.lightBlueAccent,
           "sevas": [
-            {"name": "Tulasi Archana Seva"},
-            {"name": "Jala-dana Seva"},
-            {"name": "Sudharshana Chakra Puja"},
+            {"name": "Pushpanjali Seva"},
           ],
           "obsolete": false,
         },

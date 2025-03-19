@@ -76,6 +76,14 @@ class _LogState extends State<Log> {
                     style: TextStyle(color: Colors.green[900]),
                   ),
                 ),
+                if (stock.carry != null && stock.carry != 0)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Carried over: ${stock.carry}',
+                      style: TextStyle(color: Colors.green[900]),
+                    ),
+                  ),
               ],
             ),
 
@@ -91,7 +99,7 @@ class _LogState extends State<Log> {
                     BorderRadius.circular(12.0), // Make the border circular
               ),
               child: Text(
-                stock.count.toString(),
+                (stock.count + (stock.carry ?? 0)).toString(),
                 style: TextStyle(fontSize: 24.0), // Increase the font size
               ),
             ),
@@ -183,8 +191,6 @@ class _LogState extends State<Log> {
                         TextSpan(
                           text: serve.user,
                           style: TextStyle(
-                            fontFamily:
-                                'YourFontFamily', // Replace with your font family
                             fontSize:
                                 16.0, // Replace with your desired font size
                             color:

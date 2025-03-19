@@ -1,15 +1,16 @@
-
 class LadduStock {
   final DateTime timestamp;
   final String user;
   final String from;
   final int count;
+  final int? carry;
 
   LadduStock(
       {required this.timestamp,
       required this.user,
       required this.from,
-      required this.count});
+      required this.count,
+      this.carry});
 
   // Convert a LadduStock instance to a JSON map
   Map<String, dynamic> toJson() {
@@ -18,6 +19,7 @@ class LadduStock {
       'user': user,
       'from': from,
       'count': count,
+      'carry': carry,
     };
   }
 
@@ -28,6 +30,7 @@ class LadduStock {
       user: json['user'],
       from: json['from'],
       count: json['count'],
+      carry: json['carry'],
     );
   }
 }

@@ -1,3 +1,59 @@
+# 4.1.0
+- feature: setup for notification
+- fix: multiple notification
+- fix: app icon for web notifications
+- fix: welcome key double definition
+- fix: auto update of pending requests
+- feature: auto update sangeet seva
+- feature: autoupdate Garuda
+- feature: old day summary does not include new tickets
+- feature: new session will skip obsolete denominations
+- feature: skip obsolete seva amount in ticket issue dialog
+- feature: old session session skip new seva amounts
+- feature: add session cosmetic changes
+
+# 4.1.0
+- feature: setup for notification
+- fix: multiple notification
+- fix: app icon for web notifications
+- fix: welcome key double definition
+- fix: auto update of pending requests
+- feature: auto update sangeet seva
+- feature: autoupdate Garuda
+- feature: old day summary does not include new tickets
+- feature: new session will skip obsolete denominations
+- feature: skip obsolete seva amount in ticket issue dialog
+- feature: old session session skip new seva amounts
+- feature: add session cosmetic changes
+
+# 4.1.0
+- feature: setup for notification
+- fix: multiple notification
+- fix: app icon for web notifications
+- fix: welcome key double definition
+- fix: auto update of pending requests
+- feature: auto update sangeet seva
+- feature: autoupdate Garuda
+- feature: old day summary does not include new tickets
+- feature: new session will skip obsolete denominations
+- feature: skip obsolete seva amount in ticket issue dialog
+- feature: old session session skip new seva amounts
+- feature: add session cosmetic changes
+
+# 4.1.0
+- feature: setup for notification
+- fix: multiple notification
+- fix: app icon for web notifications
+- fix: welcome key double definition
+- fix: auto update of pending requests
+- feature: auto update sangeet seva
+- feature: autoupdate Garuda
+- feature: old day summary does not include new tickets
+- feature: new session will skip obsolete denominations
+- feature: skip obsolete seva amount in ticket issue dialog
+- feature: old session session skip new seva amounts
+- feature: add session cosmetic changes
+
 # 3.3.0
 - feature: available slots
 

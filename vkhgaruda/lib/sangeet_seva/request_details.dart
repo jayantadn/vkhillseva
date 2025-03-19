@@ -33,7 +33,7 @@ class _RequestDetailsState extends State<RequestDetails> {
   UserDetails? _mainPerformer;
 
   // lists
-  List<UserDetails> _supportTeam = [];
+  final List<UserDetails> _supportTeam = [];
 
   // controllers, listeners and focus nodes
   final TextEditingController _noteController = TextEditingController();

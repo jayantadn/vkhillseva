@@ -48,7 +48,7 @@ def set_hosting_site():
         hostingsite = 'vkhillgaruda'
     elif(app == 'vkhgaruda' and reltype == 'test'):
         hostingsite = 'testgaruda'    
-    if(app == 'vkhsangeetseva' and reltype == 'release'):
+    elif(app == 'vkhsangeetseva' and reltype == 'release'):
         hostingsite = 'govindasangetseva'
     elif(app == 'vkhsangeetseva' and reltype == 'test'):
         hostingsite = 'testsangeetseva'
@@ -70,12 +70,12 @@ def replace_string_in_file(file, search_string, replacement_string):
                 file.write(line)   
     os.chdir(curdir)
 
-def set_value_in_file(file, search_string, value):
+def set_value_in_file(filepath, search_string, value):
     curdir = os.getcwd()
     os.chdir(rootdir)
-    with open(file, 'r') as file:
+    with open(filepath, 'r') as file:
         lines = file.readlines()
-    with open(file, 'w') as file:
+    with open(filepath, 'w') as file:
         for line in lines:
             if search_string in line:
                 key, _ = line.split('=', 1)
@@ -90,12 +90,11 @@ def main():
     set_parameters()
     set_hosting_site()
 
+    print("Changing directory to app folder")
     rootdir = run_command('git rev-parse --show-toplevel')
     os.chdir(rootdir)
-
-    print("Changing directory to app folder")
     try:
-        os.chdir('app')
+        os.chdir(app)
     except FileNotFoundError:
         print(f"Error: '{app}' directory not found.")
         sys.exit(1)
@@ -103,8 +102,7 @@ def main():
     print("get the branch name")
     branch_name = run_command('git rev-parse --abbrev-ref HEAD')
     branch_name = branch_name.lstrip()
-    project = branch_name.split('_')[0]
-    version = branch_name.split('_')[1]
+    version = branch_name
 
     print("generate the changelog from git log")
     base_branch = run_command('git merge-base origin/main HEAD')
@@ -127,22 +125,9 @@ def main():
             file.write(f'- {log_message}\n')
         file.write('\n')  
         file.write(existing_contents)
-
-    print("Undo main patch for testing")
-    main_file = f'{project}/lib/main.dart'
-    search_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: test);'
-    replacement_string = '        title: "ISKCON VK Hill Seva", theme: themeDefault, home: home);\n'
-    with open(main_file, 'r') as file:
-        lines = file.readlines()
-    with open(main_file, 'w') as file:
-        for line in lines:
-            if search_string in line:
-                file.write(replacement_string)
-            else:
-                file.write(line)    
                 
     print("Undo main patch2 for testing")
-    main_file = f'{project}/lib/main.dart'
+    main_file = 'lib/main.dart'
     search_string = '      home: test,'
     replacement_string = '      home: home,\n'
     with open(main_file, 'r') as file:
@@ -204,8 +189,8 @@ def main():
     prefix = ""
     if(reltype == 'test'):
         prefix = "TEST/"
-    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootGaruda", f"\"{prefix}GARUDA_01\"" )
-    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootSangeetSeva", f"\"{prefix}SANGEETSEVA_01\"" )
+    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootGaruda", f"\"{prefix}GARUDA_01\";" )
+    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootSangeetSeva", f"\"{prefix}SANGEETSEVA_01\";" )
 
     try:
         print("commit all changes and push to git")

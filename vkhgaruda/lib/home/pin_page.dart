@@ -19,7 +19,7 @@ class PinPage extends StatefulWidget {
 
 class _PinPageState extends State<PinPage> {
   bool _isLoading = true;
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
 
   final FocusNode _focusNode = FocusNode();
 

@@ -3,7 +3,6 @@ import sys
 import os
 import shutil
 
-app = ""
 reltype = ""
 hostingsite = ""
 rootdir = ""
@@ -17,20 +16,14 @@ def run_command(command):
     return result.stdout.strip()
 
 def set_parameters():
-    global app
+    global rootdir
     global reltype
-    if len(sys.argv) == 3:
-        app = sys.argv[1]
-        reltype = sys.argv[2]
+
+    rootdir = run_command('git rev-parse --show-toplevel')
+    
+    if len(sys.argv) == 2:
+        reltype = sys.argv[1]
     else:
-        appid = input("Enter the app name: 1. Garuda 2. Sangeet Seva ")
-        if appid == '1':
-            app = 'vkhgaruda'
-        elif appid == '2':
-            app = 'vkhsangeetseva'
-        else:
-            print("Invalid app id")
-            sys.exit(1)
         relid = input("Enter the release type: 1. Release 2. Test ")
         if relid == '1':
             reltype = 'release'
@@ -39,24 +32,8 @@ def set_parameters():
         else:
             print("Invalid release type")
             sys.exit(1)
-    print(f"App: {app}")
     print(f"Release type: {reltype}")
     
-def set_hosting_site():
-    global hostingsite
-    if(app == 'vkhgaruda' and reltype == 'release'):
-        hostingsite = 'vkhillgaruda'
-    elif(app == 'vkhgaruda' and reltype == 'test'):
-        hostingsite = 'testgaruda'    
-    elif(app == 'vkhsangeetseva' and reltype == 'release'):
-        hostingsite = 'govindasangetseva'
-    elif(app == 'vkhsangeetseva' and reltype == 'test'):
-        hostingsite = 'testsangeetseva'
-    else:
-        print("Hosting site could not be determined")
-        sys.exit(1)
-    print(f"Hosting site: {hostingsite}")
-
 def replace_string_in_file(file, search_string, replacement_string):
     curdir = os.getcwd()
     os.chdir(rootdir)
@@ -78,11 +55,12 @@ def set_value_in_file(filepath, search_string, value):
     with open(filepath, 'w') as file:
         for line in lines:
             if search_string in line:
-                key, _ = line.split('=', 1)
-                file.write(f'{key}={value}\n')
-            elif ':' in line:
-                key, _ = line.split(':', 1)
-                file.write(f'{key}: {value}\n')
+                if '=' in line:
+                    key, _ = line.split('=', 1)
+                    file.write(f'{key}={value}\n')
+                elif ':' in line:
+                    key, _ = line.split(':', 1)
+                    file.write(f'{key}: {value}\n')
             else:
                 file.write(line)   
     os.chdir(curdir)
@@ -108,13 +86,7 @@ def get_value_from_file(filepath, search_string):
     return ret
     os.chdir(curdir)
 
-def main():
-    global rootdir
-    rootdir = run_command('git rev-parse --show-toplevel')
-
-    set_parameters()
-    set_hosting_site()
-
+def release(app):
     print("Changing directory to app folder")
     os.chdir(rootdir)
     try:
@@ -219,8 +191,8 @@ def main():
     prefix = ""
     if(reltype == 'test'):
         prefix = "TEST/"
-    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootGaruda", f" \"{prefix}GARUDA_01\";" )
-    set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootSangeetSeva", f" \"{prefix}SANGEETSEVA_01\";" )
+    set_value_in_file('vkhpackages/lib/common/const.dart', "final String dbrootGaruda", f" \"{prefix}GARUDA_01\";" )
+    set_value_in_file('vkhpackages/lib/common/const.dart', "final String dbrootSangeetSeva", f" \"{prefix}SANGEETSEVA_01\";" )
 
     try:
         print("commit all changes and push to git")
@@ -271,6 +243,11 @@ def main():
 
 
     print("all operations completed")
-    
+
+def main():
+    set_parameters()
+    release("vkhgaruda")
+    release("vkhsangeetseva")
+
 if __name__ == '__main__':
     main()

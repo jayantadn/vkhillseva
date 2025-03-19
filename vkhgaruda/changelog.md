@@ -1,3 +1,23 @@
+# 4.4.0
+- fix: ticket icon
+- feature: laddu carry forward
+- feature: pin page
+
+# 4.4.0
+- fix: ticket icon
+- feature: laddu carry forward
+- feature: pin page
+
+# 4.4.0
+- fix: ticket icon
+- feature: laddu carry forward
+- feature: pin page
+
+# 4.4.0
+- fix: ticket icon
+- feature: laddu carry forward
+- feature: pin page
+
 # 4.1.0
 - feature: setup for notification
 - fix: multiple notification

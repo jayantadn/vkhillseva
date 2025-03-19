@@ -62,6 +62,7 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
             ),
 
             // text input for packs procured
+            SizedBox(height: 8.0),
             TextFormField(
               decoration: InputDecoration(labelText: 'Packs procured'),
               keyboardType: TextInputType.number,

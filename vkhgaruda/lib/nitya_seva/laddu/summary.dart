@@ -404,7 +404,7 @@ class _SummaryState extends State<Summary> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Total laddu packs missing = ${total_procured - total_served - lr!.count}",
+                        "Total laddu packs missing = ${((total_procured - total_served - lr!.count).abs())}",
                         style: TextStyle(color: Colors.red),
                       ),
                     ),

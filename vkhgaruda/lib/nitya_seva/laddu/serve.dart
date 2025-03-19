@@ -632,6 +632,7 @@ class _ServeState extends State<Serve> {
             ),
 
             // delete button
+            SizedBox(height: 16.0),
             if (widget.serve != null)
               ElevatedButton(
                 onPressed: _isLoading

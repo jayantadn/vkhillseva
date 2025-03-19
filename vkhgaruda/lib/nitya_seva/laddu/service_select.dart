@@ -66,15 +66,18 @@ class _ServiceSelectDialogState extends State<ServiceSelect> {
               Column(
                 children: services.map((service) {
                   int index = services.indexOf(service);
-                  return ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Serve(slot: slots[index])),
-                      );
-                    },
-                    child: Text(service),
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Serve(slot: slots[index])),
+                        );
+                      },
+                      child: Text(service),
+                    ),
                   );
                 }).toList(),
               ),

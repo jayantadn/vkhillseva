@@ -492,83 +492,92 @@ class _NityaSevaState extends State<NityaSeva> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              TextButton(
-                                child: Text('Cancel'),
-                                onPressed: () {
-                                  sevaAmounts.clear();
-                                  paymentModes.clear();
-                                  Navigator.of(context).pop();
-                                },
+                              // cancel button
+                              Expanded(
+                                child: OutlinedButton(
+                                  child: Text('Cancel'),
+                                  onPressed: () {
+                                    sevaAmounts.clear();
+                                    paymentModes.clear();
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
                               ),
-                              TextButton(
-                                child: Text(session == null ? 'Add' : 'Edit'),
-                                onPressed: () async {
-                                  String icon = '';
-                                  for (var element in _sevaList) {
-                                    if (element.name == selectedSeva) {
-                                      icon = element.icon;
-                                      break;
-                                    }
-                                  }
 
-                                  Session newSession = Session(
-                                    name: selectedSeva,
-                                    type: selectedSevaType,
-                                    defaultAmount: int.parse(sevaAmount),
-                                    defaultPaymentMode: paymentMode,
-                                    icon: icon,
-                                    sevakarta: _username,
-                                    timestamp: session == null
-                                        ? now
-                                        : session.timestamp,
-                                  );
-
-                                  if (session == null) {
-                                    List<String> errors =
-                                        _preValidation(newSession);
-                                    String? ret = 'Proceed';
-                                    if (errors.isNotEmpty) {
-                                      ret = await CommonWidgets()
-                                          .createErrorDialog(
-                                              context: context, errors: errors);
-                                    }
-                                    if (errors.isEmpty || ret == 'Proceed') {
-                                      FB().addMapToList(
-                                        path:
-                                            "${Const().dbrootGaruda}/NityaSeva/$dbDate",
-                                        child: "Settings",
-                                        data: newSession.toJson(),
-                                      );
-
-                                      setState(() {
-                                        _sessions.add(newSession);
-                                      });
-                                    }
-                                    if (errors.isEmpty) {
-                                      _postValidation(newSession);
-                                    }
-                                  } else {
-                                    setState(() {
-                                      int index = _sessions.indexWhere((s) =>
-                                          s.timestamp == session.timestamp);
-                                      if (index != -1) {
-                                        _sessions[index] = newSession;
+                              // add button
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: ElevatedButton(
+                                  child: Text(session == null ? 'Add' : 'Edit'),
+                                  onPressed: () async {
+                                    String icon = '';
+                                    for (var element in _sevaList) {
+                                      if (element.name == selectedSeva) {
+                                        icon = element.icon;
+                                        break;
                                       }
-                                    });
+                                    }
 
-                                    String dbTimestamp = session.timestamp
-                                        .toIso8601String()
-                                        .replaceAll(".", "^");
-                                    FB().editJson(
-                                        path:
-                                            "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbTimestamp/Settings",
-                                        json: newSession.toJson());
-                                  }
+                                    Session newSession = Session(
+                                      name: selectedSeva,
+                                      type: selectedSevaType,
+                                      defaultAmount: int.parse(sevaAmount),
+                                      defaultPaymentMode: paymentMode,
+                                      icon: icon,
+                                      sevakarta: _username,
+                                      timestamp: session == null
+                                          ? now
+                                          : session.timestamp,
+                                    );
 
-                                  sevaAmounts.clear();
-                                  paymentModes.clear();
-                                  Navigator.of(context).pop();
-                                },
+                                    if (session == null) {
+                                      List<String> errors =
+                                          _preValidation(newSession);
+                                      String? ret = 'Proceed';
+                                      if (errors.isNotEmpty) {
+                                        ret = await CommonWidgets()
+                                            .createErrorDialog(
+                                                context: context,
+                                                errors: errors);
+                                      }
+                                      if (errors.isEmpty || ret == 'Proceed') {
+                                        FB().addMapToList(
+                                          path:
+                                              "${Const().dbrootGaruda}/NityaSeva/$dbDate",
+                                          child: "Settings",
+                                          data: newSession.toJson(),
+                                        );
+
+                                        setState(() {
+                                          _sessions.add(newSession);
+                                        });
+                                      }
+                                      if (errors.isEmpty) {
+                                        _postValidation(newSession);
+                                      }
+                                    } else {
+                                      setState(() {
+                                        int index = _sessions.indexWhere((s) =>
+                                            s.timestamp == session.timestamp);
+                                        if (index != -1) {
+                                          _sessions[index] = newSession;
+                                        }
+                                      });
+
+                                      String dbTimestamp = session.timestamp
+                                          .toIso8601String()
+                                          .replaceAll(".", "^");
+                                      FB().editJson(
+                                          path:
+                                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbTimestamp/Settings",
+                                          json: newSession.toJson());
+                                    }
+
+                                    sevaAmounts.clear();
+                                    paymentModes.clear();
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
                               ),
                             ],
                           ),

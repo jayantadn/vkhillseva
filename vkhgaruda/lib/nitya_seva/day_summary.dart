@@ -146,107 +146,113 @@ class _DaySummaryState extends State<DaySummary> {
     }
 
     await _lock.synchronized(() async {
-      // perform sync work here
-      setState(() {
-        // clear everything
-        _amountTableHeaderRow.clear();
-        _amountTableHeaderRow.add("Seva\nTicket");
-        _amountTableTicketRow.clear();
-        _amountTableTotalRow.clear();
-        _amountTableTotalRow.add(["Total"]);
-        _amountTableTotalRow.add(["Amount"]);
-        _grandTotal.clear();
+      if (mounted) {
+        // perform sync work here
+        setState(() {
+          // clear everything
+          _amountTableHeaderRow.clear();
+          _amountTableHeaderRow.add("Seva\nTicket");
+          _amountTableTicketRow.clear();
+          _amountTableTotalRow.clear();
+          _amountTableTotalRow.add(["Total"]);
+          _amountTableTotalRow.add(["Amount"]);
+          _grandTotal.clear();
 
-        // clear pie
-        Const().paymentModes.forEach((key, value) {
-          if (key != 'Gift') {
-            _countMode[key] = 0;
-            _countModePercentage[key] = 0;
-          }
-        });
+          // clear pie
+          Const().paymentModes.forEach((key, value) {
+            if (key != 'Gift') {
+              _countMode[key] = 0;
+              _countModePercentage[key] = 0;
+            }
+          });
 
-        // loop through each session
-        for (Session session in sessions) {
-          int indexSession = sessions.indexOf(session);
+          // loop through each session
+          for (Session session in sessions) {
+            int indexSession = sessions.indexOf(session);
 
-          // header row
-          String header = (session.type == "Pushpanjali" ? "PP " : "KK ");
-          header = session.timestamp.hour < Const().morningCutoff
-              ? header += "MNG\n"
-              : header += "EVE\n";
-          header += session.name.substring(0, 6);
-          header += "..";
-          _amountTableHeaderRow.add(header);
+            // header row
+            String header = (session.type == "Pushpanjali" ? "PP " : "KK ");
+            header = session.timestamp.hour < Const().morningCutoff
+                ? header += "MNG\n"
+                : header += "EVE\n";
+            header += session.name.substring(0, 6);
+            header += "..";
+            _amountTableHeaderRow.add(header);
 
-          // total row
-          _amountTableTotalRow[0].add("0");
-          _amountTableTotalRow[1].add("0");
+            // total row
+            _amountTableTotalRow[0].add("0");
+            _amountTableTotalRow[1].add("0");
 
-          // grand total
-          _grandTotal.add(0);
-          _grandTotal.add(0);
+            // grand total
+            _grandTotal.add(0);
+            _grandTotal.add(0);
 
-          // doing zero filling for _amountTableTicketRow
-          for (var amount in Const().nityaSeva['amounts'] as List) {
-            Map<String, dynamic> amountMap = Map<String, dynamic>.from(amount);
+            // doing zero filling for _amountTableTicketRow
+            for (var amount in Const().nityaSeva['amounts'] as List) {
+              Map<String, dynamic> amountMap =
+                  Map<String, dynamic>.from(amount);
 
-            // checking if the amount was already entered
-            int index = _amountTableTicketRow
-                .indexWhere((row) => row[0] == amountMap.keys.first);
-            if (index >= 0) {
-              // amount was indeed entered
-              _amountTableTicketRow[index].add("0");
-            } else {
-              // no entry found for the amount
-              _amountTableTicketRow.add([amountMap.keys.first]);
-              _amountTableTicketRow[_amountTableTicketRow.length - 1].add("0");
+              // checking if the amount was already entered
+              int index = _amountTableTicketRow
+                  .indexWhere((row) => row[0] == amountMap.keys.first);
+              if (index >= 0) {
+                // amount was indeed entered
+                _amountTableTicketRow[index].add("0");
+              } else {
+                // no entry found for the amount
+                _amountTableTicketRow.add([amountMap.keys.first]);
+                _amountTableTicketRow[_amountTableTicketRow.length - 1]
+                    .add("0");
+              }
+            }
+
+            // loop through each ticket
+            dynamic tickets = ticketsList[indexSession];
+            for (var ticket in tickets) {
+              // find the index for the amount
+              Map<String, dynamic> ticketJson =
+                  Map<String, dynamic>.from(ticket);
+              Ticket ticketTyped = Ticket.fromJson(ticketJson);
+              int index = _amountTableTicketRow
+                  .indexWhere((row) => row[0] == ticketTyped.amount.toString());
+
+              // add count to the index
+              _amountTableTicketRow[index][indexSession + 1] =
+                  (int.parse(_amountTableTicketRow[index][indexSession + 1]) +
+                          1)
+                      .toString();
+
+              // add count to the total row
+              _amountTableTotalRow[0][indexSession + 1] =
+                  (int.parse(_amountTableTotalRow[0][indexSession + 1]) + 1)
+                      .toString();
+              _amountTableTotalRow[1][indexSession + 1] =
+                  (int.parse(_amountTableTotalRow[1][indexSession + 1]) +
+                          ticketTyped.amount)
+                      .toString();
+
+              // add count to the grand total
+              _grandTotal[0] += 1;
+              _grandTotal[1] += ticketTyped.amount;
+
+              // add count to the mode
+              _countMode[ticketTyped.mode] = _countMode[ticketTyped.mode]! + 1;
+              Const().paymentModes.forEach((key, value) {
+                if (key != 'Gift') {
+                  _countModePercentage[key] = _grandTotal[0] == 0
+                      ? 0
+                      : ((_countMode[key]! / _grandTotal[0]) * 100).round();
+                }
+              });
             }
           }
 
-          // loop through each ticket
-          dynamic tickets = ticketsList[indexSession];
-          for (var ticket in tickets) {
-            // find the index for the amount
-            Map<String, dynamic> ticketJson = Map<String, dynamic>.from(ticket);
-            Ticket ticketTyped = Ticket.fromJson(ticketJson);
-            int index = _amountTableTicketRow
-                .indexWhere((row) => row[0] == ticketTyped.amount.toString());
-
-            // add count to the index
-            _amountTableTicketRow[index][indexSession + 1] =
-                (int.parse(_amountTableTicketRow[index][indexSession + 1]) + 1)
-                    .toString();
-
-            // add count to the total row
-            _amountTableTotalRow[0][indexSession + 1] =
-                (int.parse(_amountTableTotalRow[0][indexSession + 1]) + 1)
-                    .toString();
-            _amountTableTotalRow[1][indexSession + 1] =
-                (int.parse(_amountTableTotalRow[1][indexSession + 1]) +
-                        ticketTyped.amount)
-                    .toString();
-
-            // add count to the grand total
-            _grandTotal[0] += 1;
-            _grandTotal[1] += ticketTyped.amount;
-
-            // add count to the mode
-            _countMode[ticketTyped.mode] = _countMode[ticketTyped.mode]! + 1;
-            Const().paymentModes.forEach((key, value) {
-              if (key != 'Gift') {
-                _countModePercentage[key] = _grandTotal[0] == 0
-                    ? 0
-                    : ((_countMode[key]! / _grandTotal[0]) * 100).round();
-              }
-            });
-          }
-        }
-
-        // remove empty rows
-        _amountTableTicketRow.removeWhere((row) {
-          return row.sublist(1).every((element) => element == "0");
+          // remove empty rows
+          _amountTableTicketRow.removeWhere((row) {
+            return row.sublist(1).every((element) => element == "0");
+          });
         });
-      });
+      }
     });
   }
 

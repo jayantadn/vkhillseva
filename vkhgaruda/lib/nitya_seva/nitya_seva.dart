@@ -278,6 +278,11 @@ class _NityaSevaState extends State<NityaSeva> {
     List<String> sevaAmounts = [];
     Const().nityaSeva['amounts']?.forEach((element) {
       element.forEach((key, value) {
+        // skip the obsolete amounts
+        if (value['obsolete'] == true) {
+          return;
+        }
+
         sevaAmounts.add(key);
       });
     });

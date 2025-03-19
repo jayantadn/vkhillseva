@@ -183,33 +183,40 @@ class _TicketPageState extends State<TicketPage> {
         children: [
           // left badge
           Container(
-            color: color,
-            child: SizedBox(
-              height: sizeOfContainer,
-              width: sizeOfContainer,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // serial number
-                  Text(sl.toString(),
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineLarge!
-                          .copyWith(color: backgroundColor)),
+            height: sizeOfContainer,
+            width: sizeOfContainer,
+            decoration: BoxDecoration(
+              color: color,
+              border: Border.all(color: Colors.grey),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // serial number
+                Text(sl.toString(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineLarge!
+                        .copyWith(color: Colors.black)),
 
-                  // ticket number
-                  Text("#${ticket.ticketNumber}",
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: backgroundColor, fontWeight: FontWeight.bold)),
-                ],
-              ),
+                // ticket number
+                Text("#${ticket.ticketNumber}",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge!
+                        .copyWith(fontWeight: FontWeight.bold)),
+              ],
             ),
           ),
           Expanded(
             child: Container(
               height: sizeOfContainer,
               decoration: BoxDecoration(
-                border: Border.all(color: color),
+                border: Border(
+                  top: BorderSide(color: Colors.grey),
+                  right: BorderSide(color: Colors.grey),
+                  bottom: BorderSide(color: Colors.grey),
+                ),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -225,10 +232,8 @@ class _TicketPageState extends State<TicketPage> {
                             Flexible(
                               child: Text(
                                 ticket.seva,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall!
-                                    .copyWith(color: color),
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),

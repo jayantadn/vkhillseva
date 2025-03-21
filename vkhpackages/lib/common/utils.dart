@@ -6,8 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:http/http.dart' as http;
 
-// export 'js.dart' if (kIsWeb) 'stub.dart';
-
 class Utils {
   static final Utils _instance = Utils._internal();
 
@@ -17,42 +15,6 @@ class Utils {
 
   Utils._internal() {
     // init
-  }
-
-  Future<String> checkForUpdates(String appname) async {
-    String version = "";
-
-    if (kIsWeb) {
-      String versionUrl = "https://$appname.web.app/version.json";
-      const String localVersionKey = "app_version";
-
-      try {
-        final response = await http.get(
-          Uri.parse(versionUrl),
-          headers: {'Cache-Control': 'no-cache'},
-        );
-
-        if (response.statusCode == 200) {
-          final remoteVersion = json.decode(response.body)['version'];
-          String? localVersion = await LS().read(localVersionKey);
-
-          if (localVersion != null && localVersion != remoteVersion) {
-            // Force refresh the web app using JS interop
-            Toaster().info("Updating app");
-            Future.delayed(Duration(milliseconds: 500), () {
-              // jsReloadPage();
-            });
-          }
-
-          LS().write(localVersionKey, remoteVersion);
-          version = remoteVersion;
-        }
-      } catch (e) {
-        // print("Error checking version: $e");
-      }
-    }
-
-    return version;
   }
 
   T convertRawToDatatype<T>(

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -65,7 +66,8 @@ class _HomePageState extends State<HomePage> {
     // async operations
 
     // check for updates
-    _version = await Utils().checkForUpdates("govindasangeetseva");
+    final packageInfo = await PackageInfo.fromPlatform();
+    _version = packageInfo.version;
 
     // get username from local storage
     await Utils().fetchUserBasics();

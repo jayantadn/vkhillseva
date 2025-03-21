@@ -164,6 +164,11 @@ class _HomePageState extends State<HomePage> {
       ),
       Text('Govinda Sangeet Seva',
           style: Theme.of(context).textTheme.headlineLarge),
+      Text(
+        "App ver. $_version",
+        style:
+            Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.grey),
+      ),
     ]);
   }
 
@@ -361,18 +366,6 @@ class _HomePageState extends State<HomePage> {
             LoadingOverlay(
               image: "assets/images/Logo/KrishnaLilaPark_circle.png",
             ),
-
-          Positioned(
-            top: 60,
-            right: 20,
-            child: Text(
-              "v$_version",
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall!
-                  .copyWith(color: Colors.grey),
-            ),
-          ),
         ],
       ),
     );

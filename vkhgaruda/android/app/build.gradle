@@ -18,12 +18,12 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = "17"
     }
 
     defaultConfig {
@@ -50,6 +50,17 @@ android {
         implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
         implementation("com.google.firebase:firebase-auth")
         implementation("com.google.firebase:firebase-firestore")
+
+        // Force Kotlin version to match project
+        implementation "org.jetbrains.kotlin:kotlin-stdlib:2.1.20"
+
+        configurations.all {
+            resolutionStrategy {
+                force 'org.jetbrains.kotlin:kotlin-stdlib:2.1.20'
+                force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.20'
+                force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
+            }
+        }
     }
 
     buildTypes {

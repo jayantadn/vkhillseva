@@ -97,14 +97,21 @@ class _HomePageState extends State<HomePage> {
                                     image:
                                         'assets/images/LauncherIcons/NityaSeva.png',
                                     title: "Nitya\nSeva",
-                                    callback: LauncherTileCallback(onClick: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const NityaSeva(
-                                                    title: "Nitya Seva")),
-                                      );
+                                    callback:
+                                        LauncherTileCallback(onClick: () async {
+                                      bool perm = await Utils()
+                                          .checkPermission("Nitya Seva");
+                                      if (perm) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const NityaSeva(
+                                                      title: "Nitya Seva")),
+                                        );
+                                      } else {
+                                        Toaster().error("Access Denied");
+                                      }
                                     })),
                               ),
                               LauncherTile(
@@ -115,14 +122,21 @@ class _HomePageState extends State<HomePage> {
                               LauncherTile(
                                   image: 'assets/images/Logo/SangeetSeva.png',
                                   title: "Sangeet\nSeva",
-                                  callback: LauncherTileCallback(onClick: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SangeetSeva(
-                                                  title: "Sangeet Seva")),
-                                    );
+                                  callback:
+                                      LauncherTileCallback(onClick: () async {
+                                    bool perm = await Utils()
+                                        .checkPermission("Sangeet Seva");
+                                    if (perm) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SangeetSeva(
+                                                    title: "Sangeet Seva")),
+                                      );
+                                    } else {
+                                      Toaster().error("Access Denied");
+                                    }
                                   })),
                               Padding(
                                 padding: const EdgeInsets.only(right: 8.0),

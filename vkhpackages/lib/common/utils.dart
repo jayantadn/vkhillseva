@@ -17,6 +17,27 @@ class Utils {
     // init
   }
 
+  Future<bool> checkPermission(String seva) async {
+    UserBasics? basics = getUserBasics();
+    if (basics == null) {
+      await fetchUserBasics();
+      basics = getUserBasics();
+      if (basics == null) {
+        Toaster().error("Could not fetch user details");
+        return false;
+      }
+    }
+
+    List mobiles = await FB().getList(
+      path: "${Const().dbrootGaruda}/Settings/UserManagement/$seva",
+    );
+    if (mobiles.isNotEmpty && mobiles.contains(basics.mobile)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   T convertRawToDatatype<T>(
     Map raw,
     T Function(Map<String, dynamic>) fromJson,

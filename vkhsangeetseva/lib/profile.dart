@@ -427,6 +427,14 @@ class _ProfileState extends State<Profile> {
                 }
 
                 // Handle the add session logic here
+                SangeetExp exp = SangeetExp(
+                  category: selectedExpertiseType,
+                  subcategory: selectedSkill,
+                  yrs: 0,
+                );
+                setState(() {
+                  _exp.add(exp);
+                });
 
                 // clear all local lists
 
@@ -590,7 +598,23 @@ class _ProfileState extends State<Profile> {
 
                       // sangeet exp details
                       SizedBox(height: 20),
-                      if (_exp.isNotEmpty) Placeholder(),
+                      if (_exp.isNotEmpty)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Sangeet sadhana details",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium),
+                              ...List.generate(_exp.length, (index) {
+                                return Text(
+                                    "${index + 1}. ${_exp[index].category} - ${_exp[index].subcategory} - ${_exp[index].yrs} years");
+                              }),
+                            ],
+                          ),
+                        ),
 
                       // button for sangeet exp
                       SizedBox(height: 20),

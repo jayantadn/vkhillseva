@@ -276,16 +276,9 @@ class _RequestDetailsState extends State<RequestDetails> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                            "${_mainPerformer!.credentials}, ${_mainPerformer!.experience} yrs sadhana"),
-                                        Text(_mainPerformer!.skills.join(', ')),
+                                            "${_mainPerformer!.credentials}, "),
                                       ],
                                     ),
-                              trailing: _mainPerformer == null
-                                  ? Text("")
-                                  : Icon(_mainPerformer!.fieldOfExpertise ==
-                                          "Vocalist"
-                                      ? Icons.record_voice_over
-                                      : Icons.music_note),
                             ),
                           ),
 
@@ -317,15 +310,9 @@ class _RequestDetailsState extends State<RequestDetails> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                            "${member.credentials}, ${member.experience} yrs sadhana"),
-                                        Text(member.skills.join(', ')),
+                                        Text("${member.credentials}"),
                                       ],
                                     ),
-                                    trailing: Icon(
-                                        member.fieldOfExpertise == "Vocalist"
-                                            ? Icons.record_voice_over
-                                            : Icons.music_note),
                                   ),
                                 );
                               })),

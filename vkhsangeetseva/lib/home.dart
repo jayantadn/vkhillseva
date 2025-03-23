@@ -164,11 +164,14 @@ class _HomePageState extends State<HomePage> {
       ),
       Text('Govinda Sangeet Seva',
           style: Theme.of(context).textTheme.headlineLarge),
-      Text(
-        "App ver. $_version",
-        style:
-            Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.grey),
-      ),
+      if (_version.isNotEmpty)
+        Text(
+          "version $_version",
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall!
+              .copyWith(color: Colors.grey),
+        ),
     ]);
   }
 

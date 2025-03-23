@@ -41,7 +41,7 @@ Future<void> _showDialog(BuildContext context) async {
           TextButton(
             child: Text('Add'),
             onPressed: () {
-              // Handle the add session logic here
+              // Handle the add logic here
 
               // clear all local lists
 

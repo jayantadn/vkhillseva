@@ -110,6 +110,20 @@ class SangeetExp {
     required this.subcategory,
     required this.yrs,
   });
+
+  // Factory constructor to create SangeetExp from JSON
+  factory SangeetExp.fromJson(Map<String, dynamic> json) {
+    return SangeetExp(
+      category: json['category'] as String,
+      subcategory: json['subcategory'] as String,
+      yrs: json['yrs'] as int,
+    );
+  }
+
+  // Method to convert SangeetExp to JSON
+  Map<String, dynamic> toJson() {
+    return {'category': category, 'subcategory': subcategory, 'yrs': yrs};
+  }
 }
 
 class Slot {
@@ -147,7 +161,7 @@ class UserDetails {
   final String mobile;
   final String profilePicUrl;
   final String credentials;
-  final String experience;
+  final List<SangeetExp> exps;
   final List<String> youtubeUrls;
   final List<String> audioClipUrls;
   String? fcmToken;
@@ -158,7 +172,7 @@ class UserDetails {
     required this.mobile,
     required this.profilePicUrl,
     required this.credentials,
-    required this.experience,
+    required this.exps,
     required this.youtubeUrls,
     required this.audioClipUrls,
     this.fcmToken,
@@ -171,7 +185,15 @@ class UserDetails {
       mobile: json['mobile'],
       profilePicUrl: json['profilePicUrl'],
       credentials: json['credentials'],
-      experience: json['experience'],
+      exps:
+          json['exps'] == null
+              ? []
+              : List<SangeetExp>.from(
+                json['exps'].map(
+                  (e) =>
+                      SangeetExp.fromJson(Map<String, dynamic>.from(e as Map)),
+                ),
+              ),
       youtubeUrls:
           json['youtubeUrls'] == null
               ? []
@@ -191,65 +213,10 @@ class UserDetails {
       'mobile': mobile,
       'profilePicUrl': profilePicUrl,
       'credentials': credentials,
-      'experience': experience,
+      'exps': exps.map((e) => e.toJson()).toList(),
       'youtubeUrls': youtubeUrls,
       'audioClipUrls': audioClipUrls,
       'fcmToken': fcmToken,
     };
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is UserDetails &&
-        other.salutation == salutation &&
-        other.name == name &&
-        other.mobile == mobile &&
-        other.profilePicUrl == profilePicUrl &&
-        other.credentials == credentials &&
-        other.experience == experience &&
-        other.fcmToken == fcmToken &&
-        other.youtubeUrls.every((url) => youtubeUrls.contains(url)) &&
-        other.audioClipUrls.length == audioClipUrls.length &&
-        other.audioClipUrls.every((url) => audioClipUrls.contains(url));
-  }
-
-  @override
-  int get hashCode {
-    return salutation.hashCode ^
-        name.hashCode ^
-        mobile.hashCode ^
-        profilePicUrl.hashCode ^
-        credentials.hashCode ^
-        experience.hashCode ^
-        fcmToken.hashCode ^
-        youtubeUrls.hashCode ^
-        audioClipUrls.hashCode;
-  }
-
-  bool isEqual(UserDetails other) {
-    return other.salutation == salutation &&
-        other.name == name &&
-        other.mobile == mobile &&
-        other.profilePicUrl == profilePicUrl &&
-        other.credentials == credentials &&
-        other.experience == experience &&
-        other.youtubeUrls.length == youtubeUrls.length &&
-        other.youtubeUrls.every((url) => youtubeUrls.contains(url)) &&
-        other.audioClipUrls.length == audioClipUrls.length &&
-        other.audioClipUrls.every((url) => audioClipUrls.contains(url));
-  }
-
-  bool isEmpty() {
-    return salutation.isEmpty ||
-        name.isEmpty ||
-        mobile.isEmpty ||
-        profilePicUrl.isEmpty ||
-        credentials.isEmpty ||
-        experience.isEmpty ||
-        fcmToken == null ||
-        youtubeUrls.isEmpty ||
-        audioClipUrls.isEmpty;
   }
 }

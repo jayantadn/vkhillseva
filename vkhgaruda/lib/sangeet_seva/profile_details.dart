@@ -61,23 +61,9 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                               style: Theme.of(context).textTheme.headlineLarge),
                         ),
 
-                        // type
-                        Center(
-                          child: Text(widget.userdetails.fieldOfExpertise,
-                              style:
-                                  Theme.of(context).textTheme.headlineMedium),
-                        ),
-
                         // credentials
                         Center(
                           child: Text(widget.userdetails.credentials,
-                              style: Theme.of(context).textTheme.headlineSmall),
-                        ),
-
-                        // sangeet sadhana
-                        Center(
-                          child: Text(
-                              "Sangeet sadhana: ${widget.userdetails.experience}",
                               style: Theme.of(context).textTheme.headlineSmall),
                         ),
 
@@ -105,15 +91,6 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                               width: 150,
                               child: Image.network(
                                   widget.userdetails.profilePicUrl)),
-                        ),
-
-                        // Specialization
-                        SizedBox(height: 10),
-                        Text("Specialization:",
-                            style: Theme.of(context).textTheme.headlineSmall),
-                        SizedBox(width: 10),
-                        Text(
-                          widget.userdetails.skills.join(', '),
                         ),
 
                         // youtube links

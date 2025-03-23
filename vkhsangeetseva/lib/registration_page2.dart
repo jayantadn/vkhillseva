@@ -267,13 +267,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                 ),
                                 title: Text(
                                     "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                        "${_mainPerformer!.credentials}, ${_mainPerformer!.experience} yrs sadhana"),
-                                  ],
-                                ),
                               ),
                             ),
 
@@ -290,14 +283,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                     ),
                                     title: Text(
                                         "${member.salutation} ${member.name}"),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                            "${member.credentials}, ${member.experience} yrs sadhana"),
-                                      ],
-                                    ),
                                   ),
                                 );
                               })),

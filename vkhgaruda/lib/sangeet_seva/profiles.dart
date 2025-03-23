@@ -102,37 +102,10 @@ class _ProfilesState extends State<Profiles> {
                                     "${userdetails.salutation} ${userdetails.name} (${userdetails.credentials})",
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      RichText(
-                                        text: TextSpan(
-                                          text: 'Specialization: ',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black),
-                                          children: <TextSpan>[
-                                            TextSpan(
-                                              text:
-                                                  userdetails.skills.join(', '),
-                                              style: TextStyle(
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
                                   leading: CircleAvatar(
                                     backgroundImage:
                                         NetworkImage(userdetails.profilePicUrl),
                                   ),
-                                  trailing: Icon(
-                                      userdetails.fieldOfExpertise == "Vocalist"
-                                          ? Icons.record_voice_over
-                                          : Icons.music_note),
                                   onTap: () {
                                     Navigator.push(
                                         context,

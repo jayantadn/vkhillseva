@@ -152,7 +152,6 @@ class _ProfileState extends State<Profile> {
         _mobileController.text = _userDetailsOld!.mobile;
         _profilePicUrl = _userDetailsOld!.profilePicUrl;
         _credController.text = _userDetailsOld!.credentials;
-        _experienceController.text = _userDetailsOld!.experience;
         _youtubeLinks = _userDetailsOld!.youtubeUrls;
         _audioClips = _userDetailsOld!.audioClipUrls;
 
@@ -262,8 +261,8 @@ class _ProfileState extends State<Profile> {
         name: _nameController.text,
         mobile: _mobileController.text,
         profilePicUrl: _profilePicUrl,
+        exps: _exp,
         credentials: _credController.text,
-        experience: _experienceController.text,
         youtubeUrls: _youtubeLinks.where((link) => link.isNotEmpty).toList(),
         audioClipUrls: _audioClips.where((link) => link.isNotEmpty).toList(),
       );

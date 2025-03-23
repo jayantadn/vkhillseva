@@ -71,7 +71,7 @@ class _ProfileState extends State<Profile> {
     'Others'
   ];
 
-  final List<SangeetExp> _exp = [];
+  List<SangeetExp> _exp = [];
 
   List<String> _youtubeLinks = ["", "", ""];
   List<String> _audioClips = [
@@ -152,6 +152,7 @@ class _ProfileState extends State<Profile> {
         _mobileController.text = _userDetailsOld!.mobile;
         _profilePicUrl = _userDetailsOld!.profilePicUrl;
         _credController.text = _userDetailsOld!.credentials;
+        _exp = _userDetailsOld!.exps;
         _youtubeLinks = _userDetailsOld!.youtubeUrls;
         _audioClips = _userDetailsOld!.audioClipUrls;
 
@@ -237,6 +238,12 @@ class _ProfileState extends State<Profile> {
       }
     }
 
+    // validation for sangeet experience
+    if (_exp.isEmpty) {
+      Toaster().error('Please enter your sangeet sadhana details');
+      return;
+    }
+
     // no abrupt returns before this point
     setState(() {
       _isLoading = true;
@@ -311,6 +318,8 @@ class _ProfileState extends State<Profile> {
     String selectedExpertiseType = "Vocal";
     String selectedSkill = _vocalSkills[0];
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    final TextEditingController othersController = TextEditingController();
+    final TextEditingController yearsController = TextEditingController();
 
     showDialog(
       context: context,
@@ -336,6 +345,9 @@ class _ProfileState extends State<Profile> {
                             onChanged: (String value) {
                               setState(() {
                                 selectedExpertiseType = value;
+                                selectedSkill = value == "Vocal"
+                                    ? _vocalSkills[0]
+                                    : _instrumentSkills[0];
                               });
                             },
                           ),
@@ -374,6 +386,7 @@ class _ProfileState extends State<Profile> {
                           SizedBox(height: 10),
                           if (selectedSkill == "Others")
                             TextFormField(
+                                controller: othersController,
                                 decoration: InputDecoration(
                                   labelText: 'Please specify',
                                 ),
@@ -389,8 +402,11 @@ class _ProfileState extends State<Profile> {
                   ),
 
                   // Stateless widgets
+                  // exp in years
                   SizedBox(height: 10),
                   TextFormField(
+                    controller: yearsController,
+                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: "Years of sadhana"),
                     validator: (value) {
                       if (value == null ||
@@ -425,11 +441,13 @@ class _ProfileState extends State<Profile> {
                   return;
                 }
 
-                // Handle the add session logic here
+                // Handle the add logic here
                 SangeetExp exp = SangeetExp(
                   category: selectedExpertiseType,
-                  subcategory: selectedSkill,
-                  yrs: 0,
+                  subcategory: selectedSkill == "Others"
+                      ? othersController.text
+                      : selectedSkill,
+                  yrs: int.parse(yearsController.text),
                 );
                 setState(() {
                   _exp.add(exp);

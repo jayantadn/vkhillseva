@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:vkhsangeetseva/profile.dart';
+import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/registration_page2.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -17,12 +19,11 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
-  final Widget home = const HomePage(title: "Hare Krishna");
-  final Widget test = RegistrationPage2(
-      title: "Testing",
-      selectedDate: DateTime.now(),
-      slot: Slot(
-          avl: true, from: "10:00 AM", to: "01:00 PM", name: "Morning Slot"));
+  final Widget home = const HomePage(title: "Testing");
+  final Widget test = Profile(
+    title: "test",
+    self: true,
+  );
 
   // This widget is the root of your application.
   @override
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sangeet Seva',
       theme: themeDefault,
-      home: home,
+      home: test,
     );
   }
 }

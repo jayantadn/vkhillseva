@@ -75,6 +75,8 @@ class _ProfileState extends State<Profile> {
   ];
   List<String> _selectedInstrumentalSkills = [];
 
+  final List<SangeetExp> _exp = [];
+
   List<String> _youtubeLinks = ["", "", ""];
   List<String> _audioClips = [
     "",
@@ -127,13 +129,16 @@ class _ProfileState extends State<Profile> {
     // fetch form values
     if (widget.self != null && widget.self == true) {
       await Utils().fetchUserBasics();
-      String mobile = Utils().getUserBasics()!.mobile;
-      bool exists =
-          await FB().pathExists("${Const().dbrootSangeetSeva}/Users/$mobile");
-      if (exists) {
-        Map<String, dynamic> userdetailsJson = await FB()
-            .getJson(path: "${Const().dbrootSangeetSeva}/Users/$mobile");
-        _userDetailsOld = UserDetails.fromJson(userdetailsJson);
+      UserBasics? basics = Utils().getUserBasics();
+      if (basics != null) {
+        String mobile = basics.mobile;
+        bool exists =
+            await FB().pathExists("${Const().dbrootSangeetSeva}/Users/$mobile");
+        if (exists) {
+          Map<String, dynamic> userdetailsJson = await FB()
+              .getJson(path: "${Const().dbrootSangeetSeva}/Users/$mobile");
+          _userDetailsOld = UserDetails.fromJson(userdetailsJson);
+        }
       }
     }
 
@@ -441,6 +446,20 @@ class _ProfileState extends State<Profile> {
                               return null;
                             },
                           ),
+
+                          // Sangeet credentials
+                          TextFormField(
+                            controller: _credController,
+                            decoration: const InputDecoration(
+                                labelText: 'Sangeet academic details',
+                                hintText: "e.g. MA in music"),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Field cannot be empty';
+                              }
+                              return null;
+                            },
+                          ),
                         ]),
 
                         // picture
@@ -470,119 +489,10 @@ class _ProfileState extends State<Profile> {
                         if (_profilePicUrl.isEmpty)
                           Center(child: Text("Upload your profile picture")),
 
-                        // Sangeet credentials
                         SizedBox(height: 20),
-                        Utils().responsiveBuilder(context, [
-                          TextFormField(
-                            controller: _credController,
-                            decoration: const InputDecoration(
-                                labelText: 'Academic details for sangeet',
-                                hintText: "e.g. MA in music"),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Field cannot be empty';
-                              }
-                              return null;
-                            },
-                          ),
-
-                          // years of sangeet sadhana
-                          TextFormField(
-                            controller: _experienceController,
-                            decoration: const InputDecoration(
-                                labelText: 'Years of sangeet sadhana',
-                                hintText: "e.g. 10 years"),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Field cannot be empty';
-                              }
-                              return null;
-                            },
-                          ),
-                        ]),
-
-                        // field of expertise toggle
-                        SizedBox(height: 10),
-                        RadioRow(
-                            items: ["Vocalist", "Instrumentalist"],
-                            onChanged: (String value) {
-                              setState(() {
-                                _selectedExpertiseType = value;
-                              });
-                            }),
-
-                        // toggle vocal/instrumental skills
-                        SizedBox(height: 20),
-                        if (_selectedExpertiseType == "Vocalist")
-                          InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Sangeet skills',
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 12.0),
-                              border: OutlineInputBorder(),
-                            ),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 20.0, bottom: 10),
-                              child: Wrap(
-                                spacing: 10,
-                                runSpacing: 5,
-                                children: _vocalSkills
-                                    .map((String expertise) => FilterChip(
-                                          label: Text(expertise),
-                                          selected: _selectedVocalSkills
-                                              .contains(expertise),
-                                          onSelected: (bool selected) {
-                                            setState(() {
-                                              if (selected) {
-                                                _selectedVocalSkills
-                                                    .add(expertise);
-                                              } else {
-                                                _selectedVocalSkills
-                                                    .remove(expertise);
-                                              }
-                                            });
-                                          },
-                                        ))
-                                    .toList(),
-                              ),
-                            ),
-                          ),
-                        if (_selectedExpertiseType == "Instrumentalist")
-                          InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Sangeet skills',
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 12.0),
-                              border: OutlineInputBorder(),
-                            ),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 20.0, bottom: 10),
-                              child: Wrap(
-                                spacing: 10,
-                                runSpacing: 5,
-                                children: _instrumentSkills
-                                    .map((String expertise) => FilterChip(
-                                          label: Text(expertise),
-                                          selected: _selectedInstrumentalSkills
-                                              .contains(expertise),
-                                          onSelected: (bool selected) {
-                                            setState(() {
-                                              if (selected) {
-                                                _selectedInstrumentalSkills
-                                                    .add(expertise);
-                                              } else {
-                                                _selectedInstrumentalSkills
-                                                    .remove(expertise);
-                                              }
-                                            });
-                                          },
-                                        ))
-                                    .toList(),
-                              ),
-                            ),
-                          ),
+                        ElevatedButton(
+                            onPressed: () {},
+                            child: Text("Add sangeet sadhana details")),
 
                         // youtube links
                         SizedBox(height: 20),

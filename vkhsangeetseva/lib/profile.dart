@@ -310,6 +310,8 @@ class _ProfileState extends State<Profile> {
 
   Future<void> _showDialogSangeetExp(BuildContext context) async {
     String selectedExpertiseType = "Vocal";
+    String selectedSkill = _vocalSkills[0];
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
@@ -320,58 +322,88 @@ class _ProfileState extends State<Profile> {
               style: Theme.of(context).textTheme.headlineMedium),
           content: SingleChildScrollView(
             scrollDirection: Axis.vertical,
-            child: Column(
-              children: [
-                // stateful widgets
-                StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    return Column(
-                      children: [
-                        // radio for vocal/instrumental
-                        RadioRow(
-                          items: ["Vocal", "Instrumental"],
-                          onChanged: (String value) {
-                            setState(() {
-                              selectedExpertiseType = value;
-                            });
-                          },
-                        ),
+            child: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  // stateful widgets
+                  StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                      return Column(
+                        children: [
+                          // radio for vocal/instrumental
+                          RadioRow(
+                            items: ["Vocal", "Instrumental"],
+                            onChanged: (String value) {
+                              setState(() {
+                                selectedExpertiseType = value;
+                              });
+                            },
+                          ),
 
-                        // dropdown for skills
-                        SizedBox(height: 10),
-                        DropdownButton<String>(
-                          isExpanded: true,
-                          value: selectedExpertiseType == "Vocal"
-                              ? _vocalSkills[0]
-                              : _instrumentSkills[0],
-                          onChanged: (String? newValue) {},
-                          items: selectedExpertiseType == "Vocal"
-                              ? _vocalSkills.map<DropdownMenuItem<String>>(
-                                  (String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList()
-                              : _instrumentSkills.map<DropdownMenuItem<String>>(
-                                  (String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                          // dropdown for skills
+                          SizedBox(height: 10),
+                          DropdownButton<String>(
+                            isExpanded: true,
+                            value: selectedExpertiseType == "Vocal"
+                                ? _vocalSkills[0]
+                                : _instrumentSkills[0],
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedSkill = newValue!;
+                              });
+                            },
+                            items: selectedExpertiseType == "Vocal"
+                                ? _vocalSkills.map<DropdownMenuItem<String>>(
+                                    (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList()
+                                : _instrumentSkills
+                                    .map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                          ),
 
-                // Stateless widgets
-                SizedBox(height: 10),
-                TextField(
-                  decoration: InputDecoration(labelText: "Years of sadhana"),
-                )
-              ],
+                          // hidden box for others
+                          SizedBox(height: 10),
+                          if (selectedSkill == "Others")
+                            TextFormField(
+                                decoration: InputDecoration(
+                                  labelText: 'Please specify',
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Provide valid input';
+                                  }
+                                  return null;
+                                }),
+                        ],
+                      );
+                    },
+                  ),
+
+                  // Stateless widgets
+                  SizedBox(height: 10),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: "Years of sadhana"),
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          int.parse(value) < 0) {
+                        return 'Provide valid input';
+                      }
+                      return null;
+                    },
+                  )
+                ],
+              ),
             ),
           ),
           actions: [
@@ -389,6 +421,11 @@ class _ProfileState extends State<Profile> {
             TextButton(
               child: Text('Add'),
               onPressed: () {
+                // validate
+                if (!formKey.currentState!.validate()) {
+                  return;
+                }
+
                 // Handle the add session logic here
 
                 // clear all local lists

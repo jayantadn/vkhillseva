@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
 
-Future<void> _createSomeDialog(BuildContext context) async {
+Future<void> _showDialog(BuildContext context) async {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('Add New Session',
-            style: Theme.of(context).textTheme.headlineMedium),
+        // title for the dialog
+        title: Text(
+          'Add New Session',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
         content: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
-            children: [],
+            children: [
+              // stateful widgets
+              StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(children: []);
+                },
+              ),
+
+              // Stateless widgets
+              const Placeholder(),
+            ],
           ),
         ),
         actions: [

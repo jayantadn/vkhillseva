@@ -148,8 +148,6 @@ class UserDetails {
   final String profilePicUrl;
   final String credentials;
   final String experience;
-  final String fieldOfExpertise;
-  final List<String> skills;
   final List<String> youtubeUrls;
   final List<String> audioClipUrls;
   String? fcmToken;
@@ -161,8 +159,6 @@ class UserDetails {
     required this.profilePicUrl,
     required this.credentials,
     required this.experience,
-    required this.fieldOfExpertise,
-    required this.skills,
     required this.youtubeUrls,
     required this.audioClipUrls,
     this.fcmToken,
@@ -176,8 +172,6 @@ class UserDetails {
       profilePicUrl: json['profilePicUrl'],
       credentials: json['credentials'],
       experience: json['experience'],
-      fieldOfExpertise: json['fieldOfExpertise'],
-      skills: json['skills'] == null ? [] : List<String>.from(json['skills']),
       youtubeUrls:
           json['youtubeUrls'] == null
               ? []
@@ -198,8 +192,6 @@ class UserDetails {
       'profilePicUrl': profilePicUrl,
       'credentials': credentials,
       'experience': experience,
-      'fieldOfExpertise': fieldOfExpertise,
-      'skills': skills,
       'youtubeUrls': youtubeUrls,
       'audioClipUrls': audioClipUrls,
       'fcmToken': fcmToken,
@@ -217,7 +209,6 @@ class UserDetails {
         other.profilePicUrl == profilePicUrl &&
         other.credentials == credentials &&
         other.experience == experience &&
-        other.fieldOfExpertise == fieldOfExpertise &&
         other.fcmToken == fcmToken &&
         other.youtubeUrls.every((url) => youtubeUrls.contains(url)) &&
         other.audioClipUrls.length == audioClipUrls.length &&
@@ -232,8 +223,6 @@ class UserDetails {
         profilePicUrl.hashCode ^
         credentials.hashCode ^
         experience.hashCode ^
-        fieldOfExpertise.hashCode ^
-        skills.hashCode ^
         fcmToken.hashCode ^
         youtubeUrls.hashCode ^
         audioClipUrls.hashCode;
@@ -246,9 +235,6 @@ class UserDetails {
         other.profilePicUrl == profilePicUrl &&
         other.credentials == credentials &&
         other.experience == experience &&
-        other.fieldOfExpertise == fieldOfExpertise &&
-        other.skills.length == skills.length &&
-        other.skills.every((skill) => skills.contains(skill)) &&
         other.youtubeUrls.length == youtubeUrls.length &&
         other.youtubeUrls.every((url) => youtubeUrls.contains(url)) &&
         other.audioClipUrls.length == audioClipUrls.length &&
@@ -262,9 +248,7 @@ class UserDetails {
         profilePicUrl.isEmpty ||
         credentials.isEmpty ||
         experience.isEmpty ||
-        fieldOfExpertise.isEmpty ||
         fcmToken == null ||
-        skills.isEmpty ||
         youtubeUrls.isEmpty ||
         audioClipUrls.isEmpty;
   }

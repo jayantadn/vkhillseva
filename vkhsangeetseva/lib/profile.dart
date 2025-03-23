@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:vkhsangeetseva/widgets/radio_row.dart';
+import 'package:vkhpackages/widgets/radio_row.dart';
 import 'package:file_picker/file_picker.dart';
 
 class Profile extends StatefulWidget {
@@ -35,9 +35,7 @@ class _ProfileState extends State<Profile> {
   bool _isLoading = true;
   String _profilePicUrl = '';
   late String _salutation;
-  String _selectedExpertiseType = "Vocalist";
   UserDetails? _userDetailsOld;
-  final bool _backEnabled = false;
 
   // lists
   final List<String> _salutations = [
@@ -60,7 +58,6 @@ class _ProfileState extends State<Profile> {
     'Sugam Sangeet',
     'Others'
   ];
-  List<String> _selectedVocalSkills = [];
 
   final List<String> _instrumentSkills = [
     'Veena',
@@ -73,7 +70,6 @@ class _ProfileState extends State<Profile> {
     'Keyboard',
     'Others'
   ];
-  List<String> _selectedInstrumentalSkills = [];
 
   final List<SangeetExp> _exp = [];
 
@@ -105,9 +101,7 @@ class _ProfileState extends State<Profile> {
     // clear all lists
     _salutations.clear();
     _instrumentSkills.clear();
-    _selectedInstrumentalSkills.clear();
     _vocalSkills.clear();
-    _selectedVocalSkills.clear();
     _youtubeLinks.clear();
     _audioClips.clear();
 
@@ -159,13 +153,6 @@ class _ProfileState extends State<Profile> {
         _profilePicUrl = _userDetailsOld!.profilePicUrl;
         _credController.text = _userDetailsOld!.credentials;
         _experienceController.text = _userDetailsOld!.experience;
-        _selectedExpertiseType = _userDetailsOld!.fieldOfExpertise;
-        _selectedVocalSkills = _userDetailsOld!.skills
-            .where((skill) => _vocalSkills.contains(skill))
-            .toList();
-        _selectedInstrumentalSkills = _userDetailsOld!.skills
-            .where((skill) => _instrumentSkills.contains(skill))
-            .toList();
         _youtubeLinks = _userDetailsOld!.youtubeUrls;
         _audioClips = _userDetailsOld!.audioClipUrls;
 
@@ -236,17 +223,6 @@ class _ProfileState extends State<Profile> {
       return;
     }
 
-    // validation of skill set
-    if (_selectedExpertiseType == "Vocalist" && _selectedVocalSkills.isEmpty) {
-      Toaster().error('Please select at least one vocal skill');
-      return;
-    }
-    if (_selectedExpertiseType == "Instrumentalist" &&
-        _selectedInstrumentalSkills.isEmpty) {
-      Toaster().error('Please select at least one instrumental skill');
-      return;
-    }
-
     // validation for profile photo
     if (_profilePicUrl.isEmpty) {
       Toaster().error('Please upload your profile picture');
@@ -288,10 +264,6 @@ class _ProfileState extends State<Profile> {
         profilePicUrl: _profilePicUrl,
         credentials: _credController.text,
         experience: _experienceController.text,
-        fieldOfExpertise: _selectedExpertiseType,
-        skills: _selectedExpertiseType == "Vocalist"
-            ? _selectedVocalSkills
-            : _selectedInstrumentalSkills,
         youtubeUrls: _youtubeLinks.where((link) => link.isNotEmpty).toList(),
         audioClipUrls: _audioClips.where((link) => link.isNotEmpty).toList(),
       );
@@ -336,6 +308,103 @@ class _ProfileState extends State<Profile> {
     Navigator.of(context).pop();
   }
 
+  Future<void> _showDialogSangeetExp(BuildContext context) async {
+    String selectedExpertiseType = "Vocal";
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          // title for dialog
+          title: Text('Sangeet sadhana details',
+              style: Theme.of(context).textTheme.headlineMedium),
+          content: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              children: [
+                // stateful widgets
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return Column(
+                      children: [
+                        // radio for vocal/instrumental
+                        RadioRow(
+                          items: ["Vocal", "Instrumental"],
+                          onChanged: (String value) {
+                            setState(() {
+                              selectedExpertiseType = value;
+                            });
+                          },
+                        ),
+
+                        // dropdown for skills
+                        SizedBox(height: 10),
+                        DropdownButton<String>(
+                          isExpanded: true,
+                          value: selectedExpertiseType == "Vocal"
+                              ? _vocalSkills[0]
+                              : _instrumentSkills[0],
+                          onChanged: (String? newValue) {},
+                          items: selectedExpertiseType == "Vocal"
+                              ? _vocalSkills.map<DropdownMenuItem<String>>(
+                                  (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList()
+                              : _instrumentSkills.map<DropdownMenuItem<String>>(
+                                  (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+
+                // Stateless widgets
+                SizedBox(height: 10),
+                TextField(
+                  decoration: InputDecoration(labelText: "Years of sadhana"),
+                )
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                // clear all local lists
+
+                // clear all local controllers and focus nodes
+
+                // close the dialog
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Add'),
+              onPressed: () {
+                // Handle the add session logic here
+
+                // clear all local lists
+
+                // clear all local controllers and focus nodes
+
+                // close the dialog
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   String _getFileNameFromUrl(String url) {
     if (url.isEmpty) return "No files selected";
 
@@ -349,272 +418,269 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) {
-        // FIXME: too many issues with intercepting back action
-        // _onBack(context);
-      },
-      child: Theme(
-        data: themeDefault,
-        child: Stack(
-          children: [
-            Scaffold(
-              appBar: AppBar(
-                title: Text(widget.title),
-                actions: [
-                  IconButton(
-                    icon: Icon(Icons.save),
-                    onPressed: () async {
-                      await _save();
-                    },
-                  )
-                ],
-              ),
-              body: RefreshIndicator(
-                onRefresh: refresh,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(children: [
-                        // leave some space at top
-                        SizedBox(height: 10),
+    return Theme(
+      data: themeDefault,
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(
+              title: Text(widget.title),
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.save),
+                  onPressed: () async {
+                    await _save();
+                  },
+                )
+              ],
+            ),
+            body: RefreshIndicator(
+              onRefresh: refresh,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(children: [
+                      // leave some space at top
+                      SizedBox(height: 10),
 
-                        Utils().responsiveBuilder(context, [
-                          // salutation
-                          InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Salutation',
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 12.0),
-                              border: OutlineInputBorder(),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: _salutation,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    _salutation = newValue!;
-                                  });
-                                },
-                                items: _salutations
-                                    .map<DropdownMenuItem<String>>(
-                                        (String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
+                      Utils().responsiveBuilder(context, [
+                        // salutation
+                        InputDecorator(
+                          decoration: const InputDecoration(
+                            labelText: 'Salutation',
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 12.0),
+                            border: OutlineInputBorder(),
                           ),
-
-                          // name
-                          TextFormField(
-                            controller: _nameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Full name',
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: _salutation,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  _salutation = newValue!;
+                                });
+                              },
+                              items: _salutations.map<DropdownMenuItem<String>>(
+                                  (String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Name cannot be empty';
-                              }
-                              if (value.length < 3) {
-                                return 'Please enter full name';
-                              }
-                              return null;
-                            },
-                          ),
-
-                          // mobile
-                          TextFormField(
-                            controller: _mobileController,
-                            decoration: const InputDecoration(
-                              labelText: 'Mobile',
-                            ),
-                            readOnly: widget.self ?? false,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Mobile number cannot be empty';
-                              }
-                              if (value.length != 10) {
-                                return 'Please enter 10 digit mobile number';
-                              }
-                              return null;
-                            },
-                          ),
-
-                          // Sangeet credentials
-                          TextFormField(
-                            controller: _credController,
-                            decoration: const InputDecoration(
-                                labelText: 'Sangeet academic details',
-                                hintText: "e.g. MA in music"),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Field cannot be empty';
-                              }
-                              return null;
-                            },
-                          ),
-                        ]),
-
-                        // picture
-                        SizedBox(height: 10),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Container(
-                            width: 150,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
-                            ),
-                            child: _profilePicUrl.isEmpty
-                                ? TextButton(
-                                    onPressed: _pickAndUploadImage,
-                                    child: Text("Upload"))
-                                : ClipRRect(
-                                    child: Image.network(
-                                      _profilePicUrl,
-                                      fit: BoxFit.cover,
-                                      width: 150,
-                                      height: 150,
-                                    ),
-                                  ),
                           ),
                         ),
-                        if (_profilePicUrl.isEmpty)
-                          Center(child: Text("Upload your profile picture")),
 
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                            onPressed: () {},
-                            child: Text("Add sangeet sadhana details")),
-
-                        // youtube links
-                        SizedBox(height: 20),
-                        if (widget.self != null && widget.self == true)
-                          Column(
-                            children:
-                                List.generate(_youtubeLinks.length, (index) {
-                              return Column(
-                                children: [
-                                  if (index == 0 ||
-                                      _youtubeLinks[index - 1].isNotEmpty)
-                                    TextFormField(
-                                      controller: TextEditingController()
-                                        ..text =
-                                            (_youtubeLinks[index].isNotEmpty)
-                                                ? _youtubeLinks[index]
-                                                : "",
-                                      decoration: InputDecoration(
-                                        labelText: index == 0
-                                            ? 'Youtube link for your performance'
-                                            : 'Another youtube link (optional)',
-                                        hintText:
-                                            "e.g. https://www.youtube.com/watch?v=123",
-                                      ),
-                                      onChanged: (value) {
-                                        _youtubeLinks[index] = value;
-                                      },
-                                    ),
-                                  if (index < _youtubeLinks.length - 1)
-                                    SizedBox(height: 10),
-                                ],
-                              );
-                            }),
+                        // name
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Full name',
                           ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Name cannot be empty';
+                            }
+                            if (value.length < 3) {
+                              return 'Please enter full name';
+                            }
+                            return null;
+                          },
+                        ),
 
-                        // upload audio clip
-                        SizedBox(height: 10),
-                        if (widget.self != null && widget.self == true)
-                          Text("Upload audio clip of your performance",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge!
-                                  .copyWith(color: primaryColor)),
-                        if (widget.self != null && widget.self == true)
-                          Column(
-                            children:
-                                List.generate(_audioClips.length, (index) {
-                              return Column(
-                                children: [
-                                  if (index == 0 ||
-                                      _audioClips[index - 1].isNotEmpty)
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            _getFileNameFromUrl(
-                                                _audioClips[index]),
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 2,
-                                            softWrap: false,
-                                          ),
-                                        ),
-                                        SizedBox(width: 10),
-                                        ElevatedButton(
-                                          child: Text("Browse"),
-                                          onPressed: () async {
-                                            FilePickerResult? result =
-                                                await FilePicker.platform
-                                                    .pickFiles(
-                                              type: FileType.audio,
-                                            );
-
-                                            if (result == null) return;
-                                            PlatformFile file =
-                                                result.files.first;
-
-                                            // upload to firestore
-                                            setState(() {
-                                              _isLoading = true;
-                                            });
-                                            UserBasics? basics =
-                                                Utils().getUserBasics();
-                                            if (basics == null) {
-                                              Toaster().error('User not found');
-                                              return;
-                                            }
-                                            String ext =
-                                                file.name.split('.').last;
-                                            String dstPath =
-                                                "${Const().dbrootSangeetSeva}/Users/${basics.mobile}/audio$index.$ext";
-                                            String url = await FS().uploadBytes(
-                                                dstPath: dstPath,
-                                                bytes: file.bytes!);
-
-                                            setState(() {
-                                              _audioClips[index] = url;
-                                              _isLoading = false;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  if (index < _audioClips.length - 1)
-                                    SizedBox(height: 10),
-                                ],
-                              );
-                            }),
+                        // mobile
+                        TextFormField(
+                          controller: _mobileController,
+                          decoration: const InputDecoration(
+                            labelText: 'Mobile',
                           ),
+                          readOnly: widget.self ?? false,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Mobile number cannot be empty';
+                            }
+                            if (value.length != 10) {
+                              return 'Please enter 10 digit mobile number';
+                            }
+                            return null;
+                          },
+                        ),
 
-                        // leave some space at bottom
-                        SizedBox(height: 100),
+                        // Sangeet credentials
+                        TextFormField(
+                          controller: _credController,
+                          decoration: const InputDecoration(
+                              labelText: 'Sangeet academic details',
+                              hintText: "e.g. MA in music"),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Field cannot be empty';
+                            }
+                            return null;
+                          },
+                        ),
                       ]),
-                    ),
+
+                      // picture
+                      SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          width: 150,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                          ),
+                          child: _profilePicUrl.isEmpty
+                              ? TextButton(
+                                  onPressed: _pickAndUploadImage,
+                                  child: Text("Upload"))
+                              : ClipRRect(
+                                  child: Image.network(
+                                    _profilePicUrl,
+                                    fit: BoxFit.cover,
+                                    width: 150,
+                                    height: 150,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      if (_profilePicUrl.isEmpty)
+                        Center(child: Text("Upload your profile picture")),
+
+                      // sangeet exp details
+                      SizedBox(height: 20),
+                      if (_exp.isNotEmpty) Placeholder(),
+
+                      // button for sangeet exp
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                          onPressed: () async {
+                            await _showDialogSangeetExp(context);
+                          },
+                          child: Text("Add sangeet sadhana details")),
+
+                      // youtube links
+                      SizedBox(height: 20),
+                      if (widget.self != null && widget.self == true)
+                        Column(
+                          children:
+                              List.generate(_youtubeLinks.length, (index) {
+                            return Column(
+                              children: [
+                                if (index == 0 ||
+                                    _youtubeLinks[index - 1].isNotEmpty)
+                                  TextFormField(
+                                    controller: TextEditingController()
+                                      ..text = (_youtubeLinks[index].isNotEmpty)
+                                          ? _youtubeLinks[index]
+                                          : "",
+                                    decoration: InputDecoration(
+                                      labelText: index == 0
+                                          ? 'Youtube link for your performance'
+                                          : 'Another youtube link (optional)',
+                                      hintText:
+                                          "e.g. https://www.youtube.com/watch?v=123",
+                                    ),
+                                    onChanged: (value) {
+                                      _youtubeLinks[index] = value;
+                                    },
+                                  ),
+                                if (index < _youtubeLinks.length - 1)
+                                  SizedBox(height: 10),
+                              ],
+                            );
+                          }),
+                        ),
+
+                      // upload audio clip
+                      SizedBox(height: 10),
+                      if (widget.self != null && widget.self == true)
+                        Text("Upload audio clip of your performance",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(color: primaryColor)),
+                      if (widget.self != null && widget.self == true)
+                        Column(
+                          children: List.generate(_audioClips.length, (index) {
+                            return Column(
+                              children: [
+                                if (index == 0 ||
+                                    _audioClips[index - 1].isNotEmpty)
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          _getFileNameFromUrl(
+                                              _audioClips[index]),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                          softWrap: false,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      ElevatedButton(
+                                        child: Text("Browse"),
+                                        onPressed: () async {
+                                          FilePickerResult? result =
+                                              await FilePicker.platform
+                                                  .pickFiles(
+                                            type: FileType.audio,
+                                          );
+
+                                          if (result == null) return;
+                                          PlatformFile file =
+                                              result.files.first;
+
+                                          // upload to firestore
+                                          setState(() {
+                                            _isLoading = true;
+                                          });
+                                          UserBasics? basics =
+                                              Utils().getUserBasics();
+                                          if (basics == null) {
+                                            Toaster().error('User not found');
+                                            return;
+                                          }
+                                          String ext =
+                                              file.name.split('.').last;
+                                          String dstPath =
+                                              "${Const().dbrootSangeetSeva}/Users/${basics.mobile}/audio$index.$ext";
+                                          String url = await FS().uploadBytes(
+                                              dstPath: dstPath,
+                                              bytes: file.bytes!);
+
+                                          setState(() {
+                                            _audioClips[index] = url;
+                                            _isLoading = false;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                if (index < _audioClips.length - 1)
+                                  SizedBox(height: 10),
+                              ],
+                            );
+                          }),
+                        ),
+
+                      // leave some space at bottom
+                      SizedBox(height: 100),
+                    ]),
                   ),
                 ),
               ),
             ),
+          ),
 
-            // circular progress indicator
-            if (_isLoading) LoadingOverlay(image: widget.icon)
-          ],
-        ),
+          // circular progress indicator
+          if (_isLoading) LoadingOverlay(image: widget.icon)
+        ],
       ),
     );
   }

@@ -272,14 +272,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                   children: [
                                     Text(
                                         "${_mainPerformer!.credentials}, ${_mainPerformer!.experience} yrs sadhana"),
-                                    Text(_mainPerformer!.skills.join(', ')),
                                   ],
                                 ),
-                                trailing: Icon(
-                                    _mainPerformer!.fieldOfExpertise ==
-                                            "Vocalist"
-                                        ? Icons.record_voice_over
-                                        : Icons.music_note),
                               ),
                             ),
 
@@ -302,13 +296,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                       children: [
                                         Text(
                                             "${member.credentials}, ${member.experience} yrs sadhana"),
-                                        Text(member.skills.join(', ')),
                                       ],
                                     ),
-                                    trailing: Icon(
-                                        member.fieldOfExpertise == "Vocalist"
-                                            ? Icons.record_voice_over
-                                            : Icons.music_note),
                                   ),
                                 );
                               })),

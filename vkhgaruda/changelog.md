@@ -1,3 +1,10 @@
+# 5.0.0
+- fix: toast compile error
+- feature: web app auto update
+- fix: version number display
+- feature: basic access control
+- fix:Garuda android sms auth
+
 # 4.4.1
 
 # 4.4.0

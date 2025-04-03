@@ -1,3 +1,6 @@
+# 5.0.1
+- fix: reduce list of nitya seva
+
 # 5.0.0
 - fix: toast compile error
 - feature: web app auto update

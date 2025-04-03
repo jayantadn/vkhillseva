@@ -12,8 +12,8 @@ class TallyUpiCardPage extends StatefulWidget {
 }
 
 class _TallyNotesPageState extends State<TallyUpiCardPage> {
-  final TextEditingController _controller400 = TextEditingController(text: '0');
   final TextEditingController _controller500 = TextEditingController(text: '0');
+  final TextEditingController _controller600 = TextEditingController(text: '0');
   final TextEditingController _controller1000 =
       TextEditingController(text: '0');
   final TextEditingController _controller2500 =
@@ -65,8 +65,8 @@ class _TallyNotesPageState extends State<TallyUpiCardPage> {
                     "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/TallyUpiCard")
             .then((value) {
           if (value != null && value.isNotEmpty) {
-            _controller400.text = value['400'].toString();
             _controller500.text = value['500'].toString();
+            _controller600.text = value['600'].toString();
             _controller1000.text = value['1000'].toString();
             _controller2500.text = value['2500'].toString();
             _validateTotal();
@@ -92,8 +92,8 @@ class _TallyNotesPageState extends State<TallyUpiCardPage> {
             // sum of the entries
             Text(
               _calculateTotal([
-                {'value': 400, 'controller': _controller400},
                 {'value': 500, 'controller': _controller500},
+                {'value': 600, 'controller': _controller600},
                 {'value': 1000, 'controller': _controller1000},
                 {'value': 2500, 'controller': _controller2500},
               ]).toString(),
@@ -133,8 +133,8 @@ class _TallyNotesPageState extends State<TallyUpiCardPage> {
     setState(() {
       if (_sumCash != null) {
         var total = _calculateTotal([
-          {'value': 400, 'controller': _controller400},
           {'value': 500, 'controller': _controller500},
+          {'value': 600, 'controller': _controller600},
           {'value': 1000, 'controller': _controller1000},
           {'value': 2500, 'controller': _controller2500},
         ]);
@@ -148,8 +148,8 @@ class _TallyNotesPageState extends State<TallyUpiCardPage> {
   void _dialogSave(BuildContext context) {
     // decide the content of the dialog box
     var total = _calculateTotal([
-      {'value': 400, 'controller': _controller400},
       {'value': 500, 'controller': _controller500},
+      {'value': 600, 'controller': _controller600},
       {'value': 1000, 'controller': _controller1000},
       {'value': 2500, 'controller': _controller2500},
     ]);
@@ -191,8 +191,8 @@ class _TallyNotesPageState extends State<TallyUpiCardPage> {
               onPressed: () {
                 if (_timestampSlot != null) {
                   Map<String, int> json = {
-                    '400': int.tryParse(_controller400.text) ?? 0,
                     '500': int.tryParse(_controller500.text) ?? 0,
+                    '600': int.tryParse(_controller600.text) ?? 0,
                     '1000': int.tryParse(_controller1000.text) ?? 0,
                     '2500': int.tryParse(_controller2500.text) ?? 0,
                   };
@@ -331,8 +331,8 @@ class _TallyNotesPageState extends State<TallyUpiCardPage> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: <Widget>[
-                _buildDenominationField('400', _controller400),
                 _buildDenominationField('500', _controller500),
+                _buildDenominationField('600', _controller600),
                 _buildDenominationField('1000', _controller1000),
                 _buildDenominationField('2500', _controller2500),
 

@@ -1,30 +1,13 @@
-Hare Krishna prabhus. Temple authorities have informed us to start using new tickets from coming weekend. I have published the changes to our main app. Please access the following link to view the changes.
+Hare Krishna dear devotees, 
+All glories to Srila Prabhupada.
+This is for your kind information that, starting this weekend, the Nitya Seva ticket amounts are changed. Garuda app has been updated to incorporate the changes. 
+Please use the following URL to access the Garuda app, there are no changes in URL. Please check for version 5.0.2 or above on the home page. Kindly refresh the page until you see this version.
 
-vkhillgaruda.web.app 
-
-Please look for version 5.0.0 or above.
-
-In the testers group you are free to create dummy sessions, but please make sure to delete the session soon after.
-
-Also, now access control is enabled based on mobile number. access check may need up to 2 secs, which may delay the Nitya Seva app launch. If anyone faces issues "Access Denied", please send me the mobile number you are registered with.
-
-Kindly refresh the page prabhu. You might have to do refresh couple of times till you get version 5.0.0
-
-Hare Krishna Prabhu, 
-
-The movement of the Garuda app to the temple account is now completed. Access to the old app as well as the backend database is removed for all. Please use the following URL to access the Garuda app.
- 
 https://vkhillgaruda.web.app/
 
-Please check for version 3.1.1 or above on the home page.
-
-Requesting everyone to log in to the new URL and check if everything works. Please try from home already, to avoid any service interruptions in temple.
-
-Please start using the new URL this coming weekend.
-
-Note: the old URL will not go past the pin page.
-
+Additionally, access control is enabled based on mobile number. If anyone faces issues with "Access Denied", please send me the mobile number you are registered with. Access check may need up to 2 secs extra. Please consider the extra delay in Nitya Seva app launch as normal.
+Requesting everyone to log in to the new URL and try if you can create tickets with the new denominations. There is a test session created, kindly use that to enter tickets during trials. The test session will be deleted by Friday eod. Please try from home already, to avoid any service interruptions in temple.
 For any issues Kindly contact me directly or reply to this post.
-
 Ys,
 Jayanta
+

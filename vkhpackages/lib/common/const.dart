@@ -12,8 +12,8 @@ class Const {
     // init
   }
 
-  final String dbrootGaruda = "GARUDA_01";
-  final String dbrootSangeetSeva = "SANGEETSEVA_01";
+  final String dbrootGaruda = "TEST/GARUDA_01";
+  final String dbrootSangeetSeva = "TEST/SANGEETSEVA_01";
 
   final int fbListenerDelay = 2; // seconds
   final double toolbarIconSize = 32;
@@ -50,8 +50,6 @@ class Const {
           'color': Colors.yellow,
           "sevas": [
             {"name": "Tulasi Archana Seva"},
-            {"name": "Jala-dana Seva"},
-            {"name": "Sudharshana Chakra Puja"},
           ],
           "obsolete": false,
         },
@@ -60,12 +58,8 @@ class Const {
         "1000": {
           'color': Colors.lightGreenAccent,
           "sevas": [
-            {"name": "Mandir-marjana Seva"},
             {"name": "Naivedya Seva"},
             {"name": "Sadhu Seva"},
-            {"name": "Shringara Seva"},
-            {"name": "Trikala Puja"},
-            {"name": "Tulasi Hara Seva"},
           ],
           "obsolete": false,
         },
@@ -74,10 +68,8 @@ class Const {
         "2500": {
           'color': Colors.pink[100],
           "sevas": [
-            {"name": "Gita-Dana Seva"},
             {"name": "Pushpalankara Seva"},
             {"name": "Sadhu Bhojana Seva"},
-            {"name": "Shodashopachara Seva"},
           ],
           "obsolete": false,
         },

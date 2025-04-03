@@ -1,3 +1,5 @@
+# 5.0.2
+
 # 5.0.1
 - fix: reduce list of nitya seva
 

@@ -233,25 +233,25 @@ def release(app):
         set_hosting_site(app)
         run_command(f"firebase deploy --only hosting:{hostingsite}")
 
-        if reltype == 'release':
-            print("building for android")
-            run_command("flutter build apk")
-            apk_path = "build/app/outputs/flutter-apk/app-release.apk"
-            new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{version}.apk"
-            if os.path.exists(apk_path):
-                if os.path.exists(new_apk_path):
-                    os.remove(new_apk_path)
-                os.rename(apk_path, new_apk_path)
-            else:
-                print("ERROR: APK not found")
+        # if reltype == 'release':
+        #     print("building for android")
+        #     run_command("flutter build apk")
+        #     apk_path = "build/app/outputs/flutter-apk/app-release.apk"
+        #     new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{version}.apk"
+        #     if os.path.exists(apk_path):
+        #         if os.path.exists(new_apk_path):
+        #             os.remove(new_apk_path)
+        #         os.rename(apk_path, new_apk_path)
+        #     else:
+        #         print("ERROR: APK not found")
 
-            print("upload apk to my google drive")
-            drive_path = "X:/GoogleDrive/PublicRO/Garuda"
-            if os.path.exists(drive_path):
-                shutil.copy(new_apk_path, drive_path)
-                shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{version}.apk'), os.path.join(drive_path, 'vkhgaruda_latest.apk'))
-            else:
-                print("ERROR: Google Drive not found in your local system")
+        #     print("upload apk to my google drive")
+        #     drive_path = "X:/GoogleDrive/PublicRO/Garuda"
+        #     if os.path.exists(drive_path):
+        #         shutil.copy(new_apk_path, drive_path)
+        #         shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{version}.apk'), os.path.join(drive_path, 'vkhgaruda_latest.apk'))
+        #     else:
+        #         print("ERROR: Google Drive not found in your local system")
 
     except Exception as e:
         print("reverting changes")

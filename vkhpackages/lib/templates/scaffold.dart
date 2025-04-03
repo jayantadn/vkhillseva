@@ -44,9 +44,11 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       _isLoading = true;
     });
 
+    // access control
+    
+    // perform async operations here
+        
     await _lock.synchronized(() async {
-      // perform async operations here
-
       // fetch form values
 
       // refresh all child widgets

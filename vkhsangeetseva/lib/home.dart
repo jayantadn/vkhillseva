@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
+import 'package:vkhsangeetseva/support.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -253,6 +254,22 @@ class _HomePageState extends State<HomePage> {
                               }));
                     },
                   ),
+
+                // support
+                IconButton(
+                  icon: Icon(Icons.help),
+                  onPressed: () {
+                    Navigator.push(
+                      // ignore: use_build_context_synchronously
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Support(
+                          title: "Support",
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
             body: RefreshIndicator(

@@ -15,6 +15,29 @@ def run_command(command):
         sys.exit(1)
     return result.stdout.strip()
 
+def update_changelog(version):       
+    print("generate the changelog from git log")
+    base_branch = run_command('git merge-base origin/main HEAD')
+    logs = run_command(f'git log {base_branch}..HEAD --pretty=%B')
+    log_messages = logs.split('\n\n')
+    filtered_log_messages = []
+    for log_message in log_messages:
+        first_line = log_message.split('\n')[0]
+        if first_line.startswith("feature:") or first_line.startswith("fix:"):
+            filtered_log_messages.append(log_message)
+    log_messages = filtered_log_messages
+    log_messages.reverse()
+
+    print("write changelog")
+    with open('changelog.md', 'r') as file:
+        existing_contents = file.read()
+    with open('changelog.md', 'w') as file:
+        file.write(f'# {version}\n')
+        for log_message in log_messages:
+            file.write(f'- {log_message}\n')
+        file.write('\n')  
+        file.write(existing_contents)
+
 def set_parameters():
     global rootdir
     global reltype
@@ -102,13 +125,7 @@ def get_value_from_file(filepath, search_string):
     os.chdir(curdir)
 
 def release(app):
-    print("Changing directory to app folder")
     os.chdir(rootdir)
-    try:
-        os.chdir(app)
-    except FileNotFoundError:
-        print(f"Error: '{app}' directory not found.")
-        sys.exit(1)
         
     print("get the branch name")
     branch_name = run_command('git rev-parse --abbrev-ref HEAD')
@@ -118,30 +135,15 @@ def release(app):
         version = value.split('+')[0]
     else:
         version = branch_name
+        update_changelog(version)
 
-    if branch_name != "main":
-        print("generate the changelog from git log")
-        base_branch = run_command('git merge-base origin/main HEAD')
-        logs = run_command(f'git log {base_branch}..HEAD --pretty=%B')
-        log_messages = logs.split('\n\n')
-        filtered_log_messages = []
-        for log_message in log_messages:
-            first_line = log_message.split('\n')[0]
-            if first_line.startswith("feature:") or first_line.startswith("fix:"):
-                filtered_log_messages.append(log_message)
-        log_messages = filtered_log_messages
-        log_messages.reverse()
+    print("Changing directory to app folder")
+    try:
+        os.chdir(app)
+    except FileNotFoundError:
+        print(f"Error: '{app}' directory not found.")
+        sys.exit(1)
 
-        print("write changelog")
-        with open('changelog.md', 'r') as file:
-            existing_contents = file.read()
-        with open('changelog.md', 'w') as file:
-            file.write(f'# {version}\n')
-            for log_message in log_messages:
-                file.write(f'- {log_message}\n')
-            file.write('\n')  
-            file.write(existing_contents)
-                
     print("Undo main patch for testing")
     main_file = f'{rootdir}/{app}/lib/main.dart'
     search_string = '      home: test,'

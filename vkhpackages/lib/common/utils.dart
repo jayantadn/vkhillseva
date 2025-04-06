@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class Utils {
   static final Utils _instance = Utils._internal();
@@ -176,6 +177,18 @@ class Utils {
           ),
       ],
     );
+  }
+
+  Future<void> sendWhatsAppMessage(String phoneNumber, String message) async {
+    final url = Uri.parse(
+      "https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}",
+    );
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      Toaster().error('Could not launch WhatsApp');
+    }
   }
 
   Future<void> setUserBasics(UserBasics userbasics) async {

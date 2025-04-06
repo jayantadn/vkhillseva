@@ -20,9 +20,8 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   final Widget home = const HomePage(title: "Testing");
-  final Widget test = Profile(
+  final Widget test = Support(
     title: "test",
-    self: true,
   );
 
   // This widget is the root of your application.
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sangeet Seva',
       theme: themeDefault,
-      home: home,
+      home: test,
     );
   }
 }

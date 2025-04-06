@@ -41,6 +41,7 @@ dependencies:
     path: ../vkhpackages
   firebase_messaging: ^15.2.4
   package_info_plus: ^8.3.0
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
@@ -75,6 +76,7 @@ flutter:
     - assets/images/Common/morning.png
     - assets/images/Common/evening.png
     - assets/images/Common/add.png
+    - assets/images/Common/WhatsApp.png
     - assets/images/Festivals/RamNavami.png
     - assets/images/Festivals/Balarama.png
     - assets/images/Festivals/AkshayaTritiya.png

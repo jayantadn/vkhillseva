@@ -12,8 +12,8 @@ class Const {
     // init
   }
 
-  final String dbrootGaruda = "GARUDA_01";
-  final String dbrootSangeetSeva = "SANGEETSEVA_01";
+  final String dbrootGaruda = "TEST/GARUDA_01";
+  final String dbrootSangeetSeva = "TEST/SANGEETSEVA_01";
 
   final int fbListenerDelay = 2; // seconds
   final double toolbarIconSize = 32;
@@ -38,7 +38,7 @@ class Const {
       },
       {
         "500": {
-          'color': Colors.lightBlueAccent,
+          'color': Colors.blue[100],
           "sevas": [
             {"name": "Pushpanjali Seva"},
           ],
@@ -47,7 +47,7 @@ class Const {
       },
       {
         "600": {
-          'color': Colors.yellow,
+          'color': Colors.green[100],
           "sevas": [
             {"name": "Tulasi Archana Seva"},
           ],
@@ -56,7 +56,7 @@ class Const {
       },
       {
         "1000": {
-          'color': Colors.lightGreenAccent,
+          'color': Colors.yellow,
           "sevas": [
             {"name": "Naivedya Seva"},
             {"name": "Sadhu Seva"},

@@ -1,3 +1,6 @@
+# 5.0.4
+- fix: ticket colors
+
 # 5.0.3
 - fix: new amount in tally upi
 

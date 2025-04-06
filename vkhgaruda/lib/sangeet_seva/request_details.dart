@@ -310,7 +310,7 @@ class _RequestDetailsState extends State<RequestDetails> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text("${member.credentials}"),
+                                        Text(member.credentials),
                                       ],
                                     ),
                                   ),

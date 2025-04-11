@@ -153,8 +153,25 @@ class _HomePageState extends State<HomePage> {
                 Text("Temple remarks: ${_events[index].noteTemple}"),
             ],
           ),
-          trailing: Utils().createMenuButton((position) async {
-            _showContextMenuEvent(context, position, index);
+          trailing:
+              Utils().createContextMenu(["Edit", "Delete"], (String action) {
+            switch (action) {
+              case "Edit":
+                // handle edit action
+                print('Edit action for item $index');
+                break;
+              case "Delete":
+                // handle delete action
+                print('Delete action for item $index');
+                break;
+              case "":
+                // handle other action
+                print('No action for item $index');
+                break;
+              default:
+                print('Unknown action for item $index');
+                break;
+            }
           }),
         ));
   }
@@ -246,37 +263,6 @@ class _HomePageState extends State<HomePage> {
     }).onError((err) {
       Toaster().error("Error refreshing FCM token: $err");
     });
-  }
-
-  Future<void> _showContextMenuEvent(
-      BuildContext context, Offset position, int index) async {
-    final selectedValue = await showMenu<String>(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        position.dx,
-        position.dy,
-        position.dx + 1,
-        position.dy + 1,
-      ),
-      items: [
-        PopupMenuItem(
-          value: 'edit',
-          child: Text('Edit'),
-        ),
-        PopupMenuItem(
-          value: 'delete',
-          child: Text('Delete'),
-        ),
-      ],
-    );
-
-    if (selectedValue == 'edit') {
-      // Handle edit action
-      print('Edit action for item $index');
-    } else if (selectedValue == 'delete') {
-      // Handle delete action
-      print('Delete action for item $index');
-    }
   }
 
   @override

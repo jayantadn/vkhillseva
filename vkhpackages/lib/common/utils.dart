@@ -47,20 +47,38 @@ class Utils {
     return fromJson(map);
   }
 
-  Widget createMenuButton(void Function(Offset position) onPressed) {
+  Widget createContextMenu(List<String> items, Function(String) onPressed) {
     return Builder(
       builder: (context) {
         final GlobalKey iconButtonKey = GlobalKey();
         return IconButton(
           key: iconButtonKey,
           icon: Icon(Icons.more_vert),
-          onPressed: () {
+          onPressed: () async {
             final RenderBox renderBox =
                 iconButtonKey.currentContext!.findRenderObject() as RenderBox;
             final Offset position = renderBox.localToGlobal(
               renderBox.size.bottomCenter(Offset.zero),
             );
-            onPressed(position);
+
+            final selectedValue = await showMenu<String>(
+              context: context,
+              position: RelativeRect.fromLTRB(
+                position.dx,
+                position.dy,
+                position.dx + 1,
+                position.dy + 1,
+              ),
+              items: List.generate(
+                items.length,
+                (index) => PopupMenuItem<String>(
+                  value: items[index],
+                  child: Text(items[index]),
+                ),
+              ),
+            );
+
+            onPressed(selectedValue ?? "");
           },
         );
       },

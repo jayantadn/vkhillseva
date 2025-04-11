@@ -155,21 +155,29 @@ class _HomePageState extends State<HomePage> {
           ),
           trailing:
               Utils().createContextMenu(["Edit", "Delete"], (String action) {
+            // common validations
+            if (_events[index].date.isBefore(DateTime.now())) {
+              Toaster().error("Cannot edit past events");
+              return;
+            }
+
             switch (action) {
               case "Edit":
-                // handle edit action
-                print('Edit action for item $index');
+                // validations
+                if (_events[index].status == "Approved") {
+                  Toaster().error("Cannot edit approved events");
+                  return;
+                }
                 break;
               case "Delete":
                 // handle delete action
                 print('Delete action for item $index');
                 break;
               case "":
-                // handle other action
-                print('No action for item $index');
+                // nothing to do
                 break;
               default:
-                print('Unknown action for item $index');
+                Toaster().error('Unknown action for item $index');
                 break;
             }
           }),

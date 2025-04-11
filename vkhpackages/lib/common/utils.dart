@@ -85,6 +85,25 @@ class Utils {
     );
   }
 
+  Future<void> fetchFestivalIcons() async {
+    if (festivalIcons.isEmpty) {
+      List sevaListRaw = await FB().getList(path: "Settings/NityaSevaList");
+      for (var sevaRaw in sevaListRaw) {
+        Map<String, dynamic> sevaMap = Map<String, dynamic>.from(sevaRaw);
+        festivalIcons.add({'name': sevaMap['name'], 'icon': sevaMap['icon']});
+      }
+    }
+  }
+
+  Future<void> fetchUserBasics() async {
+    final String? u = await LS().read('userbasics');
+    if (u != null) {
+      _userbasics = UserBasics.fromJson(jsonDecode(u));
+    } else {
+      _userbasics = null;
+    }
+  }
+
   String getFestivalIcon(String festival) {
     for (var seva in festivalIcons) {
       if (seva['name'] == festival) {
@@ -135,25 +154,6 @@ class Utils {
 
   Color getRandomLightColor() {
     return lightColors[DateTime.now().millisecond % lightColors.length];
-  }
-
-  Future<void> fetchFestivalIcons() async {
-    if (festivalIcons.isEmpty) {
-      List sevaListRaw = await FB().getList(path: "Settings/NityaSevaList");
-      for (var sevaRaw in sevaListRaw) {
-        Map<String, dynamic> sevaMap = Map<String, dynamic>.from(sevaRaw);
-        festivalIcons.add({'name': sevaMap['name'], 'icon': sevaMap['icon']});
-      }
-    }
-  }
-
-  Future<void> fetchUserBasics() async {
-    final String? u = await LS().read('userbasics');
-    if (u != null) {
-      _userbasics = UserBasics.fromJson(jsonDecode(u));
-    } else {
-      _userbasics = null;
-    }
   }
 
   Future<UserDetails?> getUserDetails(String mobile) async {

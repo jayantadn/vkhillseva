@@ -11,13 +11,15 @@ class RegistrationPage2 extends StatefulWidget {
   final String? icon;
   final DateTime selectedDate;
   final Slot slot;
+  final EventRecord? oldEvent;
 
   const RegistrationPage2(
       {super.key,
       required this.title,
       this.icon,
       required this.selectedDate,
-      required this.slot});
+      required this.slot,
+      this.oldEvent});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -82,6 +84,23 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       Toaster().error("User not found");
     }
 
+    if (widget.oldEvent != null) {
+      // populate the data structure
+      EventRecord performanceRequest = widget.oldEvent!;
+
+      // populate the lists
+      _mainPerformer = UserDetails.fromJson(userdetailsJson);
+      for (String mobile in performanceRequest.supportTeamMobiles) {
+        UserDetails? details = await Utils().getUserDetails(mobile);
+        if (details != null) {
+          _supportingTeam.add(details);
+        }
+      }
+      _guests.addAll(performanceRequest.guests);
+      _songs.addAll(performanceRequest.songs);
+      _noteController.text = performanceRequest.notePerformer;
+    }
+
     // refresh all child widgets
 
     // perform sync operations here
@@ -108,6 +127,21 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   }
 
   Future<void> _onSubmit() async {
+    // validations for edit event
+    if (widget.oldEvent != null) {
+      // validate if event is already approved
+      if (widget.oldEvent!.status == "Approved") {
+        Toaster().error("Can't update approved event");
+        return;
+      }
+
+      // validate if event is in the past
+      if (widget.oldEvent!.date.isBefore(DateTime.now())) {
+        Toaster().error("Can't update past event");
+        return;
+      }
+    }
+
     // add half filled song
     if (_songController.text.isNotEmpty) {
       _songs.add(_songController.text);
@@ -141,9 +175,32 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       return;
     } else {
       mobile = basics.mobile;
-      index = await FB().addToList(
-          listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
-          data: performanceRequest.toJson());
+      if (widget.oldEvent == null) {
+        // fresh entry
+        index = await FB().addToList(
+            listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
+            data: performanceRequest.toJson());
+      } else {
+        // edit entry
+        List<dynamic> list = await FB()
+            .getList(path: "${Const().dbrootSangeetSeva}/Events/$mobile");
+        index = list.indexWhere((element) {
+          EventRecord event =
+              Utils().convertRawToDatatype(element, EventRecord.fromJson);
+          return event.date == widget.oldEvent!.date &&
+              event.slot.from == widget.oldEvent!.slot.from &&
+              event.slot.to == widget.oldEvent!.slot.to;
+        });
+        if (index == -1) {
+          Toaster().error("Event not found");
+          return;
+        } else {
+          await FB().editList(
+              listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
+              index: index,
+              data: performanceRequest.toJson());
+        }
+      }
     }
 
     // add to pending requests
@@ -159,9 +216,14 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         "Your request has been submitted.\nYou will be notified once your request is approved");
 
     // go to homepage
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomePage(title: "Hare Krishna");
-    }));
+    if (widget.oldEvent == null) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+        return HomePage(title: "Hare Krishna");
+      }));
+    } else {
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+    }
   }
 
   Future<void> _showAddGuestDialog(BuildContext context) {
@@ -267,6 +329,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                 ),
                                 title: Text(
                                     "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
+                                subtitle: Text(
+                                    "${_mainPerformer!.mobile} \n${_mainPerformer!.credentials}"),
                               ),
                             ),
 
@@ -408,7 +472,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: _onSubmit,
-                            child: Text("Submit"),
+                            child: widget.oldEvent == null
+                                ? Text("Submit")
+                                : Text("Update"),
                           )
                         ]),
                       ),

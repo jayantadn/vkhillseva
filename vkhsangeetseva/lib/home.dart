@@ -8,6 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
+import 'package:vkhsangeetseva/registration_page2.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -134,6 +135,21 @@ class _HomePageState extends State<HomePage> {
                     ? Colors.green[50]
                     : Colors.red[50])),
         child: ListTile(
+          onTap: () {
+            if (_events[index].date.isAfter(DateTime.now())) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegistrationPage2(
+                    selectedDate: _events[index].date,
+                    title: "Edit event",
+                    slot: _events[index].slot,
+                    oldEvent: _events[index],
+                  ),
+                ),
+              );
+            }
+          },
           title: Text(
               "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
           leading: _events[index].status == "Pending"
@@ -153,34 +169,6 @@ class _HomePageState extends State<HomePage> {
                 Text("Temple remarks: ${_events[index].noteTemple}"),
             ],
           ),
-          trailing:
-              Utils().createContextMenu(["Edit", "Delete"], (String action) {
-            // common validations
-            if (_events[index].date.isBefore(DateTime.now())) {
-              Toaster().error("Cannot edit past events");
-              return;
-            }
-
-            switch (action) {
-              case "Edit":
-                // validations
-                if (_events[index].status == "Approved") {
-                  Toaster().error("Cannot edit approved events");
-                  return;
-                }
-                break;
-              case "Delete":
-                // handle delete action
-                print('Delete action for item $index');
-                break;
-              case "":
-                // nothing to do
-                break;
-              default:
-                Toaster().error('Unknown action for item $index');
-                break;
-            }
-          }),
         ));
   }
 

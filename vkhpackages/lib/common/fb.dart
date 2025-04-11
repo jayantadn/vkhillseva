@@ -277,6 +277,35 @@ class FB {
       Toaster().error("Error updating data: $e");
     }
   }
+
+  Future<int> editList({
+    required String listpath,
+    required dynamic data,
+    required int index,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(listpath);
+      DataSnapshot snap = await dbref.get();
+      if (snap.value == null) {
+        // empty list
+        await dbref.set([data]);
+        return 0;
+      } else {
+        List<dynamic> list = List<dynamic>.from(snap.value as List);
+
+        if (index < 0 || index >= list.length) {
+          Toaster().error("index out of bounds");
+          return -1;
+        }
+        list[index] = data;
+        await dbref.set(list);
+        return list.length - 1;
+      }
+    } catch (e) {
+      Toaster().error("Error adding data to list: $e");
+      return -1;
+    }
+  }
 }
 
 class FBCallbacks {

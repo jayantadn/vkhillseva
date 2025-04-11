@@ -47,6 +47,26 @@ class Utils {
     return fromJson(map);
   }
 
+  Widget createMenuButton(void Function(Offset position) onPressed) {
+    return Builder(
+      builder: (context) {
+        final GlobalKey iconButtonKey = GlobalKey();
+        return IconButton(
+          key: iconButtonKey,
+          icon: Icon(Icons.more_vert),
+          onPressed: () {
+            final RenderBox renderBox =
+                iconButtonKey.currentContext!.findRenderObject() as RenderBox;
+            final Offset position = renderBox.localToGlobal(
+              renderBox.size.bottomCenter(Offset.zero),
+            );
+            onPressed(position);
+          },
+        );
+      },
+    );
+  }
+
   String getFestivalIcon(String festival) {
     for (var seva in festivalIcons) {
       if (seva['name'] == festival) {

@@ -10,7 +10,6 @@ import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'dart:html';
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -126,55 +125,37 @@ class _HomePageState extends State<HomePage> {
 
   Widget _createEventCard(int index) {
     String date = DateFormat("dd MMM yyyy").format(_events[index].date);
-    return GestureDetector(
-        onLongPress: () async {
-          // Show popup menu on long press (for mobile)
-          await _showContextMenuEvent(context, Offset.zero, index);
-        },
-        onSecondaryTapDown: (details) async {
-          // Show popup menu on right-click (for desktop)
-          await _showContextMenuEvent(context, details.globalPosition, index);
-        },
-        child: Listener(
-          onPointerDown: (event) {
-            if (event.kind == PointerDeviceKind.mouse &&
-                event.buttons == kSecondaryMouseButton) {
-              // Prevent the default browser right-click menu
-              if (PlatformDispatcher.instance.defaultRouteName == 'web') {
-                document.onContextMenu
-                    .listen((event) => event.preventDefault());
-              }
-            }
-          },
-          child: Card(
-            color: _events[index].date.isBefore(DateTime.now())
-                ? Colors.grey[200]
-                : (_events[index].status == "Pending"
-                    ? Colors.yellow[50]
-                    : (_events[index].status == "Approved"
-                        ? Colors.green[50]
-                        : Colors.red[50])),
-            child: ListTile(
-                title: Text(
-                    "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
-                leading: _events[index].status == "Pending"
-                    ? Icon(Icons.question_mark)
-                    : (_events[index].status == "Approved"
-                        ? Icon(Icons.check)
-                        : Icon(Icons.close)),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(_events[index].status == "Pending"
-                        ? "Waiting for approval"
-                        : (_events[index].status == "Approved"
-                            ? "Request is approved"
-                            : "Request is rejected")),
-                    if (_events[index].noteTemple.isNotEmpty)
-                      Text("Temple remarks: ${_events[index].noteTemple}"),
-                  ],
-                )),
+    return Card(
+        color: _events[index].date.isBefore(DateTime.now())
+            ? Colors.grey[200]
+            : (_events[index].status == "Pending"
+                ? Colors.yellow[50]
+                : (_events[index].status == "Approved"
+                    ? Colors.green[50]
+                    : Colors.red[50])),
+        child: ListTile(
+          title: Text(
+              "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
+          leading: _events[index].status == "Pending"
+              ? Icon(Icons.question_mark)
+              : (_events[index].status == "Approved"
+                  ? Icon(Icons.check)
+                  : Icon(Icons.close)),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(_events[index].status == "Pending"
+                  ? "Waiting for approval"
+                  : (_events[index].status == "Approved"
+                      ? "Request is approved"
+                      : "Request is rejected")),
+              if (_events[index].noteTemple.isNotEmpty)
+                Text("Temple remarks: ${_events[index].noteTemple}"),
+            ],
           ),
+          trailing: Utils().createMenuButton((position) async {
+            _showContextMenuEvent(context, position, index);
+          }),
         ));
   }
 

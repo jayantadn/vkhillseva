@@ -19,7 +19,7 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
-  final Widget home = const HomePage(title: "Testing");
+  final Widget home = const HomePage(title: "Hare Krishna");
   final Widget test = Support(
     title: "test",
   );
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sangeet Seva',
       theme: themeDefault,
-      home: test,
+      home: home,
     );
   }
 }

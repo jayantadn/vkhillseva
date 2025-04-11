@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:ui';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -8,6 +10,7 @@ import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'dart:html';
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -121,6 +124,60 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Widget _createEventCard(int index) {
+    String date = DateFormat("dd MMM yyyy").format(_events[index].date);
+    return GestureDetector(
+        onLongPress: () async {
+          // Show popup menu on long press (for mobile)
+          await _showContextMenuEvent(context, Offset.zero, index);
+        },
+        onSecondaryTapDown: (details) async {
+          // Show popup menu on right-click (for desktop)
+          await _showContextMenuEvent(context, details.globalPosition, index);
+        },
+        child: Listener(
+          onPointerDown: (event) {
+            if (event.kind == PointerDeviceKind.mouse &&
+                event.buttons == kSecondaryMouseButton) {
+              // Prevent the default browser right-click menu
+              if (PlatformDispatcher.instance.defaultRouteName == 'web') {
+                document.onContextMenu
+                    .listen((event) => event.preventDefault());
+              }
+            }
+          },
+          child: Card(
+            color: _events[index].date.isBefore(DateTime.now())
+                ? Colors.grey[200]
+                : (_events[index].status == "Pending"
+                    ? Colors.yellow[50]
+                    : (_events[index].status == "Approved"
+                        ? Colors.green[50]
+                        : Colors.red[50])),
+            child: ListTile(
+                title: Text(
+                    "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
+                leading: _events[index].status == "Pending"
+                    ? Icon(Icons.question_mark)
+                    : (_events[index].status == "Approved"
+                        ? Icon(Icons.check)
+                        : Icon(Icons.close)),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(_events[index].status == "Pending"
+                        ? "Waiting for approval"
+                        : (_events[index].status == "Approved"
+                            ? "Request is approved"
+                            : "Request is rejected")),
+                    if (_events[index].noteTemple.isNotEmpty)
+                      Text("Temple remarks: ${_events[index].noteTemple}"),
+                  ],
+                )),
+          ),
+        ));
+  }
+
   Widget _createWelcome() {
     return Column(children: [
       Padding(
@@ -210,6 +267,37 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _showContextMenuEvent(
+      BuildContext context, Offset position, int index) async {
+    final selectedValue = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        position.dx,
+        position.dy,
+        position.dx + 1,
+        position.dy + 1,
+      ),
+      items: [
+        PopupMenuItem(
+          value: 'edit',
+          child: Text('Edit'),
+        ),
+        PopupMenuItem(
+          value: 'delete',
+          child: Text('Delete'),
+        ),
+      ],
+    );
+
+    if (selectedValue == 'edit') {
+      // Handle edit action
+      print('Edit action for item $index');
+    } else if (selectedValue == 'delete') {
+      // Handle delete action
+      print('Delete action for item $index');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -283,7 +371,6 @@ class _HomePageState extends State<HomePage> {
                         // leave some space at top
                         SizedBox(height: 10),
 
-                        // your widgets here
                         // welcome banner
                         _createWelcome(),
 
@@ -324,7 +411,7 @@ class _HomePageState extends State<HomePage> {
                             child: Text('Register for an Event'),
                           ),
 
-                        // view registered events
+                        // registered events
                         SizedBox(
                           height: 10,
                         ),
@@ -334,40 +421,7 @@ class _HomePageState extends State<HomePage> {
                               _events.length > _maxEvents
                                   ? _maxEvents
                                   : _events.length, (index) {
-                            String date = DateFormat("dd MMM yyyy")
-                                .format(_events[index].date);
-                            return Card(
-                              color:
-                                  _events[index].date.isBefore(DateTime.now())
-                                      ? Colors.grey[200]
-                                      : (_events[index].status == "Pending"
-                                          ? Colors.yellow[50]
-                                          : (_events[index].status == "Approved"
-                                              ? Colors.green[50]
-                                              : Colors.red[50])),
-                              child: ListTile(
-                                  title: Text(
-                                      "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
-                                  leading: _events[index].status == "Pending"
-                                      ? Icon(Icons.question_mark)
-                                      : (_events[index].status == "Approved"
-                                          ? Icon(Icons.check)
-                                          : Icon(Icons.close)),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(_events[index].status == "Pending"
-                                          ? "Waiting for approval"
-                                          : (_events[index].status == "Approved"
-                                              ? "Request is approved"
-                                              : "Request is rejected")),
-                                      if (_events[index].noteTemple.isNotEmpty)
-                                        Text(
-                                            "Temple remarks: ${_events[index].noteTemple}"),
-                                    ],
-                                  )),
-                            );
+                            return _createEventCard(index);
                           }),
 
                         // leave some space at bottom

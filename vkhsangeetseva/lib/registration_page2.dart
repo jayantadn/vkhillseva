@@ -430,6 +430,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       if (value == null || value.isEmpty) {
                         return "Please enter song title";
                       }
+                      if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                        return "Special characters are not allowed";
+                      }
                       return null;
                     },
                   ),
@@ -440,6 +443,13 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                     controller: _raagaController,
                     onChanged: (value) {},
                     decoration: InputDecoration(labelText: "Raaga"),
+                    validator: (value) {
+                      if (value != null &&
+                          RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                        return "Special characters are not allowed";
+                      }
+                      return null;
+                    },
                   ),
 
                   // Taala
@@ -448,6 +458,13 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                     controller: _taalaController,
                     onChanged: (value) {},
                     decoration: InputDecoration(labelText: "Taala"),
+                    validator: (value) {
+                      if (value != null &&
+                          RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                        return "Special characters are not allowed";
+                      }
+                      return null;
+                    },
                   ),
                 ],
               ),

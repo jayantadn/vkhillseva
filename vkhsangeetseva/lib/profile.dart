@@ -635,7 +635,7 @@ class _ProfileState extends State<Profile> {
 
                       // button for sangeet exp
                       SizedBox(height: 20),
-                      ElevatedButton(
+                      TextButton(
                           onPressed: () async {
                             await _showDialogSangeetExp(context);
                           },

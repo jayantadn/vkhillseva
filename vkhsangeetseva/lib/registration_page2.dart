@@ -39,8 +39,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   // controllers, listeners and focus nodes
   final TextEditingController _guestNameController = TextEditingController();
-  final TextEditingController _songController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _raagaController = TextEditingController();
+  final TextEditingController _taalaController = TextEditingController();
 
   @override
   initState() {
@@ -58,8 +60,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     // clear all controllers and focus nodes
     _guestNameController.dispose();
-    _songController.dispose();
     _noteController.dispose();
+    _titleController.dispose();
+    _raagaController.dispose();
+    _taalaController.dispose();
 
     super.dispose();
   }
@@ -224,11 +228,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       }
     }
 
-    // add half filled song
-    if (_songController.text.isNotEmpty) {
-      _songs.add(_songController.text);
-    }
-
     // validate list of songs
     if (_songs.length < _minSongs) {
       Toaster().error("Please enter at least $_minSongs songs");
@@ -365,6 +364,80 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     );
   }
 
+  Future<void> _showAddSongDialog(BuildContext context) {
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    _titleController.clear();
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Add song for event"),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  // title
+                  TextFormField(
+                    controller: _titleController,
+                    onChanged: (value) {},
+                    decoration: InputDecoration(labelText: "Song title"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter song title";
+                      }
+                      return null;
+                    },
+                  ),
+
+                  // Raaga
+                  SizedBox(height: 10),
+                  TextFormField(
+                    controller: _raagaController,
+                    onChanged: (value) {},
+                    decoration: InputDecoration(labelText: "Raaga"),
+                  ),
+
+                  // Taala
+                  SizedBox(height: 10),
+                  TextFormField(
+                    controller: _taalaController,
+                    onChanged: (value) {},
+                    decoration: InputDecoration(labelText: "Taala"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (!formKey.currentState!.validate()) {
+                  return;
+                }
+
+                setState(() {
+                  _songs.add(
+                      "${_titleController.text}:${_raagaController.text}:${_taalaController.text}");
+                });
+
+                Navigator.pop(context);
+              },
+              child: Text("Add"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -433,8 +506,17 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                 ),
                                 title: Text(
                                     "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
-                                subtitle: Text(
-                                    "${_mainPerformer!.mobile} \n${_mainPerformer!.credentials}"),
+                                subtitle: Row(
+                                  children: [
+                                    Icon(Icons.phone),
+                                    SizedBox(width: 5),
+                                    Text(_mainPerformer!.mobile),
+                                    SizedBox(width: 10),
+                                    Icon(Icons.workspace_premium),
+                                    SizedBox(width: 5),
+                                    Text(_mainPerformer!.credentials),
+                                  ],
+                                ),
                               ),
                             ),
 
@@ -451,6 +533,26 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                     ),
                                     title: Text(
                                         "${member.salutation} ${member.name}"),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(Icons.phone),
+                                            SizedBox(width: 5),
+                                            Text(member.mobile),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.workspace_premium),
+                                            SizedBox(width: 5),
+                                            Text(member.credentials),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 );
                               })),
@@ -511,44 +613,42 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                           // list of songs
                           SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("List of songs",
-                                style: themeDefault.textTheme.headlineSmall),
-                          ),
+                          if (_songs.isNotEmpty)
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text("List of songs",
+                                  style: themeDefault.textTheme.headlineSmall),
+                            ),
                           ...List.generate(_songs.length, (index) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "${index + 1}. ${_songs[index]}",
-                                ),
+                            var song = _songs[index];
+                            var songDetails = song.split(":");
+                            String title = songDetails[0];
+                            String raaga = songDetails[1];
+                            String taala = songDetails[2];
+                            return ListTile(
+                              leading: Text(
+                                "${index + 1}",
+                                style: Theme.of(context).textTheme.bodyLarge,
                               ),
+                              title: Text(title),
+                              subtitle: (raaga.isNotEmpty && taala.isNotEmpty)
+                                  ? Row(
+                                      children: [
+                                        Text("raaga: $raaga"),
+                                        SizedBox(width: 10),
+                                        Text("taala: $taala"),
+                                      ],
+                                    )
+                                  : null,
                             );
                           }),
                           SizedBox(height: 10),
                           if (_songs.length < 10)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: _songController,
-                                    decoration: InputDecoration(
-                                        hintText: "Enter song name"),
-                                  ),
-                                ),
-                                IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _songs.add(_songController.text);
-                                      });
-                                      _songController.clear();
-                                    },
-                                    icon: Icon(Icons.add))
-                              ],
-                            ),
+                            TextButton(
+                                onPressed: () async {
+                                  await _showAddSongDialog(context);
+                                },
+                                child: Text("Add song for event")),
 
                           // performer note
                           SizedBox(height: 10),

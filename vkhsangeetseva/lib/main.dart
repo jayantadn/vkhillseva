@@ -20,8 +20,10 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   final Widget home = const HomePage(title: "Hare Krishna");
-  final Widget test = Support(
+  final Widget test = RegistrationPage2(
     title: "test",
+    selectedDate: DateTime.now(),
+    slot: Slot(name: "name", avl: true, from: "10:00 AM", to: "12:00 PM"),
   );
 
   // This widget is the root of your application.

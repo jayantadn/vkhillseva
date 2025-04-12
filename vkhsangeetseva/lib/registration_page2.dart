@@ -197,7 +197,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     // notify admin
     String msg = Utils().getUsername();
-    msg += " ${widget.oldEvent!.date} ${widget.slot.from} - ${widget.slot.to}";
+    String date = DateFormat("dd MMM yyyy").format(widget.oldEvent!.date);
+    msg += ", $date ${widget.slot.from} - ${widget.slot.to}";
     Notifications().sendPushNotificationToTopic(
         topic: "SSAdmin", title: "Event request deleted", body: msg);
 

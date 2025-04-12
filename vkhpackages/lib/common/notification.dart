@@ -173,6 +173,6 @@ class Notifications {
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.notification != null) {
-    // do something
+    // nothing required as of now, as the notification is already displayed
   }
 }

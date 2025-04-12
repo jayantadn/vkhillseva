@@ -130,6 +130,42 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     });
   }
 
+  Widget _createSongTile(int index) {
+    var song = _songs[index];
+    var songDetails = song.split(":");
+    String title = songDetails[0];
+    String raaga = songDetails[1];
+    String taala = songDetails[2];
+    return ListTile(
+        leading: Text(
+          "${index + 1}",
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        title: Text(title),
+        subtitle: (raaga.isNotEmpty && taala.isNotEmpty)
+            ? Row(
+                children: [
+                  Text("raaga: $raaga"),
+                  SizedBox(width: 10),
+                  Text("taala: $taala"),
+                ],
+              )
+            : null,
+        trailing:
+            Utils().createContextMenu(["Edit", "Delete"], (String action) {
+          switch (action) {
+            case "Edit":
+              _showAddSongDialog(context: context, index: index);
+              break;
+            case "Delete":
+              setState(() {
+                _songs.removeAt(index);
+              });
+              break;
+          }
+        }));
+  }
+
   Future<void> _deleteEvent() async {
     // validate if event is in the past
     if (widget.oldEvent!.date.isBefore(DateTime.now())) {
@@ -364,9 +400,16 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     );
   }
 
-  Future<void> _showAddSongDialog(BuildContext context) {
+  Future<void> _showAddSongDialog({required BuildContext context, int? index}) {
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     _titleController.clear();
+
+    if (index != null) {
+      var songDetails = _songs[index].split(":");
+      _titleController.text = songDetails[0];
+      _raagaController.text = songDetails[1];
+      _taalaController.text = songDetails[2];
+    }
 
     return showDialog(
       context: context,
@@ -424,13 +467,19 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 }
 
                 setState(() {
-                  _songs.add(
-                      "${_titleController.text}:${_raagaController.text}:${_taalaController.text}");
+                  if (index == null) {
+                    _songs.add(
+                        "${_titleController.text}:${_raagaController.text}:${_taalaController.text}");
+                  } else {
+                    // edit mode
+                    _songs[index] =
+                        "${_titleController.text}:${_raagaController.text}:${_taalaController.text}";
+                  }
                 });
 
                 Navigator.pop(context);
               },
-              child: Text("Add"),
+              child: Text(index == null ? "Add" : "Update"),
             ),
           ],
         );
@@ -620,33 +669,13 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                   style: themeDefault.textTheme.headlineSmall),
                             ),
                           ...List.generate(_songs.length, (index) {
-                            var song = _songs[index];
-                            var songDetails = song.split(":");
-                            String title = songDetails[0];
-                            String raaga = songDetails[1];
-                            String taala = songDetails[2];
-                            return ListTile(
-                              leading: Text(
-                                "${index + 1}",
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                              title: Text(title),
-                              subtitle: (raaga.isNotEmpty && taala.isNotEmpty)
-                                  ? Row(
-                                      children: [
-                                        Text("raaga: $raaga"),
-                                        SizedBox(width: 10),
-                                        Text("taala: $taala"),
-                                      ],
-                                    )
-                                  : null,
-                            );
+                            return _createSongTile(index);
                           }),
                           SizedBox(height: 10),
                           if (_songs.length < 10)
                             TextButton(
                                 onPressed: () async {
-                                  await _showAddSongDialog(context);
+                                  await _showAddSongDialog(context: context);
                                 },
                                 child: Text("Add song for event")),
 

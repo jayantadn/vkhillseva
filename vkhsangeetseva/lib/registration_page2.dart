@@ -218,15 +218,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         "Your request has been submitted.\nYou will be notified once your request is approved");
 
     // go to homepage
-    if (widget.oldEvent == null) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-        return HomePage(title: "Hare Krishna");
-      }));
-    } else {
-      // FIXME: why twice pop is required
-      Navigator.of(context).pop();
-      Navigator.of(context).pop();
-    }
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return HomePage(title: "Hare Krishna");
+    }));
   }
 
   Future<void> _showAddGuestDialog(BuildContext context) {

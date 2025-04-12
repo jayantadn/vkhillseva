@@ -155,16 +155,16 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     // populate the data structure
     EventRecord performanceRequest = EventRecord(
-      date: widget.selectedDate,
-      slot: widget.slot,
-      mainPerformerMobile: _mainPerformer!.mobile,
-      supportTeamMobiles: List.generate(_supportingTeam.length, (index) {
-        return _supportingTeam[index].mobile;
-      }),
-      guests: _guests,
-      songs: _songs,
-      notePerformer: _noteController.text,
-    );
+        date: widget.selectedDate,
+        slot: widget.slot,
+        mainPerformerMobile: _mainPerformer!.mobile,
+        supportTeamMobiles: List.generate(_supportingTeam.length, (index) {
+          return _supportingTeam[index].mobile;
+        }),
+        guests: _guests,
+        songs: _songs,
+        notePerformer: _noteController.text,
+        status: "Pending");
 
     // save to firebase
     UserBasics? basics = Utils().getUserBasics();
@@ -204,12 +204,14 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     }
 
     // add to pending requests
-    FB().addToList(
-        listpath: "${Const().dbrootSangeetSeva}/PendingRequests",
-        data: {
-          "path": "${Const().dbrootSangeetSeva}/Events/$mobile",
-          "index": index
-        });
+    if (widget.oldEvent == null || widget.oldEvent!.status != "Pending") {
+      FB().addToList(
+          listpath: "${Const().dbrootSangeetSeva}/PendingRequests",
+          data: {
+            "path": "${Const().dbrootSangeetSeva}/Events/$mobile",
+            "index": index
+          });
+    }
 
     // show success message
     UtilWidgets().showMessage(context,
@@ -221,6 +223,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         return HomePage(title: "Hare Krishna");
       }));
     } else {
+      // FIXME: why twice pop is required
       Navigator.of(context).pop();
       Navigator.of(context).pop();
     }

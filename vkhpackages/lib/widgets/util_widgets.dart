@@ -29,4 +29,32 @@ class UtilWidgets {
       },
     );
   }
+
+  Future<void> showConfirmDialog(
+    BuildContext context,
+    String msg,
+    String? actionType,
+    void Function()? action,
+  ) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(msg),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(onPressed: action, child: Text(actionType ?? 'OK')),
+          ],
+        );
+      },
+    );
+  }
 }

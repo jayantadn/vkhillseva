@@ -257,6 +257,28 @@ class FB {
     }
   }
 
+  Future<void> deleteFromList({
+    required String listpath,
+    required int index,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(listpath);
+      DataSnapshot snap = await dbref.get();
+      if (snap.value == null) {
+        // list is empty
+        return;
+      } else {
+        List<dynamic> list = List<dynamic>.from(snap.value as List);
+        list.removeAt(index);
+        await dbref.set(list);
+        return;
+      }
+    } catch (e) {
+      Toaster().error("Error deleting data from list: $e");
+      return;
+    }
+  }
+
   Future<void> deleteValue({required String path}) async {
     try {
       DatabaseReference dbref = FirebaseDatabase.instance.ref(path);

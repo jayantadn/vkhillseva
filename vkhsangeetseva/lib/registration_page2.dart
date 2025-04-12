@@ -126,6 +126,87 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     });
   }
 
+  Future<void> _deleteEvent() async {
+    // validate if event is in the past
+    if (widget.oldEvent!.date.isBefore(DateTime.now())) {
+      Toaster().error("Can't delete past event");
+      return;
+    }
+
+    // delete from events
+    UserBasics? basics = Utils().getUserBasics();
+    String mobile = "";
+    int index = 0;
+    if (basics == null) {
+      Toaster().error("Cant access user data");
+      return;
+    } else {
+      mobile = basics.mobile;
+      List<dynamic> list = await FB()
+          .getList(path: "${Const().dbrootSangeetSeva}/Events/$mobile");
+      index = list.indexWhere((element) {
+        EventRecord event =
+            Utils().convertRawToDatatype(element, EventRecord.fromJson);
+        return event.date == widget.oldEvent!.date &&
+            event.slot.from == widget.oldEvent!.slot.from &&
+            event.slot.to == widget.oldEvent!.slot.to;
+      });
+      if (index == -1) {
+        Toaster().error("Event not found");
+        return;
+      } else {
+        await FB().deleteFromList(
+            listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
+            index: index);
+      }
+    }
+
+    // delete from pending requests
+    List pendingEvents = await FB()
+        .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
+    int indexP = pendingEvents.indexWhere((element) =>
+        element['path'] == "${Const().dbrootSangeetSeva}/Events/$mobile" &&
+        element['index'] == index);
+    await FB().deleteFromList(
+        listpath: "${Const().dbrootSangeetSeva}/PendingRequests",
+        index: indexP);
+
+    // mark available slot
+    String dbdate = DateFormat("yyyy-MM-dd").format(widget.selectedDate);
+    Map<String, dynamic> slots = await FB().getJson(
+        path: "${Const().dbrootSangeetSeva}/Slots/$dbdate", silent: true);
+    String slotKey = "";
+    for (var slot in slots.entries) {
+      Slot s = Utils().convertRawToDatatype(slot.value, Slot.fromJson);
+      if (widget.slot.from == s.from && widget.slot.to == s.to) {
+        slotKey = slot.key;
+        break;
+      }
+    }
+    if (slotKey.isNotEmpty) {
+      Slot slotToUpdate =
+          Utils().convertRawToDatatype(slots[slotKey], Slot.fromJson);
+      slotToUpdate.avl = true;
+      await FB().setJson(
+          path: "${Const().dbrootSangeetSeva}/Slots/$dbdate/$slotKey",
+          json: slotToUpdate.toJson());
+    }
+
+    // show success message
+    Toaster().info("Event deleted successfully");
+
+    // notify admin
+    String msg = Utils().getUsername();
+    msg += " ${widget.oldEvent!.date} ${widget.slot.from} - ${widget.slot.to}";
+    Notifications().sendPushNotificationToTopic(
+        topic: "SSAdmin", title: "Event request deleted", body: msg);
+
+    // go to homepage
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return HomePage(title: "Hare Krishna");
+    }));
+  }
+
   Future<void> _onSubmit() async {
     // validations for edit event
     if (widget.oldEvent != null) {
@@ -290,7 +371,20 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       child: Stack(
         children: [
           Scaffold(
-            appBar: AppBar(title: Text(widget.title)),
+            appBar: AppBar(title: Text(widget.title), actions: [
+              if (widget.oldEvent != null)
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    UtilWidgets().showConfirmDialog(
+                        context,
+                        "Are you sure you want to delete this event?",
+                        "Delete", () async {
+                      await _deleteEvent();
+                    });
+                  },
+                )
+            ]),
             body: RefreshIndicator(
               onRefresh: refresh,
               child: SingleChildScrollView(

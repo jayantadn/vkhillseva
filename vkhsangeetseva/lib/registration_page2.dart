@@ -638,6 +638,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                           _supportingTeam.add(user);
                                         });
                                       },
+                                      friendMobile: _mainPerformer!.mobile,
                                     ),
                                   ),
                                 );

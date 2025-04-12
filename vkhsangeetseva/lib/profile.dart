@@ -16,13 +16,15 @@ class Profile extends StatefulWidget {
   final String? icon;
   final bool? self;
   final Function(UserDetails user)? onProfileSaved;
+  final String? friendMobile;
 
   const Profile(
       {super.key,
       required this.title,
       this.icon,
       this.self,
-      this.onProfileSaved});
+      this.onProfileSaved,
+      this.friendMobile});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -283,6 +285,11 @@ class _ProfileState extends State<Profile> {
       Toaster().error("FCM token not available");
     } else {
       details.fcmToken = fcmToken;
+    }
+
+    // set friend mobile
+    if (widget.friendMobile != null) {
+      details.friendMobile = widget.friendMobile;
     }
 
     // write to database

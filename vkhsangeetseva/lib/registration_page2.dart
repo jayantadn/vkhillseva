@@ -166,6 +166,55 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         }));
   }
 
+  Widget _createSupportingTeamTile(int index) {
+    var member = _supportingTeam[index];
+    return Card(
+      child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Profile(
+                title: "Supporting team",
+                self: false,
+                onProfileSaved: (user) {
+                  setState(() {
+                    _supportingTeam[index] = user;
+                  });
+                },
+                friendMobile: _mainPerformer!.mobile,
+                oldUserDetails: _supportingTeam[index],
+              ),
+            ),
+          );
+        },
+        leading: CircleAvatar(
+          backgroundImage: NetworkImage(member.profilePicUrl),
+        ),
+        title: Text("${member.salutation} ${member.name}"),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.phone),
+                SizedBox(width: 5),
+                Text(member.mobile),
+              ],
+            ),
+            Row(
+              children: [
+                Icon(Icons.workspace_premium),
+                SizedBox(width: 5),
+                Text(member.credentials),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _deleteEvent() async {
     // validate if event is in the past
     if (widget.oldEvent!.date.isBefore(DateTime.now())) {
@@ -566,6 +615,23 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           if (_mainPerformer != null)
                             Card(
                               child: ListTile(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Profile(
+                                        title: "Main performer",
+                                        self: true,
+                                        onProfileSaved: (user) {
+                                          setState(() {
+                                            _mainPerformer = user;
+                                          });
+                                        },
+                                        friendMobile: _mainPerformer!.mobile,
+                                      ),
+                                    ),
+                                  );
+                                },
                                 leading: CircleAvatar(
                                   backgroundImage: NetworkImage(
                                       _mainPerformer!.profilePicUrl),
@@ -590,37 +656,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           Utils().responsiveBuilder(
                               context,
                               List.generate(_supportingTeam.length, (index) {
-                                var member = _supportingTeam[index];
-                                return Card(
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(member.profilePicUrl),
-                                    ),
-                                    title: Text(
-                                        "${member.salutation} ${member.name}"),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Icon(Icons.phone),
-                                            SizedBox(width: 5),
-                                            Text(member.mobile),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.workspace_premium),
-                                            SizedBox(width: 5),
-                                            Text(member.credentials),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
+                                return _createSupportingTeamTile(index);
                               })),
 
                           // add supporting team

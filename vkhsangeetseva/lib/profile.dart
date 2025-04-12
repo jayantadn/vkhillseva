@@ -17,6 +17,7 @@ class Profile extends StatefulWidget {
   final bool? self;
   final Function(UserDetails user)? onProfileSaved;
   final String? friendMobile;
+  final UserDetails? oldUserDetails;
 
   const Profile(
       {super.key,
@@ -24,7 +25,8 @@ class Profile extends StatefulWidget {
       this.icon,
       this.self,
       this.onProfileSaved,
-      this.friendMobile});
+      this.friendMobile,
+      this.oldUserDetails});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -136,6 +138,8 @@ class _ProfileState extends State<Profile> {
           _userDetailsOld = UserDetails.fromJson(userdetailsJson);
         }
       }
+    } else if (widget.oldUserDetails != null) {
+      _userDetailsOld = widget.oldUserDetails;
     }
 
     await _lock.synchronized(() async {
@@ -266,15 +270,15 @@ class _ProfileState extends State<Profile> {
     UserDetails? details;
     if (userdetails == null) {
       details = UserDetails(
-        salutation: _salutation,
-        name: _nameController.text,
-        mobile: _mobileController.text,
-        profilePicUrl: _profilePicUrl,
-        exps: _exp,
-        credentials: _credController.text,
-        youtubeUrls: _youtubeLinks.where((link) => link.isNotEmpty).toList(),
-        audioClipUrls: _audioClips.where((link) => link.isNotEmpty).toList(),
-      );
+          salutation: _salutation,
+          name: _nameController.text,
+          mobile: _mobileController.text,
+          profilePicUrl: _profilePicUrl,
+          exps: _exp,
+          credentials: _credController.text,
+          youtubeUrls: _youtubeLinks.where((link) => link.isNotEmpty).toList(),
+          audioClipUrls: _audioClips.where((link) => link.isNotEmpty).toList(),
+          friendMobile: widget.friendMobile);
     } else {
       details = userdetails;
     }
@@ -285,11 +289,6 @@ class _ProfileState extends State<Profile> {
       Toaster().error("FCM token not available");
     } else {
       details.fcmToken = fcmToken;
-    }
-
-    // set friend mobile
-    if (widget.friendMobile != null) {
-      details.friendMobile = widget.friendMobile;
     }
 
     // write to database

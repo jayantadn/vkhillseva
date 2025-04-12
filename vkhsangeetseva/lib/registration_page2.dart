@@ -411,6 +411,18 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           Text("${widget.slot.from} - ${widget.slot.to}",
                               style: themeDefault.textTheme.headlineMedium),
 
+                          // temple notes
+                          if (widget.oldEvent != null &&
+                              widget.oldEvent!.noteTemple.isNotEmpty)
+                            Card(
+                                color: widget.oldEvent!.status == "Approved"
+                                    ? Colors.green[50]
+                                    : Colors.red[50],
+                                child: ListTile(
+                                  title: Text("Temple notes"),
+                                  subtitle: Text(widget.oldEvent!.noteTemple),
+                                )),
+
                           // main performer
                           if (_mainPerformer != null)
                             Card(

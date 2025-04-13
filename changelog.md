@@ -1,3 +1,13 @@
+# 6.0.0
+- fix: changelog centralized
+- fix: remove auto update
+- feature: edit and delete event request
+
+# 6.0.0
+- fix: changelog centralized
+- fix: remove auto update
+- feature: edit and delete event request
+
 # 5.0.4
 - fix: ticket colors
 

@@ -41,7 +41,7 @@ class Toaster {
     if (kIsWeb) {
       msg = "<b>$header</b><br>$body";
     } else {
-      msg = body;
+      msg = "[$header] $body";
     }
 
     Fluttertoast.showToast(

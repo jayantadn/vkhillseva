@@ -165,6 +165,7 @@ class UserDetails {
   final List<String> youtubeUrls;
   final List<String> audioClipUrls;
   String? fcmToken;
+  String? friendMobile;
 
   UserDetails({
     required this.salutation,
@@ -176,6 +177,7 @@ class UserDetails {
     required this.youtubeUrls,
     required this.audioClipUrls,
     this.fcmToken,
+    this.friendMobile,
   });
 
   factory UserDetails.fromJson(Map<String, dynamic> json) {
@@ -203,6 +205,7 @@ class UserDetails {
               ? []
               : List<String>.from(json['audioClipUrls']),
       fcmToken: json['fcmToken'],
+      friendMobile: json['friendMobile'],
     );
   }
 
@@ -217,6 +220,7 @@ class UserDetails {
       'youtubeUrls': youtubeUrls,
       'audioClipUrls': audioClipUrls,
       'fcmToken': fcmToken,
+      'friendMobile': friendMobile,
     };
   }
 }

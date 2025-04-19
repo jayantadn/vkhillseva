@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class Utils {
   static final Utils _instance = Utils._internal();
@@ -44,6 +45,63 @@ class Utils {
   ) {
     Map<String, dynamic> map = Map<String, dynamic>.from(raw);
     return fromJson(map);
+  }
+
+  Widget createContextMenu(List<String> items, Function(String) onPressed) {
+    return Builder(
+      builder: (context) {
+        final GlobalKey iconButtonKey = GlobalKey();
+        return IconButton(
+          key: iconButtonKey,
+          icon: Icon(Icons.more_vert),
+          onPressed: () async {
+            final RenderBox renderBox =
+                iconButtonKey.currentContext!.findRenderObject() as RenderBox;
+            final Offset position = renderBox.localToGlobal(
+              renderBox.size.bottomCenter(Offset.zero),
+            );
+
+            final selectedValue = await showMenu<String>(
+              context: context,
+              position: RelativeRect.fromLTRB(
+                position.dx,
+                position.dy,
+                position.dx + 1,
+                position.dy + 1,
+              ),
+              items: List.generate(
+                items.length,
+                (index) => PopupMenuItem<String>(
+                  value: items[index],
+                  child: Text(items[index]),
+                ),
+              ),
+            );
+
+            onPressed(selectedValue ?? "");
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> fetchFestivalIcons() async {
+    if (festivalIcons.isEmpty) {
+      List sevaListRaw = await FB().getList(path: "Settings/NityaSevaList");
+      for (var sevaRaw in sevaListRaw) {
+        Map<String, dynamic> sevaMap = Map<String, dynamic>.from(sevaRaw);
+        festivalIcons.add({'name': sevaMap['name'], 'icon': sevaMap['icon']});
+      }
+    }
+  }
+
+  Future<void> fetchUserBasics() async {
+    final String? u = await LS().read('userbasics');
+    if (u != null) {
+      _userbasics = UserBasics.fromJson(jsonDecode(u));
+    } else {
+      _userbasics = null;
+    }
   }
 
   String getFestivalIcon(String festival) {
@@ -96,25 +154,6 @@ class Utils {
 
   Color getRandomLightColor() {
     return lightColors[DateTime.now().millisecond % lightColors.length];
-  }
-
-  Future<void> fetchFestivalIcons() async {
-    if (festivalIcons.isEmpty) {
-      List sevaListRaw = await FB().getList(path: "Settings/NityaSevaList");
-      for (var sevaRaw in sevaListRaw) {
-        Map<String, dynamic> sevaMap = Map<String, dynamic>.from(sevaRaw);
-        festivalIcons.add({'name': sevaMap['name'], 'icon': sevaMap['icon']});
-      }
-    }
-  }
-
-  Future<void> fetchUserBasics() async {
-    final String? u = await LS().read('userbasics');
-    if (u != null) {
-      _userbasics = UserBasics.fromJson(jsonDecode(u));
-    } else {
-      _userbasics = null;
-    }
   }
 
   Future<UserDetails?> getUserDetails(String mobile) async {
@@ -176,6 +215,18 @@ class Utils {
           ),
       ],
     );
+  }
+
+  Future<void> sendWhatsAppMessage(String phoneNumber, String message) async {
+    final url = Uri.parse(
+      "https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}",
+    );
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      Toaster().error('Could not launch WhatsApp');
+    }
   }
 
   Future<void> setUserBasics(UserBasics userbasics) async {

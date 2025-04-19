@@ -257,6 +257,28 @@ class FB {
     }
   }
 
+  Future<void> deleteFromList({
+    required String listpath,
+    required int index,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(listpath);
+      DataSnapshot snap = await dbref.get();
+      if (snap.value == null) {
+        // list is empty
+        return;
+      } else {
+        List<dynamic> list = List<dynamic>.from(snap.value as List);
+        list.removeAt(index);
+        await dbref.set(list);
+        return;
+      }
+    } catch (e) {
+      Toaster().error("Error deleting data from list: $e");
+      return;
+    }
+  }
+
   Future<void> deleteValue({required String path}) async {
     try {
       DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
@@ -275,6 +297,35 @@ class FB {
       await dbref.update(json);
     } catch (e) {
       Toaster().error("Error updating data: $e");
+    }
+  }
+
+  Future<int> editList({
+    required String listpath,
+    required dynamic data,
+    required int index,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(listpath);
+      DataSnapshot snap = await dbref.get();
+      if (snap.value == null) {
+        // empty list
+        await dbref.set([data]);
+        return 0;
+      } else {
+        List<dynamic> list = List<dynamic>.from(snap.value as List);
+
+        if (index < 0 || index >= list.length) {
+          Toaster().error("index out of bounds");
+          return -1;
+        }
+        list[index] = data;
+        await dbref.set(list);
+        return list.length - 1;
+      }
+    } catch (e) {
+      Toaster().error("Error adding data to list: $e");
+      return -1;
     }
   }
 }

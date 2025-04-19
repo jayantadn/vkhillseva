@@ -16,13 +16,17 @@ class Profile extends StatefulWidget {
   final String? icon;
   final bool? self;
   final Function(UserDetails user)? onProfileSaved;
+  final String? friendMobile;
+  final UserDetails? oldUserDetails;
 
   const Profile(
       {super.key,
       required this.title,
       this.icon,
       this.self,
-      this.onProfileSaved});
+      this.onProfileSaved,
+      this.friendMobile,
+      this.oldUserDetails});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -134,6 +138,8 @@ class _ProfileState extends State<Profile> {
           _userDetailsOld = UserDetails.fromJson(userdetailsJson);
         }
       }
+    } else if (widget.oldUserDetails != null) {
+      _userDetailsOld = widget.oldUserDetails;
     }
 
     await _lock.synchronized(() async {
@@ -264,15 +270,15 @@ class _ProfileState extends State<Profile> {
     UserDetails? details;
     if (userdetails == null) {
       details = UserDetails(
-        salutation: _salutation,
-        name: _nameController.text,
-        mobile: _mobileController.text,
-        profilePicUrl: _profilePicUrl,
-        exps: _exp,
-        credentials: _credController.text,
-        youtubeUrls: _youtubeLinks.where((link) => link.isNotEmpty).toList(),
-        audioClipUrls: _audioClips.where((link) => link.isNotEmpty).toList(),
-      );
+          salutation: _salutation,
+          name: _nameController.text,
+          mobile: _mobileController.text,
+          profilePicUrl: _profilePicUrl,
+          exps: _exp,
+          credentials: _credController.text,
+          youtubeUrls: _youtubeLinks.where((link) => link.isNotEmpty).toList(),
+          audioClipUrls: _audioClips.where((link) => link.isNotEmpty).toList(),
+          friendMobile: widget.friendMobile);
     } else {
       details = userdetails;
     }
@@ -635,7 +641,7 @@ class _ProfileState extends State<Profile> {
 
                       // button for sangeet exp
                       SizedBox(height: 20),
-                      ElevatedButton(
+                      TextButton(
                           onPressed: () async {
                             await _showDialogSangeetExp(context);
                           },

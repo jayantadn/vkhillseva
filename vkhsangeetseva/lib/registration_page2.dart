@@ -11,13 +11,15 @@ class RegistrationPage2 extends StatefulWidget {
   final String? icon;
   final DateTime selectedDate;
   final Slot slot;
+  final EventRecord? oldEvent;
 
   const RegistrationPage2(
       {super.key,
       required this.title,
       this.icon,
       required this.selectedDate,
-      required this.slot});
+      required this.slot,
+      this.oldEvent});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -37,8 +39,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   // controllers, listeners and focus nodes
   final TextEditingController _guestNameController = TextEditingController();
-  final TextEditingController _songController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _raagaController = TextEditingController();
+  final TextEditingController _taalaController = TextEditingController();
 
   @override
   initState() {
@@ -56,8 +60,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     // clear all controllers and focus nodes
     _guestNameController.dispose();
-    _songController.dispose();
     _noteController.dispose();
+    _titleController.dispose();
+    _raagaController.dispose();
+    _taalaController.dispose();
 
     super.dispose();
   }
@@ -80,6 +86,23 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           .getJson(path: "${Const().dbrootSangeetSeva}/Users/$mobile");
     } else {
       Toaster().error("User not found");
+    }
+
+    if (widget.oldEvent != null) {
+      // populate the data structure
+      EventRecord performanceRequest = widget.oldEvent!;
+
+      // populate the lists
+      _mainPerformer = UserDetails.fromJson(userdetailsJson);
+      for (String mobile in performanceRequest.supportTeamMobiles) {
+        UserDetails? details = await Utils().getUserDetails(mobile);
+        if (details != null) {
+          _supportingTeam.add(details);
+        }
+      }
+      _guests.addAll(performanceRequest.guests);
+      _songs.addAll(performanceRequest.songs);
+      _noteController.text = performanceRequest.notePerformer;
     }
 
     // refresh all child widgets
@@ -107,10 +130,187 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     });
   }
 
+  Widget _createSongTile(int index) {
+    var song = _songs[index];
+    var songDetails = song.split(":");
+    String title = songDetails[0];
+    String raaga = songDetails[1];
+    String taala = songDetails[2];
+    return ListTile(
+        leading: Text(
+          "${index + 1}",
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        title: Text(title),
+        subtitle: (raaga.isNotEmpty && taala.isNotEmpty)
+            ? Row(
+                children: [
+                  Text("raaga: $raaga"),
+                  SizedBox(width: 10),
+                  Text("taala: $taala"),
+                ],
+              )
+            : null,
+        trailing:
+            Utils().createContextMenu(["Edit", "Delete"], (String action) {
+          switch (action) {
+            case "Edit":
+              _showAddSongDialog(context: context, index: index);
+              break;
+            case "Delete":
+              setState(() {
+                _songs.removeAt(index);
+              });
+              break;
+          }
+        }));
+  }
+
+  Widget _createSupportingTeamTile(int index) {
+    var member = _supportingTeam[index];
+    return Card(
+      child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Profile(
+                title: "Supporting team",
+                self: false,
+                onProfileSaved: (user) {
+                  setState(() {
+                    _supportingTeam[index] = user;
+                  });
+                },
+                friendMobile: _mainPerformer!.mobile,
+                oldUserDetails: _supportingTeam[index],
+              ),
+            ),
+          );
+        },
+        leading: CircleAvatar(
+          backgroundImage: NetworkImage(member.profilePicUrl),
+        ),
+        title: Text("${member.salutation} ${member.name}"),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.phone),
+                SizedBox(width: 5),
+                Text(member.mobile),
+              ],
+            ),
+            Row(
+              children: [
+                Icon(Icons.workspace_premium),
+                SizedBox(width: 5),
+                Text(member.credentials),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _deleteEvent() async {
+    // validate if event is in the past
+    if (widget.oldEvent!.date.isBefore(DateTime.now())) {
+      Toaster().error("Can't delete past event");
+      return;
+    }
+
+    // delete from events
+    UserBasics? basics = Utils().getUserBasics();
+    String mobile = "";
+    int index = 0;
+    if (basics == null) {
+      Toaster().error("Cant access user data");
+      return;
+    } else {
+      mobile = basics.mobile;
+      List<dynamic> list = await FB()
+          .getList(path: "${Const().dbrootSangeetSeva}/Events/$mobile");
+      index = list.indexWhere((element) {
+        EventRecord event =
+            Utils().convertRawToDatatype(element, EventRecord.fromJson);
+        return event.date == widget.oldEvent!.date &&
+            event.slot.from == widget.oldEvent!.slot.from &&
+            event.slot.to == widget.oldEvent!.slot.to;
+      });
+      if (index == -1) {
+        Toaster().error("Event not found");
+        return;
+      } else {
+        await FB().deleteFromList(
+            listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
+            index: index);
+      }
+    }
+
+    // delete from pending requests
+    List pendingEvents = await FB()
+        .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
+    int indexP = pendingEvents.indexWhere((element) =>
+        element['path'] == "${Const().dbrootSangeetSeva}/Events/$mobile" &&
+        element['index'] == index);
+    await FB().deleteFromList(
+        listpath: "${Const().dbrootSangeetSeva}/PendingRequests",
+        index: indexP);
+
+    // mark available slot
+    String dbdate = DateFormat("yyyy-MM-dd").format(widget.selectedDate);
+    Map<String, dynamic> slots = await FB().getJson(
+        path: "${Const().dbrootSangeetSeva}/Slots/$dbdate", silent: true);
+    String slotKey = "";
+    for (var slot in slots.entries) {
+      Slot s = Utils().convertRawToDatatype(slot.value, Slot.fromJson);
+      if (widget.slot.from == s.from && widget.slot.to == s.to) {
+        slotKey = slot.key;
+        break;
+      }
+    }
+    if (slotKey.isNotEmpty) {
+      Slot slotToUpdate =
+          Utils().convertRawToDatatype(slots[slotKey], Slot.fromJson);
+      slotToUpdate.avl = true;
+      await FB().setJson(
+          path: "${Const().dbrootSangeetSeva}/Slots/$dbdate/$slotKey",
+          json: slotToUpdate.toJson());
+    }
+
+    // show success message
+    Toaster().info("Event deleted successfully");
+
+    // notify admin
+    String msg = Utils().getUsername();
+    String date = DateFormat("dd MMM yyyy").format(widget.oldEvent!.date);
+    msg += ", $date ${widget.slot.from} - ${widget.slot.to}";
+    Notifications().sendPushNotificationToTopic(
+        topic: "SSAdmin", title: "Event request deleted", body: msg);
+
+    // go to homepage
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return HomePage(title: "Hare Krishna");
+    }));
+  }
+
   Future<void> _onSubmit() async {
-    // add half filled song
-    if (_songController.text.isNotEmpty) {
-      _songs.add(_songController.text);
+    // validations for edit event
+    if (widget.oldEvent != null) {
+      // validate if event is already approved
+      if (widget.oldEvent!.status == "Approved") {
+        Toaster().error("Can't update approved event");
+        return;
+      }
+
+      // validate if event is in the past
+      if (widget.oldEvent!.date.isBefore(DateTime.now())) {
+        Toaster().error("Can't update past event");
+        return;
+      }
     }
 
     // validate list of songs
@@ -121,16 +321,16 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     // populate the data structure
     EventRecord performanceRequest = EventRecord(
-      date: widget.selectedDate,
-      slot: widget.slot,
-      mainPerformerMobile: _mainPerformer!.mobile,
-      supportTeamMobiles: List.generate(_supportingTeam.length, (index) {
-        return _supportingTeam[index].mobile;
-      }),
-      guests: _guests,
-      songs: _songs,
-      notePerformer: _noteController.text,
-    );
+        date: widget.selectedDate,
+        slot: widget.slot,
+        mainPerformerMobile: _mainPerformer!.mobile,
+        supportTeamMobiles: List.generate(_supportingTeam.length, (index) {
+          return _supportingTeam[index].mobile;
+        }),
+        guests: _guests,
+        songs: _songs,
+        notePerformer: _noteController.text,
+        status: "Pending");
 
     // save to firebase
     UserBasics? basics = Utils().getUserBasics();
@@ -141,18 +341,43 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       return;
     } else {
       mobile = basics.mobile;
-      index = await FB().addToList(
-          listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
-          data: performanceRequest.toJson());
+      if (widget.oldEvent == null) {
+        // fresh entry
+        index = await FB().addToList(
+            listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
+            data: performanceRequest.toJson());
+      } else {
+        // edit entry
+        List<dynamic> list = await FB()
+            .getList(path: "${Const().dbrootSangeetSeva}/Events/$mobile");
+        index = list.indexWhere((element) {
+          EventRecord event =
+              Utils().convertRawToDatatype(element, EventRecord.fromJson);
+          return event.date == widget.oldEvent!.date &&
+              event.slot.from == widget.oldEvent!.slot.from &&
+              event.slot.to == widget.oldEvent!.slot.to;
+        });
+        if (index == -1) {
+          Toaster().error("Event not found");
+          return;
+        } else {
+          await FB().editList(
+              listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
+              index: index,
+              data: performanceRequest.toJson());
+        }
+      }
     }
 
     // add to pending requests
-    FB().addToList(
-        listpath: "${Const().dbrootSangeetSeva}/PendingRequests",
-        data: {
-          "path": "${Const().dbrootSangeetSeva}/Events/$mobile",
-          "index": index
-        });
+    if (widget.oldEvent == null || widget.oldEvent!.status != "Pending") {
+      FB().addToList(
+          listpath: "${Const().dbrootSangeetSeva}/PendingRequests",
+          data: {
+            "path": "${Const().dbrootSangeetSeva}/Events/$mobile",
+            "index": index
+          });
+    }
 
     // show success message
     UtilWidgets().showMessage(context,
@@ -224,6 +449,110 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     );
   }
 
+  Future<void> _showAddSongDialog({required BuildContext context, int? index}) {
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    _titleController.clear();
+
+    if (index != null) {
+      var songDetails = _songs[index].split(":");
+      _titleController.text = songDetails[0];
+      _raagaController.text = songDetails[1];
+      _taalaController.text = songDetails[2];
+    }
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Add song for event"),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  // title
+                  TextFormField(
+                    controller: _titleController,
+                    onChanged: (value) {},
+                    decoration: InputDecoration(labelText: "Song title"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter song title";
+                      }
+                      if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                        return "Special characters are not allowed";
+                      }
+                      return null;
+                    },
+                  ),
+
+                  // Raaga
+                  SizedBox(height: 10),
+                  TextFormField(
+                    controller: _raagaController,
+                    onChanged: (value) {},
+                    decoration: InputDecoration(labelText: "Raaga"),
+                    validator: (value) {
+                      if (value != null &&
+                          RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                        return "Special characters are not allowed";
+                      }
+                      return null;
+                    },
+                  ),
+
+                  // Taala
+                  SizedBox(height: 10),
+                  TextFormField(
+                    controller: _taalaController,
+                    onChanged: (value) {},
+                    decoration: InputDecoration(labelText: "Taala"),
+                    validator: (value) {
+                      if (value != null &&
+                          RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                        return "Special characters are not allowed";
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (!formKey.currentState!.validate()) {
+                  return;
+                }
+
+                setState(() {
+                  if (index == null) {
+                    _songs.add(
+                        "${_titleController.text}:${_raagaController.text}:${_taalaController.text}");
+                  } else {
+                    // edit mode
+                    _songs[index] =
+                        "${_titleController.text}:${_raagaController.text}:${_taalaController.text}";
+                  }
+                });
+
+                Navigator.pop(context);
+              },
+              child: Text(index == null ? "Add" : "Update"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -231,7 +560,20 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       child: Stack(
         children: [
           Scaffold(
-            appBar: AppBar(title: Text(widget.title)),
+            appBar: AppBar(title: Text(widget.title), actions: [
+              if (widget.oldEvent != null)
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    UtilWidgets().showConfirmDialog(
+                        context,
+                        "Are you sure you want to delete this event?",
+                        "Delete", () async {
+                      await _deleteEvent();
+                    });
+                  },
+                )
+            ]),
             body: RefreshIndicator(
               onRefresh: refresh,
               child: SingleChildScrollView(
@@ -257,16 +599,56 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           Text("${widget.slot.from} - ${widget.slot.to}",
                               style: themeDefault.textTheme.headlineMedium),
 
+                          // temple notes
+                          if (widget.oldEvent != null &&
+                              widget.oldEvent!.noteTemple.isNotEmpty)
+                            Card(
+                                color: widget.oldEvent!.status == "Approved"
+                                    ? Colors.green[50]
+                                    : Colors.red[50],
+                                child: ListTile(
+                                  title: Text("Temple notes"),
+                                  subtitle: Text(widget.oldEvent!.noteTemple),
+                                )),
+
                           // main performer
                           if (_mainPerformer != null)
                             Card(
                               child: ListTile(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Profile(
+                                        title: "Main performer",
+                                        self: true,
+                                        onProfileSaved: (user) {
+                                          setState(() {
+                                            _mainPerformer = user;
+                                          });
+                                        },
+                                        friendMobile: _mainPerformer!.mobile,
+                                      ),
+                                    ),
+                                  );
+                                },
                                 leading: CircleAvatar(
                                   backgroundImage: NetworkImage(
                                       _mainPerformer!.profilePicUrl),
                                 ),
                                 title: Text(
                                     "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
+                                subtitle: Row(
+                                  children: [
+                                    Icon(Icons.phone),
+                                    SizedBox(width: 5),
+                                    Text(_mainPerformer!.mobile),
+                                    SizedBox(width: 10),
+                                    Icon(Icons.workspace_premium),
+                                    SizedBox(width: 5),
+                                    Text(_mainPerformer!.credentials),
+                                  ],
+                                ),
                               ),
                             ),
 
@@ -274,17 +656,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           Utils().responsiveBuilder(
                               context,
                               List.generate(_supportingTeam.length, (index) {
-                                var member = _supportingTeam[index];
-                                return Card(
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(member.profilePicUrl),
-                                    ),
-                                    title: Text(
-                                        "${member.salutation} ${member.name}"),
-                                  ),
-                                );
+                                return _createSupportingTeamTile(index);
                               })),
 
                           // add supporting team
@@ -302,6 +674,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                           _supportingTeam.add(user);
                                         });
                                       },
+                                      friendMobile: _mainPerformer!.mobile,
                                     ),
                                   ),
                                 );
@@ -343,44 +716,22 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                           // list of songs
                           SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("List of songs",
-                                style: themeDefault.textTheme.headlineSmall),
-                          ),
+                          if (_songs.isNotEmpty)
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text("List of songs",
+                                  style: themeDefault.textTheme.headlineSmall),
+                            ),
                           ...List.generate(_songs.length, (index) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "${index + 1}. ${_songs[index]}",
-                                ),
-                              ),
-                            );
+                            return _createSongTile(index);
                           }),
                           SizedBox(height: 10),
                           if (_songs.length < 10)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: _songController,
-                                    decoration: InputDecoration(
-                                        hintText: "Enter song name"),
-                                  ),
-                                ),
-                                IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _songs.add(_songController.text);
-                                      });
-                                      _songController.clear();
-                                    },
-                                    icon: Icon(Icons.add))
-                              ],
-                            ),
+                            TextButton(
+                                onPressed: () async {
+                                  await _showAddSongDialog(context: context);
+                                },
+                                child: Text("Add song for event")),
 
                           // performer note
                           SizedBox(height: 10),
@@ -408,7 +759,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: _onSubmit,
-                            child: Text("Submit"),
+                            child: widget.oldEvent == null
+                                ? Text("Submit")
+                                : Text("Update"),
                           )
                         ]),
                       ),

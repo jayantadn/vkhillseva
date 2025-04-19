@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration.dart';
+import 'package:vkhsangeetseva/registration_page2.dart';
 import 'package:vkhsangeetseva/widgets/common_widgets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -119,6 +120,54 @@ class _HomePageState extends State<HomePage> {
       _username = Utils().getUsername();
       _isLoading = false;
     });
+  }
+
+  Widget _createEventCard(int index) {
+    String date = DateFormat("dd MMM yyyy").format(_events[index].date);
+    return Card(
+        color: _events[index].date.isBefore(DateTime.now())
+            ? Colors.grey[200]
+            : (_events[index].status == "Pending"
+                ? Colors.yellow[50]
+                : (_events[index].status == "Approved"
+                    ? Colors.green[50]
+                    : Colors.red[50])),
+        child: ListTile(
+          onTap: () {
+            if (_events[index].date.isAfter(DateTime.now())) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegistrationPage2(
+                    selectedDate: _events[index].date,
+                    title: "Edit event",
+                    slot: _events[index].slot,
+                    oldEvent: _events[index],
+                  ),
+                ),
+              );
+            }
+          },
+          title: Text(
+              "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
+          leading: _events[index].status == "Pending"
+              ? Icon(Icons.question_mark)
+              : (_events[index].status == "Approved"
+                  ? Icon(Icons.check)
+                  : Icon(Icons.close)),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(_events[index].status == "Pending"
+                  ? "Waiting for approval"
+                  : (_events[index].status == "Approved"
+                      ? "Request is approved"
+                      : "Request is rejected")),
+              if (_events[index].noteTemple.isNotEmpty)
+                Text("Temple remarks: ${_events[index].noteTemple}"),
+            ],
+          ),
+        ));
   }
 
   Widget _createWelcome() {
@@ -253,6 +302,22 @@ class _HomePageState extends State<HomePage> {
                               }));
                     },
                   ),
+
+                // support
+                IconButton(
+                  icon: Icon(Icons.help),
+                  onPressed: () {
+                    Navigator.push(
+                      // ignore: use_build_context_synchronously
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Support(
+                          title: "Support",
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
             body: RefreshIndicator(
@@ -267,7 +332,6 @@ class _HomePageState extends State<HomePage> {
                         // leave some space at top
                         SizedBox(height: 10),
 
-                        // your widgets here
                         // welcome banner
                         _createWelcome(),
 
@@ -308,7 +372,7 @@ class _HomePageState extends State<HomePage> {
                             child: Text('Register for an Event'),
                           ),
 
-                        // view registered events
+                        // registered events
                         SizedBox(
                           height: 10,
                         ),
@@ -318,40 +382,7 @@ class _HomePageState extends State<HomePage> {
                               _events.length > _maxEvents
                                   ? _maxEvents
                                   : _events.length, (index) {
-                            String date = DateFormat("dd MMM yyyy")
-                                .format(_events[index].date);
-                            return Card(
-                              color:
-                                  _events[index].date.isBefore(DateTime.now())
-                                      ? Colors.grey[200]
-                                      : (_events[index].status == "Pending"
-                                          ? Colors.yellow[50]
-                                          : (_events[index].status == "Approved"
-                                              ? Colors.green[50]
-                                              : Colors.red[50])),
-                              child: ListTile(
-                                  title: Text(
-                                      "$date, ${_events[index].slot.from} - ${_events[index].slot.to}"),
-                                  leading: _events[index].status == "Pending"
-                                      ? Icon(Icons.question_mark)
-                                      : (_events[index].status == "Approved"
-                                          ? Icon(Icons.check)
-                                          : Icon(Icons.close)),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(_events[index].status == "Pending"
-                                          ? "Waiting for approval"
-                                          : (_events[index].status == "Approved"
-                                              ? "Request is approved"
-                                              : "Request is rejected")),
-                                      if (_events[index].noteTemple.isNotEmpty)
-                                        Text(
-                                            "Temple remarks: ${_events[index].noteTemple}"),
-                                    ],
-                                  )),
-                            );
+                            return _createEventCard(index);
                           }),
 
                         // leave some space at bottom

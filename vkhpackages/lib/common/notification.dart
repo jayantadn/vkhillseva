@@ -137,11 +137,42 @@ class Notifications {
       Toaster().error("Error sending notification: $e");
     }
   }
+
+  Future<void> sendPushNotificationToTopic({
+    required String topic,
+    required String title,
+    required String body,
+    String? imageUrl,
+  }) async {
+    const String functionUrl =
+        "https://us-central1-garuda-1ba07.cloudfunctions.net/sendNotificationToTopic";
+
+    try {
+      final Map<String, dynamic> payload = {
+        "topic": topic,
+        "title": title,
+        "body": body,
+      };
+
+      final response = await http.post(
+        Uri.parse(functionUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode == 200) {
+      } else {
+        Toaster().error("Failed to send notification: ${response.body}");
+      }
+    } catch (e) {
+      Toaster().error("Error sending notification: $e");
+    }
+  }
 }
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.notification != null) {
-    // do something
+    // nothing required as of now, as the notification is already displayed
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 // import 'package:garuda/sangeet_seva/sangeet_seva.dart';
-// import 'package:garuda/nitya_seva/nitya_seva.dart';
+import 'package:garuda/nitya_seva/nitya_seva.dart';
 import 'package:garuda/widgets/launcher_tile.dart';
 import 'package:garuda/widgets/welcome.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -103,14 +103,15 @@ class _HomePageState extends State<HomePage> {
                                         "Nitya Seva",
                                       );
                                       if (perm) {
-                                        // TODO
-                                        // Navigator.push(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //       builder: (context) =>
-                                        //           const NityaSeva(
-                                        //               title: "Nitya Seva")),
-                                        // );
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => const NityaSeva(
+                                                  title: "Nitya Seva",
+                                                ),
+                                          ),
+                                        );
                                       } else {
                                         Toaster().error("Access Denied");
                                       }

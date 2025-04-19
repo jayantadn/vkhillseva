@@ -5,15 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "garuda",
-      "program": "garuda/lib/main.dart",
+      "name": "vkhgaruda",
+      "program": "vkhgaruda/lib/main.dart",
       "request": "launch",
       "type": "dart",
       "args": ["--web-port=8080"]
     },
     {
-      "name": "garuda (release)",
-      "program": "garuda/lib/main.dart",
+      "name": "vkhgaruda (release)",
+      "program": "vkhgaruda/lib/main.dart",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",

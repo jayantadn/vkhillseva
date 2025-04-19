@@ -623,52 +623,70 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           // main performer
                           if (_mainPerformer != null)
                             Card(
-                              child: ListTile(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => Profile(
-                                        title: "Main performer",
-                                        self: true,
-                                        onProfileSaved: (user) {
-                                          setState(() {
-                                            _mainPerformer = user;
-                                          });
-                                        },
-                                        friendMobile: _mainPerformer!.mobile,
+                              child: Column(
+                                children: [
+                                  Text("Main performer",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall),
+                                  ListTile(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Profile(
+                                            title: "Main performer",
+                                            self: true,
+                                            onProfileSaved: (user) {
+                                              setState(() {
+                                                _mainPerformer = user;
+                                              });
+                                            },
+                                            friendMobile:
+                                                _mainPerformer!.mobile,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    leading: CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                          _mainPerformer!.profilePicUrl),
+                                    ),
+                                    title: Text(
+                                        "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
+                                    subtitle: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.phone),
+                                          Text(_mainPerformer!.mobile),
+                                          SizedBox(width: 4),
+                                          Icon(Icons.workspace_premium),
+                                          Text(_mainPerformer!.credentials),
+                                        ],
                                       ),
                                     ),
-                                  );
-                                },
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      _mainPerformer!.profilePicUrl),
-                                ),
-                                title: Text(
-                                    "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
-                                subtitle: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.phone),
-                                      Text(_mainPerformer!.mobile),
-                                      SizedBox(width: 4),
-                                      Icon(Icons.workspace_premium),
-                                      Text(_mainPerformer!.credentials),
-                                    ],
                                   ),
-                                ),
+                                ],
                               ),
                             ),
 
                           // supporting team
                           Card(
-                            child: Utils().responsiveBuilder(
-                                context,
-                                List.generate(_supportingTeam.length, (index) {
-                                  return _createSupportingTeamTile(index);
-                                })),
+                            child: Column(
+                              children: [
+                                Text("Supporting team",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall),
+                                Utils().responsiveBuilder(
+                                    context,
+                                    List.generate(_supportingTeam.length,
+                                        (index) {
+                                      return _createSupportingTeamTile(index);
+                                    })),
+                              ],
+                            ),
                           ),
 
                           // add supporting team

@@ -191,24 +191,27 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           backgroundImage: NetworkImage(member.profilePicUrl),
         ),
         title: Text("${member.salutation} ${member.name}"),
-        subtitle: Row(
-          children: [
-            Row(
-              children: [
-                Icon(Icons.phone),
-                SizedBox(width: 5),
-                Text(member.mobile),
-              ],
-            ),
-            SizedBox(width: 4),
-            Row(
-              children: [
-                Icon(Icons.workspace_premium),
-                SizedBox(width: 5),
-                Text(member.credentials),
-              ],
-            ),
-          ],
+        subtitle: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.phone),
+                  SizedBox(width: 5),
+                  Text(member.mobile),
+                ],
+              ),
+              SizedBox(width: 4),
+              Row(
+                children: [
+                  Icon(Icons.workspace_premium),
+                  SizedBox(width: 5),
+                  Text(member.credentials),
+                ],
+              ),
+            ],
+          ),
         ),
         trailing: Utils().createContextMenu(["Remove"], (String action) {
           switch (action) {
@@ -644,14 +647,17 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                 ),
                                 title: Text(
                                     "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
-                                subtitle: Row(
-                                  children: [
-                                    Icon(Icons.phone),
-                                    Text(_mainPerformer!.mobile),
-                                    SizedBox(width: 4),
-                                    Icon(Icons.workspace_premium),
-                                    Text(_mainPerformer!.credentials),
-                                  ],
+                                subtitle: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.phone),
+                                      Text(_mainPerformer!.mobile),
+                                      SizedBox(width: 4),
+                                      Icon(Icons.workspace_premium),
+                                      Text(_mainPerformer!.credentials),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

@@ -196,7 +196,7 @@ class Utils {
   }
 
   Widget responsiveBuilder(BuildContext context, List<Widget> children) {
-    double maxWidth = 300;
+    double maxWidth = 350;
 
     final double screenWidth = MediaQuery.of(context).size.width;
     maxWidth =
@@ -206,7 +206,7 @@ class Utils {
 
     return Wrap(
       spacing: 10,
-      runSpacing: 20,
+      runSpacing: 10,
       children: [
         for (var child in children)
           ConstrainedBox(

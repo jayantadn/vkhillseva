@@ -206,6 +206,10 @@ class _ProfileState extends State<Profile> {
                 Text('Mobile: ${_mobileController.text}'),
                 Text('Name: ${userDetails.salutation} ${userDetails.name}'),
                 Text('Credentials: ${userDetails.credentials}'),
+                SizedBox(height: 4),
+                if (!isFriend)
+                  Text('You do not have permission to edit this profile.',
+                      style: TextStyle(color: Colors.red)),
               ],
             ),
           ),
@@ -213,7 +217,6 @@ class _ProfileState extends State<Profile> {
             TextButton(
               child: Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
             ),
@@ -225,13 +228,14 @@ class _ProfileState extends State<Profile> {
                 widget.onProfileSaved!(userDetails);
               },
             ),
-            TextButton(
-              child: Text('Overwrite'),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await _save();
-              },
-            ),
+            if (isFriend)
+              TextButton(
+                child: Text('Overwrite'),
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await _save();
+                },
+              ),
           ],
         );
       },

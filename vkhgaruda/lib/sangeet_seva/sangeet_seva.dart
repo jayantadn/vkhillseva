@@ -283,7 +283,24 @@ class _SangeetSevaState extends State<SangeetSeva> {
     // get the list of pending requests
     List<dynamic> pendingRequestsRaw = await FB()
         .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
-    pendingRequests = pendingRequestsRaw.length;
+    for (var pendingRequestLinkRaw in pendingRequestsRaw) {
+      Map<String, dynamic> pendingRequestLink =
+          Map<String, dynamic>.from(pendingRequestLinkRaw);
+      String path = pendingRequestLink['path'];
+      int index = pendingRequestLink['index'];
+
+      List pendingRequestsPerUserRaw = await FB().getList(path: path);
+      var pendingRequestPerUserRaw = pendingRequestsPerUserRaw[index];
+      EventRecord pendingRequest = Utils()
+          .convertRawToDatatype(pendingRequestPerUserRaw, EventRecord.fromJson);
+
+      // discard if pending request is in the past
+      if (pendingRequest.date.isBefore(DateTime.now())) {
+        continue;
+      }
+
+      pendingRequests++;
+    }
 
     return pendingRequests;
   }

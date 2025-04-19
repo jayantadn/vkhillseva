@@ -69,6 +69,47 @@ class _ProfilesState extends State<Profiles> {
     });
   }
 
+  Widget _createPerformerCard(int index) {
+    var member = _performers[index];
+    return ListTile(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProfileDetails(
+                      title: "Profile details",
+                      userdetails: _performers[index],
+                    )));
+      },
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(member.profilePicUrl),
+      ),
+      title: Text("${member.salutation} ${member.name}"),
+      subtitle: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            Row(
+              children: [
+                Icon(Icons.phone),
+                SizedBox(width: 5),
+                Text(member.mobile),
+              ],
+            ),
+            SizedBox(width: 4),
+            Row(
+              children: [
+                Icon(Icons.workspace_premium),
+                SizedBox(width: 5),
+                Text(member.credentials),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -89,35 +130,13 @@ class _ProfilesState extends State<Profiles> {
                           // leave some space at top
                           SizedBox(height: 10),
 
-                          // your widgets here
+                          // performers list
                           ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemCount: _performers.length,
                             itemBuilder: (context, index) {
-                              UserDetails userdetails = _performers[index];
-                              return Card(
-                                child: ListTile(
-                                  title: Text(
-                                    "${userdetails.salutation} ${userdetails.name} (${userdetails.credentials})",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  leading: CircleAvatar(
-                                    backgroundImage:
-                                        NetworkImage(userdetails.profilePicUrl),
-                                  ),
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ProfileDetails(
-                                                  title: "Profile details",
-                                                  userdetails: userdetails,
-                                                )));
-                                  },
-                                ),
-                              );
+                              return Card(child: _createPerformerCard(index));
                             },
                           ),
 

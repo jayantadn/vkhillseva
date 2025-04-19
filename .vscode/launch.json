@@ -11,6 +11,14 @@
       "type": "dart",
       "args": ["--web-port=8080"]
     },
+    {
+      "name": "garuda (release)",
+      "program": "garuda/lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "args": ["--web-port=8080"]
+    },
 
     {
       "name": "vkhsangeetseva",

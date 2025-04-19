@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:garuda/home/home.dart';
-// import 'package:vkhgaruda/widgets/welcome.dart';
+import 'package:garuda/widgets/welcome.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Landing extends StatefulWidget {
@@ -90,7 +90,7 @@ class _LandingState extends State<Landing> {
 
                         // your widgets here
                         // welcome header
-                        // Welcome(),
+                        Welcome(),
 
                         // sms authetication
                         SizedBox(height: 8),

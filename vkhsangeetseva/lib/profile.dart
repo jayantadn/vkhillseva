@@ -176,6 +176,50 @@ class _ProfileState extends State<Profile> {
     });
   }
 
+  Future<void> _handleExistingUser(BuildContext context) async {
+    // fetch existing user details
+    String dbpath =
+        "${Const().dbrootSangeetSeva}/Users/${_mobileController.text}";
+    Map<String, dynamic> userdetailsJson = await FB().getJson(path: dbpath);
+    UserDetails? userDetails = UserDetails.fromJson(userdetailsJson);
+
+    // show dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('User already exists'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Mobile: ${_mobileController.text}'),
+                Text('Name: ${userDetails.salutation} ${userDetails.name}'),
+                Text('Credentials: ${userDetails.credentials}'),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Use existing'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                widget.onProfileSaved!(userDetails);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _pickAndUploadImage() async {
     final ImagePicker picker = ImagePicker();
     XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -222,7 +266,7 @@ class _ProfileState extends State<Profile> {
     });
   }
 
-  Future<void> _save({UserDetails? userdetails}) async {
+  Future<void> _save() async {
     // validation of form
     if (!_formKey.currentState!.validate()) {
       Toaster().error('There are errors in the form');
@@ -250,7 +294,7 @@ class _ProfileState extends State<Profile> {
       return;
     }
 
-    // no abrupt returns before this point
+    // no abrupt returns after this point
     setState(() {
       _isLoading = true;
     });
@@ -268,20 +312,16 @@ class _ProfileState extends State<Profile> {
 
     // create user details object
     UserDetails? details;
-    if (userdetails == null) {
-      details = UserDetails(
-          salutation: _salutation,
-          name: _nameController.text,
-          mobile: _mobileController.text,
-          profilePicUrl: _profilePicUrl,
-          exps: _exp,
-          credentials: _credController.text,
-          youtubeUrls: _youtubeLinks.where((link) => link.isNotEmpty).toList(),
-          audioClipUrls: _audioClips.where((link) => link.isNotEmpty).toList(),
-          friendMobile: widget.friendMobile);
-    } else {
-      details = userdetails;
-    }
+    details = UserDetails(
+        salutation: _salutation,
+        name: _nameController.text,
+        mobile: _mobileController.text,
+        profilePicUrl: _profilePicUrl,
+        exps: _exp,
+        credentials: _credController.text,
+        youtubeUrls: _youtubeLinks.where((link) => link.isNotEmpty).toList(),
+        audioClipUrls: _audioClips.where((link) => link.isNotEmpty).toList(),
+        friendMobile: widget.friendMobile);
 
     // set the FCM token
     String? fcmToken = await Notifications().setupFirebaseMessaging();
@@ -497,7 +537,15 @@ class _ProfileState extends State<Profile> {
                 IconButton(
                   icon: Icon(Icons.save),
                   onPressed: () async {
-                    await _save();
+                    // validation if user already exists
+                    String dbpath =
+                        "${Const().dbrootSangeetSeva}/Users/${_mobileController.text}";
+                    bool exists = await FB().pathExists(dbpath);
+                    if (exists) {
+                      await _handleExistingUser(context);
+                    } else {
+                      await _save();
+                    }
                   },
                 )
               ],

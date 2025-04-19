@@ -669,7 +669,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                     builder: (context) => Profile(
                                       title: "Supporting team",
                                       self: false,
-                                      onProfileSaved: (user) {
+                                      onProfileSaved: (UserDetails user) {
                                         setState(() {
                                           _supportingTeam.add(user);
                                         });

@@ -183,6 +183,16 @@ class _ProfileState extends State<Profile> {
     Map<String, dynamic> userdetailsJson = await FB().getJson(path: dbpath);
     UserDetails? userDetails = UserDetails.fromJson(userdetailsJson);
 
+    // check if current user is friend
+    bool isFriend = false;
+    UserBasics? currentUser = Utils().getUserBasics();
+    if (currentUser != null) {
+      if (userDetails.friendMobile != null &&
+          userDetails.friendMobile!.contains(currentUser.mobile)) {
+        isFriend = true;
+      }
+    }
+
     // show dialog
     showDialog(
       context: context,
@@ -204,6 +214,7 @@ class _ProfileState extends State<Profile> {
               child: Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
+                Navigator.of(context).pop();
               },
             ),
             TextButton(
@@ -212,6 +223,13 @@ class _ProfileState extends State<Profile> {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
                 widget.onProfileSaved!(userDetails);
+              },
+            ),
+            TextButton(
+              child: Text('Overwrite'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _save();
               },
             ),
           ],

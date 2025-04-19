@@ -123,8 +123,12 @@ class _SangeetSevaState extends State<SangeetSeva> {
     _pendingRequests = await _getPendingRequestsCount();
 
     // subscribe to notifications
-    await Notifications().setupFirebaseMessaging();
-    FirebaseMessaging.instance.subscribeToTopic("SSAdmin");
+    try {
+      await Notifications().setupFirebaseMessaging();
+      FirebaseMessaging.instance.subscribeToTopic("SSAdmin");
+    } catch (e) {
+      // nothing to do
+    }
 
     // refresh all child widgets
     calendarKey.currentState!.refresh();

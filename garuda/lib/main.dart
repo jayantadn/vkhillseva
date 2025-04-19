@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-// import 'package:vkhgaruda/home/landing.dart';
+import 'package:garuda/home/landing.dart';
 // import 'package:vkhgaruda/nitya_seva/laddu/laddu.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -25,12 +25,12 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // final Widget home = const Landing(title: "Hare Krishna");
+  final Widget home = const Landing(title: "Hare Krishna");
   final Widget test = const Placeholder();
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Garuda', theme: themeDefault, home: test);
+    return MaterialApp(title: 'Garuda', theme: themeDefault, home: home);
   }
 }

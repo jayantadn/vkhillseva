@@ -168,8 +168,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   Widget _createSupportingTeamTile(int index) {
     var member = _supportingTeam[index];
-    return Card(
-      child: ListTile(
+    return ListTile(
         onTap: () {
           Navigator.push(
             context,
@@ -192,8 +191,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           backgroundImage: NetworkImage(member.profilePicUrl),
         ),
         title: Text("${member.salutation} ${member.name}"),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        subtitle: Row(
           children: [
             Row(
               children: [
@@ -202,6 +200,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 Text(member.mobile),
               ],
             ),
+            SizedBox(width: 4),
             Row(
               children: [
                 Icon(Icons.workspace_premium),
@@ -211,8 +210,15 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
             ),
           ],
         ),
-      ),
-    );
+        trailing: Utils().createContextMenu(["Remove"], (String action) {
+          switch (action) {
+            case "Remove":
+              setState(() {
+                _supportingTeam.removeAt(index);
+              });
+              break;
+          }
+        }));
   }
 
   Future<void> _deleteEvent() async {
@@ -380,7 +386,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     }
 
     // show success message
-    UtilWidgets().showMessage(context,
+    Utils().showMessage(context,
         "Your request has been submitted.\nYou will be notified once your request is approved");
 
     // go to homepage
@@ -565,7 +571,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
-                    UtilWidgets().showConfirmDialog(
+                    Utils().showConfirmDialog(
                         context,
                         "Are you sure you want to delete this event?",
                         "Delete", () async {
@@ -641,11 +647,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                 subtitle: Row(
                                   children: [
                                     Icon(Icons.phone),
-                                    SizedBox(width: 5),
                                     Text(_mainPerformer!.mobile),
-                                    SizedBox(width: 10),
+                                    SizedBox(width: 4),
                                     Icon(Icons.workspace_premium),
-                                    SizedBox(width: 5),
                                     Text(_mainPerformer!.credentials),
                                   ],
                                 ),
@@ -653,11 +657,13 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                             ),
 
                           // supporting team
-                          Utils().responsiveBuilder(
-                              context,
-                              List.generate(_supportingTeam.length, (index) {
-                                return _createSupportingTeamTile(index);
-                              })),
+                          Card(
+                            child: Utils().responsiveBuilder(
+                                context,
+                                List.generate(_supportingTeam.length, (index) {
+                                  return _createSupportingTeamTile(index);
+                                })),
+                          ),
 
                           // add supporting team
                           SizedBox(height: 10),

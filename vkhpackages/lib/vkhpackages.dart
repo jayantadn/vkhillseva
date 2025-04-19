@@ -13,5 +13,4 @@ export 'common/notification.dart';
 export 'widgets/auth.dart';
 export 'widgets/calendar.dart';
 export 'widgets/loading_overlay.dart';
-export 'widgets/util_widgets.dart';
 export 'widgets/support.dart';

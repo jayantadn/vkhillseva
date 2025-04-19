@@ -247,75 +247,95 @@ class _RequestDetailsState extends State<RequestDetails> {
 
                           // main performer
                           Card(
-                            child: ListTile(
-                              onTap: () async {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProfileDetails(
-                                        title: "Main performer",
-                                        icon: widget.icon,
-                                        userdetails: _mainPerformer!),
-                                  ),
-                                );
-                              },
-                              leading: _mainPerformer == null
-                                  ? Text("")
-                                  : CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                          _mainPerformer!.profilePicUrl),
-                                    ),
-                              title: _mainPerformer == null
-                                  ? Text("")
-                                  : Text(
-                                      "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
-                              subtitle: _mainPerformer == null
-                                  ? Text("")
-                                  : Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                            "${_mainPerformer!.credentials}, "),
-                                      ],
-                                    ),
+                            child: Column(
+                              children: [
+                                Text("Main performer",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall),
+                                ListTile(
+                                  onTap: () async {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProfileDetails(
+                                            title: "Main performer",
+                                            icon: widget.icon,
+                                            userdetails: _mainPerformer!),
+                                      ),
+                                    );
+                                  },
+                                  leading: _mainPerformer == null
+                                      ? Text("")
+                                      : CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              _mainPerformer!.profilePicUrl),
+                                        ),
+                                  title: _mainPerformer == null
+                                      ? Text("")
+                                      : Text(
+                                          "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
+                                  subtitle: _mainPerformer == null
+                                      ? Text("")
+                                      : Row(
+                                          children: [
+                                            Icon(Icons.phone),
+                                            Text(_mainPerformer!.mobile),
+                                            SizedBox(width: 10),
+                                            Icon(Icons.workspace_premium),
+                                            Text(_mainPerformer!.credentials),
+                                          ],
+                                        ),
+                                ),
+                              ],
                             ),
                           ),
 
                           // supporting team
-                          Utils().responsiveBuilder(
-                              context,
-                              List.generate(_supportTeam.length, (index) {
-                                var member = _supportTeam[index];
-                                return Card(
-                                  child: ListTile(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ProfileDetails(
-                                              title: "Supporting team",
-                                              icon: widget.icon,
-                                              userdetails: member),
+                          Card(
+                            child: Column(
+                              children: [
+                                Text("Supporting team",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall),
+                                Utils().responsiveBuilder(
+                                    context,
+                                    List.generate(_supportTeam.length, (index) {
+                                      var member = _supportTeam[index];
+                                      return ListTile(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ProfileDetails(
+                                                      title: "Supporting team",
+                                                      icon: widget.icon,
+                                                      userdetails: member),
+                                            ),
+                                          );
+                                        },
+                                        leading: CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              member.profilePicUrl),
+                                        ),
+                                        title: Text(
+                                            "${member.salutation} ${member.name}"),
+                                        subtitle: Row(
+                                          children: [
+                                            Icon(Icons.phone),
+                                            Text(member!.mobile),
+                                            SizedBox(width: 10),
+                                            Icon(Icons.workspace_premium),
+                                            Text(member!.credentials),
+                                          ],
                                         ),
                                       );
-                                    },
-                                    leading: CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(member.profilePicUrl),
-                                    ),
-                                    title: Text(
-                                        "${member.salutation} ${member.name}"),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(member.credentials),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              })),
+                                    })),
+                              ],
+                            ),
+                          ),
 
                           // guests
                           SizedBox(height: 10),
@@ -350,13 +370,25 @@ class _RequestDetailsState extends State<RequestDetails> {
                           ),
                           ...List.generate(widget.eventRecord.songs.length,
                               (index) {
+                            String song = widget.eventRecord.songs[index];
+                            String title = song.split(":")[0];
+                            String raaga = song.split(":")[1];
+                            String taala = song.split(":")[2];
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),
                               child: Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "${index + 1}. ${widget.eventRecord.songs[index]}",
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "${index + 1}. title: $title",
+                                    ),
+                                    SizedBox(width: 10),
+                                    if (raaga.isNotEmpty) Text("raaga: $raaga"),
+                                    SizedBox(width: 10),
+                                    if (taala.isNotEmpty) Text("taala: $taala"),
+                                  ],
                                 ),
                               ),
                             );

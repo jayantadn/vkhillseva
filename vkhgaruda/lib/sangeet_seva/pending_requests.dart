@@ -108,7 +108,15 @@ class _PendingRequestsState extends State<PendingRequests> {
         child: ListTile(
       title: Text(title),
       leading: CircleAvatar(backgroundImage: NetworkImage(profilePicUrl)),
-      subtitle: Text(performer),
+      subtitle: Row(
+        children: [
+          Icon(Icons.person),
+          Text(performer),
+          SizedBox(width: 10),
+          Icon(Icons.phone),
+          Text(_mainPerformers[index].mobile),
+        ],
+      ),
     ));
   }
 

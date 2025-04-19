@@ -672,22 +672,23 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                             ),
 
                           // supporting team
-                          Card(
-                            child: Column(
-                              children: [
-                                Text("Supporting team",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall),
-                                Utils().responsiveBuilder(
-                                    context,
-                                    List.generate(_supportingTeam.length,
-                                        (index) {
-                                      return _createSupportingTeamTile(index);
-                                    })),
-                              ],
+                          if (_supportingTeam.isNotEmpty)
+                            Card(
+                              child: Column(
+                                children: [
+                                  Text("Supporting team",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall),
+                                  Utils().responsiveBuilder(
+                                      context,
+                                      List.generate(_supportingTeam.length,
+                                          (index) {
+                                        return _createSupportingTeamTile(index);
+                                      })),
+                                ],
+                              ),
                             ),
-                          ),
 
                           // add supporting team
                           SizedBox(height: 10),

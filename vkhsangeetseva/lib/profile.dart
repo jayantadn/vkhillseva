@@ -187,8 +187,9 @@ class _ProfileState extends State<Profile> {
     bool isFriend = false;
     UserBasics? currentUser = Utils().getUserBasics();
     if (currentUser != null) {
-      if (userDetails.friendMobile != null &&
-          userDetails.friendMobile!.contains(currentUser.mobile)) {
+      if (currentUser.mobile == userDetails.mobile ||
+          (userDetails.friendMobile != null &&
+              userDetails.friendMobile!.contains(currentUser.mobile))) {
         isFriend = true;
       }
     }

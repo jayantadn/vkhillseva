@@ -5,28 +5,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "vkhgaruda",
-      "program": "vkhgaruda/lib/main.dart",
+      "name": "garuda",
+      "program": "garuda/lib/main.dart",
       "request": "launch",
       "type": "dart",
       "args": ["--web-port=8080"]
     },
-    {
-      "name": "vkhgaruda (profile mode)",
-      "program": "vkhgaruda/lib/main.dart",
-      "request": "launch",
-      "type": "dart",
-      "flutterMode": "profile",
-      "args": ["--web-port=8080"]
-    },
-    {
-      "name": "vkhgaruda (release mode)",
-      "program": "vkhgaruda/lib/main.dart",
-      "request": "launch",
-      "type": "dart",
-      "flutterMode": "release",
-      "args": ["--web-port=8080"]
-    },
+
     {
       "name": "vkhsangeetseva",
       "program": "vkhsangeetseva/lib/main.dart",

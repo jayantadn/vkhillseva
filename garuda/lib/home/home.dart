@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 // import 'package:garuda/sangeet_seva/sangeet_seva.dart';
 // import 'package:garuda/nitya_seva/nitya_seva.dart';
-// import 'package:garuda/widgets/launcher_tile.dart';
-// import 'package:garuda/widgets/welcome.dart';
+import 'package:garuda/widgets/launcher_tile.dart';
+import 'package:garuda/widgets/welcome.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class HomePage extends StatefulWidget {
@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
 
                         // your widgets here
                         //welcome message
-                        // Welcome(),
+                        Welcome(),
 
                         // row of launchers
                         SizedBox(height: 50),
@@ -91,71 +91,69 @@ class _HomePageState extends State<HomePage> {
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
-                              // Padding(
-                              //   padding: const EdgeInsets.only(left: 8.0),
-                              //   child: LauncherTile(
-                              //     image:
-                              //         'assets/images/LauncherIcons/NityaSeva.png',
-                              //     title: "Nitya\nSeva",
-                              //     callback: LauncherTileCallback(
-                              //       onClick: () async {
-                              //         bool perm = await Utils().checkPermission(
-                              //           "Nitya Seva",
-                              //         );
-                              //         if (perm) {
-                              //           Navigator.push(
-                              //             context,
-                              //             MaterialPageRoute(
-                              //               builder:
-                              //                   (context) => const NityaSeva(
-                              //                     title: "Nitya Seva",
-                              //                   ),
-                              //             ),
-                              //           );
-                              //         } else {
-                              //           Toaster().error("Access Denied");
-                              //         }
-                              //       },
-                              //     ),
-                              //   ),
-                              // ),
-                              // LauncherTile(
-                              //   image:
-                              //       'assets/images/LauncherIcons/Harinaam.png',
-                              //   title: "Harinaam\nMantapa",
-                              // ),
-                              // LauncherTile(
-                              //   image: 'assets/images/Logo/SangeetSeva.png',
-                              //   title: "Sangeet\nSeva",
-                              //   callback: LauncherTileCallback(
-                              //     onClick: () async {
-                              //       bool perm = await Utils().checkPermission(
-                              //         "Sangeet Seva",
-                              //       );
-                              //       if (perm) {
-                              //         Navigator.push(
-                              //           context,
-                              //           MaterialPageRoute(
-                              //             builder:
-                              //                 (context) => const SangeetSeva(
-                              //                   title: "Sangeet Seva",
-                              //                 ),
-                              //           ),
-                              //         );
-                              //       } else {
-                              //         Toaster().error("Access Denied");
-                              //       }
-                              //     },
-                              //   ),
-                              // ),
-                              // Padding(
-                              //   padding: const EdgeInsets.only(right: 8.0),
-                              //   child: LauncherTile(
-                              //     image:
-                              //         'assets/images/LauncherIcons/Deepotsava.png',
-                              //     title: "Karthika\nDeepotsava",
-                              //   ),
-                              // ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: LauncherTile(
+                                  image:
+                                      'assets/images/LauncherIcons/NityaSeva.png',
+                                  title: "Nitya\nSeva",
+                                  callback: LauncherTileCallback(
+                                    onClick: () async {
+                                      bool perm = await Utils().checkPermission(
+                                        "Nitya Seva",
+                                      );
+                                      if (perm) {
+                                        // TODO
+                                        // Navigator.push(
+                                        //   context,
+                                        //   MaterialPageRoute(
+                                        //       builder: (context) =>
+                                        //           const NityaSeva(
+                                        //               title: "Nitya Seva")),
+                                        // );
+                                      } else {
+                                        Toaster().error("Access Denied");
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                              LauncherTile(
+                                image:
+                                    'assets/images/LauncherIcons/Harinaam.png',
+                                title: "Harinaam\nMantapa",
+                              ),
+                              LauncherTile(
+                                image: 'assets/images/Logo/SangeetSeva.png',
+                                title: "Sangeet\nSeva",
+                                callback: LauncherTileCallback(
+                                  onClick: () async {
+                                    bool perm = await Utils().checkPermission(
+                                      "Sangeet Seva",
+                                    );
+                                    if (perm) {
+                                      // TODO
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //       builder: (context) =>
+                                      //           const SangeetSeva(
+                                      //               title: "Sangeet Seva")),
+                                      // );
+                                    } else {
+                                      Toaster().error("Access Denied");
+                                    }
+                                  },
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: LauncherTile(
+                                  image:
+                                      'assets/images/LauncherIcons/Deepotsava.png',
+                                  title: "Karthika\nDeepotsava",
+                                ),
+                              ),
                             ],
                           ),
                         ),

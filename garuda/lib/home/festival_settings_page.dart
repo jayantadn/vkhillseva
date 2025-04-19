@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:vkhgaruda/widgets/image_selector.dart';
+import 'package:garuda/widgets/image_selector.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class FestivalSettingsPage extends StatefulWidget {
@@ -138,12 +138,14 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
                 ),
 
                 // icon
-                // ImageSelector(
-                //     selectedImage: old == null ? "" : old.icon,
-                //     callback:
-                //         ImageSelectorCallback(onImageSelected: (String icon) {
-                //       selectedIcon = icon;
-                //     })),
+                ImageSelector(
+                  selectedImage: old == null ? "" : old.icon,
+                  callback: ImageSelectorCallback(
+                    onImageSelected: (String icon) {
+                      selectedIcon = icon;
+                    },
+                  ),
+                ),
               ],
             ),
           ),

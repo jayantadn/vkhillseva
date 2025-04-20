@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/sangeet_seva/pending_requests.dart';
 import 'package:vkhgaruda/sangeet_seva/profiles.dart';
+import 'package:vkhgaruda/sangeet_seva/request_details.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class SangeetSeva extends StatefulWidget {
@@ -258,6 +259,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
             child: ListTile(
               title: Text(slot.name),
               subtitle: Text('${slot.from} - ${slot.to}'),
+              onTap: () {},
             ),
           );
         }),

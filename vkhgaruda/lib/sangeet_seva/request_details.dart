@@ -9,7 +9,7 @@ import 'package:vkhpackages/vkhpackages.dart';
 class RequestDetails extends StatefulWidget {
   final String title;
   final String? icon;
-  final Map<String, dynamic> pendingRequest;
+  final Map<String, dynamic>? pendingRequest;
   final EventRecord eventRecord;
   final void Function(String action) callback;
 
@@ -17,7 +17,7 @@ class RequestDetails extends StatefulWidget {
       {super.key,
       required this.title,
       this.icon,
-      required this.pendingRequest,
+      this.pendingRequest,
       required this.eventRecord,
       required this.callback});
 
@@ -80,8 +80,10 @@ class _RequestDetailsState extends State<RequestDetails> {
   }
 
   Future<void> _performAction(String action) async {
-    String path = widget.pendingRequest['path'];
-    int index = widget.pendingRequest['index'];
+    if (widget.pendingRequest == null) return;
+
+    String path = widget.pendingRequest!['path'];
+    int index = widget.pendingRequest!['index'];
     List eventsRaw = await FB().getList(path: path);
 
     EventRecord event =
@@ -102,6 +104,11 @@ class _RequestDetailsState extends State<RequestDetails> {
             "Request for ${DateFormat("EEE, dd MMM, yyyy").format(widget.eventRecord.date)} is ${action == 'Approve' ? 'approved' : 'rejected'}",
         imageUrl:
             "https://firebasestorage.googleapis.com/v0/b/garuda-1ba07.firebasestorage.app/o/SANGEETSEVA_01%2FAppIcons%2FSangeetSeva_64x64.png?alt=media&token=9e6777cc-014b-4c15-85e4-8c5c0a5282d1");
+
+    // append to booked events
+    String dbdate = DateFormat("yyyy-MM-dd").format(widget.eventRecord.date);
+    String dbpath = "${Const().dbrootSangeetSeva}/BookedEvents/$dbdate";
+    await FB().addToList(listpath: dbpath, data: widget.pendingRequest!);
 
     // mark the availability of the slot
     if (action == "Approve") {

@@ -57,6 +57,7 @@ class _PendingRequestsState extends State<PendingRequests> {
 
     // fetch pending requests
     _linkedEventRecords.clear();
+    _pendingRequests.clear();
     List<dynamic> pendingRequestLinks = await FB()
         .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
     for (var pendingRequestLinkRaw in pendingRequestLinks) {
@@ -77,6 +78,12 @@ class _PendingRequestsState extends State<PendingRequests> {
 
       _pendingRequests.add({'path': path, 'index': index});
       _linkedEventRecords.add(pendingRequest);
+    }
+    if (_pendingRequests.length != pendingRequestLinks.length) {
+      // outdated requests detected
+      await FB().setValue(
+          path: "${Const().dbrootSangeetSeva}/PendingRequests",
+          value: _pendingRequests);
     }
 
     // fetch main performers

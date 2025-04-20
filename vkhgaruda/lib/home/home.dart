@@ -132,7 +132,10 @@ class _HomePageState extends State<HomePage> {
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 const SangeetSeva(
-                                                    title: "Sangeet Seva")),
+                                                  title: "Sangeet Seva",
+                                                  icon:
+                                                      'assets/images/Logo/SangeetSeva.png',
+                                                )),
                                       );
                                     } else {
                                       Toaster().error("Access Denied");

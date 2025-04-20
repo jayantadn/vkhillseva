@@ -292,50 +292,53 @@ class _RequestDetailsState extends State<RequestDetails> {
                           ),
 
                           // supporting team
-                          Card(
-                            child: Column(
-                              children: [
-                                Text("Supporting team",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall),
-                                Utils().responsiveBuilder(
-                                    context,
-                                    List.generate(_supportTeam.length, (index) {
-                                      var member = _supportTeam[index];
-                                      return ListTile(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ProfileDetails(
-                                                      title: "Supporting team",
-                                                      icon: widget.icon,
-                                                      userdetails: member),
-                                            ),
-                                          );
-                                        },
-                                        leading: CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                              member.profilePicUrl),
-                                        ),
-                                        title: Text(
-                                            "${member.salutation} ${member.name}"),
-                                        subtitle: Row(
-                                          children: [
-                                            Icon(Icons.phone),
-                                            Text(member!.mobile),
-                                            SizedBox(width: 10),
-                                            Icon(Icons.workspace_premium),
-                                            Text(member!.credentials),
-                                          ],
-                                        ),
-                                      );
-                                    })),
-                              ],
+                          if (_supportTeam.isNotEmpty)
+                            Card(
+                              child: Column(
+                                children: [
+                                  Text("Supporting team",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall),
+                                  Utils().responsiveBuilder(
+                                      context,
+                                      List.generate(_supportTeam.length,
+                                          (index) {
+                                        var member = _supportTeam[index];
+                                        return ListTile(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProfileDetails(
+                                                        title:
+                                                            "Supporting team",
+                                                        icon: widget.icon,
+                                                        userdetails: member),
+                                              ),
+                                            );
+                                          },
+                                          leading: CircleAvatar(
+                                            backgroundImage: NetworkImage(
+                                                member.profilePicUrl),
+                                          ),
+                                          title: Text(
+                                              "${member.salutation} ${member.name}"),
+                                          subtitle: Row(
+                                            children: [
+                                              Icon(Icons.phone),
+                                              Text(member!.mobile),
+                                              SizedBox(width: 10),
+                                              Icon(Icons.workspace_premium),
+                                              Text(member!.credentials),
+                                            ],
+                                          ),
+                                        );
+                                      })),
+                                ],
+                              ),
                             ),
-                          ),
 
                           // guests
                           SizedBox(height: 10),

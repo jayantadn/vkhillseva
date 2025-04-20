@@ -154,10 +154,11 @@ class _SangeetSevaState extends State<SangeetSeva> {
     }
 
     // check if end time is greater than start time
-    final DateFormat timeFormat = DateFormat('hh:mm a');
     try {
-      final DateTime startDateTime = timeFormat.parse(startTime);
-      final DateTime endDateTime = timeFormat.parse(endTime);
+      final DateTime startDateTime =
+          Utils().getTimeFromString(_selectedDate, startTime);
+      final DateTime endDateTime =
+          Utils().getTimeFromString(_selectedDate, endTime);
       if (endDateTime.isBefore(startDateTime)) {
         Toaster().error("End time should be greater than start time");
         return false;
@@ -172,7 +173,12 @@ class _SangeetSevaState extends State<SangeetSeva> {
     await FB().addKVToList(
       path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
       key: name,
-      value: Slot(name: name, avl: true, from: startTime, to: endTime).toJson(),
+      value: Slot(
+              name: name,
+              avl: true,
+              from: Utils().convertTimeStringTo12HrFormat(startTime),
+              to: Utils().convertTimeStringTo12HrFormat(endTime))
+          .toJson(),
     );
 
     // refresh the availability indicators

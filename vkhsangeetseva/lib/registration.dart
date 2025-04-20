@@ -216,6 +216,21 @@ class _RegistrationState extends State<Registration> {
                   }
                 }
 
+                // check if slot is in the past
+                DateTime now = DateTime.now();
+                List<int> hrMin = Utils().getHrMinFromTime(slot.from);
+                DateTime slotDateTime = DateTime(
+                  _selectedDate.year,
+                  _selectedDate.month,
+                  _selectedDate.day,
+                  hrMin[0],
+                  hrMin[1],
+                );
+                if (slotDateTime.isBefore(now)) {
+                  Toaster().error("Cannot book slot in the past");
+                  return;
+                }
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(

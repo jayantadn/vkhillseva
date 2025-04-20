@@ -9,7 +9,7 @@ import 'package:vkhpackages/vkhpackages.dart';
 class RequestDetails extends StatefulWidget {
   final String title;
   final String? icon;
-  final Map<String, dynamic> pendingRequest;
+  final Map<String, dynamic>? pendingRequest;
   final EventRecord eventRecord;
   final void Function(String action) callback;
 
@@ -17,7 +17,7 @@ class RequestDetails extends StatefulWidget {
       {super.key,
       required this.title,
       this.icon,
-      required this.pendingRequest,
+      this.pendingRequest,
       required this.eventRecord,
       required this.callback});
 
@@ -79,71 +79,91 @@ class _RequestDetailsState extends State<RequestDetails> {
     });
   }
 
+  // action = Approve or Reject
   Future<void> _performAction(String action) async {
-    String path = widget.pendingRequest['path'];
-    int index = widget.pendingRequest['index'];
-    List eventsRaw = await FB().getList(path: path);
+    if (widget.pendingRequest == null) {
+      // event is already booked
 
-    EventRecord event =
-        Utils().convertRawToDatatype(eventsRaw[index], EventRecord.fromJson);
-    event.status = action == "Approve" ? "Approved" : "Rejected";
-    event.noteTemple = _noteController.text;
+      if (action == "Approve") {
+        Toaster().error("Event is already approved");
+        return;
+      }
+    } else {
+      // event is pending approval
 
-    eventsRaw[index] = event.toJson();
-    await FB().setValue(path: path, value: eventsRaw);
+      String path = widget.pendingRequest!['path'];
+      int index = widget.pendingRequest!['index'];
 
-    // notify the user
-    String mobile = widget.eventRecord.mainPerformerMobile;
-    String fcmToken = await Utils().getFcmToken(mobile);
-    Notifications().sendPushNotification(
-        fcmToken: fcmToken,
-        title: action == "Approve" ? "Request approved" : "Request rejected",
-        body:
-            "Request for ${DateFormat("EEE, dd MMM, yyyy").format(widget.eventRecord.date)} is ${action == 'Approve' ? 'approved' : 'rejected'}",
-        imageUrl:
-            "https://firebasestorage.googleapis.com/v0/b/garuda-1ba07.firebasestorage.app/o/SANGEETSEVA_01%2FAppIcons%2FSangeetSeva_64x64.png?alt=media&token=9e6777cc-014b-4c15-85e4-8c5c0a5282d1");
+      // set the availability flag in Event
+      List eventsRaw = await FB().getList(path: path);
+      EventRecord event =
+          Utils().convertRawToDatatype(eventsRaw[index], EventRecord.fromJson);
+      event.status = action == "Approve" ? "Approved" : "Rejected";
+      event.noteTemple = _noteController.text;
+      eventsRaw[index] = event.toJson();
+      await FB().setValue(path: path, value: eventsRaw);
 
-    // mark the availability of the slot
-    if (action == "Approve") {
-      widget.eventRecord.slot.avl = false;
+      // notify the user
+      String mobile = widget.eventRecord.mainPerformerMobile;
+      String fcmToken = await Utils().getFcmToken(mobile);
+      Notifications().sendPushNotification(
+          fcmToken: fcmToken,
+          title: action == "Approve" ? "Request approved" : "Request rejected",
+          body:
+              "Request for ${DateFormat("EEE, dd MMM, yyyy").format(widget.eventRecord.date)} is ${action == 'Approve' ? 'approved' : 'rejected'}",
+          imageUrl:
+              "https://firebasestorage.googleapis.com/v0/b/garuda-1ba07.firebasestorage.app/o/SANGEETSEVA_01%2FAppIcons%2FSangeetSeva_64x64.png?alt=media&token=9e6777cc-014b-4c15-85e4-8c5c0a5282d1");
+
+      // append to booked events
       String dbdate = DateFormat("yyyy-MM-dd").format(widget.eventRecord.date);
-      String dbpath = "${Const().dbrootSangeetSeva}/Slots/$dbdate";
-      if (await FB().pathExists(dbpath)) {
-        List slotsRaw = await FB().getList(path: dbpath);
-        String dbpathNew =
-            "${Const().dbrootSangeetSeva}/Slots/$dbdate/Slot${slotsRaw.length + 1}";
-        await FB()
-            .setJson(path: dbpathNew, json: widget.eventRecord.slot.toJson());
-      } else {
-        if (Utils().isDateWeekend(widget.eventRecord.date)) {
-          await FB().setJson(
-              path: dbpath, json: {"Slot1": widget.eventRecord.slot.toJson()});
+      String dbpath = "${Const().dbrootSangeetSeva}/BookedEvents/$dbdate";
+      await FB().addToList(listpath: dbpath, data: widget.pendingRequest!);
+
+      // mark the availability of the slot
+      if (action == "Approve") {
+        widget.eventRecord.slot.avl = false;
+        String dbdate =
+            DateFormat("yyyy-MM-dd").format(widget.eventRecord.date);
+        String dbpath = "${Const().dbrootSangeetSeva}/Slots/$dbdate";
+        if (await FB().pathExists(dbpath)) {
+          List slotsRaw = await FB().getList(path: dbpath);
+          String dbpathNew =
+              "${Const().dbrootSangeetSeva}/Slots/$dbdate/Slot${slotsRaw.length + 1}";
+          await FB()
+              .setJson(path: dbpathNew, json: widget.eventRecord.slot.toJson());
         } else {
-          Toaster().error("Invalid slot");
+          if (Utils().isDateWeekend(widget.eventRecord.date)) {
+            await FB().setJson(
+                path: dbpath,
+                json: {"Slot1": widget.eventRecord.slot.toJson()});
+          } else {
+            Toaster().error("Invalid slot");
+          }
         }
       }
-    }
 
-    // loop through all pending requests, remove the matching one
-    List pendingRequestsRaw = await FB()
-        .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
-    for (var pendingRequestRaw in pendingRequestsRaw) {
-      Map<String, dynamic> pendingRequest =
-          Map<String, dynamic>.from(pendingRequestRaw);
-      if (pendingRequest['path'] == path && pendingRequest['index'] == index) {
-        pendingRequestsRaw.remove(pendingRequestRaw);
-        break;
+      // loop through all pending requests, remove the matching one
+      List pendingRequestsRaw = await FB()
+          .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
+      for (var pendingRequestRaw in pendingRequestsRaw) {
+        Map<String, dynamic> pendingRequest =
+            Map<String, dynamic>.from(pendingRequestRaw);
+        if (pendingRequest['path'] == path &&
+            pendingRequest['index'] == index) {
+          pendingRequestsRaw.remove(pendingRequestRaw);
+          break;
+        }
       }
-    }
-    await FB().setValue(
-        path: "${Const().dbrootSangeetSeva}/PendingRequests",
-        value: pendingRequestsRaw);
+      await FB().setValue(
+          path: "${Const().dbrootSangeetSeva}/PendingRequests",
+          value: pendingRequestsRaw);
 
-    // callback
-    widget.callback(action);
+      // callback
+      widget.callback(action);
+    }
   }
 
-  void _showDialog(String action) {
+  void _showActionDialog(String action) {
     _noteController.clear();
     showDialog(
       context: context,
@@ -204,20 +224,22 @@ class _RequestDetailsState extends State<RequestDetails> {
               title: Text(widget.title),
               actions: [
                 // reject button
-                IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () {
-                    _showDialog("Reject");
-                  },
-                ),
+                if (widget.pendingRequest != null)
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      _showActionDialog("Reject");
+                    },
+                  ),
 
                 // approve button
-                IconButton(
-                  icon: Icon(Icons.check),
-                  onPressed: () {
-                    _showDialog("Approve");
-                  },
-                ),
+                if (widget.pendingRequest != null)
+                  IconButton(
+                    icon: Icon(Icons.check),
+                    onPressed: () {
+                      _showActionDialog("Approve");
+                    },
+                  ),
               ],
             ),
             body: RefreshIndicator(
@@ -247,75 +269,98 @@ class _RequestDetailsState extends State<RequestDetails> {
 
                           // main performer
                           Card(
-                            child: ListTile(
-                              onTap: () async {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProfileDetails(
-                                        title: "Main performer",
-                                        icon: widget.icon,
-                                        userdetails: _mainPerformer!),
-                                  ),
-                                );
-                              },
-                              leading: _mainPerformer == null
-                                  ? Text("")
-                                  : CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                          _mainPerformer!.profilePicUrl),
-                                    ),
-                              title: _mainPerformer == null
-                                  ? Text("")
-                                  : Text(
-                                      "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
-                              subtitle: _mainPerformer == null
-                                  ? Text("")
-                                  : Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                            "${_mainPerformer!.credentials}, "),
-                                      ],
-                                    ),
+                            child: Column(
+                              children: [
+                                Text("Main performer",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall),
+                                ListTile(
+                                  onTap: () async {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProfileDetails(
+                                            title: "Main performer",
+                                            icon: widget.icon,
+                                            userdetails: _mainPerformer!),
+                                      ),
+                                    );
+                                  },
+                                  leading: _mainPerformer == null
+                                      ? Text("")
+                                      : CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              _mainPerformer!.profilePicUrl),
+                                        ),
+                                  title: _mainPerformer == null
+                                      ? Text("")
+                                      : Text(
+                                          "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
+                                  subtitle: _mainPerformer == null
+                                      ? Text("")
+                                      : Row(
+                                          children: [
+                                            Icon(Icons.phone),
+                                            Text(_mainPerformer!.mobile),
+                                            SizedBox(width: 10),
+                                            Icon(Icons.workspace_premium),
+                                            Text(_mainPerformer!.credentials),
+                                          ],
+                                        ),
+                                ),
+                              ],
                             ),
                           ),
 
                           // supporting team
-                          Utils().responsiveBuilder(
-                              context,
-                              List.generate(_supportTeam.length, (index) {
-                                var member = _supportTeam[index];
-                                return Card(
-                                  child: ListTile(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ProfileDetails(
-                                              title: "Supporting team",
-                                              icon: widget.icon,
-                                              userdetails: member),
-                                        ),
-                                      );
-                                    },
-                                    leading: CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(member.profilePicUrl),
-                                    ),
-                                    title: Text(
-                                        "${member.salutation} ${member.name}"),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(member.credentials),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              })),
+                          if (_supportTeam.isNotEmpty)
+                            Card(
+                              child: Column(
+                                children: [
+                                  Text("Supporting team",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall),
+                                  Utils().responsiveBuilder(
+                                      context,
+                                      List.generate(_supportTeam.length,
+                                          (index) {
+                                        var member = _supportTeam[index];
+                                        return ListTile(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProfileDetails(
+                                                        title:
+                                                            "Supporting team",
+                                                        icon: widget.icon,
+                                                        userdetails: member),
+                                              ),
+                                            );
+                                          },
+                                          leading: CircleAvatar(
+                                            backgroundImage: NetworkImage(
+                                                member.profilePicUrl),
+                                          ),
+                                          title: Text(
+                                              "${member.salutation} ${member.name}"),
+                                          subtitle: Row(
+                                            children: [
+                                              Icon(Icons.phone),
+                                              Text(member.mobile),
+                                              SizedBox(width: 10),
+                                              Icon(Icons.workspace_premium),
+                                              Text(member.credentials),
+                                            ],
+                                          ),
+                                        );
+                                      })),
+                                ],
+                              ),
+                            ),
 
                           // guests
                           SizedBox(height: 10),
@@ -350,13 +395,25 @@ class _RequestDetailsState extends State<RequestDetails> {
                           ),
                           ...List.generate(widget.eventRecord.songs.length,
                               (index) {
+                            String song = widget.eventRecord.songs[index];
+                            String title = song.split(":")[0];
+                            String raaga = song.split(":")[1];
+                            String taala = song.split(":")[2];
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),
                               child: Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "${index + 1}. ${widget.eventRecord.songs[index]}",
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "${index + 1}. title: $title",
+                                    ),
+                                    SizedBox(width: 10),
+                                    if (raaga.isNotEmpty) Text("raaga: $raaga"),
+                                    SizedBox(width: 10),
+                                    if (taala.isNotEmpty) Text("taala: $taala"),
+                                  ],
                                 ),
                               ),
                             );

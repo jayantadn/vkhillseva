@@ -57,6 +57,7 @@ class _PendingRequestsState extends State<PendingRequests> {
 
     // fetch pending requests
     _linkedEventRecords.clear();
+    _pendingRequests.clear();
     List<dynamic> pendingRequestLinks = await FB()
         .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
     for (var pendingRequestLinkRaw in pendingRequestLinks) {
@@ -64,14 +65,25 @@ class _PendingRequestsState extends State<PendingRequests> {
           Map<String, dynamic>.from(pendingRequestLinkRaw);
       String path = pendingRequestLink['path'];
       int index = pendingRequestLink['index'];
-      _pendingRequests.add({'path': path, 'index': index});
 
       List pendingRequestsPerUserRaw = await FB().getList(path: path);
       var pendingRequestPerUserRaw = pendingRequestsPerUserRaw[index];
       EventRecord pendingRequest = Utils()
           .convertRawToDatatype(pendingRequestPerUserRaw, EventRecord.fromJson);
 
+      // discard if pending request is in the past
+      if (pendingRequest.date.isBefore(DateTime.now())) {
+        continue;
+      }
+
+      _pendingRequests.add({'path': path, 'index': index});
       _linkedEventRecords.add(pendingRequest);
+    }
+    if (_pendingRequests.length != pendingRequestLinks.length) {
+      // outdated requests detected
+      await FB().setValue(
+          path: "${Const().dbrootSangeetSeva}/PendingRequests",
+          value: _pendingRequests);
     }
 
     // fetch main performers
@@ -103,7 +115,15 @@ class _PendingRequestsState extends State<PendingRequests> {
         child: ListTile(
       title: Text(title),
       leading: CircleAvatar(backgroundImage: NetworkImage(profilePicUrl)),
-      subtitle: Text(performer),
+      subtitle: Row(
+        children: [
+          Icon(Icons.person),
+          Text(performer),
+          SizedBox(width: 10),
+          Icon(Icons.phone),
+          Text(_mainPerformers[index].mobile),
+        ],
+      ),
     ));
   }
 

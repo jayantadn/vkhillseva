@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/sangeet_seva/pending_requests.dart';
 import 'package:vkhgaruda/sangeet_seva/profiles.dart';
+import 'package:vkhgaruda/sangeet_seva/request_details.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class SangeetSeva extends StatefulWidget {
@@ -123,8 +124,12 @@ class _SangeetSevaState extends State<SangeetSeva> {
     _pendingRequests = await _getPendingRequestsCount();
 
     // subscribe to notifications
-    await Notifications().setupFirebaseMessaging();
-    FirebaseMessaging.instance.subscribeToTopic("SSAdmin");
+    try {
+      await Notifications().setupFirebaseMessaging();
+      FirebaseMessaging.instance.subscribeToTopic("SSAdmin");
+    } catch (e) {
+      // nothing to do
+    }
 
     // refresh all child widgets
     calendarKey.currentState!.refresh();
@@ -149,10 +154,11 @@ class _SangeetSevaState extends State<SangeetSeva> {
     }
 
     // check if end time is greater than start time
-    final DateFormat timeFormat = DateFormat('hh:mm a');
     try {
-      final DateTime startDateTime = timeFormat.parse(startTime);
-      final DateTime endDateTime = timeFormat.parse(endTime);
+      final DateTime startDateTime =
+          Utils().getTimeFromString(_selectedDate, startTime);
+      final DateTime endDateTime =
+          Utils().getTimeFromString(_selectedDate, endTime);
       if (endDateTime.isBefore(startDateTime)) {
         Toaster().error("End time should be greater than start time");
         return false;
@@ -167,7 +173,12 @@ class _SangeetSevaState extends State<SangeetSeva> {
     await FB().addKVToList(
       path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
       key: name,
-      value: Slot(name: name, avl: true, from: startTime, to: endTime).toJson(),
+      value: Slot(
+              name: name,
+              avl: true,
+              from: Utils().convertTimeStringTo12HrFormat(startTime),
+              to: Utils().convertTimeStringTo12HrFormat(endTime))
+          .toJson(),
     );
 
     // refresh the availability indicators
@@ -254,6 +265,49 @@ class _SangeetSevaState extends State<SangeetSeva> {
             child: ListTile(
               title: Text(slot.name),
               subtitle: Text('${slot.from} - ${slot.to}'),
+              onTap: () async {
+                // look in booked slots and determine the Event
+                EventRecord? bookedEvent;
+                String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+                String dbpath =
+                    "${Const().dbrootSangeetSeva}/BookedEvents/$dbdate";
+                List eventLinksRaw = await FB().getList(path: dbpath);
+                for (var eventLinkRaw in eventLinksRaw) {
+                  Map<String, dynamic> eventLink =
+                      Map<String, dynamic>.from(eventLinkRaw);
+                  String path = eventLink['path'];
+                  int index = eventLink['index'];
+
+                  List eventsRaw = await FB().getList(path: path);
+                  var eventRaw = eventsRaw[index];
+                  EventRecord event = Utils()
+                      .convertRawToDatatype(eventRaw, EventRecord.fromJson);
+
+                  if (event.slot.from == slot.from &&
+                      event.slot.to == slot.to) {
+                    bookedEvent = event;
+                    break;
+                  }
+                }
+
+                // open the event details page
+                if (bookedEvent != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RequestDetails(
+                        title: 'Event details',
+                        eventRecord: bookedEvent!,
+                        callback: (action) {
+                          // placeholder for rejecting an approved request
+                        },
+                      ),
+                    ),
+                  );
+                } else {
+                  Toaster().error("Event not found");
+                }
+              },
             ),
           );
         }),
@@ -279,7 +333,24 @@ class _SangeetSevaState extends State<SangeetSeva> {
     // get the list of pending requests
     List<dynamic> pendingRequestsRaw = await FB()
         .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
-    pendingRequests = pendingRequestsRaw.length;
+    for (var pendingRequestLinkRaw in pendingRequestsRaw) {
+      Map<String, dynamic> pendingRequestLink =
+          Map<String, dynamic>.from(pendingRequestLinkRaw);
+      String path = pendingRequestLink['path'];
+      int index = pendingRequestLink['index'];
+
+      List pendingRequestsPerUserRaw = await FB().getList(path: path);
+      var pendingRequestPerUserRaw = pendingRequestsPerUserRaw[index];
+      EventRecord pendingRequest = Utils()
+          .convertRawToDatatype(pendingRequestPerUserRaw, EventRecord.fromJson);
+
+      // discard if pending request is in the past
+      if (pendingRequest.date.isBefore(DateTime.now())) {
+        continue;
+      }
+
+      pendingRequests++;
+    }
 
     return pendingRequests;
   }

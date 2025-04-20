@@ -192,7 +192,45 @@ class _RegistrationState extends State<Registration> {
             child: ListTile(
               title: Text(slot.name),
               subtitle: Text('${slot.from} - ${slot.to}'),
-              onTap: () {
+              onTap: () async {
+                // check if the slot is already booked
+                List requestsRaw = await FB().getList(
+                    path: "${Const().dbrootSangeetSeva}/PendingRequests");
+                for (var requestRaw in requestsRaw) {
+                  Map<String, dynamic> requestMap =
+                      Map<String, dynamic>.from(requestRaw);
+                  String mobile = requestMap['path'].split('/').last;
+                  UserBasics? basics = Utils().getUserBasics();
+                  if (basics != null && mobile == basics.mobile) {
+                    String dbpath = requestMap['path'];
+                    List events = await FB().getList(path: dbpath);
+                    int index = requestMap['index'];
+                    EventRecord event = Utils().convertRawToDatatype(
+                        events[index], EventRecord.fromJson);
+                    if (event.date == _selectedDate &&
+                        event.slot.from == slot.from &&
+                        event.slot.to == slot.to) {
+                      Toaster().error("You already requested this slot");
+                      return;
+                    }
+                  }
+                }
+
+                // check if slot is in the past
+                DateTime now = DateTime.now();
+                List<int> hrMin = Utils().getHrMinFromTime(slot.from);
+                DateTime slotDateTime = DateTime(
+                  _selectedDate.year,
+                  _selectedDate.month,
+                  _selectedDate.day,
+                  hrMin[0],
+                  hrMin[1],
+                );
+                if (slotDateTime.isBefore(now)) {
+                  Toaster().error("Cannot book slot in the past");
+                  return;
+                }
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(

@@ -94,9 +94,8 @@ class _CalendarState extends State<Calendar> {
     DateTime? focusedDay,
   }) async {
     if (date == null) {
-      focusedDay ??= DateTime.now();
-
       // generate for whole month
+      focusedDay ??= DateTime.now();
       int startDay = focusedDay.day - 1;
       for (int day = startDay; day < 31; day++) {
         DateTime givenDate = DateTime(
@@ -198,7 +197,7 @@ class SlotUtils {
         cnt++;
         for (var slotRaw in slotListRaw) {
           Slot slot = Utils().convertRawToDatatype(slotRaw, Slot.fromJson);
-          if (slot.from != slotw.from && slot.to != slotw.to) {
+          if (slot.from == slotw.from && slot.to == slotw.to) {
             cnt--;
           }
         }

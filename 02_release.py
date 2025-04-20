@@ -144,74 +144,41 @@ def release(app):
         print(f"Error: '{app}' directory not found.")
         sys.exit(1)
 
-    print("Undo main patch for testing")
-    main_file = f'{rootdir}/{app}/lib/main.dart'
-    search_string = '      home: test,'
-    replacement_string = '      home: home,\n'
-    with open(main_file, 'r') as file:
-        lines = file.readlines()
-    with open(main_file, 'w') as file:
-        for line in lines:
-            if search_string in line:
-                file.write(replacement_string)
-            else:
-                file.write(line)
+    if branch_name != 'main':
+        print("Undo main patch for testing")
+        main_file = f'{rootdir}/{app}/lib/main.dart'
+        search_string = '      home: test,'
+        replacement_string = '      home: home,\n'
+        with open(main_file, 'r') as file:
+            lines = file.readlines()
+        with open(main_file, 'w') as file:
+            for line in lines:
+                if search_string in line:
+                    file.write(replacement_string)
+                else:
+                    file.write(line)
 
-    print("Applying dart fix")
-    os.chdir(f"{rootdir}/{app}")
-    try:
-        result = subprocess.run(["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
-        print(result.stdout)
-        if result.returncode != 0:
-            print(result.stderr)
-    except subprocess.CalledProcessError as e:
-        print(f"CalledProcessError: {e}")
-    except FileNotFoundError as e:
-        print(f"FileNotFoundError: {e}")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print("Applying dart fix")
+        os.chdir(f"{rootdir}/{app}")
+        try:
+            result = subprocess.run(["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
+            print(result.stdout)
+            if result.returncode != 0:
+                print(result.stderr)
+        except subprocess.CalledProcessError as e:
+            print(f"CalledProcessError: {e}")
+        except FileNotFoundError as e:
+            print(f"FileNotFoundError: {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
 
-    # print("update the list of icons")
-    # src_file = 'pubspec.yaml'
-    # src_contents = "- assets/images/"
-    # images = []
-    # dst_file = 'lib/common/const.dart'
-    # dst_start = 'final List<String> icons = ['
-    # dst_end = '];'
-    # with open(src_file, 'r') as file:
-    #     src_lines = file.readlines()
-    #     for line in src_lines:
-    #         if src_contents in line:
-    #             image = line.strip()
-    #             image = image[1:]
-    #             image = image.strip()
-    #             images.append(image.strip())
-    # with open(dst_file, 'r') as file:
-    #     dst_lines = file.readlines()
-    # with open(dst_file, 'w') as file:
-    #     flag_start = False
-    #     for line in dst_lines:
-    #         if line.strip() == dst_start:
-    #             flag_start = True
-    #             file.write(line)
-    #             for image in images:
-    #                 file.write(f'      "{image}",\n')
-    #         else:
-    #             if(not flag_start):
-    #                 file.write(line)
-    #             else:
-    #                 if line.strip() == dst_end:
-    #                     file.write(line)
-    #                     flag_start = False
-    
-    print("set database path")
-    prefix = ""
-    if(reltype == 'test'):
-        prefix = "TEST/"
-    set_value_in_file('vkhpackages/lib/common/const.dart', "final String dbrootGaruda", f" \"{prefix}GARUDA_01\";" )
-    set_value_in_file('vkhpackages/lib/common/const.dart', "final String dbrootSangeetSeva", f" \"{prefix}SANGEETSEVA_01\";" )
+        print("set database path")
+        prefix = ""
+        if(reltype == 'test'):
+            prefix = "TEST/"
+        set_value_in_file('vkhpackages/lib/common/const.dart', "final String dbrootGaruda", f" \"{prefix}GARUDA_01\";" )
+        set_value_in_file('vkhpackages/lib/common/const.dart', "final String dbrootSangeetSeva", f" \"{prefix}SANGEETSEVA_01\";" )
 
-    try:
         print("commit all changes and push to git")
         if run_command('git status --porcelain'):
             run_command('git add -A')
@@ -228,37 +195,32 @@ def release(app):
         else:
             print("No changes to commit")
 
-        print("building for web")
-        run_command("flutter clean")
-        run_command("flutter pub get")
-        run_command("flutter build web")
-        set_hosting_site(app)
-        run_command(f"firebase deploy --only hosting:{hostingsite}")
+    print("building for web")
+    run_command("flutter clean")
+    run_command("flutter pub get")
+    run_command("flutter build web")
+    set_hosting_site(app)
+    run_command(f"firebase deploy --only hosting:{hostingsite}")
 
-        if reltype == 'release':
-            print("building for android")
-            run_command("flutter build apk")
-            apk_path = "build/app/outputs/flutter-apk/app-release.apk"
-            new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{version}.apk"
-            if os.path.exists(apk_path):
-                if os.path.exists(new_apk_path):
-                    os.remove(new_apk_path)
-                os.rename(apk_path, new_apk_path)
-            else:
-                print("ERROR: APK not found")
+    if reltype == 'release':
+        print("building for android")
+        run_command("flutter build apk")
+        apk_path = "build/app/outputs/flutter-apk/app-release.apk"
+        new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{version}.apk"
+        if os.path.exists(apk_path):
+            if os.path.exists(new_apk_path):
+                os.remove(new_apk_path)
+            os.rename(apk_path, new_apk_path)
+        else:
+            print("ERROR: APK not found")
 
-            print("upload apk to my google drive")
-            drive_path = "X:/GoogleDrive/PublicRO/Garuda"
-            if os.path.exists(drive_path):
-                shutil.copy(new_apk_path, drive_path)
-                shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{version}.apk'), os.path.join(drive_path, 'vkhgaruda_latest.apk'))
-            else:
-                print("ERROR: Google Drive not found in your local system")
-
-    except Exception as e:
-        print("reverting changes")
-        run_command(f'git checkout {branch_name}')
-
+        print("upload apk to my google drive")
+        drive_path = "X:/GoogleDrive/PublicRO/Garuda"
+        if os.path.exists(drive_path):
+            shutil.copy(new_apk_path, drive_path)
+            shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{version}.apk'), os.path.join(drive_path, 'vkhgaruda_latest.apk'))
+        else:
+            print("ERROR: Google Drive not found in your local system")
 
     print("all operations completed")
 

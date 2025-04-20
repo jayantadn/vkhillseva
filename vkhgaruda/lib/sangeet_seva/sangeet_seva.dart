@@ -259,7 +259,49 @@ class _SangeetSevaState extends State<SangeetSeva> {
             child: ListTile(
               title: Text(slot.name),
               subtitle: Text('${slot.from} - ${slot.to}'),
-              onTap: () {},
+              onTap: () async {
+                // look in booked slots and determine the Event
+                EventRecord? bookedEvent;
+                String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+                String dbpath =
+                    "${Const().dbrootSangeetSeva}/BookedEvents/$dbdate";
+                List eventLinksRaw = await FB().getList(path: dbpath);
+                for (var eventLinkRaw in eventLinksRaw) {
+                  Map<String, dynamic> eventLink =
+                      Map<String, dynamic>.from(eventLinkRaw);
+                  String path = eventLink['path'];
+                  int index = eventLink['index'];
+
+                  List eventsRaw = await FB().getList(path: path);
+                  var eventRaw = eventsRaw[index];
+                  EventRecord event = Utils()
+                      .convertRawToDatatype(eventRaw, EventRecord.fromJson);
+
+                  if (event.slot.from == slot.from &&
+                      event.slot.to == slot.to) {
+                    bookedEvent = event;
+                    break;
+                  }
+                }
+
+                // open the event details page
+                if (bookedEvent != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RequestDetails(
+                        title: 'Event details',
+                        eventRecord: bookedEvent!,
+                        callback: (action) {
+                          // placeholder for rejecting an approved request
+                        },
+                      ),
+                    ),
+                  );
+                } else {
+                  Toaster().error("Event not found");
+                }
+              },
             ),
           );
         }),

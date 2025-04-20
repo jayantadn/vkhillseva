@@ -389,7 +389,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     }
 
     // show success message
-    Utils().showMessage(context,
+    await Utils().showMessage(context,
         "Your request has been submitted.\nYou will be notified once your request is approved");
 
     // go to homepage

@@ -79,78 +79,91 @@ class _RequestDetailsState extends State<RequestDetails> {
     });
   }
 
+  // action = Approve or Reject
   Future<void> _performAction(String action) async {
-    if (widget.pendingRequest == null) return;
+    if (widget.pendingRequest == null) {
+      // event is already booked
 
-    String path = widget.pendingRequest!['path'];
-    int index = widget.pendingRequest!['index'];
-    List eventsRaw = await FB().getList(path: path);
+      if (action == "Approve") {
+        Toaster().error("Event is already approved");
+        return;
+      }
+    } else {
+      // event is pending approval
 
-    EventRecord event =
-        Utils().convertRawToDatatype(eventsRaw[index], EventRecord.fromJson);
-    event.status = action == "Approve" ? "Approved" : "Rejected";
-    event.noteTemple = _noteController.text;
+      String path = widget.pendingRequest!['path'];
+      int index = widget.pendingRequest!['index'];
 
-    eventsRaw[index] = event.toJson();
-    await FB().setValue(path: path, value: eventsRaw);
+      // set the availability flag in Event
+      List eventsRaw = await FB().getList(path: path);
+      EventRecord event =
+          Utils().convertRawToDatatype(eventsRaw[index], EventRecord.fromJson);
+      event.status = action == "Approve" ? "Approved" : "Rejected";
+      event.noteTemple = _noteController.text;
+      eventsRaw[index] = event.toJson();
+      await FB().setValue(path: path, value: eventsRaw);
 
-    // notify the user
-    String mobile = widget.eventRecord.mainPerformerMobile;
-    String fcmToken = await Utils().getFcmToken(mobile);
-    Notifications().sendPushNotification(
-        fcmToken: fcmToken,
-        title: action == "Approve" ? "Request approved" : "Request rejected",
-        body:
-            "Request for ${DateFormat("EEE, dd MMM, yyyy").format(widget.eventRecord.date)} is ${action == 'Approve' ? 'approved' : 'rejected'}",
-        imageUrl:
-            "https://firebasestorage.googleapis.com/v0/b/garuda-1ba07.firebasestorage.app/o/SANGEETSEVA_01%2FAppIcons%2FSangeetSeva_64x64.png?alt=media&token=9e6777cc-014b-4c15-85e4-8c5c0a5282d1");
+      // notify the user
+      String mobile = widget.eventRecord.mainPerformerMobile;
+      String fcmToken = await Utils().getFcmToken(mobile);
+      Notifications().sendPushNotification(
+          fcmToken: fcmToken,
+          title: action == "Approve" ? "Request approved" : "Request rejected",
+          body:
+              "Request for ${DateFormat("EEE, dd MMM, yyyy").format(widget.eventRecord.date)} is ${action == 'Approve' ? 'approved' : 'rejected'}",
+          imageUrl:
+              "https://firebasestorage.googleapis.com/v0/b/garuda-1ba07.firebasestorage.app/o/SANGEETSEVA_01%2FAppIcons%2FSangeetSeva_64x64.png?alt=media&token=9e6777cc-014b-4c15-85e4-8c5c0a5282d1");
 
-    // append to booked events
-    String dbdate = DateFormat("yyyy-MM-dd").format(widget.eventRecord.date);
-    String dbpath = "${Const().dbrootSangeetSeva}/BookedEvents/$dbdate";
-    await FB().addToList(listpath: dbpath, data: widget.pendingRequest!);
-
-    // mark the availability of the slot
-    if (action == "Approve") {
-      widget.eventRecord.slot.avl = false;
+      // append to booked events
       String dbdate = DateFormat("yyyy-MM-dd").format(widget.eventRecord.date);
-      String dbpath = "${Const().dbrootSangeetSeva}/Slots/$dbdate";
-      if (await FB().pathExists(dbpath)) {
-        List slotsRaw = await FB().getList(path: dbpath);
-        String dbpathNew =
-            "${Const().dbrootSangeetSeva}/Slots/$dbdate/Slot${slotsRaw.length + 1}";
-        await FB()
-            .setJson(path: dbpathNew, json: widget.eventRecord.slot.toJson());
-      } else {
-        if (Utils().isDateWeekend(widget.eventRecord.date)) {
-          await FB().setJson(
-              path: dbpath, json: {"Slot1": widget.eventRecord.slot.toJson()});
+      String dbpath = "${Const().dbrootSangeetSeva}/BookedEvents/$dbdate";
+      await FB().addToList(listpath: dbpath, data: widget.pendingRequest!);
+
+      // mark the availability of the slot
+      if (action == "Approve") {
+        widget.eventRecord.slot.avl = false;
+        String dbdate =
+            DateFormat("yyyy-MM-dd").format(widget.eventRecord.date);
+        String dbpath = "${Const().dbrootSangeetSeva}/Slots/$dbdate";
+        if (await FB().pathExists(dbpath)) {
+          List slotsRaw = await FB().getList(path: dbpath);
+          String dbpathNew =
+              "${Const().dbrootSangeetSeva}/Slots/$dbdate/Slot${slotsRaw.length + 1}";
+          await FB()
+              .setJson(path: dbpathNew, json: widget.eventRecord.slot.toJson());
         } else {
-          Toaster().error("Invalid slot");
+          if (Utils().isDateWeekend(widget.eventRecord.date)) {
+            await FB().setJson(
+                path: dbpath,
+                json: {"Slot1": widget.eventRecord.slot.toJson()});
+          } else {
+            Toaster().error("Invalid slot");
+          }
         }
       }
-    }
 
-    // loop through all pending requests, remove the matching one
-    List pendingRequestsRaw = await FB()
-        .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
-    for (var pendingRequestRaw in pendingRequestsRaw) {
-      Map<String, dynamic> pendingRequest =
-          Map<String, dynamic>.from(pendingRequestRaw);
-      if (pendingRequest['path'] == path && pendingRequest['index'] == index) {
-        pendingRequestsRaw.remove(pendingRequestRaw);
-        break;
+      // loop through all pending requests, remove the matching one
+      List pendingRequestsRaw = await FB()
+          .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
+      for (var pendingRequestRaw in pendingRequestsRaw) {
+        Map<String, dynamic> pendingRequest =
+            Map<String, dynamic>.from(pendingRequestRaw);
+        if (pendingRequest['path'] == path &&
+            pendingRequest['index'] == index) {
+          pendingRequestsRaw.remove(pendingRequestRaw);
+          break;
+        }
       }
-    }
-    await FB().setValue(
-        path: "${Const().dbrootSangeetSeva}/PendingRequests",
-        value: pendingRequestsRaw);
+      await FB().setValue(
+          path: "${Const().dbrootSangeetSeva}/PendingRequests",
+          value: pendingRequestsRaw);
 
-    // callback
-    widget.callback(action);
+      // callback
+      widget.callback(action);
+    }
   }
 
-  void _showDialog(String action) {
+  void _showActionDialog(String action) {
     _noteController.clear();
     showDialog(
       context: context,
@@ -211,20 +224,22 @@ class _RequestDetailsState extends State<RequestDetails> {
               title: Text(widget.title),
               actions: [
                 // reject button
-                IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () {
-                    _showDialog("Reject");
-                  },
-                ),
+                if (widget.pendingRequest != null)
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      _showActionDialog("Reject");
+                    },
+                  ),
 
                 // approve button
-                IconButton(
-                  icon: Icon(Icons.check),
-                  onPressed: () {
-                    _showDialog("Approve");
-                  },
-                ),
+                if (widget.pendingRequest != null)
+                  IconButton(
+                    icon: Icon(Icons.check),
+                    onPressed: () {
+                      _showActionDialog("Approve");
+                    },
+                  ),
               ],
             ),
             body: RefreshIndicator(

@@ -1,3 +1,14 @@
+# 6.2.0
+- fix: garuda launch issue
+- feature: check for existing user before adding
+- feature: warn user if same slot requested twice
+- fix: slot count in calendar
+- feature: booked slot is stored in db
+- feature: clicking booked slot will show event details
+- feature: deleting outdated requests
+- fix: forbid booking slot in the past
+- fix: await message display for request submission confirmation
+
 # 6.0.0
 - fix: changelog centralized
 - fix: remove auto update

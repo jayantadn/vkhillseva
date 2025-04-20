@@ -350,10 +350,10 @@ class _RequestDetailsState extends State<RequestDetails> {
                                           subtitle: Row(
                                             children: [
                                               Icon(Icons.phone),
-                                              Text(member!.mobile),
+                                              Text(member.mobile),
                                               SizedBox(width: 10),
                                               Icon(Icons.workspace_premium),
-                                              Text(member!.credentials),
+                                              Text(member.credentials),
                                             ],
                                           ),
                                         );

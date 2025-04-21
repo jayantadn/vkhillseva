@@ -5,102 +5,117 @@ import 'package:flutter/material.dart';
 // secondary color (dark): AppBar background
 // scaffoldBackgroundColor (light): page background
 // secondaryBackgroundColor (light): card background
-ThemeData createTheme({
-  required Color primaryColor,
-  required Color secondaryColor,
-}) {
-  return ThemeData(
-    // General Colors
-    brightness: Brightness.light,
-    primaryColor: Colors.black,
-    scaffoldBackgroundColor: Colors.grey[100],
-    colorScheme: ColorScheme.light(
-      primary: Colors.black,
-      secondary: Colors.black,
-      surface: secondaryColor,
-      onPrimary: secondaryColor,
-      onSecondary: secondaryColor,
-      onSurface: Colors.black,
-    ),
 
-    // appbar theme
-    appBarTheme: AppBarTheme(
-      backgroundColor: primaryColor,
-      foregroundColor: secondaryColor,
-      iconTheme: IconThemeData(color: secondaryColor, size: 32.0),
-      elevation: 2.0,
-      shadowColor: primaryColor,
-    ),
+class ThemeCreator {
+  Color primaryColor;
+  Color secondaryColor;
 
-    // Input Fields
-    inputDecorationTheme: InputDecorationTheme(
-      hintStyle: TextStyle(color: Colors.grey),
-      floatingLabelStyle: TextStyle(
-        color: primaryColor,
-        fontWeight: FontWeight.bold,
+  ThemeCreator({required this.primaryColor, required this.secondaryColor});
+
+  ThemeData create() {
+    return ThemeData(
+      // General Colors
+      brightness: Brightness.light,
+      primaryColor: primaryColor,
+      scaffoldBackgroundColor: Colors.grey[100],
+      colorScheme: ColorScheme.light(
+        primary: primaryColor,
+        secondary: secondaryColor,
+        surface: secondaryColor,
+        onPrimary: secondaryColor,
+        onSecondary: secondaryColor,
+        onSurface: Colors.black,
       ),
-    ),
 
-    // Floating Action Button
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: primaryColor,
-    ),
-
-    // icon Theme
-    iconTheme: IconThemeData(color: primaryColor, size: 24.0),
-
-    // Checkboxes, Radios, Switches
-    checkboxTheme: CheckboxThemeData(
-      fillColor: WidgetStateProperty.all(Colors.transparent),
-      checkColor: WidgetStateProperty.resolveWith(
-        (states) =>
-            states.contains(WidgetState.selected)
-                ? primaryColor
-                : Colors.transparent,
+      // Text Styles
+      textTheme: TextTheme(
+        bodyLarge: TextStyle(fontSize: 18.0),
+        bodyMedium: TextStyle(fontSize: 14.0),
+        bodySmall: TextStyle(fontSize: 12.0),
+        headlineLarge: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+        headlineMedium: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+        headlineSmall: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
       ),
-      side: WidgetStateBorderSide.resolveWith(
-        (states) => BorderSide(
-          color:
-              states.contains(WidgetState.selected)
-                  ? primaryColor
-                  : Colors.grey,
+
+      // appbar theme
+      appBarTheme: AppBarTheme(
+        backgroundColor: primaryColor,
+        foregroundColor: secondaryColor,
+        iconTheme: IconThemeData(color: secondaryColor, size: 32.0),
+        elevation: 2.0,
+        shadowColor: primaryColor,
+      ),
+
+      // Input Fields
+      inputDecorationTheme: InputDecorationTheme(
+        hintStyle: TextStyle(color: Colors.grey),
+        floatingLabelStyle: TextStyle(
+          color: primaryColor,
+          fontWeight: FontWeight.bold,
         ),
       ),
-    ),
-    radioTheme: RadioThemeData(
-      fillColor: WidgetStateProperty.resolveWith(
-        (states) =>
-            states.contains(WidgetState.selected)
-                ? primaryColor
-                : Colors.transparent,
-      ),
-    ),
-    switchTheme: SwitchThemeData(
-      thumbColor: WidgetStateProperty.all(primaryColor),
-      trackColor: WidgetStateProperty.all(primaryColor.withOpacity(0.5)),
-    ),
 
-    // Buttons
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        foregroundColor: secondaryColor,
+      // Floating Action Button
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: primaryColor,
       ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        side: BorderSide(color: primaryColor, width: 2.0),
-        foregroundColor: primaryColor,
-      ),
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: primaryColor,
-        textStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-          decoration: TextDecoration.underline,
+
+      // icon Theme
+      iconTheme: IconThemeData(color: primaryColor, size: 24.0),
+
+      // Checkboxes, Radios, Switches
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.all(Colors.transparent),
+        checkColor: WidgetStateProperty.resolveWith(
+          (states) =>
+              states.contains(WidgetState.selected)
+                  ? primaryColor
+                  : Colors.transparent,
+        ),
+        side: WidgetStateBorderSide.resolveWith(
+          (states) => BorderSide(
+            color:
+                states.contains(WidgetState.selected)
+                    ? primaryColor
+                    : Colors.grey,
+          ),
         ),
       ),
-    ),
-  );
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith(
+          (states) =>
+              states.contains(WidgetState.selected)
+                  ? primaryColor
+                  : Colors.transparent,
+        ),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.all(primaryColor),
+        trackColor: WidgetStateProperty.all(primaryColor.withOpacity(0.5)),
+      ),
+
+      // Buttons
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          foregroundColor: secondaryColor,
+          backgroundColor: primaryColor,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: primaryColor, width: 2.0),
+          foregroundColor: primaryColor,
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: primaryColor,
+          textStyle: TextStyle(
+            fontWeight: FontWeight.bold,
+            decoration: TextDecoration.underline,
+          ),
+        ),
+      ),
+    );
+  }
 }

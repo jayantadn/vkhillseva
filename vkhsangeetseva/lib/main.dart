@@ -24,10 +24,10 @@ class MyApp extends StatelessWidget {
     slot: Slot(name: "name", avl: true, from: "10:00 AM", to: "12:00 PM"),
   );
 
-  final ThemeData themeSangeetSeva = createTheme(
+  final ThemeData themeSangeetSeva = ThemeCreator(
     primaryColor: Colors.green,
     secondaryColor: Colors.white,
-  );
+  ).create();
 
   // This widget is the root of your application.
   @override

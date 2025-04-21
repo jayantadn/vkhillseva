@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
-class RegistrationPage2 extends StatefulWidget {
+class HomePage extends StatefulWidget {
   final String title;
 
-  const RegistrationPage2({super.key, required this.title});
+  const HomePage({super.key, required this.title});
 
   @override
   // ignore: library_private_types_in_public_api
-  _RegistrationPage2State createState() => _RegistrationPage2State();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _RegistrationPage2State extends State<RegistrationPage2> {
+class _HomePageState extends State<HomePage> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
@@ -79,8 +79,15 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      // your widgets here
-                      const Placeholder(),
+                      Widgets().createResponsiveContainer(context, [
+                        // your widgets here
+                        Widgets().createTopLevelCard(
+                            context,
+                            ListTile(
+                              title: Text("Hello World"),
+                              subtitle: Text("This is a sample card"),
+                            )),
+                      ]),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

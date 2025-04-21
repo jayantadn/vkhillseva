@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:vkhsangeetseva/landing.dart';
 import 'package:vkhsangeetseva/registration_page2.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';

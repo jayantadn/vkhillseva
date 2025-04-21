@@ -322,7 +322,7 @@ class _RequestDetailsState extends State<RequestDetails> {
                                       style: Theme.of(context)
                                           .textTheme
                                           .headlineSmall),
-                                  Utils().responsiveBuilder(
+                                  Widgets().createResponsiveContainer(
                                       context,
                                       List.generate(_supportTeam.length,
                                           (index) {
@@ -373,7 +373,7 @@ class _RequestDetailsState extends State<RequestDetails> {
 
                           Align(
                             alignment: Alignment.centerLeft,
-                            child: Utils().responsiveBuilder(
+                            child: Widgets().createResponsiveContainer(
                                 context,
                                 List.generate(widget.eventRecord.guests.length,
                                     (index) {

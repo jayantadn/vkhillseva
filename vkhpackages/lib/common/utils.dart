@@ -68,44 +68,6 @@ class Utils {
     }
   }
 
-  Widget createContextMenu(List<String> items, Function(String) onPressed) {
-    return Builder(
-      builder: (context) {
-        final GlobalKey iconButtonKey = GlobalKey();
-        return IconButton(
-          key: iconButtonKey,
-          icon: Icon(Icons.more_vert),
-          onPressed: () async {
-            final RenderBox renderBox =
-                iconButtonKey.currentContext!.findRenderObject() as RenderBox;
-            final Offset position = renderBox.localToGlobal(
-              renderBox.size.bottomCenter(Offset.zero),
-            );
-
-            final selectedValue = await showMenu<String>(
-              context: context,
-              position: RelativeRect.fromLTRB(
-                position.dx,
-                position.dy,
-                position.dx + 1,
-                position.dy + 1,
-              ),
-              items: List.generate(
-                items.length,
-                (index) => PopupMenuItem<String>(
-                  value: items[index],
-                  child: Text(items[index]),
-                ),
-              ),
-            );
-
-            onPressed(selectedValue ?? "");
-          },
-        );
-      },
-    );
-  }
-
   Future<void> fetchFestivalIcons() async {
     if (festivalIcons.isEmpty) {
       List sevaListRaw = await FB().getList(path: "Settings/NityaSevaList");
@@ -264,28 +226,6 @@ class Utils {
     return _userbasics;
   }
 
-  Widget responsiveBuilder(BuildContext context, List<Widget> children) {
-    double maxWidth = 350;
-
-    final double screenWidth = MediaQuery.of(context).size.width;
-    maxWidth =
-        (screenWidth > maxWidth && screenWidth < maxWidth * 2)
-            ? screenWidth
-            : maxWidth;
-
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: [
-        for (var child in children)
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: maxWidth),
-            child: child,
-          ),
-      ],
-    );
-  }
-
   Future<void> sendWhatsAppMessage(String phoneNumber, String message) async {
     final url = Uri.parse(
       "https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}",
@@ -310,52 +250,5 @@ class Utils {
 
   bool isDateWeekend(DateTime date) {
     return date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
-  }
-
-  Future<void> showMessage(BuildContext context, String msg) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Text(msg),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> showConfirmDialog(
-    BuildContext context,
-    String msg,
-    String? actionType,
-    void Function()? action,
-  ) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(msg),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(onPressed: action, child: Text(actionType ?? 'OK')),
-          ],
-        );
-      },
-    );
   }
 }

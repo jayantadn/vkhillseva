@@ -9,6 +9,7 @@ export 'common/local_storage.dart';
 export 'common/theme.dart';
 export 'common/themeGaruda.dart';
 export 'common/utils.dart';
+export 'widgets/widgets.dart';
 export 'common/notification.dart';
 export 'widgets/auth.dart';
 export 'widgets/calendar.dart';

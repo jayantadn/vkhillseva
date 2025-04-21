@@ -152,7 +152,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
               )
             : null,
         trailing:
-            Utils().createContextMenu(["Edit", "Delete"], (String action) {
+            Widgets().createContextMenu(["Edit", "Delete"], (String action) {
           switch (action) {
             case "Edit":
               _showAddSongDialog(context: context, index: index);
@@ -213,7 +213,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
             ],
           ),
         ),
-        trailing: Utils().createContextMenu(["Remove"], (String action) {
+        trailing: Widgets().createContextMenu(["Remove"], (String action) {
           switch (action) {
             case "Remove":
               setState(() {
@@ -389,7 +389,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     }
 
     // show success message
-    await Utils().showMessage(context,
+    await Widgets().showMessage(context,
         "Your request has been submitted.\nYou will be notified once your request is approved");
 
     // go to homepage
@@ -572,7 +572,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
               IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
-                  Utils().showConfirmDialog(
+                  Widgets().showConfirmDialog(
                       context,
                       "Are you sure you want to delete this event?",
                       "Delete", () async {
@@ -677,7 +677,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineSmall),
-                                Utils().responsiveBuilder(
+                                Widgets().createResponsiveContainer(
                                     context,
                                     List.generate(_supportingTeam.length,
                                         (index) {
@@ -722,7 +722,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Utils().responsiveBuilder(
+                          child: Widgets().createResponsiveContainer(
                               context,
                               List.generate(_guests.length, (index) {
                                 var guest = _guests[index];

@@ -583,7 +583,7 @@ class _ProfileState extends State<Profile> {
                     // leave some space at top
                     SizedBox(height: 10),
 
-                    Widgets().createResponsiveContainer(context, [
+                    Widgets().createResponsiveTopLevelContainer(context, [
                       // salutation
                       InputDecorator(
                         decoration: const InputDecoration(

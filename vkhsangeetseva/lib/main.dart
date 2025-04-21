@@ -26,7 +26,6 @@ class MyApp extends StatelessWidget {
 
   final ThemeData themeSangeetSeva = ThemeCreator(
     primaryColor: Colors.green,
-    secondaryColor: Colors.white,
   ).create();
 
   // This widget is the root of your application.

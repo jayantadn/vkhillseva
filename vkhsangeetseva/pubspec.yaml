@@ -73,6 +73,9 @@ flutter:
     - assets/images/LauncherIcons/NityaSeva.png
     - assets/images/LauncherIcons/Deepotsava.png
     - assets/images/LauncherIcons/Harinaam.png
+    - assets/images/LauncherIcons/Register.png
+    - assets/images/LauncherIcons/RegisteredEvents.png
+    - assets/images/LauncherIcons/PastEvents.png
     - assets/images/Common/morning.png
     - assets/images/Common/evening.png
     - assets/images/Common/add.png

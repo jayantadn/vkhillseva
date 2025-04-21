@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class Widgets {
   static final Widgets _instance = Widgets._internal();
+  static final double maxCardWidth = 400;
 
   factory Widgets() {
     return _instance;
@@ -56,11 +57,126 @@ class Widgets {
     );
   }
 
-  Widget createResponsiveContainer(
+  Widget createImageButton({
+    required BuildContext context,
+    required String image,
+    required String text,
+    required void Function() onPressed,
+    bool? imageOnRight,
+    double? fixedWidth, // Optional parameter to set a specific width
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        constraints:
+            fixedWidth != null
+                ? BoxConstraints(
+                  minHeight: 50,
+                  maxHeight: 50,
+                  maxWidth: fixedWidth,
+                  minWidth: fixedWidth,
+                )
+                : BoxConstraints(minHeight: 50, maxHeight: 50),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Theme.of(context).colorScheme.primary),
+        ),
+        child: Row(
+          mainAxisSize:
+              fixedWidth != null ? MainAxisSize.max : MainAxisSize.min,
+          children:
+              imageOnRight == true
+                  ? [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Center(
+                          child: Text(
+                            text,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(
+                              context,
+                            ).textTheme.headlineSmall!.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(8),
+                        bottomRight: Radius.circular(8),
+                      ),
+                      child: Image.asset(
+                        image,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ]
+                  : [
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        bottomLeft: Radius.circular(8),
+                      ),
+                      child: Image.asset(
+                        image,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Center(
+                          child: Text(
+                            text,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(
+                              context,
+                            ).textTheme.headlineSmall!.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+        ),
+      ),
+    );
+  }
+
+  Widget createResponsiveRow(BuildContext context, List<Widget> children) {
+    double maxWidth = maxCardWidth * 0.8;
+
+    return Wrap(
+      alignment: WrapAlignment.start,
+      spacing: 0,
+      runSpacing: 0,
+      children: [
+        for (var child in children)
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            child: child,
+          ),
+      ],
+    );
+  }
+
+  Widget createResponsiveTopLevelContainer(
     BuildContext context,
     List<Widget> children,
   ) {
-    double maxWidth = 400;
+    double maxWidth = maxCardWidth;
     final double screenWidth = MediaQuery.of(context).size.width;
 
     maxWidth = screenWidth < maxWidth * 2 ? screenWidth : maxWidth;
@@ -80,7 +196,7 @@ class Widgets {
   }
 
   Widget createTopLevelCard(BuildContext context, Widget child) {
-    double maxWidth = 400;
+    double maxWidth = maxCardWidth;
     final double screenWidth = MediaQuery.of(context).size.width;
     maxWidth =
         (screenWidth > maxWidth && screenWidth < maxWidth * 2)
@@ -90,7 +206,9 @@ class Widgets {
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth, minWidth: maxWidth),
-        child: Card(child: child),
+        child: Card(
+          child: Padding(padding: const EdgeInsets.all(8.0), child: child),
+        ),
       ),
     );
   }

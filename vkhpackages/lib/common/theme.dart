@@ -8,9 +8,9 @@ import 'package:flutter/material.dart';
 
 class ThemeCreator {
   Color primaryColor;
-  Color secondaryColor;
+  Color secondaryColor = Colors.white;
 
-  ThemeCreator({required this.primaryColor, required this.secondaryColor});
+  ThemeCreator({required this.primaryColor});
 
   ThemeData create() {
     return ThemeData(

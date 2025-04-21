@@ -677,7 +677,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineSmall),
-                                Widgets().createResponsiveContainer(
+                                Widgets().createResponsiveTopLevelContainer(
                                     context,
                                     List.generate(_supportingTeam.length,
                                         (index) {
@@ -722,7 +722,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Widgets().createResponsiveContainer(
+                          child: Widgets().createResponsiveTopLevelContainer(
                               context,
                               List.generate(_guests.length, (index) {
                                 var guest = _guests[index];

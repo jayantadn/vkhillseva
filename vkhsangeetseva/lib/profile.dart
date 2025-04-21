@@ -549,294 +549,285 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: themeDefault,
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: AppBar(
-              title: Text(widget.title),
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.save),
-                  onPressed: () async {
-                    // validation if user already exists
-                    String dbpath =
-                        "${Const().dbrootSangeetSeva}/Users/${_mobileController.text}";
-                    bool exists = await FB().pathExists(dbpath);
-                    if (exists) {
-                      await _handleExistingUser(context);
-                    } else {
-                      await _save();
-                    }
-                  },
-                )
-              ],
-            ),
-            body: RefreshIndicator(
-              onRefresh: refresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(children: [
-                      // leave some space at top
-                      SizedBox(height: 10),
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.save),
+                onPressed: () async {
+                  // validation if user already exists
+                  String dbpath =
+                      "${Const().dbrootSangeetSeva}/Users/${_mobileController.text}";
+                  bool exists = await FB().pathExists(dbpath);
+                  if (exists) {
+                    await _handleExistingUser(context);
+                  } else {
+                    await _save();
+                  }
+                },
+              )
+            ],
+          ),
+          body: RefreshIndicator(
+            onRefresh: refresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(children: [
+                    // leave some space at top
+                    SizedBox(height: 10),
 
-                      Utils().responsiveBuilder(context, [
-                        // salutation
-                        InputDecorator(
-                          decoration: const InputDecoration(
-                            labelText: 'Salutation',
-                            contentPadding:
-                                EdgeInsets.symmetric(horizontal: 12.0),
-                            border: OutlineInputBorder(),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: _salutation,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  _salutation = newValue!;
-                                });
-                              },
-                              items: _salutations.map<DropdownMenuItem<String>>(
-                                  (String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                            ),
-                          ),
+                    Utils().responsiveBuilder(context, [
+                      // salutation
+                      InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Salutation',
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 12.0),
+                          border: OutlineInputBorder(),
                         ),
-
-                        // name
-                        TextFormField(
-                          controller: _nameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Full name',
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _salutation,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _salutation = newValue!;
+                              });
+                            },
+                            items: _salutations
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Name cannot be empty';
-                            }
-                            if (value.length < 3) {
-                              return 'Please enter full name';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        // mobile
-                        TextFormField(
-                          controller: _mobileController,
-                          decoration: const InputDecoration(
-                            labelText: 'Mobile',
-                          ),
-                          readOnly: widget.self ?? false,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Mobile number cannot be empty';
-                            }
-                            if (value.length != 10) {
-                              return 'Please enter 10 digit mobile number';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        // Sangeet credentials
-                        TextFormField(
-                          controller: _credController,
-                          decoration: const InputDecoration(
-                              labelText: 'Sangeet academic details',
-                              hintText: "e.g. MA in music"),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Field cannot be empty';
-                            }
-                            return null;
-                          },
-                        ),
-                      ]),
-
-                      // picture
-                      SizedBox(height: 10),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Container(
-                          width: 150,
-                          height: 150,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black),
-                          ),
-                          child: _profilePicUrl.isEmpty
-                              ? TextButton(
-                                  onPressed: _pickAndUploadImage,
-                                  child: Text("Upload"))
-                              : ClipRRect(
-                                  child: Image.network(
-                                    _profilePicUrl,
-                                    fit: BoxFit.cover,
-                                    width: 150,
-                                    height: 150,
-                                  ),
-                                ),
                         ),
                       ),
-                      if (_profilePicUrl.isEmpty)
-                        Center(child: Text("Upload your profile picture")),
 
-                      // sangeet exp details
-                      SizedBox(height: 20),
-                      if (_exp.isNotEmpty)
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Sangeet sadhana details",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium),
-                              ...List.generate(_exp.length, (index) {
-                                return Text(
-                                    "${index + 1}. ${_exp[index].category} - ${_exp[index].subcategory} - ${_exp[index].yrs} years");
-                              }),
-                            ],
-                          ),
+                      // name
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Full name',
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Name cannot be empty';
+                          }
+                          if (value.length < 3) {
+                            return 'Please enter full name';
+                          }
+                          return null;
+                        },
+                      ),
 
-                      // button for sangeet exp
-                      SizedBox(height: 20),
-                      TextButton(
-                          onPressed: () async {
-                            await _showDialogSangeetExp(context);
-                          },
-                          child: Text("Add sangeet sadhana details")),
-
-                      // youtube links
-                      SizedBox(height: 20),
-                      if (widget.self != null && widget.self == true)
-                        Column(
-                          children:
-                              List.generate(_youtubeLinks.length, (index) {
-                            return Column(
-                              children: [
-                                if (index == 0 ||
-                                    _youtubeLinks[index - 1].isNotEmpty)
-                                  TextFormField(
-                                    controller: TextEditingController()
-                                      ..text = (_youtubeLinks[index].isNotEmpty)
-                                          ? _youtubeLinks[index]
-                                          : "",
-                                    decoration: InputDecoration(
-                                      labelText: index == 0
-                                          ? 'Youtube link for your performance'
-                                          : 'Another youtube link (optional)',
-                                      hintText:
-                                          "e.g. https://www.youtube.com/watch?v=123",
-                                    ),
-                                    onChanged: (value) {
-                                      _youtubeLinks[index] = value;
-                                    },
-                                  ),
-                                if (index < _youtubeLinks.length - 1)
-                                  SizedBox(height: 10),
-                              ],
-                            );
-                          }),
+                      // mobile
+                      TextFormField(
+                        controller: _mobileController,
+                        decoration: const InputDecoration(
+                          labelText: 'Mobile',
                         ),
+                        readOnly: widget.self ?? false,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Mobile number cannot be empty';
+                          }
+                          if (value.length != 10) {
+                            return 'Please enter 10 digit mobile number';
+                          }
+                          return null;
+                        },
+                      ),
 
-                      // upload audio clip
-                      SizedBox(height: 10),
-                      if (widget.self != null && widget.self == true)
-                        Text("Upload audio clip of your performance",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge!
-                                .copyWith(color: primaryColor)),
-                      if (widget.self != null && widget.self == true)
-                        Column(
-                          children: List.generate(_audioClips.length, (index) {
-                            return Column(
-                              children: [
-                                if (index == 0 ||
-                                    _audioClips[index - 1].isNotEmpty)
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          _getFileNameFromUrl(
-                                              _audioClips[index]),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                          softWrap: false,
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      ElevatedButton(
-                                        child: Text("Browse"),
-                                        onPressed: () async {
-                                          FilePickerResult? result =
-                                              await FilePicker.platform
-                                                  .pickFiles(
-                                            type: FileType.audio,
-                                          );
-
-                                          if (result == null) return;
-                                          PlatformFile file =
-                                              result.files.first;
-
-                                          // upload to firestore
-                                          setState(() {
-                                            _isLoading = true;
-                                          });
-                                          UserBasics? basics =
-                                              Utils().getUserBasics();
-                                          if (basics == null) {
-                                            Toaster().error('User not found');
-                                            return;
-                                          }
-                                          String ext =
-                                              file.name.split('.').last;
-                                          String dstPath =
-                                              "${Const().dbrootSangeetSeva}/Users/${basics.mobile}/audio$index.$ext";
-                                          String url = await FS().uploadBytes(
-                                              dstPath: dstPath,
-                                              bytes: file.bytes!);
-
-                                          setState(() {
-                                            _audioClips[index] = url;
-                                            _isLoading = false;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                if (index < _audioClips.length - 1)
-                                  SizedBox(height: 10),
-                              ],
-                            );
-                          }),
-                        ),
-
-                      // leave some space at bottom
-                      SizedBox(height: 100),
+                      // Sangeet credentials
+                      TextFormField(
+                        controller: _credController,
+                        decoration: const InputDecoration(
+                            labelText: 'Sangeet academic details',
+                            hintText: "e.g. MA in music"),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Field cannot be empty';
+                          }
+                          return null;
+                        },
+                      ),
                     ]),
-                  ),
+
+                    // picture
+                    SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 150,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                        ),
+                        child: _profilePicUrl.isEmpty
+                            ? TextButton(
+                                onPressed: _pickAndUploadImage,
+                                child: Text("Upload"))
+                            : ClipRRect(
+                                child: Image.network(
+                                  _profilePicUrl,
+                                  fit: BoxFit.cover,
+                                  width: 150,
+                                  height: 150,
+                                ),
+                              ),
+                      ),
+                    ),
+                    if (_profilePicUrl.isEmpty)
+                      Center(child: Text("Upload your profile picture")),
+
+                    // sangeet exp details
+                    SizedBox(height: 20),
+                    if (_exp.isNotEmpty)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Sangeet sadhana details",
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium),
+                            ...List.generate(_exp.length, (index) {
+                              return Text(
+                                  "${index + 1}. ${_exp[index].category} - ${_exp[index].subcategory} - ${_exp[index].yrs} years");
+                            }),
+                          ],
+                        ),
+                      ),
+
+                    // button for sangeet exp
+                    SizedBox(height: 20),
+                    TextButton(
+                        onPressed: () async {
+                          await _showDialogSangeetExp(context);
+                        },
+                        child: Text("Add sangeet sadhana details")),
+
+                    // youtube links
+                    SizedBox(height: 20),
+                    if (widget.self != null && widget.self == true)
+                      Column(
+                        children: List.generate(_youtubeLinks.length, (index) {
+                          return Column(
+                            children: [
+                              if (index == 0 ||
+                                  _youtubeLinks[index - 1].isNotEmpty)
+                                TextFormField(
+                                  controller: TextEditingController()
+                                    ..text = (_youtubeLinks[index].isNotEmpty)
+                                        ? _youtubeLinks[index]
+                                        : "",
+                                  decoration: InputDecoration(
+                                    labelText: index == 0
+                                        ? 'Youtube link for your performance'
+                                        : 'Another youtube link (optional)',
+                                    hintText:
+                                        "e.g. https://www.youtube.com/watch?v=123",
+                                  ),
+                                  onChanged: (value) {
+                                    _youtubeLinks[index] = value;
+                                  },
+                                ),
+                              if (index < _youtubeLinks.length - 1)
+                                SizedBox(height: 10),
+                            ],
+                          );
+                        }),
+                      ),
+
+                    // upload audio clip
+                    SizedBox(height: 10),
+                    if (widget.self != null && widget.self == true)
+                      Text("Upload audio clip of your performance",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(color: primaryColor)),
+                    if (widget.self != null && widget.self == true)
+                      Column(
+                        children: List.generate(_audioClips.length, (index) {
+                          return Column(
+                            children: [
+                              if (index == 0 ||
+                                  _audioClips[index - 1].isNotEmpty)
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        _getFileNameFromUrl(_audioClips[index]),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        softWrap: false,
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    ElevatedButton(
+                                      child: Text("Browse"),
+                                      onPressed: () async {
+                                        FilePickerResult? result =
+                                            await FilePicker.platform.pickFiles(
+                                          type: FileType.audio,
+                                        );
+
+                                        if (result == null) return;
+                                        PlatformFile file = result.files.first;
+
+                                        // upload to firestore
+                                        setState(() {
+                                          _isLoading = true;
+                                        });
+                                        UserBasics? basics =
+                                            Utils().getUserBasics();
+                                        if (basics == null) {
+                                          Toaster().error('User not found');
+                                          return;
+                                        }
+                                        String ext = file.name.split('.').last;
+                                        String dstPath =
+                                            "${Const().dbrootSangeetSeva}/Users/${basics.mobile}/audio$index.$ext";
+                                        String url = await FS().uploadBytes(
+                                            dstPath: dstPath,
+                                            bytes: file.bytes!);
+
+                                        setState(() {
+                                          _audioClips[index] = url;
+                                          _isLoading = false;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              if (index < _audioClips.length - 1)
+                                SizedBox(height: 10),
+                            ],
+                          );
+                        }),
+                      ),
+
+                    // leave some space at bottom
+                    SizedBox(height: 100),
+                  ]),
                 ),
               ),
             ),
           ),
+        ),
 
-          // circular progress indicator
-          if (_isLoading) LoadingOverlay(image: widget.icon)
-        ],
-      ),
+        // circular progress indicator
+        if (_isLoading) LoadingOverlay(image: widget.icon)
+      ],
     );
   }
 }

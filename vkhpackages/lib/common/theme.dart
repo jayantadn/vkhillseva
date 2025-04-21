@@ -19,9 +19,7 @@ ThemeData themeDefault = ThemeData(
     backgroundColor: backgroundColor,
     foregroundColor: accentColor,
     titleTextStyle: GoogleFonts.pacifico(color: accentColor, fontSize: 32),
-    iconTheme: IconThemeData(
-      size: 32.0,
-    ),
+    iconTheme: IconThemeData(size: 32.0),
     elevation: 2.0, // This will create a shadow which looks like an underline
     shadowColor: accentColor, // Color of the shadow
   ),
@@ -31,10 +29,7 @@ ThemeData themeDefault = ThemeData(
     bodyLarge: TextStyle(color: textColor, fontSize: 18.0),
     bodyMedium: TextStyle(color: textColor, fontSize: 14.0),
     bodySmall: TextStyle(color: textColor, fontSize: 12.0),
-    headlineLarge: GoogleFonts.mogra(
-      color: accentColor,
-      fontSize: 24.0,
-    ),
+    headlineLarge: GoogleFonts.mogra(color: accentColor, fontSize: 24.0),
     headlineMedium: GoogleFonts.delius(
       color: primaryColor,
       fontSize: 18.0,
@@ -52,13 +47,8 @@ ThemeData themeDefault = ThemeData(
     style: ElevatedButton.styleFrom(
       foregroundColor: backgroundColor,
       backgroundColor: primaryColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      textStyle: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 16.0,
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+      textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
     ),
   ),
 
@@ -66,13 +56,8 @@ ThemeData themeDefault = ThemeData(
     style: OutlinedButton.styleFrom(
       foregroundColor: accentColor, // Set the foreground color explicitly
       side: BorderSide(color: accentColor, width: 2.0),
-      textStyle: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 16.0,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
-      ),
+      textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
     ),
   ),
 
@@ -130,10 +115,7 @@ ThemeData themeDefault = ThemeData(
   // Popup Menu Theme
   popupMenuTheme: PopupMenuThemeData(
     color: backgroundColor,
-    textStyle: TextStyle(
-      color: textColor,
-      fontSize: 16.0,
-    ),
+    textStyle: TextStyle(color: textColor, fontSize: 16.0),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8.0),
       side: BorderSide(color: accentColor, width: 1.0),
@@ -141,10 +123,7 @@ ThemeData themeDefault = ThemeData(
   ),
 
   // Icon Theme
-  iconTheme: IconThemeData(
-    color: accentColor,
-    size: 24.0,
-  ),
+  iconTheme: IconThemeData(color: accentColor, size: 24.0),
 
   // Icon Button Theme
   iconButtonTheme: IconButtonThemeData(
@@ -156,16 +135,20 @@ ThemeData themeDefault = ThemeData(
 
   // Checkboxes, Radios, Switches
   checkboxTheme: CheckboxThemeData(
-    fillColor: WidgetStateProperty.resolveWith((states) =>
-        states.contains(WidgetState.selected)
-            ? accentColor
-            : Colors.transparent),
+    fillColor: WidgetStateProperty.resolveWith(
+      (states) =>
+          states.contains(WidgetState.selected)
+              ? accentColor
+              : Colors.transparent,
+    ),
   ),
   radioTheme: RadioThemeData(
-    fillColor: WidgetStateProperty.resolveWith((states) =>
-        states.contains(WidgetState.selected)
-            ? accentColor
-            : Colors.transparent),
+    fillColor: WidgetStateProperty.resolveWith(
+      (states) =>
+          states.contains(WidgetState.selected)
+              ? accentColor
+              : Colors.transparent,
+    ),
   ),
   switchTheme: SwitchThemeData(
     thumbColor: WidgetStateProperty.all(accentColor),

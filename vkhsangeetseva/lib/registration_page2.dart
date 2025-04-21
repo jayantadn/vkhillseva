@@ -564,252 +564,247 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: themeDefault,
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: AppBar(title: Text(widget.title), actions: [
-              if (widget.oldEvent != null)
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    Utils().showConfirmDialog(
-                        context,
-                        "Are you sure you want to delete this event?",
-                        "Delete", () async {
-                      await _deleteEvent();
-                    });
-                  },
-                )
-            ]),
-            body: RefreshIndicator(
-              onRefresh: refresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // leave some space at top
-                      SizedBox(height: 10),
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(title: Text(widget.title), actions: [
+            if (widget.oldEvent != null)
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  Utils().showConfirmDialog(
+                      context,
+                      "Are you sure you want to delete this event?",
+                      "Delete", () async {
+                    await _deleteEvent();
+                  });
+                },
+              )
+          ]),
+          body: RefreshIndicator(
+            onRefresh: refresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // leave some space at top
+                    SizedBox(height: 10),
 
-                      // your widgets here
-                      Center(
-                        child: Column(children: [
-                          // date
-                          Text(
-                              DateFormat("EEE, dd MMM, yyyy")
-                                  .format(widget.selectedDate),
-                              style: themeDefault.textTheme.headlineLarge),
+                    // your widgets here
+                    Center(
+                      child: Column(children: [
+                        // date
+                        Text(
+                            DateFormat("EEE, dd MMM, yyyy")
+                                .format(widget.selectedDate),
+                            style: themeDefault.textTheme.headlineLarge),
 
-                          // slot
-                          Text("${widget.slot.from} - ${widget.slot.to}",
-                              style: themeDefault.textTheme.headlineMedium),
+                        // slot
+                        Text("${widget.slot.from} - ${widget.slot.to}",
+                            style: themeDefault.textTheme.headlineMedium),
 
-                          // temple notes
-                          if (widget.oldEvent != null &&
-                              widget.oldEvent!.noteTemple.isNotEmpty)
-                            Card(
-                                color: widget.oldEvent!.status == "Approved"
-                                    ? Colors.green[50]
-                                    : Colors.red[50],
-                                child: ListTile(
-                                  title: Text("Temple notes"),
-                                  subtitle: Text(widget.oldEvent!.noteTemple),
-                                )),
-
-                          // main performer
-                          if (_mainPerformer != null)
-                            Card(
-                              child: Column(
-                                children: [
-                                  Text("Main performer",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineSmall),
-                                  ListTile(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => Profile(
-                                            title: "Main performer",
-                                            self: true,
-                                            onProfileSaved: (user) {
-                                              setState(() {
-                                                _mainPerformer = user;
-                                              });
-                                            },
-                                            friendMobile:
-                                                _mainPerformer!.mobile,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    leading: CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                          _mainPerformer!.profilePicUrl),
-                                    ),
-                                    title: Text(
-                                        "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
-                                    subtitle: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.phone),
-                                          Text(_mainPerformer!.mobile),
-                                          SizedBox(width: 4),
-                                          Icon(Icons.workspace_premium),
-                                          Text(_mainPerformer!.credentials),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                          // supporting team
-                          if (_supportingTeam.isNotEmpty)
-                            Card(
-                              child: Column(
-                                children: [
-                                  Text("Supporting team",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineSmall),
-                                  Utils().responsiveBuilder(
-                                      context,
-                                      List.generate(_supportingTeam.length,
-                                          (index) {
-                                        return _createSupportingTeamTile(index);
-                                      })),
-                                ],
-                              ),
-                            ),
-
-                          // add supporting team
-                          SizedBox(height: 10),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Profile(
-                                      title: "Supporting team",
-                                      self: false,
-                                      onProfileSaved: (UserDetails user) {
-                                        setState(() {
-                                          _supportingTeam.add(user);
-                                        });
-                                      },
-                                      friendMobile: _mainPerformer!.mobile,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                "Add supporting team",
+                        // temple notes
+                        if (widget.oldEvent != null &&
+                            widget.oldEvent!.noteTemple.isNotEmpty)
+                          Card(
+                              color: widget.oldEvent!.status == "Approved"
+                                  ? Colors.green[50]
+                                  : Colors.red[50],
+                              child: ListTile(
+                                title: Text("Temple notes"),
+                                subtitle: Text(widget.oldEvent!.noteTemple),
                               )),
 
-                          // guests
-                          SizedBox(height: 10),
-                          if (_guests.isNotEmpty)
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text("Guests",
-                                  style: themeDefault.textTheme.headlineSmall),
-                            ),
-
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Utils().responsiveBuilder(
-                                context,
-                                List.generate(_guests.length, (index) {
-                                  var guest = _guests[index];
-                                  return Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                        "${index + 1}. ${guest.name} ${guest.honorPrasadam ? " (Prasadam)" : ""}"),
-                                  );
-                                })),
-                          ),
-
-                          // add guest
-                          SizedBox(height: 10),
-                          TextButton(
-                              onPressed: () {
-                                _showAddGuestDialog(context);
-                              },
-                              child: Text("Add guest")),
-
-                          // list of songs
-                          SizedBox(height: 10),
-                          if (_songs.isNotEmpty)
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text("List of songs",
-                                  style: themeDefault.textTheme.headlineSmall),
-                            ),
-                          ...List.generate(_songs.length, (index) {
-                            return _createSongTile(index);
-                          }),
-                          SizedBox(height: 10),
-                          if (_songs.length < 10)
-                            TextButton(
-                                onPressed: () async {
-                                  await _showAddSongDialog(context: context);
-                                },
-                                child: Text("Add song for event")),
-
-                          // performer note
-                          SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerLeft,
+                        // main performer
+                        if (_mainPerformer != null)
+                          Card(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Note:",
-                                    style:
-                                        themeDefault.textTheme.headlineSmall),
-                                TextField(
-                                  maxLines: 2,
-                                  controller: _noteController,
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    hintText: "optional note for performer",
+                                Text("Main performer",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall),
+                                ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Profile(
+                                          title: "Main performer",
+                                          self: true,
+                                          onProfileSaved: (user) {
+                                            setState(() {
+                                              _mainPerformer = user;
+                                            });
+                                          },
+                                          friendMobile: _mainPerformer!.mobile,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  leading: CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                        _mainPerformer!.profilePicUrl),
+                                  ),
+                                  title: Text(
+                                      "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
+                                  subtitle: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.phone),
+                                        Text(_mainPerformer!.mobile),
+                                        SizedBox(width: 4),
+                                        Icon(Icons.workspace_premium),
+                                        Text(_mainPerformer!.credentials),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
 
-                          // submit button
-                          SizedBox(height: 10),
-                          ElevatedButton(
-                            onPressed: _onSubmit,
-                            child: widget.oldEvent == null
-                                ? Text("Submit")
-                                : Text("Update"),
-                          )
-                        ]),
-                      ),
+                        // supporting team
+                        if (_supportingTeam.isNotEmpty)
+                          Card(
+                            child: Column(
+                              children: [
+                                Text("Supporting team",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall),
+                                Utils().responsiveBuilder(
+                                    context,
+                                    List.generate(_supportingTeam.length,
+                                        (index) {
+                                      return _createSupportingTeamTile(index);
+                                    })),
+                              ],
+                            ),
+                          ),
 
-                      // leave some space at bottom
-                      SizedBox(height: 100),
-                    ],
-                  ),
+                        // add supporting team
+                        SizedBox(height: 10),
+                        TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Profile(
+                                    title: "Supporting team",
+                                    self: false,
+                                    onProfileSaved: (UserDetails user) {
+                                      setState(() {
+                                        _supportingTeam.add(user);
+                                      });
+                                    },
+                                    friendMobile: _mainPerformer!.mobile,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              "Add supporting team",
+                            )),
+
+                        // guests
+                        SizedBox(height: 10),
+                        if (_guests.isNotEmpty)
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text("Guests",
+                                style: themeDefault.textTheme.headlineSmall),
+                          ),
+
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Utils().responsiveBuilder(
+                              context,
+                              List.generate(_guests.length, (index) {
+                                var guest = _guests[index];
+                                return Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                      "${index + 1}. ${guest.name} ${guest.honorPrasadam ? " (Prasadam)" : ""}"),
+                                );
+                              })),
+                        ),
+
+                        // add guest
+                        SizedBox(height: 10),
+                        TextButton(
+                            onPressed: () {
+                              _showAddGuestDialog(context);
+                            },
+                            child: Text("Add guest")),
+
+                        // list of songs
+                        SizedBox(height: 10),
+                        if (_songs.isNotEmpty)
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text("List of songs",
+                                style: themeDefault.textTheme.headlineSmall),
+                          ),
+                        ...List.generate(_songs.length, (index) {
+                          return _createSongTile(index);
+                        }),
+                        SizedBox(height: 10),
+                        if (_songs.length < 10)
+                          TextButton(
+                              onPressed: () async {
+                                await _showAddSongDialog(context: context);
+                              },
+                              child: Text("Add song for event")),
+
+                        // performer note
+                        SizedBox(height: 10),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Note:",
+                                  style: themeDefault.textTheme.headlineSmall),
+                              TextField(
+                                maxLines: 2,
+                                controller: _noteController,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  hintText: "optional note for performer",
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // submit button
+                        SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: _onSubmit,
+                          child: widget.oldEvent == null
+                              ? Text("Submit")
+                              : Text("Update"),
+                        )
+                      ]),
+                    ),
+
+                    // leave some space at bottom
+                    SizedBox(height: 100),
+                  ],
                 ),
               ),
             ),
           ),
+        ),
 
-          // circular progress indicator
-          if (_isLoading) LoadingOverlay(image: widget.icon),
-        ],
-      ),
+        // circular progress indicator
+        if (_isLoading) LoadingOverlay(image: widget.icon),
+      ],
     );
   }
 }

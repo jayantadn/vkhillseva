@@ -261,147 +261,144 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: themeDefault,
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: AppBar(
-              title: Text(widget.title),
-              actions: [
-                // profile button
-                if (_username.isNotEmpty)
-                  IconButton(
-                    icon: Icon(Icons.person),
-                    onPressed: () {
-                      Navigator.push(
-                        // ignore: use_build_context_synchronously
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Profile(
-                            title: "Profile",
-                            self: true,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-
-                // logout button
-                if (_username.isNotEmpty)
-                  IconButton(
-                    icon: Icon(Icons.logout),
-                    onPressed: () async {
-                      CommonWidgets().confirm(
-                          context: context,
-                          msg: "Are you sure you want to logout?",
-                          callbacks: ConfirmationCallbacks(
-                              onConfirm: _logout,
-                              onCancel: () {
-                                Navigator.pop(context);
-                              }));
-                    },
-                  ),
-
-                // support
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
+            actions: [
+              // profile button
+              if (_username.isNotEmpty)
                 IconButton(
-                  icon: Icon(Icons.help),
+                  icon: Icon(Icons.person),
                   onPressed: () {
                     Navigator.push(
                       // ignore: use_build_context_synchronously
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Support(
-                          title: "Support",
+                        builder: (context) => Profile(
+                          title: "Profile",
+                          self: true,
                         ),
                       ),
                     );
                   },
                 ),
-              ],
-            ),
-            body: RefreshIndicator(
-              onRefresh: refresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        // leave some space at top
-                        SizedBox(height: 10),
 
-                        // welcome banner
-                        _createWelcome(),
+              // logout button
+              if (_username.isNotEmpty)
+                IconButton(
+                  icon: Icon(Icons.logout),
+                  onPressed: () async {
+                    CommonWidgets().confirm(
+                        context: context,
+                        msg: "Are you sure you want to logout?",
+                        callbacks: ConfirmationCallbacks(
+                            onConfirm: _logout,
+                            onCancel: () {
+                              Navigator.pop(context);
+                            }));
+                  },
+                ),
 
-                        SizedBox(
-                          height: 10,
-                        ),
-
-                        // sms authentication
-                        if (_username.isEmpty)
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors
-                                  .deepOrange, // Change the background color here
-                            ),
-                            onPressed: () {
-                              smsAuth(context, () async {
-                                // auth complete
-                                await refresh();
-                              });
-                            },
-                            child: Text('Signup / Login'),
-                          ),
-
-                        // register for events
-                        if (_username.isNotEmpty)
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                // ignore: use_build_context_synchronously
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Registration(
-                                    title: "Event Registration",
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Text('Register for an Event'),
-                          ),
-
-                        // registered events
-                        SizedBox(
-                          height: 10,
-                        ),
-                        if (_username.isNotEmpty)
-                          // clip number of events to display
-                          ...List.generate(
-                              _events.length > _maxEvents
-                                  ? _maxEvents
-                                  : _events.length, (index) {
-                            return _createEventCard(index);
-                          }),
-
-                        // leave some space at bottom
-                        SizedBox(height: 100),
-                      ],
+              // support
+              IconButton(
+                icon: Icon(Icons.help),
+                onPressed: () {
+                  Navigator.push(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Support(
+                        title: "Support",
+                      ),
                     ),
+                  );
+                },
+              ),
+            ],
+          ),
+          body: RefreshIndicator(
+            onRefresh: refresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      // leave some space at top
+                      SizedBox(height: 10),
+
+                      // welcome banner
+                      _createWelcome(),
+
+                      SizedBox(
+                        height: 10,
+                      ),
+
+                      // sms authentication
+                      if (_username.isEmpty)
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors
+                                .deepOrange, // Change the background color here
+                          ),
+                          onPressed: () {
+                            smsAuth(context, () async {
+                              // auth complete
+                              await refresh();
+                            });
+                          },
+                          child: Text('Signup / Login'),
+                        ),
+
+                      // register for events
+                      if (_username.isNotEmpty)
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              // ignore: use_build_context_synchronously
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Registration(
+                                  title: "Event Registration",
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text('Register for an Event'),
+                        ),
+
+                      // registered events
+                      SizedBox(
+                        height: 10,
+                      ),
+                      if (_username.isNotEmpty)
+                        // clip number of events to display
+                        ...List.generate(
+                            _events.length > _maxEvents
+                                ? _maxEvents
+                                : _events.length, (index) {
+                          return _createEventCard(index);
+                        }),
+
+                      // leave some space at bottom
+                      SizedBox(height: 100),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
+        ),
 
-          // circular progress indicator
-          if (_isLoading)
-            LoadingOverlay(
-              image: "assets/images/Logo/KrishnaLilaPark_circle.png",
-            ),
-        ],
-      ),
+        // circular progress indicator
+        if (_isLoading)
+          LoadingOverlay(
+            image: "assets/images/Logo/KrishnaLilaPark_circle.png",
+          ),
+      ],
     );
   }
 }

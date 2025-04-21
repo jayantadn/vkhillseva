@@ -45,9 +45,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     });
 
     // access control
-    
+
     // perform async operations here
-        
+
     await _lock.synchronized(() async {
       // fetch form values
 
@@ -63,44 +63,41 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: themeDefault,
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: AppBar(title: Text(widget.title)),
-            body: RefreshIndicator(
-              onRefresh: refresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        // leave some space at top
-                        SizedBox(height: 10),
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(title: Text(widget.title)),
+          body: RefreshIndicator(
+            onRefresh: refresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      // leave some space at top
+                      SizedBox(height: 10),
 
-                        // your widgets here
-                        const Placeholder(),
+                      // your widgets here
+                      const Placeholder(),
 
-                        // leave some space at bottom
-                        SizedBox(height: 100),
-                      ],
-                    ),
+                      // leave some space at bottom
+                      SizedBox(height: 100),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
+        ),
 
-          // circular progress indicator
-          if (_isLoading)
-            LoadingOverlay(
-              image: "assets/images/Logo/KrishnaLilaPark_circle.png",
-            ),
-        ],
-      ),
+        // circular progress indicator
+        if (_isLoading)
+          LoadingOverlay(
+            image: "assets/images/Logo/KrishnaLilaPark_circle.png",
+          ),
+      ],
     );
   }
 }

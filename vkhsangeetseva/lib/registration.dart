@@ -300,46 +300,43 @@ class _RegistrationState extends State<Registration> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: themeDefault,
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: AppBar(
-              title: Text(widget.title),
-            ),
-            body: RefreshIndicator(
-                onRefresh: refresh,
-                child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // leave some space at top
-                              SizedBox(height: 10),
-
-                              Calendar(
-                                  key: calendarKey,
-                                  onDaySelected: (date) async {
-                                    await _fillBookingLists(date);
-
-                                    setState(() {
-                                      _selectedDate = date;
-                                    });
-                                  }),
-                              _createSlotDetails(context),
-
-                              // leave some space at bottom
-                              SizedBox(height: 100),
-                            ])))),
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
           ),
+          body: RefreshIndicator(
+              onRefresh: refresh,
+              child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // leave some space at top
+                            SizedBox(height: 10),
 
-          // circular progress indicator
-          if (_isLoading) LoadingOverlay(image: widget.icon)
-        ],
-      ),
+                            Calendar(
+                                key: calendarKey,
+                                onDaySelected: (date) async {
+                                  await _fillBookingLists(date);
+
+                                  setState(() {
+                                    _selectedDate = date;
+                                  });
+                                }),
+                            _createSlotDetails(context),
+
+                            // leave some space at bottom
+                            SizedBox(height: 100),
+                          ])))),
+        ),
+
+        // circular progress indicator
+        if (_isLoading) LoadingOverlay(image: widget.icon)
+      ],
     );
   }
 }

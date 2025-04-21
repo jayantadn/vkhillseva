@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/registration.dart';
+import 'package:vkhsangeetseva/slot_selection.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -181,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => Registration(
+                                            builder: (context) => SlotSelection(
                                               title: "Event Registration",
                                             ),
                                           ),

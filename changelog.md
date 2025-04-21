@@ -1,3 +1,5 @@
+# 6.2.1
+
 # 6.2.0
 - fix: garuda launch issue
 - feature: check for existing user before adding

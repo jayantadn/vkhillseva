@@ -50,6 +50,9 @@ class _HomePageState extends State<HomePage> {
 
     // perform async operations here
 
+    // get username from local storage
+    await Utils().fetchUserBasics();
+
     await _lock.synchronized(() async {
       // fetch form values
 
@@ -59,13 +62,14 @@ class _HomePageState extends State<HomePage> {
     });
 
     setState(() {
+      _username = Utils().getUsername();
       _isLoading = false;
     });
   }
 
   Widget _createWelcome() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(10.0),
       child: Column(children: [
         // image
         Container(
@@ -116,6 +120,25 @@ class _HomePageState extends State<HomePage> {
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
+
+        // signup button
+        SizedBox(
+          height: 10,
+        ),
+        if (_username.isEmpty)
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  Colors.deepOrange, // Change the background color here
+            ),
+            onPressed: () {
+              smsAuth(context, () async {
+                // auth complete
+                await refresh();
+              });
+            },
+            child: Text('Signup / Login'),
+          ),
       ]),
     );
   }

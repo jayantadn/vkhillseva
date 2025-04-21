@@ -61,23 +61,42 @@ class Widgets {
     List<Widget> children,
   ) {
     double maxWidth = 350;
+    final double screenWidth = MediaQuery.of(context).size.width;
 
+    // Ensure maxWidth is adjusted to fit within the screen width
+    maxWidth =
+        screenWidth < maxWidth * 2
+            ? (screenWidth - 20) /
+                2 // Adjust for spacing and padding
+            : maxWidth;
+
+    return Wrap(
+      alignment: WrapAlignment.start,
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        for (var child in children)
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxWidth, minWidth: maxWidth),
+            child: child,
+          ),
+      ],
+    );
+  }
+
+  Widget createTopLevelCard(BuildContext context, Widget child) {
+    double maxWidth = 350;
     final double screenWidth = MediaQuery.of(context).size.width;
     maxWidth =
         (screenWidth > maxWidth && screenWidth < maxWidth * 2)
             ? screenWidth
             : maxWidth;
 
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: [
-        for (var child in children)
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: maxWidth),
-            child: child,
-          ),
-      ],
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: Card(child: child),
+      ),
     );
   }
 

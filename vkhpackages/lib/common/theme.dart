@@ -13,7 +13,7 @@ ThemeData createTheme({
     // General Colors
     brightness: Brightness.light,
     primaryColor: Colors.black,
-    scaffoldBackgroundColor: Colors.grey[50],
+    scaffoldBackgroundColor: Colors.grey[100],
     colorScheme: ColorScheme.light(
       primary: Colors.black,
       secondary: Colors.black,

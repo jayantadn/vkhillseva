@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
     slot: Slot(name: "name", avl: true, from: "10:00 AM", to: "12:00 PM"),
   );
 
-  ThemeData themeSangeetSeva = createTheme(
+  final ThemeData themeSangeetSeva = createTheme(
     primaryColor: Colors.green,
     secondaryColor: Colors.white,
   );

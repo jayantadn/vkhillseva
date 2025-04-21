@@ -79,8 +79,15 @@ class _HomePageState extends State<HomePage> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      // your widgets here
-                      const Placeholder(),
+                      Widgets().createResponsiveContainer(context, [
+                        // your widgets here
+                        Widgets().createTopLevelCard(
+                            context,
+                            ListTile(
+                              title: Text("Hello World"),
+                              subtitle: Text("This is a sample card"),
+                            )),
+                      ]),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

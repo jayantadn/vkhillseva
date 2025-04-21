@@ -637,7 +637,7 @@ class _NityaSevaState extends State<NityaSeva> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: themeDefault,
+      data: themeGaruda,
       child: Stack(
         children: [
           Scaffold(

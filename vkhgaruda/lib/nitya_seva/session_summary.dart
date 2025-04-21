@@ -275,7 +275,7 @@ class _SessionSummaryState extends State<SessionSummary> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: themeDefault,
+      data: themeGaruda,
       child: Stack(
         children: [
           Scaffold(

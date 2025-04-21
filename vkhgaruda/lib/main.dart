@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Garuda',
-      theme: themeDefault,
+      theme: themeGaruda,
       home: home,
     );
   }

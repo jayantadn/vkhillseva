@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhsangeetseva/landing.dart';
 import 'package:vkhsangeetseva/registration_page2.dart';
-import 'package:vkhsangeetseva/theme_new.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/home.dart';
@@ -27,10 +26,8 @@ class MyApp extends StatelessWidget {
   );
 
   ThemeData themeSangeetSeva = createTheme(
-    primaryColor: Colors.black,
-    secondaryColor: Colors.green,
-    scaffoldBackgroundColor: Colors.grey[100]!,
-    secondaryBackgroundColor: Colors.white,
+    primaryColor: Colors.green,
+    secondaryColor: Colors.white,
   );
 
   // This widget is the root of your application.
@@ -39,7 +36,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sangeet Seva',
       theme: themeSangeetSeva,
-      home: LandingPage(title: "Sangeet Seva"),
+      home: HomePage(title: "Sangeet Seva"),
     );
   }
 }

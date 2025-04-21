@@ -176,7 +176,7 @@ class _RequestDetailsState extends State<RequestDetails> {
               children: [
                 Text("Are you sure you want to $action this request?"),
                 SizedBox(height: 10),
-                Text("Note:", style: themeDefault.textTheme.headlineSmall),
+                Text("Note:", style: themeGaruda.textTheme.headlineSmall),
                 TextField(
                   maxLines: 2,
                   controller: _noteController,
@@ -216,7 +216,7 @@ class _RequestDetailsState extends State<RequestDetails> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: themeDefault,
+      data: themeGaruda,
       child: Stack(
         children: [
           Scaffold(
@@ -260,12 +260,12 @@ class _RequestDetailsState extends State<RequestDetails> {
                           Text(
                               DateFormat("EEE, dd MMM, yyyy")
                                   .format(widget.eventRecord.date),
-                              style: themeDefault.textTheme.headlineLarge),
+                              style: themeGaruda.textTheme.headlineLarge),
 
                           // slot
                           Text(
                               "${widget.eventRecord.slot.from} - ${widget.eventRecord.slot.to}",
-                              style: themeDefault.textTheme.headlineMedium),
+                              style: themeGaruda.textTheme.headlineMedium),
 
                           // main performer
                           Card(
@@ -368,7 +368,7 @@ class _RequestDetailsState extends State<RequestDetails> {
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Text("Guests",
-                                  style: themeDefault.textTheme.headlineSmall),
+                                  style: themeGaruda.textTheme.headlineSmall),
                             ),
 
                           Align(
@@ -391,7 +391,7 @@ class _RequestDetailsState extends State<RequestDetails> {
                           Align(
                             alignment: Alignment.centerLeft,
                             child: Text("List of songs",
-                                style: themeDefault.textTheme.headlineSmall),
+                                style: themeGaruda.textTheme.headlineSmall),
                           ),
                           ...List.generate(widget.eventRecord.songs.length,
                               (index) {
@@ -427,8 +427,7 @@ class _RequestDetailsState extends State<RequestDetails> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text("Note:",
-                                    style:
-                                        themeDefault.textTheme.headlineSmall),
+                                    style: themeGaruda.textTheme.headlineSmall),
                                 Text(widget.eventRecord.notePerformer)
                               ],
                             ),

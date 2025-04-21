@@ -231,7 +231,7 @@ class _FestivalSettingsPageState extends State<FestivalSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: themeDefault,
+      data: themeGaruda,
       child: Stack(
         children: [
           Scaffold(

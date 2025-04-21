@@ -113,7 +113,7 @@ class _ProfilesState extends State<Profiles> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: themeDefault,
+      data: themeGaruda,
       child: Stack(
         children: [
           Scaffold(

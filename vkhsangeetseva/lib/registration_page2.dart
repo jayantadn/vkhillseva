@@ -600,11 +600,11 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                         Text(
                             DateFormat("EEE, dd MMM, yyyy")
                                 .format(widget.selectedDate),
-                            style: themeDefault.textTheme.headlineLarge),
+                            style: themeGaruda.textTheme.headlineLarge),
 
                         // slot
                         Text("${widget.slot.from} - ${widget.slot.to}",
-                            style: themeDefault.textTheme.headlineMedium),
+                            style: themeGaruda.textTheme.headlineMedium),
 
                         // temple notes
                         if (widget.oldEvent != null &&
@@ -717,7 +717,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           Align(
                             alignment: Alignment.centerLeft,
                             child: Text("Guests",
-                                style: themeDefault.textTheme.headlineSmall),
+                                style: themeGaruda.textTheme.headlineSmall),
                           ),
 
                         Align(
@@ -748,7 +748,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           Align(
                             alignment: Alignment.centerLeft,
                             child: Text("List of songs",
-                                style: themeDefault.textTheme.headlineSmall),
+                                style: themeGaruda.textTheme.headlineSmall),
                           ),
                         ...List.generate(_songs.length, (index) {
                           return _createSongTile(index);
@@ -769,7 +769,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("Note:",
-                                  style: themeDefault.textTheme.headlineSmall),
+                                  style: themeGaruda.textTheme.headlineSmall),
                               TextField(
                                 maxLines: 2,
                                 controller: _noteController,

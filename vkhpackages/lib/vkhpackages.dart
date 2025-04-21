@@ -7,9 +7,9 @@ export 'common/fs.dart';
 export 'common/fb.dart';
 export 'common/local_storage.dart';
 export 'common/theme.dart';
+export 'common/themeGaruda.dart';
 export 'common/utils.dart';
 export 'common/notification.dart';
-
 export 'widgets/auth.dart';
 export 'widgets/calendar.dart';
 export 'widgets/loading_overlay.dart';

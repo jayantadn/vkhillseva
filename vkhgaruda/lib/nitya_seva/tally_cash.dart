@@ -344,7 +344,7 @@ class _TallyNotesPageState extends State<TallyCashPage> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: themeDefault,
+      data: themeGaruda,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Tally Cash'),

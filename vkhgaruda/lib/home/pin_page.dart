@@ -49,7 +49,7 @@ class _PinPageState extends State<PinPage> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: themeDefault,
+      data: themeGaruda,
       child: Stack(
         children: [
           Scaffold(

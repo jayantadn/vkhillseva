@@ -130,7 +130,7 @@ class _PendingRequestsState extends State<PendingRequests> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: themeDefault,
+      data: themeGaruda,
       child: Stack(
         children: [
           Scaffold(

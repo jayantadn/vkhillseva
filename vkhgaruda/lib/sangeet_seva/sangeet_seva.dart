@@ -156,9 +156,9 @@ class _SangeetSevaState extends State<SangeetSeva> {
     // check if end time is greater than start time
     try {
       final DateTime startDateTime =
-          Utils().getTimeFromString(_selectedDate, startTime);
+          Utils().convertStringToTime(_selectedDate, startTime);
       final DateTime endDateTime =
-          Utils().getTimeFromString(_selectedDate, endTime);
+          Utils().convertStringToTime(_selectedDate, endTime);
       if (endDateTime.isBefore(startDateTime)) {
         Toaster().error("End time should be greater than start time");
         return false;

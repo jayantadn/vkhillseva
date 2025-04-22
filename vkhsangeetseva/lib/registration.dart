@@ -218,7 +218,7 @@ class _RegistrationState extends State<Registration> {
 
                 // check if slot is in the past
                 DateTime now = DateTime.now();
-                List<int> hrMin = Utils().getHrMinFromTime(slot.from);
+                List<int> hrMin = Utils().convertTimeToHrMin(slot.from);
                 DateTime slotDateTime = DateTime(
                   _selectedDate.year,
                   _selectedDate.month,

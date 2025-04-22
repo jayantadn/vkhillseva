@@ -97,7 +97,7 @@ class Utils {
   }
 
   // input time is in format "07:30 PM" or "19:30"
-  DateTime getTimeFromString(DateTime date, String time) {
+  DateTime convertStringToTime(DateTime date, String time) {
     // check if 12 hr or 24 hr format
     if (time.contains("AM") || time.contains("PM")) {
       // 12-hr format
@@ -105,8 +105,8 @@ class Utils {
         date.year,
         date.month,
         date.day,
-        getHrMinFromTime(time)[0],
-        getHrMinFromTime(time)[1],
+        convertTimeToHrMin(time)[0],
+        convertTimeToHrMin(time)[1],
       );
     } else {
       // 24-hr format
@@ -124,7 +124,7 @@ class Utils {
 
   // input time is in format "07:30 PM"
   // return [19, 30]
-  List<int> getHrMinFromTime(String time) {
+  List<int> convertTimeToHrMin(String time) {
     String part1 = time.split(":")[0];
     String part2 = time.split(":")[1];
     String part3 = part2.split(" ")[0];

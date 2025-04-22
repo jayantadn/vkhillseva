@@ -178,8 +178,8 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
             break;
           } else if (_nextAvailableSlot != null) {
             if (slot.avl == true) {
-              if (Utils().getTimeFromString(date, slot.from).isAfter(Utils()
-                  .getTimeFromString(
+              if (Utils().convertStringToTime(date, slot.from).isAfter(Utils()
+                  .convertStringToTime(
                       _nextAvailableDate!, _nextAvailableSlot!.from))) {
                 _nextAvailableDate = date;
                 _nextAvailableSlot = slot;
@@ -196,27 +196,45 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
     }
 
     // arbitrate against the weekend slots
-    if (_nextAvailableDate!.isAfter(nextWeekendDate)) {
-      for (var slot in Const().weekendSangeetSevaSlots) {
-        if (_nextAvailableSlot == null) {
-          _nextAvailableDate = nextWeekendDate;
-          _nextAvailableSlot = slot;
-          break;
-        } else if (Utils()
-            .getTimeFromString(_nextAvailableDate!, _nextAvailableSlot!.from)
-            .isAfter(Utils().getTimeFromString(nextWeekendDate, slot.from))) {
-          if (await _isSlotAvailable(nextWeekendDate, slot)) {
+    bool foundWeekend = false;
+    for (int i = 0; i < 10; i++) {
+      if (_nextAvailableSlot == null ||
+          _nextAvailableDate!.isAfter(nextWeekendDate)) {
+        for (var slot in Const().weekendSangeetSevaSlots) {
+          if (_nextAvailableSlot == null) {
             _nextAvailableDate = nextWeekendDate;
             _nextAvailableSlot = slot;
+            foundWeekend = true;
             break;
+          } else if (Utils()
+              .convertStringToTime(
+                  _nextAvailableDate!, _nextAvailableSlot!.from)
+              .isAfter(
+                  Utils().convertStringToTime(nextWeekendDate, slot.from))) {
+            if (await _isSlotAvailable(nextWeekendDate, slot)) {
+              _nextAvailableDate = nextWeekendDate;
+              _nextAvailableSlot = slot;
+              foundWeekend = true;
+              break;
+            }
           }
         }
       }
+      if (foundWeekend) {
+        break;
+      }
+      // go to next weekend
+      while (nextWeekendDate.weekday != DateTime.saturday &&
+          nextWeekendDate.weekday != DateTime.sunday) {
+        nextWeekendDate = nextWeekendDate.add(Duration(days: 1));
+      }
     }
 
-    // check if availability is found
-    if (_nextAvailableDate == null || _nextAvailableSlot == null) {
-      Toaster().error("No available slots found");
+    // if no slot is found, set the next available date to null
+    if (_nextAvailableSlot == null) {
+      _nextAvailableDate = null;
+      _nextAvailableSlot = null;
+      Toaster().error("Unable to find available slot.");
     }
   }
 

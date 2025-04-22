@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhpackages/common/const.dart';
+import 'package:vkhpackages/common/fb.dart';
 
 class NextAvlSlot extends StatefulWidget {
   const NextAvlSlot({super.key});
@@ -33,6 +36,10 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
 
   Future<void> refresh() async {
     // perform async work here
+    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    Map<String, dynamic> kvs = await FB().getValuesByDateRange(
+        path: "${Const().dbrootSangeetSeva}/Slots", startDate: today);
+    List<String> slotDates = kvs.keys.toList();
 
     await _lock.synchronized(() async {
       // perform sync work here

@@ -81,6 +81,33 @@ class FB {
     }
   }
 
+  Future<Map<String, dynamic>> getValuesByDateRange({
+    required String path,
+    required String startDate,
+    String? endDate,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
+
+      // Create a query to filter by the date range
+      Query query = dbref.orderByKey().startAt(startDate);
+      if (endDate != null) {
+        query = query.endAt(endDate);
+      }
+
+      DataSnapshot snapshot = await query.get();
+
+      if (snapshot.value is Map) {
+        return Map<String, dynamic>.from(snapshot.value as Map);
+      } else {
+        return {};
+      }
+    } catch (e) {
+      Toaster().error("Error getting data by date range: $e");
+      return {};
+    }
+  }
+
   Future<Map<String, dynamic>> getJson({
     required String path,
     bool? silent,

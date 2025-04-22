@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:vkhsangeetseva/widgets/next_avl_slot.dart';
 
 class SlotSelection extends StatefulWidget {
   final String title;
@@ -82,12 +83,31 @@ class _SlotSelectionState extends State<SlotSelection> {
                       Widgets().createResponsiveTopLevelContainer(context, [
                         // your widgets here
                         Widgets().createTopLevelCard(
-                          context,
-                          ListTile(
-                            title: Text("Hello World"),
-                            subtitle: Text("This is a sample card"),
-                          ),
-                        ),
+                            context,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Next available slot:"),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    NextAvlSlot(key: nextavlslotKey),
+                                    const SizedBox(width: 10),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.calendar_month))
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: ElevatedButton(
+                                      onPressed: () {},
+                                      child: Text("Select slot")),
+                                ),
+                              ],
+                            )),
                       ]),
 
                       // leave some space at bottom

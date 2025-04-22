@@ -64,7 +64,7 @@ class _CalendarState extends State<Calendar> {
           decoration: BoxDecoration(
             color:
                 (fill != null && fill == true)
-                    ? Colors.blue[50]
+                    ? Colors.grey[300]
                     : Colors.transparent,
             border: border == true ? Border.all(color: Colors.grey) : null,
             borderRadius: BorderRadius.circular(8.0),

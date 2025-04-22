@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/widgets/next_avl_slot.dart';
 
 class SlotSelection extends StatefulWidget {
@@ -95,7 +96,18 @@ class _SlotSelectionState extends State<SlotSelection> {
                                     NextAvlSlot(key: nextavlslotKey),
                                     const SizedBox(width: 10),
                                     IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          Navigator.push(
+                                            // ignore: use_build_context_synchronously
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  Registration(
+                                                title: "Event Registration",
+                                              ),
+                                            ),
+                                          );
+                                        },
                                         icon: Icon(Icons.calendar_month))
                                   ],
                                 ),

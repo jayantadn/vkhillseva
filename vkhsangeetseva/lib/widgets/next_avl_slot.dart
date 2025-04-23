@@ -20,8 +20,9 @@ GlobalKey<_NextAvlSlotState> nextavlslotKey = GlobalKey<_NextAvlSlotState>();
 
 class _NextAvlSlotState extends State<NextAvlSlot> {
   final Lock _lock = Lock();
-  DateTime? _nextAvailableDate; // Class member to store the last checked date
-  Slot? _nextAvailableSlot; // Class member to store the next available slot
+  bool _isLoading = false;
+  DateTime? _nextAvailableDate;
+  Slot? _nextAvailableSlot;
 
   @override
   void initState() {
@@ -40,12 +41,20 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
   }
 
   Future<void> refresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     // perform async work here
     await _fetchNextAvailableSlot();
 
     await _lock.synchronized(() async {
       // perform sync work here
       setState(() {});
+    });
+
+    setState(() {
+      _isLoading = false;
     });
   }
 
@@ -76,6 +85,10 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
   }
 
   Future<void> _fetchNextAvailableSlot() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     // set the starting search date and the next weekend date
     if (_nextAvailableDate == null) {
       _nextAvailableDate = DateTime.now();
@@ -283,9 +296,17 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
       _nextAvailableDate = null;
       _nextAvailableSlot = null;
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _fetchPreviousAvailableSlot() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     if (_nextAvailableDate == null) {
       _nextAvailableDate = DateTime.now();
     } else {
@@ -469,6 +490,10 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
       _nextAvailableDate = null;
       _nextAvailableSlot = null;
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -484,25 +509,40 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
               color: Theme.of(context).iconTheme.color,
             ),
           ),
-          onPressed: () async {
-            await _fetchPreviousAvailableSlot();
-            setState(() {});
-          },
+          onPressed: _isLoading
+              ? null
+              : () async {
+                  await _fetchPreviousAvailableSlot();
+                  setState(() {});
+                },
         ),
 
         // slot details
-        Column(
-          children: [
-            Text(
-              _nextAvailableDate != null
-                  ? DateFormat('dd MMM yyyy').format(_nextAvailableDate!)
-                  : "No slots available",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            if (_nextAvailableSlot != null)
-              Text("${_nextAvailableSlot!.from} - ${_nextAvailableSlot!.to}"),
-          ],
-        ),
+        if (!_isLoading)
+          Column(
+            children: [
+              Text(
+                _nextAvailableDate != null
+                    ? DateFormat('dd MMM yyyy').format(_nextAvailableDate!)
+                    : "No slots available",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              if (_nextAvailableSlot != null)
+                Text("${_nextAvailableSlot!.from} - ${_nextAvailableSlot!.to}"),
+            ],
+          ),
+
+        // loading screen
+        if (_isLoading)
+          Column(
+            children: [
+              Text(
+                'Loading....',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text("00:00 AM - 00:00 PM"),
+            ],
+          ),
 
         // next available slot
         IconButton(
@@ -513,10 +553,12 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
               color: Theme.of(context).iconTheme.color,
             ),
           ),
-          onPressed: () async {
-            await _fetchNextAvailableSlot();
-            setState(() {});
-          },
+          onPressed: _isLoading
+              ? null
+              : () async {
+                  await _fetchNextAvailableSlot();
+                  setState(() {});
+                },
         ),
       ],
     );

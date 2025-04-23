@@ -283,6 +283,31 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
             }
           }
         }
+      } else {
+        // date is same as the current date
+        var slotsRaw = await FB()
+            .getValue(path: "${Const().dbrootSangeetSeva}/Slots/$dateStr");
+        Map<String, dynamic> slots = Map<String, dynamic>.from(slotsRaw);
+        for (var entry in slots.entries) {
+          Slot slot = Utils().convertRawToDatatype(entry.value, Slot.fromJson);
+          if (_nextAvailableSlot == null && slot.avl == true) {
+            _nextAvailableDate = date;
+            _nextAvailableSlot = slot;
+            found = true;
+            break;
+          } else if (_nextAvailableSlot != null) {
+            if (slot.avl == true) {
+              if (Utils().convertStringToTime(date, slot.from).isAfter(Utils()
+                  .convertStringToTime(
+                      _nextAvailableDate!, _nextAvailableSlot!.from))) {
+                _nextAvailableDate = date;
+                _nextAvailableSlot = slot;
+                found = true;
+                break;
+              }
+            }
+          }
+        }
       }
       if (found) {
         break;

@@ -20,7 +20,6 @@ GlobalKey<_NextAvlSlotState> nextavlslotKey = GlobalKey<_NextAvlSlotState>();
 
 class _NextAvlSlotState extends State<NextAvlSlot> {
   final Lock _lock = Lock();
-  List<String> _slotDates = []; // Class member to store slot dates
   DateTime? _nextAvailableDate; // Class member to store the last checked date
   Slot? _nextAvailableSlot; // Class member to store the next available slot
 
@@ -42,15 +41,6 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
 
   Future<void> refresh() async {
     // perform async work here
-    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    Map<String, dynamic> kvs = await FB().getValuesByDateRange(
-        path: "${Const().dbrootSangeetSeva}/Slots", startDate: today);
-    _slotDates = kvs.keys.toList();
-    await fetchNextAvailableSlot();
-    print("$_nextAvailableDate ${_nextAvailableSlot!.name}");
-    print("****************");
-    await fetchNextAvailableSlot();
-    print("$_nextAvailableDate ${_nextAvailableSlot!.name}");
 
     await _lock.synchronized(() async {
       // perform sync work here
@@ -60,8 +50,14 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
 
   Future<bool> _isSlotAvailable(DateTime date, Slot slot) async {
     String dateStr = DateFormat('yyyy-MM-dd').format(date);
-    var slotsRaw = await FB()
-        .getValue(path: "${Const().dbrootSangeetSeva}/Slots/$dateStr");
+    String dbpath = "${Const().dbrootSangeetSeva}/Slots/$dateStr";
+
+    bool exists = await FB().pathExists(dbpath);
+    if (!exists) {
+      return true;
+    }
+
+    var slotsRaw = await FB().getValue(path: dbpath);
     Map<String, dynamic> slots = Map<String, dynamic>.from(slotsRaw);
 
     for (var slotRaw in slots.entries) {
@@ -75,6 +71,12 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
   }
 
   Future<Map<String, dynamic>> getNextAvailableSlot_() async {
+    // fetch all the created slots
+    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    Map<String, dynamic> kvs = await FB().getValuesByDateRange(
+        path: "${Const().dbrootSangeetSeva}/Slots", startDate: today);
+    List<String> slotDates = kvs.keys.toList();
+
     DateTime currentDate = _nextAvailableDate?.add(Duration(days: 1)) ??
         DateTime
             .now(); // Start from the day after the last checked date or today
@@ -83,8 +85,8 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
     while (true) {
       String dateStr = DateFormat('yyyy-MM-dd').format(currentDate);
 
-      // Check if the date exists in the _slotDates list
-      if (_slotDates.contains(dateStr)) {
+      // Check if the date exists in the slotDates list
+      if (slotDates.contains(dateStr)) {
         var slotsRaw = await FB()
             .getValue(path: "${Const().dbrootSangeetSeva}/Slots/$dateStr");
         Map<String, dynamic> slots = Map<String, dynamic>.from(slotsRaw);
@@ -150,18 +152,216 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
     }
   }
 
-  Future<void> fetchNextAvailableSlot() async {
+  Future<void> _fetchNextAvailableSlot() async {
     // set the starting search date and the next weekend date
-    _nextAvailableDate ??= DateTime.now();
-    DateTime nextWeekendDate = _nextAvailableDate!;
+    if (_nextAvailableDate == null) {
+      _nextAvailableDate = DateTime.now();
+    } else {
+      List<Slot> slots = [];
+
+      // check if any more slots available for the current date
+      // if yes, retain the date
+      String dbdate = DateFormat('yyyy-MM-dd').format(_nextAvailableDate!);
+      var slotsRaw = await FB()
+          .getValue(path: "${Const().dbrootSangeetSeva}/Slots/$dbdate");
+      if (slotsRaw != null) {
+        Map<String, dynamic> slotsRawMap = Map<String, dynamic>.from(slotsRaw);
+        for (var entry in slotsRawMap.entries) {
+          Slot slot = Utils().convertRawToDatatype(entry.value, Slot.fromJson);
+          slots.add(slot);
+        }
+      }
+
+      // is the available date a weekend date?
+      // if yes, check if any slots available after this
+      if (_nextAvailableDate!.weekday == DateTime.saturday ||
+          _nextAvailableDate!.weekday == DateTime.sunday) {
+        for (var slotw in Const().weekendSangeetSevaSlots) {
+          bool found = false;
+          for (var slot in slots) {
+            if (slotw.from == slot.from && slotw.to == slot.to) {
+              found = true;
+              break;
+            }
+          }
+
+          if (!found) {
+            slots.add(slotw);
+          }
+        }
+      }
+
+      // filter for available slots
+      slots = slots.where((slot) => slot.avl == true).toList();
+
+      // sort the slots by time
+      slots.sort((a, b) {
+        DateTime timeA = Utils().convertStringToTime(
+            _nextAvailableDate!, a.from); // Convert to DateTime
+        DateTime timeB = Utils().convertStringToTime(
+            _nextAvailableDate!, b.from); // Convert to DateTime
+        return timeA.compareTo(timeB); // Compare the times
+      });
+
+      // set the starting search date
+      if (_nextAvailableSlot == null) {
+        if (slots.isEmpty) {
+          _nextAvailableDate = _nextAvailableDate!.add(Duration(days: 1));
+        } else {
+          _nextAvailableSlot = slots[0];
+          return;
+        }
+      } else {
+        if (slots.isEmpty) {
+          _nextAvailableDate = _nextAvailableDate!.add(Duration(days: 1));
+        } else {
+          for (Slot slot in slots) {
+            DateTime currentSlot = Utils().convertStringToTime(
+                _nextAvailableDate!, _nextAvailableSlot!.from);
+            DateTime newSlot =
+                Utils().convertStringToTime(_nextAvailableDate!, slot.from);
+
+            if (newSlot.isAfter(currentSlot)) {
+              _nextAvailableSlot = slot;
+              return;
+            }
+          }
+
+          // no available slots found, so move to the next date
+          _nextAvailableDate = _nextAvailableDate!.add(Duration(days: 1));
+        }
+      }
+    }
+
+    // weekend date after the next available date
+    DateTime nextWeekendDate = DateTime(
+      _nextAvailableDate!.year,
+      _nextAvailableDate!.month,
+      _nextAvailableDate!.day,
+    );
     while (nextWeekendDate.weekday != DateTime.saturday &&
         nextWeekendDate.weekday != DateTime.sunday) {
       nextWeekendDate = nextWeekendDate.add(Duration(days: 1));
     }
 
+    // fetch all the created slots
+    String today = DateFormat('yyyy-MM-dd').format(_nextAvailableDate!);
+    Map<String, dynamic> kvs = await FB().getValuesByDateRange(
+        path: "${Const().dbrootSangeetSeva}/Slots", startDate: today);
+    List<String> slotDates = kvs.keys.toList();
+
     // find the next available slots from the created slots
     bool found = false;
-    for (String dateStr in _slotDates) {
+    for (String dateStr in slotDates) {
+      DateTime date = DateFormat('yyyy-MM-dd').parse(dateStr);
+      if (date.isAfter(_nextAvailableDate!)) {
+        var slotsRaw = await FB()
+            .getValue(path: "${Const().dbrootSangeetSeva}/Slots/$dateStr");
+        Map<String, dynamic> slots = Map<String, dynamic>.from(slotsRaw);
+
+        for (var entry in slots.entries) {
+          Slot slot = Utils().convertRawToDatatype(entry.value, Slot.fromJson);
+
+          if (_nextAvailableSlot == null && slot.avl == true) {
+            _nextAvailableDate = date;
+            _nextAvailableSlot = slot;
+            found = true;
+            break;
+          } else if (_nextAvailableSlot != null) {
+            if (slot.avl == true) {
+              if (Utils().convertStringToTime(date, slot.from).isAfter(Utils()
+                  .convertStringToTime(
+                      _nextAvailableDate!, _nextAvailableSlot!.from))) {
+                _nextAvailableDate = date;
+                _nextAvailableSlot = slot;
+                found = true;
+                break;
+              }
+            }
+          }
+        }
+      }
+      if (found) {
+        break;
+      }
+    }
+
+    // arbitrate against the weekend slots
+    bool foundWeekend = false;
+    for (int i = 0; i < 10; i++) {
+      for (var slot in Const().weekendSangeetSevaSlots) {
+        bool avl = await _isSlotAvailable(nextWeekendDate, slot);
+        if (avl) {
+          if (_nextAvailableSlot == null) {
+            _nextAvailableDate = nextWeekendDate;
+            _nextAvailableSlot = slot;
+            foundWeekend = true;
+            break;
+          } else if (_nextAvailableDate!.isAfter(nextWeekendDate)) {
+            _nextAvailableDate = nextWeekendDate;
+            _nextAvailableSlot = slot;
+            foundWeekend = true;
+            break;
+          } else {
+            DateTime nextslot = Utils().convertStringToTime(
+                _nextAvailableDate!, _nextAvailableSlot!.from);
+            DateTime nextweekendslot =
+                Utils().convertStringToTime(nextWeekendDate, slot.from);
+            if (nextslot.isAfter(nextweekendslot)) {
+              _nextAvailableDate = nextWeekendDate;
+              _nextAvailableSlot = slot;
+              foundWeekend = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (foundWeekend) {
+        break;
+      }
+      // go to next weekend
+      do {
+        nextWeekendDate = nextWeekendDate.add(Duration(days: 1));
+      } while (nextWeekendDate.weekday != DateTime.saturday &&
+          nextWeekendDate.weekday != DateTime.sunday);
+    }
+
+    // if no slot is found, set the next available date to null
+    if (_nextAvailableSlot == null) {
+      _nextAvailableDate = null;
+      _nextAvailableSlot = null;
+      Toaster().error("Unable to find available slot.");
+    }
+  }
+
+  Future<void> _fetchNextAvailableSlot_() async {
+    // fetch all the created slots
+    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    Map<String, dynamic> kvs = await FB().getValuesByDateRange(
+        path: "${Const().dbrootSangeetSeva}/Slots", startDate: today);
+    List<String> slotDates = kvs.keys.toList();
+
+    // next weekend date
+    DateTime nextWeekendDate = DateTime.now();
+    while (nextWeekendDate.weekday != DateTime.saturday &&
+        nextWeekendDate.weekday != DateTime.sunday) {
+      nextWeekendDate = nextWeekendDate.add(Duration(days: 1));
+    }
+
+    // set the starting search date
+    if (slotDates.isNotEmpty) {
+      DateTime firstDate = DateFormat('yyyy-MM-dd').parse(slotDates[0]);
+      if (firstDate.isAfter(nextWeekendDate)) {
+        _nextAvailableDate = nextWeekendDate;
+      } else {
+        _nextAvailableDate = firstDate;
+      }
+    }
+
+    // find the next available slots from the created slots
+    bool found = false;
+    for (String dateStr in slotDates) {
       DateTime date = DateFormat('yyyy-MM-dd').parse(dateStr);
       if (date.isAfter(_nextAvailableDate!)) {
         var slotsRaw = await FB()
@@ -201,17 +401,17 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
       if (_nextAvailableSlot == null ||
           _nextAvailableDate!.isAfter(nextWeekendDate)) {
         for (var slot in Const().weekendSangeetSevaSlots) {
-          if (_nextAvailableSlot == null) {
-            _nextAvailableDate = nextWeekendDate;
-            _nextAvailableSlot = slot;
-            foundWeekend = true;
-            break;
-          } else if (Utils()
-              .convertStringToTime(
-                  _nextAvailableDate!, _nextAvailableSlot!.from)
-              .isAfter(
-                  Utils().convertStringToTime(nextWeekendDate, slot.from))) {
-            if (await _isSlotAvailable(nextWeekendDate, slot)) {
+          if (await _isSlotAvailable(nextWeekendDate, slot)) {
+            if (_nextAvailableSlot == null) {
+              _nextAvailableDate = nextWeekendDate;
+              _nextAvailableSlot = slot;
+              foundWeekend = true;
+              break;
+            } else if (Utils()
+                .convertStringToTime(
+                    _nextAvailableDate!, _nextAvailableSlot!.from)
+                .isAfter(
+                    Utils().convertStringToTime(nextWeekendDate, slot.from))) {
               _nextAvailableDate = nextWeekendDate;
               _nextAvailableSlot = slot;
               foundWeekend = true;
@@ -219,15 +419,17 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
             }
           }
         }
+      } else {
+        break;
       }
       if (foundWeekend) {
         break;
       }
       // go to next weekend
-      while (nextWeekendDate.weekday != DateTime.saturday &&
-          nextWeekendDate.weekday != DateTime.sunday) {
+      do {
         nextWeekendDate = nextWeekendDate.add(Duration(days: 1));
-      }
+      } while (nextWeekendDate.weekday != DateTime.saturday &&
+          nextWeekendDate.weekday != DateTime.sunday);
     }
 
     // if no slot is found, set the next available date to null
@@ -274,7 +476,13 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
               color: Theme.of(context).iconTheme.color,
             ),
           ),
-          onPressed: () {},
+          onPressed: () async {
+            await _fetchNextAvailableSlot();
+            if (_nextAvailableSlot != null) {
+              print(
+                  "Next available slot: ${_nextAvailableDate} ${_nextAvailableSlot!.from} - ${_nextAvailableSlot!.to}");
+            }
+          },
         ),
       ],
     );

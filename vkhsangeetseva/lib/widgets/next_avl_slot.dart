@@ -85,10 +85,6 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
   }
 
   Future<void> _fetchNextAvailableSlot() async {
-    setState(() {
-      _isLoading = true;
-    });
-
     // set the starting search date and the next weekend date
     if (_nextAvailableDate == null) {
       _nextAvailableDate = DateTime.now();
@@ -296,17 +292,9 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
       _nextAvailableDate = null;
       _nextAvailableSlot = null;
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   Future<void> _fetchPreviousAvailableSlot() async {
-    setState(() {
-      _isLoading = true;
-    });
-
     if (_nextAvailableDate == null) {
       _nextAvailableDate = DateTime.now();
     } else {
@@ -490,10 +478,6 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
       _nextAvailableDate = null;
       _nextAvailableSlot = null;
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
@@ -512,8 +496,13 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
           onPressed: _isLoading
               ? null
               : () async {
+                  setState(() {
+                    _isLoading = true;
+                  });
                   await _fetchPreviousAvailableSlot();
-                  setState(() {});
+                  setState(() {
+                    _isLoading = false;
+                  });
                 },
         ),
 
@@ -556,8 +545,13 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
           onPressed: _isLoading
               ? null
               : () async {
+                  setState(() {
+                    _isLoading = true;
+                  });
                   await _fetchNextAvailableSlot();
-                  setState(() {});
+                  setState(() {
+                    _isLoading = false;
+                  });
                 },
         ),
       ],

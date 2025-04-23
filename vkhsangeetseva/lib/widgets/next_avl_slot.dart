@@ -207,6 +207,7 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
       if (_nextAvailableSlot == null) {
         if (slots.isEmpty) {
           _nextAvailableDate = _nextAvailableDate!.add(Duration(days: 1));
+          _nextAvailableSlot = null;
         } else {
           _nextAvailableSlot = slots[0];
           return;
@@ -214,6 +215,7 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
       } else {
         if (slots.isEmpty) {
           _nextAvailableDate = _nextAvailableDate!.add(Duration(days: 1));
+          _nextAvailableSlot = null;
         } else {
           for (Slot slot in slots) {
             DateTime currentSlot = Utils().convertStringToTime(
@@ -229,6 +231,7 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
 
           // no available slots found, so move to the next date
           _nextAvailableDate = _nextAvailableDate!.add(Duration(days: 1));
+          _nextAvailableSlot = null;
         }
       }
     }

@@ -24,6 +24,10 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
   DateTime? _nextAvailableDate;
   Slot? _nextAvailableSlot;
 
+  // getter methods
+  DateTime? get nextAvailableDate => _nextAvailableDate;
+  Slot? get nextAvailableSlot => _nextAvailableSlot;
+
   @override
   void initState() {
     super.initState();

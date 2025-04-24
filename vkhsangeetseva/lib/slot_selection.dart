@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/registration.dart';
+import 'package:vkhsangeetseva/registration_page2.dart';
 import 'package:vkhsangeetseva/widgets/next_avl_slot.dart';
 
 class SlotSelection extends StatefulWidget {
@@ -115,7 +116,28 @@ class _SlotSelectionState extends State<SlotSelection> {
                                 Align(
                                   alignment: Alignment.center,
                                   child: ElevatedButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        DateTime? date = nextavlslotKey
+                                            .currentState!.nextAvailableDate;
+                                        Slot? slot = nextavlslotKey
+                                            .currentState!.nextAvailableSlot;
+
+                                        if (date != null && slot != null) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  RegistrationPage2(
+                                                title: widget.title,
+                                                selectedDate: date,
+                                                slot: slot,
+                                              ),
+                                            ),
+                                          );
+                                        } else {
+                                          Toaster().error("Invalid slot");
+                                        }
+                                      },
                                       child: Text("Select slot")),
                                 ),
                               ],
@@ -135,7 +157,7 @@ class _SlotSelectionState extends State<SlotSelection> {
         // circular progress indicator
         if (_isLoading)
           LoadingOverlay(
-            image: "assets/images/Logo/KrishnaLilaPark_circle.png",
+            image: "assets/images/Logo/SangeetSeva.png",
           ),
       ],
     );

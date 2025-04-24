@@ -193,7 +193,7 @@ class SlotUtils {
 
     int cnt = slotListRaw.length;
     if (Utils().isDateWeekend(date)) {
-      for (Slot slotw in Const().weekendSangeetSevaSlots) {
+      for (Slot slotw in SSConst().weekendSangeetSevaSlots) {
         cnt++;
         for (var slotRaw in slotListRaw) {
           Slot slot = Utils().convertRawToDatatype(slotRaw, Slot.fromJson);

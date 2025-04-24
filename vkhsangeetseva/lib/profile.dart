@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-
 import 'package:fast_image_resizer/fast_image_resizer.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +14,9 @@ class Profile extends StatefulWidget {
   final String title;
   final String? icon;
   final bool? self;
-  final Function(UserDetails user)? onProfileSaved;
+  final Function(PerformerDetails user)? onProfileSaved;
   final String? friendMobile;
-  final UserDetails? oldUserDetails;
+  final PerformerDetails? oldUserDetails;
 
   const Profile(
       {super.key,
@@ -39,41 +38,9 @@ class _ProfileState extends State<Profile> {
   bool _isLoading = true;
   String _profilePicUrl = '';
   late String _salutation;
-  UserDetails? _userDetailsOld;
+  PerformerDetails? _userDetailsOld;
 
   // lists
-  final List<String> _salutations = [
-    'Shri',
-    'Smt',
-    'Kumar',
-    'Kumari',
-    'Vidwan',
-    'Vidushi',
-    'Chiranjeevi',
-    'Others'
-  ];
-
-  final List<String> _vocalSkills = [
-    'Hindustani',
-    'Carnatic',
-    'Western',
-    'Bhajan Mandali',
-    'Semi classical',
-    'Sugam Sangeet',
-    'Others'
-  ];
-
-  final List<String> _instrumentSkills = [
-    'Veena',
-    'Flute',
-    'Tabla',
-    'Mridangam',
-    'Harmonium',
-    'Kartaal',
-    'Violin',
-    'Keyboard',
-    'Others'
-  ];
 
   List<SangeetExp> _exp = [];
 
@@ -95,7 +62,7 @@ class _ProfileState extends State<Profile> {
   initState() {
     super.initState();
 
-    _salutation = _salutations[0];
+    _salutation = SSConst().salutations[0];
 
     refresh();
   }
@@ -103,9 +70,6 @@ class _ProfileState extends State<Profile> {
   @override
   dispose() {
     // clear all lists
-    _salutations.clear();
-    _instrumentSkills.clear();
-    _vocalSkills.clear();
     _youtubeLinks.clear();
     _audioClips.clear();
 
@@ -135,7 +99,7 @@ class _ProfileState extends State<Profile> {
         if (exists) {
           Map<String, dynamic> userdetailsJson = await FB()
               .getJson(path: "${Const().dbrootSangeetSeva}/Users/$mobile");
-          _userDetailsOld = UserDetails.fromJson(userdetailsJson);
+          _userDetailsOld = PerformerDetails.fromJson(userdetailsJson);
         }
       }
     } else if (widget.oldUserDetails != null) {
@@ -181,7 +145,7 @@ class _ProfileState extends State<Profile> {
     String dbpath =
         "${Const().dbrootSangeetSeva}/Users/${_mobileController.text}";
     Map<String, dynamic> userdetailsJson = await FB().getJson(path: dbpath);
-    UserDetails? userDetails = UserDetails.fromJson(userdetailsJson);
+    PerformerDetails? userDetails = PerformerDetails.fromJson(userdetailsJson);
 
     // check if current user is friend
     bool isFriend = false;
@@ -334,8 +298,8 @@ class _ProfileState extends State<Profile> {
     });
 
     // create user details object
-    UserDetails? details;
-    details = UserDetails(
+    PerformerDetails? details;
+    details = PerformerDetails(
         salutation: _salutation,
         name: _nameController.text,
         mobile: _mobileController.text,
@@ -385,7 +349,7 @@ class _ProfileState extends State<Profile> {
 
   Future<void> _showDialogSangeetExp(BuildContext context) async {
     String selectedExpertiseType = "Vocal";
-    String selectedSkill = _vocalSkills[0];
+    String selectedSkill = SSConst().vocalSkills[0];
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     final TextEditingController othersController = TextEditingController();
     final TextEditingController yearsController = TextEditingController();
@@ -415,8 +379,8 @@ class _ProfileState extends State<Profile> {
                               setState(() {
                                 selectedExpertiseType = value;
                                 selectedSkill = value == "Vocal"
-                                    ? _vocalSkills[0]
-                                    : _instrumentSkills[0];
+                                    ? SSConst().vocalSkills[0]
+                                    : SSConst().instrumentSkills[0];
                               });
                             },
                           ),
@@ -426,22 +390,25 @@ class _ProfileState extends State<Profile> {
                           DropdownButton<String>(
                             isExpanded: true,
                             value: selectedExpertiseType == "Vocal"
-                                ? _vocalSkills[0]
-                                : _instrumentSkills[0],
+                                ? SSConst().vocalSkills[0]
+                                : SSConst().instrumentSkills[0],
                             onChanged: (String? newValue) {
                               setState(() {
                                 selectedSkill = newValue!;
                               });
                             },
                             items: selectedExpertiseType == "Vocal"
-                                ? _vocalSkills.map<DropdownMenuItem<String>>(
-                                    (String value) {
+                                ? SSConst()
+                                    .vocalSkills
+                                    .map<DropdownMenuItem<String>>(
+                                        (String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Text(value),
                                     );
                                   }).toList()
-                                : _instrumentSkills
+                                : SSConst()
+                                    .instrumentSkills
                                     .map<DropdownMenuItem<String>>(
                                         (String value) {
                                     return DropdownMenuItem<String>(
@@ -600,7 +567,8 @@ class _ProfileState extends State<Profile> {
                                 _salutation = newValue!;
                               });
                             },
-                            items: _salutations
+                            items: SSConst()
+                                .salutations
                                 .map<DropdownMenuItem<String>>((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,

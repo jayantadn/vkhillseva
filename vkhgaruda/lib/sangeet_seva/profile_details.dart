@@ -5,7 +5,7 @@ import 'package:vkhpackages/vkhpackages.dart';
 class ProfileDetails extends StatefulWidget {
   final String title;
   final String? icon;
-  final UserDetails userdetails;
+  final PerformerDetails userdetails;
 
   const ProfileDetails(
       {super.key, required this.title, this.icon, required this.userdetails});

@@ -25,7 +25,7 @@ class _PendingRequestsState extends State<PendingRequests> {
   // lists
   final List<Map<String, dynamic>> _pendingRequests = [];
   final List<EventRecord> _linkedEventRecords = [];
-  final List<UserDetails> _mainPerformers = [];
+  final List<PerformerDetails> _mainPerformers = [];
 
   // controllers, listeners and focus nodes
 
@@ -89,7 +89,7 @@ class _PendingRequestsState extends State<PendingRequests> {
     // fetch main performers
     _mainPerformers.clear();
     for (EventRecord pendingRequest in _linkedEventRecords) {
-      UserDetails? mainPerformer =
+      PerformerDetails? mainPerformer =
           await Utils().getUserDetails(pendingRequest.mainPerformerMobile);
       if (mainPerformer != null) _mainPerformers.add(mainPerformer);
     }

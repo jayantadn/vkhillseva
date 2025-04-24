@@ -28,11 +28,11 @@ class RegistrationPage2 extends StatefulWidget {
 class _RegistrationPage2State extends State<RegistrationPage2> {
   // scalars
   bool _isLoading = true;
-  UserDetails? _mainPerformer;
+  PerformerDetails? _mainPerformer;
   final _minSongs = 4;
 
   // lists
-  final List<UserDetails> _supportingTeam = [];
+  final List<SupportUser> _supportingTeam = [];
   final List<Guest> _guests = [];
   final List<String> _songs = [];
 
@@ -92,13 +92,13 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       EventRecord performanceRequest = widget.oldEvent!;
 
       // populate the lists
-      _mainPerformer = UserDetails.fromJson(userdetailsJson);
-      for (String mobile in performanceRequest.supportTeamMobiles) {
-        UserDetails? details = await Utils().getUserDetails(mobile);
-        if (details != null) {
-          _supportingTeam.add(details);
-        }
-      }
+      _mainPerformer = PerformerDetails.fromJson(userdetailsJson);
+      // TODO for (String mobile in performanceRequest.supportTeamMobiles) {
+      //   PerformerDetails? details = await Utils().getUserDetails(mobile);
+      //   if (details != null) {
+      //     _supportingTeam.add(details);
+      //   }
+      // }
       _guests.addAll(performanceRequest.guests);
       _songs.addAll(performanceRequest.songs);
       _noteController.text = performanceRequest.notePerformer;
@@ -124,7 +124,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           );
         }));
       } else {
-        _mainPerformer = UserDetails.fromJson(userdetailsJson);
+        _mainPerformer = PerformerDetails.fromJson(userdetailsJson);
       }
     });
   }
@@ -168,27 +168,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   Widget _createSupportingTeamTile(int index) {
     var member = _supportingTeam[index];
     return ListTile(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Profile(
-                title: "Supporting team",
-                self: false,
-                onProfileSaved: (user) {
-                  setState(() {
-                    _supportingTeam[index] = user;
-                  });
-                },
-                friendMobile: _mainPerformer!.mobile,
-                oldUserDetails: _supportingTeam[index],
-              ),
-            ),
-          );
-        },
-        leading: CircleAvatar(
-          backgroundImage: NetworkImage(member.profilePicUrl),
-        ),
+        onTap: () {},
         title: Text("${member.salutation} ${member.name}"),
         subtitle: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -196,17 +176,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.phone),
-                  SizedBox(width: 5),
-                  Text(member.mobile),
-                ],
-              ),
-              SizedBox(width: 4),
-              Row(
-                children: [
                   Icon(Icons.workspace_premium),
                   SizedBox(width: 5),
-                  Text(member.credentials),
+                  Text(member.specialization),
                 ],
               ),
             ],
@@ -332,9 +304,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         date: widget.selectedDate,
         slot: widget.slot,
         mainPerformerMobile: _mainPerformer!.mobile,
-        supportTeamMobiles: List.generate(_supportingTeam.length, (index) {
-          return _supportingTeam[index].mobile;
-        }),
+        supportTeam: _supportingTeam,
         guests: _guests,
         songs: _songs,
         notePerformer: _noteController.text,
@@ -561,6 +531,112 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     );
   }
 
+  Future<void> _showAddSupportTeamDialog(BuildContext context) {
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    String salutation = "";
+    String specialization = "Vocalist";
+    TextEditingController _supportNameController = TextEditingController();
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Add support team"),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  // salutation
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(labelText: "Salutation"),
+                    items: SSConst().salutations.map((salutation) {
+                      return DropdownMenuItem<String>(
+                        value: salutation,
+                        child: Text(salutation),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      salutation = value!;
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please select a salutation";
+                      }
+                      return null;
+                    },
+                  ),
+
+                  // name
+                  TextFormField(
+                    controller: _supportNameController,
+                    decoration: InputDecoration(labelText: "Name"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter a name";
+                      }
+                      return null;
+                    },
+                  ),
+
+                  // specialization
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(labelText: "Specialization"),
+                    items: ["Vocalist", ...SSConst().instrumentSkills, "Other"]
+                        .map((specialization) {
+                      return DropdownMenuItem<String>(
+                        value: specialization,
+                        child: Text(specialization),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      specialization = value!;
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please select a specialization";
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (!formKey.currentState!.validate()) {
+                  return;
+                }
+
+                Navigator.pop(context);
+
+                SupportUser user = SupportUser(
+                  salutation: salutation,
+                  name: _supportNameController.text,
+                  specialization: specialization,
+                  friendMobile: _mainPerformer!.mobile,
+                );
+
+                setState(() {
+                  _supportingTeam.add(user);
+                });
+              },
+              child: Text("Add"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -683,24 +759,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                     return _createSupportingTeamTile(index);
                                   })),
 
-                              // button
+                              // button - add supporting team
                               TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Profile(
-                                          title: "Supporting team",
-                                          self: false,
-                                          onProfileSaved: (UserDetails user) {
-                                            setState(() {
-                                              _supportingTeam.add(user);
-                                            });
-                                          },
-                                          friendMobile: _mainPerformer!.mobile,
-                                        ),
-                                      ),
-                                    );
+                                  onPressed: () async {
+                                    await _showAddSupportTeamDialog(context);
                                   },
                                   child: Text(
                                     _supportingTeam.isEmpty

@@ -22,7 +22,7 @@ class _ProfilesState extends State<Profiles> {
   bool _isLoading = true;
 
   // lists
-  final List<UserDetails> _performers = [];
+  final List<PerformerDetails> _performers = [];
 
   // controllers, listeners and focus nodes
 
@@ -55,7 +55,7 @@ class _ProfilesState extends State<Profiles> {
     );
     for (var userRaw in usersRawList) {
       Map<String, dynamic> userJson = Map<String, dynamic>.from(userRaw);
-      UserDetails user = UserDetails.fromJson(userJson);
+      PerformerDetails user = PerformerDetails.fromJson(userJson);
       _performers.add(user);
     }
 

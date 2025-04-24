@@ -352,7 +352,7 @@ class FBL {
   //   return json;
   // }
 
-  // Future<void> addPendingUser(UserDetails user) async {
+  // Future<void> addPendingUser(PerformerDetails user) async {
   //   final DatabaseReference dbRef = FirebaseDatabase.instance
   //       .ref('record_db${Const().dbVersion}/users/pending');
 
@@ -368,7 +368,7 @@ class FBL {
   // }
 
   // // returns success or failure
-  // Future<bool> approveUser(UserDetails user) async {
+  // Future<bool> approveUser(PerformerDetails user) async {
   //   final DatabaseReference dbRef =
   //       FirebaseDatabase.instance.ref('record_db${Const().dbVersion}/users');
 
@@ -396,7 +396,7 @@ class FBL {
   //   return true;
   // }
 
-  // Future<void> rejectUser(UserDetails user) async {
+  // Future<void> rejectUser(PerformerDetails user) async {
   //   final DatabaseReference dbRef = FirebaseDatabase.instance
   //       .ref('record_db${Const().dbVersion}/users/pending');
 
@@ -407,7 +407,7 @@ class FBL {
   // }
 
   // // returns "pending", "approved", "none"
-  // Future<String> checkUserApprovalStatus(UserDetails user) async {
+  // Future<String> checkUserApprovalStatus(PerformerDetails user) async {
   //   final DatabaseReference dbRef =
   //       FirebaseDatabase.instance.ref('record_db${Const().dbVersion}/users');
 
@@ -459,15 +459,15 @@ class FBL {
   //   await ref.update({'title': title});
   // }
 
-  // Future<UserDetails> getUserDetails(String uid) async {
+  // Future<PerformerDetails> getUserDetails(String uid) async {
   //   final DatabaseReference dbRef = FirebaseDatabase.instance
   //       .ref('record_db${Const().dbVersion}/users/approved');
 
   //   DataSnapshot snapshot = await dbRef.child(uid).get();
-  //   UserDetails user = UserDetails();
+  //   PerformerDetails user = PerformerDetails();
 
   //   if (snapshot.exists) {
-  //     user = UserDetails.fromJson(
+  //     user = PerformerDetails.fromJson(
   //         Map<String, dynamic>.from(snapshot.value as Map));
   //   }
 
@@ -539,36 +539,36 @@ class FBL {
     });
   }
 
-  // Future<List<UserDetails>> readPendingUsers() async {
+  // Future<List<PerformerDetails>> readPendingUsers() async {
   //   final DatabaseReference dbRef = FirebaseDatabase.instance
   //       .ref('record_db${Const().dbVersion}/users/pending');
 
   //   DataSnapshot snapshot = await dbRef.get();
-  //   List<UserDetails> users = [];
+  //   List<PerformerDetails> users = [];
 
   //   if (snapshot.exists) {
   //     users = (snapshot.value as Map)
   //         .values
   //         .map((value) =>
-  //             UserDetails.fromJson(Map<String, dynamic>.from(value as Map)))
+  //             PerformerDetails.fromJson(Map<String, dynamic>.from(value as Map)))
   //         .toList();
   //   }
 
   //   return users;
   // }
 
-  // Future<List<UserDetails>> readApprovedUsers() async {
+  // Future<List<PerformerDetails>> readApprovedUsers() async {
   //   final DatabaseReference dbRef = FirebaseDatabase.instance
   //       .ref('record_db${Const().dbVersion}/users/approved');
 
   //   DataSnapshot snapshot = await dbRef.get();
-  //   List<UserDetails> users = [];
+  //   List<PerformerDetails> users = [];
 
   //   if (snapshot.exists) {
   //     users = (snapshot.value as Map)
   //         .values
   //         .map((value) =>
-  //             UserDetails.fromJson(Map<String, dynamic>.from(value as Map)))
+  //             PerformerDetails.fromJson(Map<String, dynamic>.from(value as Map)))
   //         .toList();
   //   }
 

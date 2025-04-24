@@ -115,7 +115,7 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
       // if yes, check if any slots available after this
       if (_nextAvailableDate!.weekday == DateTime.saturday ||
           _nextAvailableDate!.weekday == DateTime.sunday) {
-        for (var slotw in Const().weekendSangeetSevaSlots) {
+        for (var slotw in SSConst().weekendSangeetSevaSlots) {
           bool found = false;
           for (var slot in slots) {
             if (slotw.from == slot.from && slotw.to == slot.to) {
@@ -256,7 +256,7 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
     // arbitrate against the weekend slots
     bool foundWeekend = false;
     for (int i = 0; i < 10; i++) {
-      for (var slotw in Const().weekendSangeetSevaSlots) {
+      for (var slotw in SSConst().weekendSangeetSevaSlots) {
         bool avl = await _isSlotAvailable(nextWeekendDate, slotw);
         if (avl) {
           if (_nextAvailableSlot == null) {
@@ -323,7 +323,7 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
       // is the available date a weekend date?
       if (_nextAvailableDate!.weekday == DateTime.saturday ||
           _nextAvailableDate!.weekday == DateTime.sunday) {
-        for (var slotw in Const().weekendSangeetSevaSlots) {
+        for (var slotw in SSConst().weekendSangeetSevaSlots) {
           bool found = false;
           for (var slot in slots) {
             if (slotw.from == slot.from && slotw.to == slot.to) {
@@ -441,7 +441,7 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
     // arbitrate against the weekend slots
     bool foundWeekend = false;
     for (int i = 0; i < 10; i++) {
-      List<Slot> weekendSlots = Const().weekendSangeetSevaSlots;
+      List<Slot> weekendSlots = SSConst().weekendSangeetSevaSlots;
       weekendSlots.sort((a, b) {
         DateTime timeA =
             Utils().convertStringToTime(_nextAvailableDate!, a.from);
@@ -449,7 +449,7 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
             Utils().convertStringToTime(_nextAvailableDate!, b.from);
         return timeB.compareTo(timeA); // Reverse sort
       });
-      for (var slot in Const().weekendSangeetSevaSlots) {
+      for (var slot in SSConst().weekendSangeetSevaSlots) {
         bool avl = await _isSlotAvailable(_nextAvailableDate!, slot);
         if (avl) {
           if (_nextAvailableSlot == null) {

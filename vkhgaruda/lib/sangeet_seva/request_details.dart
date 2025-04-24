@@ -30,10 +30,10 @@ class _RequestDetailsState extends State<RequestDetails> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  UserDetails? _mainPerformer;
+  PerformerDetails? _mainPerformer;
 
   // lists
-  final List<UserDetails> _supportTeam = [];
+  final List<PerformerDetails> _supportTeam = [];
 
   // controllers, listeners and focus nodes
   final TextEditingController _noteController = TextEditingController();
@@ -64,10 +64,10 @@ class _RequestDetailsState extends State<RequestDetails> {
     // perform async operations here
     _mainPerformer =
         await Utils().getUserDetails(widget.eventRecord.mainPerformerMobile);
-    for (String supportMobile in widget.eventRecord.supportTeamMobiles) {
-      UserDetails? support = await Utils().getUserDetails(supportMobile);
-      if (support != null) _supportTeam.add(support);
-    }
+    // TODO for (String supportMobile in widget.eventRecord.supportTeamMobiles) {
+    //   PerformerDetails? support = await Utils().getUserDetails(supportMobile);
+    //   if (support != null) _supportTeam.add(support);
+    // }
 
     // refresh all child widgets
 

@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
         if (_isFcmSetup == false) {
           _isFcmSetup = true;
           await _setupFirebaseMessaging(Utils()
-              .convertRawToDatatype(userdetailsMap, UserDetails.fromJson));
+              .convertRawToDatatype(userdetailsMap, PerformerDetails.fromJson));
         }
       }
     }
@@ -235,7 +235,7 @@ class _HomePageState extends State<HomePage> {
     Navigator.pop(context);
   }
 
-  Future<void> _setupFirebaseMessaging(UserDetails details) async {
+  Future<void> _setupFirebaseMessaging(PerformerDetails details) async {
     String? fcmToken = await Notifications().setupFirebaseMessaging();
     if (fcmToken != null && fcmToken.isNotEmpty) {
       if (fcmToken != details.fcmToken) {
@@ -248,7 +248,7 @@ class _HomePageState extends State<HomePage> {
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
       UserBasics? basics = Utils().getUserBasics();
       if (basics != null) {
-        UserDetails? details = await Utils().getUserDetails(basics.mobile);
+        PerformerDetails? details = await Utils().getUserDetails(basics.mobile);
         if (details != null) {
           details.fcmToken = newToken;
           Utils().setUserDetails(details);

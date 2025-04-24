@@ -1,3 +1,9 @@
+# 6.3.0
+- feature: new theme generator
+- fix: reset next available slot when no slots are found
+- fix: improve slot availability logic and update UI messaging
+- fix: fetch previous slot
+
 # 6.2.1
 
 # 6.2.0

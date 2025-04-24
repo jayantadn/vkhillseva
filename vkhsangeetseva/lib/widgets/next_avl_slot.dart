@@ -74,6 +74,8 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
           return slotObj.avl;
         }
       }
+      // slot not found, means it is available
+      return true;
     } else {
       if (date.weekday == DateTime.saturday ||
           date.weekday == DateTime.sunday) {
@@ -249,27 +251,27 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
     // arbitrate against the weekend slots
     bool foundWeekend = false;
     for (int i = 0; i < 10; i++) {
-      for (var slot in Const().weekendSangeetSevaSlots) {
-        bool avl = await _isSlotAvailable(nextWeekendDate, slot);
+      for (var slotw in Const().weekendSangeetSevaSlots) {
+        bool avl = await _isSlotAvailable(nextWeekendDate, slotw);
         if (avl) {
           if (_nextAvailableSlot == null) {
             _nextAvailableDate = nextWeekendDate;
-            _nextAvailableSlot = slot;
+            _nextAvailableSlot = slotw;
             foundWeekend = true;
             break;
           } else if (_nextAvailableDate!.isAfter(nextWeekendDate)) {
             _nextAvailableDate = nextWeekendDate;
-            _nextAvailableSlot = slot;
+            _nextAvailableSlot = slotw;
             foundWeekend = true;
             break;
           } else {
             DateTime nextslot = Utils().convertStringToTime(
                 _nextAvailableDate!, _nextAvailableSlot!.from);
             DateTime nextweekendslot =
-                Utils().convertStringToTime(nextWeekendDate, slot.from);
+                Utils().convertStringToTime(nextWeekendDate, slotw.from);
             if (nextslot.isAfter(nextweekendslot)) {
               _nextAvailableDate = nextWeekendDate;
-              _nextAvailableSlot = slot;
+              _nextAvailableSlot = slotw;
               foundWeekend = true;
               break;
             }
@@ -513,11 +515,12 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
               Text(
                 _nextAvailableDate != null
                     ? DateFormat('dd MMM yyyy').format(_nextAvailableDate!)
-                    : "No slots available",
+                    : "No slots...",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              if (_nextAvailableSlot != null)
-                Text("${_nextAvailableSlot!.from} - ${_nextAvailableSlot!.to}"),
+              Text(_nextAvailableSlot != null
+                  ? "${_nextAvailableSlot!.from} - ${_nextAvailableSlot!.to}"
+                  : "00:00 AM - 00:00 PM"),
             ],
           ),
 

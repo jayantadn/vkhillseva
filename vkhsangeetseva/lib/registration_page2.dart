@@ -619,40 +619,41 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                         // your widgets here
 
                         // main performer
-                        Widgets().createTopLevelCard(
-                          context,
-                          Column(children: [
-                            Text("Main performer",
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall),
-                            ListTile(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Profile(
-                                      title: "Main performer",
-                                      self: true,
-                                      onProfileSaved: (user) {
-                                        setState(() {
-                                          _mainPerformer = user;
-                                        });
-                                      },
-                                      friendMobile: _mainPerformer!.mobile,
+                        if (_mainPerformer != null)
+                          Widgets().createTopLevelCard(
+                            context,
+                            Column(children: [
+                              Text("Main performer",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall),
+                              ListTile(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Profile(
+                                        title: "Main performer",
+                                        self: true,
+                                        onProfileSaved: (user) {
+                                          setState(() {
+                                            _mainPerformer = user;
+                                          });
+                                        },
+                                        friendMobile: _mainPerformer!.mobile,
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                              leading: CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(_mainPerformer!.profilePicUrl),
-                              ),
-                              title: Text(
-                                  "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
-                              subtitle: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: [
+                                  );
+                                },
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      _mainPerformer!.profilePicUrl),
+                                ),
+                                title: Text(
+                                    "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
+                                subtitle: Widgets().createResponsiveRow(
+                                  context,
+                                  [
                                     Icon(Icons.phone),
                                     Text(_mainPerformer!.mobile),
                                     SizedBox(width: 4),
@@ -661,10 +662,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                   ],
                                 ),
                               ),
-                              trailing: Icon(Icons.arrow_forward_ios),
-                            ),
-                          ]),
-                        ),
+                            ]),
+                          ),
 
                         // supporting team
                         Widgets().createTopLevelCard(

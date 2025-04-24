@@ -156,7 +156,7 @@ class Widgets {
   }
 
   Widget createResponsiveRow(BuildContext context, List<Widget> children) {
-    double maxWidth = maxCardWidth * 0.8;
+    double maxWidth = MediaQuery.of(context).size.width;
 
     return Wrap(
       alignment: WrapAlignment.start,

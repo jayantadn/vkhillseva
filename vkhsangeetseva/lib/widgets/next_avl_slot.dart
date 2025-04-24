@@ -90,6 +90,7 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
     // set the starting search date and the next weekend date
     if (_nextAvailableDate == null) {
       _nextAvailableDate = DateTime.now();
+      _nextAvailableSlot = null;
     } else {
       List<Slot> slots = [];
 
@@ -299,10 +300,11 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
   Future<void> _fetchPreviousAvailableSlot() async {
     if (_nextAvailableDate == null) {
       _nextAvailableDate = DateTime.now();
+      _nextAvailableSlot = null;
     } else {
       List<Slot> slots = [];
 
-      // check if any slots are available for the current date
+      // check if any created slots are available for the current date
       String dbdate = DateFormat('yyyy-MM-dd').format(_nextAvailableDate!);
       var slotsRaw = await FB()
           .getValue(path: "${Const().dbrootSangeetSeva}/Slots/$dbdate");
@@ -325,7 +327,6 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
               break;
             }
           }
-
           if (!found) {
             slots.add(slotw);
           }
@@ -391,10 +392,15 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
       startDate: today,
     );
     List<String> slotDates = kvs.keys.toList();
+    slotDates.sort((a, b) {
+      DateTime dateA = DateFormat('yyyy-MM-dd').parse(a);
+      DateTime dateB = DateFormat('yyyy-MM-dd').parse(b);
+      return dateB.compareTo(dateA); // Reverse sort
+    });
 
     // find the previous available slots from the created slots
     bool found = false;
-    for (String dateStr in slotDates.reversed) {
+    for (String dateStr in slotDates) {
       DateTime date = DateFormat('yyyy-MM-dd').parse(dateStr);
       if (date.isBefore(_nextAvailableDate!)) {
         var slotsRaw = await FB()
@@ -431,6 +437,14 @@ class _NextAvlSlotState extends State<NextAvlSlot> {
     // arbitrate against the weekend slots
     bool foundWeekend = false;
     for (int i = 0; i < 10; i++) {
+      List<Slot> weekendSlots = Const().weekendSangeetSevaSlots;
+      weekendSlots.sort((a, b) {
+        DateTime timeA =
+            Utils().convertStringToTime(_nextAvailableDate!, a.from);
+        DateTime timeB =
+            Utils().convertStringToTime(_nextAvailableDate!, b.from);
+        return timeB.compareTo(timeA); // Reverse sort
+      });
       for (var slot in Const().weekendSangeetSevaSlots) {
         bool avl = await _isSlotAvailable(_nextAvailableDate!, slot);
         if (avl) {

@@ -38,8 +38,8 @@ class _CalendarState extends State<Calendar> {
   @override
   dispose() {
     // clear all lists
-    _bookedSlotsCnt.clear();
-    _avlSlotsCnt.clear();
+    _bookedSlotsCnt = [];
+    _avlSlotsCnt = [];
 
     // dispose all controllers
 

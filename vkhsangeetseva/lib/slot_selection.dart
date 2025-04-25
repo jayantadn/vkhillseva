@@ -61,7 +61,8 @@ class _SlotSelectionState extends State<SlotSelection> {
       Toaster().error("Invalid user");
       return;
     }
-    PerformerProfile? profile = await SSUtils().getUserProfile(basics.mobile);
+    PerformerProfile? profile =
+        await SSUtils().getPerformerProfile(basics.mobile);
     if (profile == null) {
       await Widgets().showMessage(
           context, "Profile not set. Please set your profile first.");
@@ -111,111 +112,116 @@ class _SlotSelectionState extends State<SlotSelection> {
                         // your widgets here
                         Widgets().createTopLevelCard(
                             context,
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Next available slot:"),
-                                const SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    NextAvlSlot(key: _nextavlslotKey),
-                                    const SizedBox(width: 10),
-                                    IconButton(
-                                        onPressed: () {
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Next available slot:"),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      NextAvlSlot(key: _nextavlslotKey),
+                                      const SizedBox(width: 10),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Registration(
+                                                  title: "Event Registration",
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          icon: Icon(Icons.calendar_month))
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: ElevatedButton(
+                                        onPressed: () async {
+                                          DateTime? date = _nextavlslotKey
+                                              .currentState!.nextAvailableDate;
+                                          Slot? slot = _nextavlslotKey
+                                              .currentState!.nextAvailableSlot;
+
+                                          if (date == null || slot == null) {
+                                            Toaster().error("invalid slot");
+                                            return;
+                                          }
+
+                                          // check if the slot is already booked
+                                          List requestsRaw = await FB().getList(
+                                              path:
+                                                  "${Const().dbrootSangeetSeva}/PendingRequests");
+                                          for (var requestRaw in requestsRaw) {
+                                            Map<String, dynamic> requestMap =
+                                                Map<String, dynamic>.from(
+                                                    requestRaw);
+                                            String mobile = requestMap['path']
+                                                .split('/')
+                                                .last;
+                                            UserBasics? basics =
+                                                Utils().getUserBasics();
+                                            if (basics != null &&
+                                                mobile == basics.mobile) {
+                                              String dbpath =
+                                                  requestMap['path'];
+                                              List events = await FB()
+                                                  .getList(path: dbpath);
+                                              int index = requestMap['index'];
+                                              EventRecord event = Utils()
+                                                  .convertRawToDatatype(
+                                                      events[index],
+                                                      EventRecord.fromJson);
+                                              if (event.date == date &&
+                                                  event.slot.from ==
+                                                      slot.from &&
+                                                  event.slot.to == slot.to) {
+                                                Toaster().error(
+                                                    "You already requested this slot");
+                                                return;
+                                              }
+                                            }
+                                          }
+
+                                          // check if slot is in the past
+                                          DateTime now = DateTime.now();
+                                          List<int> hrMin = Utils()
+                                              .convertTimeToHrMin(slot.from);
+                                          DateTime slotDateTime = DateTime(
+                                            date.year,
+                                            date.month,
+                                            date.day,
+                                            hrMin[0],
+                                            hrMin[1],
+                                          );
+                                          if (slotDateTime.isBefore(now)) {
+                                            Toaster().error(
+                                                "Cannot book slot in the past");
+                                            return;
+                                          }
+
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  Registration(
-                                                title: "Event Registration",
+                                                  RegistrationPage2(
+                                                title: widget.title,
+                                                selectedDate: date,
+                                                slot: slot,
                                               ),
                                             ),
                                           );
                                         },
-                                        icon: Icon(Icons.calendar_month))
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: ElevatedButton(
-                                      onPressed: () async {
-                                        DateTime? date = _nextavlslotKey
-                                            .currentState!.nextAvailableDate;
-                                        Slot? slot = _nextavlslotKey
-                                            .currentState!.nextAvailableSlot;
-
-                                        if (date == null || slot == null) {
-                                          Toaster().error("invalid slot");
-                                          return;
-                                        }
-
-                                        // check if the slot is already booked
-                                        List requestsRaw = await FB().getList(
-                                            path:
-                                                "${Const().dbrootSangeetSeva}/PendingRequests");
-                                        for (var requestRaw in requestsRaw) {
-                                          Map<String, dynamic> requestMap =
-                                              Map<String, dynamic>.from(
-                                                  requestRaw);
-                                          String mobile = requestMap['path']
-                                              .split('/')
-                                              .last;
-                                          UserBasics? basics =
-                                              Utils().getUserBasics();
-                                          if (basics != null &&
-                                              mobile == basics.mobile) {
-                                            String dbpath = requestMap['path'];
-                                            List events = await FB()
-                                                .getList(path: dbpath);
-                                            int index = requestMap['index'];
-                                            EventRecord event = Utils()
-                                                .convertRawToDatatype(
-                                                    events[index],
-                                                    EventRecord.fromJson);
-                                            if (event.date == date &&
-                                                event.slot.from == slot.from &&
-                                                event.slot.to == slot.to) {
-                                              Toaster().error(
-                                                  "You already requested this slot");
-                                              return;
-                                            }
-                                          }
-                                        }
-
-                                        // check if slot is in the past
-                                        DateTime now = DateTime.now();
-                                        List<int> hrMin = Utils()
-                                            .convertTimeToHrMin(slot.from);
-                                        DateTime slotDateTime = DateTime(
-                                          date.year,
-                                          date.month,
-                                          date.day,
-                                          hrMin[0],
-                                          hrMin[1],
-                                        );
-                                        if (slotDateTime.isBefore(now)) {
-                                          Toaster().error(
-                                              "Cannot book slot in the past");
-                                          return;
-                                        }
-
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                RegistrationPage2(
-                                              title: widget.title,
-                                              selectedDate: date,
-                                              slot: slot,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Text("Select slot")),
-                                ),
-                              ],
+                                        child: Text("Select slot")),
+                                  ),
+                                ],
+                              ),
                             )),
                       ]),
 

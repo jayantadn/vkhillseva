@@ -96,7 +96,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       // populate the lists
       _mainPerformer = PerformerProfile.fromJson(userdetailsJson);
       // TODO for (String mobile in performanceRequest.supportTeamMobiles) {
-      //   PerformerProfile? details = await SSUtils().getUserProfile(mobile);
+      //   PerformerProfile? details = await SSUtils().getPerformerProfile(mobile);
       //   if (details != null) {
       //     _supportingTeam.add(details);
       //   }

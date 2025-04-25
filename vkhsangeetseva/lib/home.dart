@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registered_events.dart';
 import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/slot_selection.dart';
@@ -56,6 +57,27 @@ class _HomePageState extends State<HomePage> {
 
     // get username from local storage
     await Utils().fetchUserBasics();
+    UserBasics? basics = Utils().getUserBasics();
+    if (basics != null) {
+      {
+        PerformerProfile? profile =
+            await SSUtils().getPerformerProfile(basics.mobile);
+        if (profile == null) {
+          await Widgets().showMessage(context,
+              "No profile found for this mobile. You will be redirected to create a profile.");
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Profile(
+                title: "Create Profile",
+                self: true,
+              ),
+            ),
+          );
+        }
+      }
+    }
 
     await _lock.synchronized(() async {
       // fetch form values
@@ -72,76 +94,90 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _createWelcome() {
-    return Column(children: [
-      // image
-      Container(
-        height: 200,
-        width: 200,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: Offset(0, 3),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(children: [
+        // image
+        Container(
+          height: 200,
+          width: 200,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: Image.asset(
+              'assets/images/Logo/SangeetSeva.png',
+              fit: BoxFit.cover,
             ),
-          ],
-        ),
-        child: ClipOval(
-          child: Image.asset(
-            'assets/images/Logo/SangeetSeva.png',
-            fit: BoxFit.cover,
           ),
         ),
-      ),
 
-      // all text
-      SizedBox(
-        height: 10,
-      ),
-      Text(
-        'Welcome',
-        style: Theme.of(context).textTheme.headlineSmall,
-      ),
-      Text(
-        _username.isEmpty ? 'Guest' : _username,
-        style: Theme.of(context).textTheme.headlineSmall,
-      ),
-      SizedBox(
-        height: 8,
-      ),
-      Text(
-        'ISKCON Vaikuntha Hill',
-        style: Theme.of(context).textTheme.headlineMedium,
-      ),
-      Text(
-        'Govinda Sangeet Seva',
-        style: GoogleFonts.pacifico(
-          textStyle: Theme.of(context).textTheme.headlineLarge,
-          color: Theme.of(context).colorScheme.primary,
+        // all text
+        SizedBox(
+          height: 10,
         ),
-      ),
-
-      // signup button
-      SizedBox(
-        height: 10,
-      ),
-      if (_username.isEmpty)
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor:
-                Colors.deepOrange, // Change the background color here
+        Text(
+          'Welcome',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        Text(
+          _username.isEmpty ? 'Guest' : _username,
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        Text(
+          'ISKCON Vaikuntha Hill',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+        Text(
+          'Govinda Sangeet Seva',
+          style: GoogleFonts.pacifico(
+            textStyle: Theme.of(context).textTheme.headlineLarge,
+            color: Theme.of(context).colorScheme.primary,
           ),
-          onPressed: () {
-            smsAuth(context, () async {
-              // auth complete
-              await refresh();
-            });
-          },
-          child: Text('Signup / Login'),
         ),
-    ]);
+
+        // signup button
+        SizedBox(
+          height: 10,
+        ),
+        if (_username.isEmpty)
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  Colors.deepOrange, // Change the background color here
+            ),
+            onPressed: () {
+              smsAuth(context, () async {
+                // auth complete
+                await refresh();
+              });
+            },
+            child: Text('Signup / Login'),
+          ),
+      ]),
+    );
+  }
+
+  Future<void> _logout() async {
+    await LS().delete("userbasics");
+    await refresh();
+
+    setState(() {
+      _username = "";
+    });
+
+    Navigator.pop(context);
   }
 
   @override
@@ -149,7 +185,54 @@ class _HomePageState extends State<HomePage> {
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(title: Text(widget.title)),
+          appBar: AppBar(
+            title: Text(widget.title),
+            actions: [
+              // profile button
+              if (_username.isNotEmpty)
+                IconButton(
+                  icon: Icon(Icons.person),
+                  onPressed: () {
+                    Navigator.push(
+                      // ignore: use_build_context_synchronously
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Profile(
+                          title: "Profile",
+                          self: true,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+              // logout button
+              if (_username.isNotEmpty)
+                IconButton(
+                  icon: Icon(Icons.logout),
+                  onPressed: () async {
+                    Widgets().showConfirmDialog(context,
+                        "Are you sure to log out?", "Log out", _logout);
+                  },
+                ),
+
+              // support
+              IconButton(
+                icon: Icon(Icons.help),
+                onPressed: () {
+                  Navigator.push(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Support(
+                        title: "Support",
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
           body: RefreshIndicator(
             onRefresh: refresh,
             child: SingleChildScrollView(

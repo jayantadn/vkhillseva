@@ -11,7 +11,7 @@ class SSUtils {
     // init
   }
 
-  Future<PerformerProfile?> getUserProfile(String mobile) async {
+  Future<PerformerProfile?> getPerformerProfile(String mobile) async {
     var userDetailsRaw = await FB().getValue(
       path: "${Const().dbrootSangeetSeva}/Users/$mobile",
     );

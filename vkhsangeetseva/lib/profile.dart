@@ -22,7 +22,7 @@ class Profile extends StatefulWidget {
       {super.key,
       required this.title,
       this.icon,
-      this.self,
+      required this.self,
       this.onProfileSaved,
       this.friendMobile,
       this.oldUserDetails});

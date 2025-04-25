@@ -69,7 +69,8 @@ class _RegistrationState extends State<Registration> {
       Toaster().error("Invalid user");
       return;
     }
-    PerformerProfile? profile = await SSUtils().getUserProfile(basics.mobile);
+    PerformerProfile? profile =
+        await SSUtils().getPerformerProfile(basics.mobile);
     if (profile == null) {
       await Widgets().showMessage(
           context, "Profile not set. Please set your profile first.");

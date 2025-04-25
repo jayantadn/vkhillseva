@@ -184,8 +184,13 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
             ],
           ),
         ),
-        trailing: Widgets().createContextMenu(["Remove"], (String action) {
+        trailing: Widgets().createContextMenu(["Edit", "Remove"],
+            (String action) async {
           switch (action) {
+            case "Edit":
+              await _showAddSupportTeamDialog(
+                  context: context, oldUser: member);
+              break;
             case "Remove":
               setState(() {
                 _supportingTeam.removeAt(index);
@@ -531,17 +536,27 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     );
   }
 
-  Future<void> _showAddSupportTeamDialog(BuildContext context) {
+  Future<void> _showAddSupportTeamDialog(
+      {required BuildContext context, SupportUser? oldUser}) {
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
     String salutation = "";
+    TextEditingController supportNameController = TextEditingController();
     String specialization = "Vocalist";
-    TextEditingController _supportNameController = TextEditingController();
+
+    // edit mode
+    if (oldUser != null) {
+      salutation = oldUser.salutation;
+      supportNameController.text = oldUser.name;
+      specialization = oldUser.specialization;
+    }
 
     return showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Add support team"),
+          title:
+              Text(oldUser == null ? "Add support team" : "Edit support team"),
           content: SingleChildScrollView(
             child: Form(
               key: formKey,
@@ -550,6 +565,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                   // salutation
                   DropdownButtonFormField<String>(
                     decoration: InputDecoration(labelText: "Salutation"),
+                    value: salutation.isNotEmpty
+                        ? salutation
+                        : SSConst().salutations.first,
                     items: SSConst().salutations.map((salutation) {
                       return DropdownMenuItem<String>(
                         value: salutation,
@@ -569,7 +587,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                   // name
                   TextFormField(
-                    controller: _supportNameController,
+                    controller: supportNameController,
                     decoration: InputDecoration(labelText: "Name"),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -582,6 +600,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                   // specialization
                   DropdownButtonFormField<String>(
                     decoration: InputDecoration(labelText: "Specialization"),
+                    value: specialization,
                     items: ["Vocalist", ...SSConst().instrumentSkills, "Other"]
                         .map((specialization) {
                       return DropdownMenuItem<String>(
@@ -620,16 +639,23 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                 SupportUser user = SupportUser(
                   salutation: salutation,
-                  name: _supportNameController.text,
+                  name: supportNameController.text,
                   specialization: specialization,
                   friendMobile: _mainPerformer!.mobile,
                 );
 
                 setState(() {
-                  _supportingTeam.add(user);
+                  if (oldUser == null) {
+                    _supportingTeam.add(user);
+                  } else {
+                    int index = _supportingTeam.indexOf(oldUser);
+                    if (index != -1) {
+                      _supportingTeam[index] = user;
+                    }
+                  }
                 });
               },
-              child: Text("Add"),
+              child: Text(oldUser == null ? "Add" : "Update"),
             ),
           ],
         );
@@ -762,7 +788,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                               // button - add supporting team
                               TextButton(
                                   onPressed: () async {
-                                    await _showAddSupportTeamDialog(context);
+                                    await _showAddSupportTeamDialog(
+                                        context: context);
                                   },
                                   child: Text(
                                     _supportingTeam.isEmpty

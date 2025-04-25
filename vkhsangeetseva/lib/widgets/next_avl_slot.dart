@@ -11,14 +11,10 @@ class NextAvlSlot extends StatefulWidget {
   const NextAvlSlot({super.key});
 
   @override
-  State<NextAvlSlot> createState() => _NextAvlSlotState();
+  State<NextAvlSlot> createState() => NextAvlSlotState();
 }
 
-// hint: instantiate the class with a global key
-// ignore: library_private_types_in_public_api
-GlobalKey<_NextAvlSlotState> nextavlslotKey = GlobalKey<_NextAvlSlotState>();
-
-class _NextAvlSlotState extends State<NextAvlSlot> {
+class NextAvlSlotState extends State<NextAvlSlot> {
   final Lock _lock = Lock();
   bool _isLoading = false;
   DateTime? _nextAvailableDate;

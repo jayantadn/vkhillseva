@@ -21,6 +21,8 @@ class _SlotSelectionState extends State<SlotSelection> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  final GlobalKey<NextAvlSlotState> _nextavlslotKey =
+      GlobalKey<NextAvlSlotState>();
 
   // lists
 
@@ -94,12 +96,11 @@ class _SlotSelectionState extends State<SlotSelection> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    NextAvlSlot(key: nextavlslotKey),
+                                    NextAvlSlot(key: _nextavlslotKey),
                                     const SizedBox(width: 10),
                                     IconButton(
                                         onPressed: () {
                                           Navigator.push(
-                                            // ignore: use_build_context_synchronously
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
@@ -116,27 +117,78 @@ class _SlotSelectionState extends State<SlotSelection> {
                                 Align(
                                   alignment: Alignment.center,
                                   child: ElevatedButton(
-                                      onPressed: () {
-                                        DateTime? date = nextavlslotKey
+                                      onPressed: () async {
+                                        DateTime? date = _nextavlslotKey
                                             .currentState!.nextAvailableDate;
-                                        Slot? slot = nextavlslotKey
+                                        Slot? slot = _nextavlslotKey
                                             .currentState!.nextAvailableSlot;
 
-                                        if (date != null && slot != null) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  RegistrationPage2(
-                                                title: widget.title,
-                                                selectedDate: date,
-                                                slot: slot,
-                                              ),
-                                            ),
-                                          );
-                                        } else {
-                                          Toaster().error("Invalid slot");
+                                        if (date == null || slot == null) {
+                                          Toaster().error("invalid slot");
+                                          return;
                                         }
+
+                                        // check if the slot is already booked
+                                        List requestsRaw = await FB().getList(
+                                            path:
+                                                "${Const().dbrootSangeetSeva}/PendingRequests");
+                                        for (var requestRaw in requestsRaw) {
+                                          Map<String, dynamic> requestMap =
+                                              Map<String, dynamic>.from(
+                                                  requestRaw);
+                                          String mobile = requestMap['path']
+                                              .split('/')
+                                              .last;
+                                          UserBasics? basics =
+                                              Utils().getUserBasics();
+                                          if (basics != null &&
+                                              mobile == basics.mobile) {
+                                            String dbpath = requestMap['path'];
+                                            List events = await FB()
+                                                .getList(path: dbpath);
+                                            int index = requestMap['index'];
+                                            EventRecord event = Utils()
+                                                .convertRawToDatatype(
+                                                    events[index],
+                                                    EventRecord.fromJson);
+                                            if (event.date == date &&
+                                                event.slot.from == slot.from &&
+                                                event.slot.to == slot.to) {
+                                              Toaster().error(
+                                                  "You already requested this slot");
+                                              return;
+                                            }
+                                          }
+                                        }
+
+                                        // check if slot is in the past
+                                        DateTime now = DateTime.now();
+                                        List<int> hrMin = Utils()
+                                            .convertTimeToHrMin(slot.from);
+                                        DateTime slotDateTime = DateTime(
+                                          date.year,
+                                          date.month,
+                                          date.day,
+                                          hrMin[0],
+                                          hrMin[1],
+                                        );
+                                        if (slotDateTime.isBefore(now)) {
+                                          Toaster().error(
+                                              "Cannot book slot in the past");
+                                          return;
+                                        }
+
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                RegistrationPage2(
+                                              title: widget.title,
+                                              selectedDate: date,
+                                              slot: slot,
+                                            ),
+                                          ),
+                                        );
                                       },
                                       child: Text("Select slot")),
                                 ),

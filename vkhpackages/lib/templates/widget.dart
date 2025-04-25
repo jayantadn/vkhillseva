@@ -10,7 +10,7 @@ class Summary extends StatefulWidget {
 
 // hint: instantiate the class with a global key
 // ignore: library_private_types_in_public_api
-GlobalKey<_SummaryState> summaryKey = GlobalKey<_SummaryState>();
+final GlobalKey<_SummaryState> summaryKey = GlobalKey<_SummaryState>();
 
 class _SummaryState extends State<Summary> {
   final Lock _lock = Lock();

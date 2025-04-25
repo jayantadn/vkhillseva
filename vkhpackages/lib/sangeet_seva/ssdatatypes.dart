@@ -93,7 +93,7 @@ class EventRecord {
       'date': date.toIso8601String(),
       'slot': slot.toJson(),
       'mainPerformer': mainPerformerMobile,
-      'supportTeam': supportTeam.map((e) => e).toList(),
+      'supportTeam': supportTeam.map((e) => e.toJson()).toList(),
       'guests': guests.map((e) => e.toJson()).toList(),
       'songs': songs,
       'status': status,
@@ -176,7 +176,7 @@ class Slot {
   }
 }
 
-class PerformerDetails {
+class PerformerProfile {
   final String salutation;
   final String name;
   final String mobile;
@@ -188,7 +188,7 @@ class PerformerDetails {
   String? fcmToken;
   String? friendMobile;
 
-  PerformerDetails({
+  PerformerProfile({
     required this.salutation,
     required this.name,
     required this.mobile,
@@ -201,8 +201,8 @@ class PerformerDetails {
     this.friendMobile,
   });
 
-  factory PerformerDetails.fromJson(Map<String, dynamic> json) {
-    return PerformerDetails(
+  factory PerformerProfile.fromJson(Map<String, dynamic> json) {
+    return PerformerProfile(
       salutation: json['salutation'],
       name: json['name'],
       mobile: json['mobile'],

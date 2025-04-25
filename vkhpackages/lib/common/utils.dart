@@ -187,18 +187,6 @@ class Utils {
     return lightColors[DateTime.now().millisecond % lightColors.length];
   }
 
-  Future<PerformerDetails?> getUserDetails(String mobile) async {
-    var userDetailsRaw = await FB().getValue(
-      path: "${Const().dbrootSangeetSeva}/Users/$mobile",
-    );
-
-    if (userDetailsRaw == null || userDetailsRaw.isEmpty) {
-      return null;
-    }
-
-    return convertRawToDatatype(userDetailsRaw, PerformerDetails.fromJson);
-  }
-
   String formatIndianCurrency(int amount) {
     final formatter = NumberFormat.currency(
       locale: 'en_IN',
@@ -243,7 +231,7 @@ class Utils {
     await LS().write('userbasics', jsonEncode(userbasics.toJson()));
   }
 
-  Future<void> setUserDetails(PerformerDetails details) async {
+  Future<void> setUserDetails(PerformerProfile details) async {
     String dbpath = "${Const().dbrootSangeetSeva}/Users/${details.mobile}";
     await FB().setJson(path: dbpath, json: details.toJson());
   }

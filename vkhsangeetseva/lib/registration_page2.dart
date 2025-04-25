@@ -28,7 +28,7 @@ class RegistrationPage2 extends StatefulWidget {
 class _RegistrationPage2State extends State<RegistrationPage2> {
   // scalars
   bool _isLoading = true;
-  PerformerDetails? _mainPerformer;
+  PerformerProfile? _mainPerformer;
   final _minSongs = 3;
 
   // lists
@@ -92,9 +92,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       EventRecord performanceRequest = widget.oldEvent!;
 
       // populate the lists
-      _mainPerformer = PerformerDetails.fromJson(userdetailsJson);
+      _mainPerformer = PerformerProfile.fromJson(userdetailsJson);
       // TODO for (String mobile in performanceRequest.supportTeamMobiles) {
-      //   PerformerDetails? details = await Utils().getUserDetails(mobile);
+      //   PerformerProfile? details = await SSUtils().getUserProfile(mobile);
       //   if (details != null) {
       //     _supportingTeam.add(details);
       //   }
@@ -124,7 +124,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           );
         }));
       } else {
-        _mainPerformer = PerformerDetails.fromJson(userdetailsJson);
+        _mainPerformer = PerformerProfile.fromJson(userdetailsJson);
       }
     });
   }

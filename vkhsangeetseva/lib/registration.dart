@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration_page2.dart';
 
 class Registration extends StatefulWidget {
@@ -60,6 +61,29 @@ class _RegistrationState extends State<Registration> {
     });
 
     // perform async operations here
+
+    // check if profile is set
+    await Utils().fetchUserBasics();
+    UserBasics? basics = Utils().getUserBasics();
+    if (basics == null) {
+      Toaster().error("Invalid user");
+      return;
+    }
+    PerformerProfile? profile = await SSUtils().getUserProfile(basics.mobile);
+    if (profile == null) {
+      await Widgets().showMessage(
+          context, "Profile not set. Please set your profile first.");
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Profile(
+            title: "Performer Profile",
+            self: true,
+          ),
+        ),
+      );
+    }
+
     await _fillBookingLists(_selectedDate);
 
     // refresh all child widgets

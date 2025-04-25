@@ -25,7 +25,7 @@ class _PendingRequestsState extends State<PendingRequests> {
   // lists
   final List<Map<String, dynamic>> _pendingRequests = [];
   final List<EventRecord> _linkedEventRecords = [];
-  final List<PerformerDetails> _mainPerformers = [];
+  final List<PerformerProfile> _mainPerformers = [];
 
   // controllers, listeners and focus nodes
 
@@ -89,8 +89,8 @@ class _PendingRequestsState extends State<PendingRequests> {
     // fetch main performers
     _mainPerformers.clear();
     for (EventRecord pendingRequest in _linkedEventRecords) {
-      PerformerDetails? mainPerformer =
-          await Utils().getUserDetails(pendingRequest.mainPerformerMobile);
+      PerformerProfile? mainPerformer =
+          await SSUtils().getUserProfile(pendingRequest.mainPerformerMobile);
       if (mainPerformer != null) _mainPerformers.add(mainPerformer);
     }
 
@@ -109,7 +109,7 @@ class _PendingRequestsState extends State<PendingRequests> {
     title += " (${pendingRequest.slot.from} - ${pendingRequest.slot.to})";
     String performer = _mainPerformers[index].name;
     String profilePicUrl = _mainPerformers[index].profilePicUrl;
-    Utils().getUserDetails(pendingRequest.mainPerformerMobile);
+    SSUtils().getUserProfile(pendingRequest.mainPerformerMobile);
 
     return Card(
         child: ListTile(

@@ -81,8 +81,6 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
       }
     });
 
-    // Spawn a thread to write pastEvents in the database
-
     // write past events
     String year = DateTime.now().year.toString();
     dbpath = "${Const().dbrootSangeetSeva}/PastEvents/$year/${basics.mobile}";

@@ -14,9 +14,9 @@ class Profile extends StatefulWidget {
   final String title;
   final String? icon;
   final bool? self;
-  final Function(PerformerDetails user)? onProfileSaved;
+  final Function(PerformerProfile user)? onProfileSaved;
   final String? friendMobile;
-  final PerformerDetails? oldUserDetails;
+  final PerformerProfile? oldUserDetails;
 
   const Profile(
       {super.key,
@@ -38,7 +38,7 @@ class _ProfileState extends State<Profile> {
   bool _isLoading = true;
   String _profilePicUrl = '';
   late String _salutation;
-  PerformerDetails? _userDetailsOld;
+  PerformerProfile? _userDetailsOld;
 
   // lists
 
@@ -99,7 +99,7 @@ class _ProfileState extends State<Profile> {
         if (exists) {
           Map<String, dynamic> userdetailsJson = await FB()
               .getJson(path: "${Const().dbrootSangeetSeva}/Users/$mobile");
-          _userDetailsOld = PerformerDetails.fromJson(userdetailsJson);
+          _userDetailsOld = PerformerProfile.fromJson(userdetailsJson);
         }
       }
     } else if (widget.oldUserDetails != null) {
@@ -145,7 +145,7 @@ class _ProfileState extends State<Profile> {
     String dbpath =
         "${Const().dbrootSangeetSeva}/Users/${_mobileController.text}";
     Map<String, dynamic> userdetailsJson = await FB().getJson(path: dbpath);
-    PerformerDetails? userDetails = PerformerDetails.fromJson(userdetailsJson);
+    PerformerProfile? userDetails = PerformerProfile.fromJson(userdetailsJson);
 
     // check if current user is friend
     bool isFriend = false;
@@ -298,8 +298,8 @@ class _ProfileState extends State<Profile> {
     });
 
     // create user details object
-    PerformerDetails? details;
-    details = PerformerDetails(
+    PerformerProfile? details;
+    details = PerformerProfile(
         salutation: _salutation,
         name: _nameController.text,
         mobile: _mobileController.text,
@@ -521,22 +521,7 @@ class _ProfileState extends State<Profile> {
         Scaffold(
           appBar: AppBar(
             title: Text(widget.title),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.save),
-                onPressed: () async {
-                  // validation if user already exists
-                  String dbpath =
-                      "${Const().dbrootSangeetSeva}/Users/${_mobileController.text}";
-                  bool exists = await FB().pathExists(dbpath);
-                  if (exists) {
-                    await _handleExistingUser(context);
-                  } else {
-                    await _save();
-                  }
-                },
-              )
-            ],
+            actions: [],
           ),
           body: RefreshIndicator(
             onRefresh: refresh,
@@ -741,7 +726,7 @@ class _ProfileState extends State<Profile> {
                                       ),
                                     ),
                                     SizedBox(width: 10),
-                                    ElevatedButton(
+                                    OutlinedButton(
                                       child: Text("Browse"),
                                       onPressed: () async {
                                         FilePickerResult? result =
@@ -783,6 +768,22 @@ class _ProfileState extends State<Profile> {
                           );
                         }),
                       ),
+
+                    // submit button
+                    ElevatedButton(
+                      onPressed: () async {
+                        // validation if user already exists
+                        String dbpath =
+                            "${Const().dbrootSangeetSeva}/Users/${_mobileController.text}";
+                        bool exists = await FB().pathExists(dbpath);
+                        if (exists) {
+                          await _handleExistingUser(context);
+                        } else {
+                          await _save();
+                        }
+                      },
+                      child: Text("Save"),
+                    ),
 
                     // leave some space at bottom
                     SizedBox(height: 100),

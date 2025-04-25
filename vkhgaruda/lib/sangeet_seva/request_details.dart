@@ -30,10 +30,10 @@ class _RequestDetailsState extends State<RequestDetails> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  PerformerDetails? _mainPerformer;
+  PerformerProfile? _mainPerformer;
 
   // lists
-  final List<PerformerDetails> _supportTeam = [];
+  final List<PerformerProfile> _supportTeam = [];
 
   // controllers, listeners and focus nodes
   final TextEditingController _noteController = TextEditingController();
@@ -63,9 +63,9 @@ class _RequestDetailsState extends State<RequestDetails> {
 
     // perform async operations here
     _mainPerformer =
-        await Utils().getUserDetails(widget.eventRecord.mainPerformerMobile);
+        await SSUtils().getUserProfile(widget.eventRecord.mainPerformerMobile);
     // TODO for (String supportMobile in widget.eventRecord.supportTeamMobiles) {
-    //   PerformerDetails? support = await Utils().getUserDetails(supportMobile);
+    //   PerformerProfile? support = await SSUtils().getUserProfile(supportMobile);
     //   if (support != null) _supportTeam.add(support);
     // }
 

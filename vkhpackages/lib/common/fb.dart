@@ -312,16 +312,22 @@ class FB {
     }
   }
 
-  Future<void> setList({
+  Future<void> setList<T>({
     required String path,
-    required List<dynamic> list,
-    required Map<String, dynamic> Function(void) toJson,
+    required List<T> list,
+    required Map<String, dynamic> Function(T) toJson,
   }) async {
     try {
+      // Convert each element in the list to JSON
+      List<Map<String, dynamic>> jsonList =
+          list.map((item) => toJson(item)).toList();
+
+      // Publish the JSON list to the specified database path
       DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
-      await dbref.set(json);
+      await dbref.set(jsonList);
     } catch (e) {
-      Toaster().error("Error setting data: $e");
+      Toaster().error("Error in setList: $e");
+      rethrow;
     }
   }
 

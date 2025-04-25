@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:vkhsangeetseva/registration_page2.dart';
 
 class RegisteredEvents extends StatefulWidget {
   final String title;
@@ -89,10 +90,14 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
     }
 
     // delete past events from the current database
+    // this is done by saving just the future events
     if (_events.isNotEmpty) {
       dbpath = "${Const().dbrootSangeetSeva}/Events/${basics.mobile}";
-      await FB()
-          .setList(path: dbpath, list: _events, toJson: EventRecord.toJson);
+      await FB().setList(
+        path: dbpath,
+        list: _events,
+        toJson: (e) => e.toJson(),
+      );
     }
 
     setState(() {
@@ -101,10 +106,78 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
   }
 
   Widget _createEventCard(int index) {
+    EventRecord event = _events[index];
     return Widgets().createTopLevelCard(
         context,
         ListTile(
-          title: Text(DateFormat("dd MMM, yyyy").format(_events[index].date)),
+          onTap: () {
+            if (event.status == "Approved") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegistrationPage2(
+                    selectedDate: event.date,
+                    slot: event.slot,
+                    title: "Update event",
+                    icon: widget.icon,
+                    oldEvent: event,
+                    readOnly: true,
+                  ),
+                ),
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegistrationPage2(
+                    selectedDate: event.date,
+                    slot: event.slot,
+                    title: "Update event",
+                    icon: widget.icon,
+                    oldEvent: event,
+                  ),
+                ),
+              );
+            }
+          },
+          leading: Icon(event.status == "Pending"
+              ? Icons.question_mark
+              : (event.status == "Approved" ? Icons.check : Icons.close)),
+          title: Row(
+            children: [
+              Text(DateFormat("dd MMM, yyyy").format(event.date)),
+              const SizedBox(width: 10),
+              if (event.noteTemple.isNotEmpty)
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black, width: 1.0),
+                    color: Colors.yellow,
+                  ),
+                  child: Text(
+                    "Note",
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+            ],
+          ),
+          subtitle: Widgets().createResponsiveRow(
+            context,
+            [
+              Text(("${event.slot.from} - ${event.slot.to}, ")),
+              Text("Request is "),
+              Text(
+                event.status,
+                style: TextStyle(
+                  color: event.status == "Approved"
+                      ? Colors.green
+                      : (event.status == "Rejected"
+                          ? Colors.red
+                          : Colors.black),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ));
   }
 

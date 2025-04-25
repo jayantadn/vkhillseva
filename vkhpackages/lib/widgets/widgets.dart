@@ -206,9 +206,7 @@ class Widgets {
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth, minWidth: maxWidth),
-        child: Card(
-          child: Padding(padding: const EdgeInsets.all(8.0), child: child),
-        ),
+        child: Card(child: child),
       ),
     );
   }

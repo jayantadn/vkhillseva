@@ -11,6 +11,7 @@ class RegistrationPage2 extends StatefulWidget {
   final DateTime selectedDate;
   final Slot slot;
   final EventRecord? oldEvent;
+  final bool? readOnly;
 
   const RegistrationPage2(
       {super.key,
@@ -18,7 +19,8 @@ class RegistrationPage2 extends StatefulWidget {
       this.icon,
       required this.selectedDate,
       required this.slot,
-      this.oldEvent});
+      this.oldEvent,
+      this.readOnly});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -150,19 +152,20 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 ],
               )
             : null,
-        trailing:
-            Widgets().createContextMenu(["Edit", "Delete"], (String action) {
-          switch (action) {
-            case "Edit":
-              _showAddSongDialog(context: context, index: index);
-              break;
-            case "Delete":
-              setState(() {
-                _songs.removeAt(index);
-              });
-              break;
-          }
-        }));
+        trailing: widget.readOnly != null
+            ? null
+            : Widgets().createContextMenu(["Edit", "Delete"], (String action) {
+                switch (action) {
+                  case "Edit":
+                    _showAddSongDialog(context: context, index: index);
+                    break;
+                  case "Delete":
+                    setState(() {
+                      _songs.removeAt(index);
+                    });
+                    break;
+                }
+              }));
   }
 
   Widget _createSupportingTeamTile(int index) {
@@ -184,20 +187,22 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
             ],
           ),
         ),
-        trailing: Widgets().createContextMenu(["Edit", "Remove"],
-            (String action) async {
-          switch (action) {
-            case "Edit":
-              await _showAddSupportTeamDialog(
-                  context: context, oldUser: member);
-              break;
-            case "Remove":
-              setState(() {
-                _supportingTeam.removeAt(index);
-              });
-              break;
-          }
-        }));
+        trailing: widget.readOnly != null
+            ? null
+            : Widgets().createContextMenu(["Edit", "Remove"],
+                (String action) async {
+                switch (action) {
+                  case "Edit":
+                    await _showAddSupportTeamDialog(
+                        context: context, oldUser: member);
+                    break;
+                  case "Remove":
+                    setState(() {
+                      _supportingTeam.removeAt(index);
+                    });
+                    break;
+                }
+              }));
   }
 
   Widget _createGuestTile(int index) {
@@ -217,19 +222,22 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
             ],
           ),
         ),
-        trailing: Widgets().createContextMenu(["Edit", "Remove"],
-            (String action) async {
-          switch (action) {
-            case "Edit":
-              await _showAddGuestDialog(context: context, oldUser: member);
-              break;
-            case "Remove":
-              setState(() {
-                _guests.removeAt(index);
-              });
-              break;
-          }
-        }));
+        trailing: widget.readOnly != null
+            ? null
+            : Widgets().createContextMenu(["Edit", "Remove"],
+                (String action) async {
+                switch (action) {
+                  case "Edit":
+                    await _showAddGuestDialog(
+                        context: context, oldUser: member);
+                    break;
+                  case "Remove":
+                    setState(() {
+                      _guests.removeAt(index);
+                    });
+                    break;
+                }
+              }));
   }
 
   Future<void> _deleteEvent() async {
@@ -716,7 +724,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       children: [
         Scaffold(
           appBar: AppBar(title: Text(widget.title), actions: [
-            if (widget.oldEvent != null)
+            if (widget.oldEvent != null && widget.readOnly == null)
               IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
@@ -755,14 +763,17 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       SizedBox(height: 10),
                       if (widget.oldEvent != null &&
                           widget.oldEvent!.noteTemple.isNotEmpty)
-                        Card(
-                            color: widget.oldEvent!.status == "Approved"
-                                ? Colors.green[50]
-                                : Colors.red[50],
-                            child: ListTile(
-                              title: Text("Temple notes"),
-                              subtitle: Text(widget.oldEvent!.noteTemple),
-                            )),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.yellow,
+                            border: Border.all(color: Colors.black, width: 2),
+                          ),
+                          child: ListTile(
+                            title: Text("Notes from temple"),
+                            subtitle: Text(widget.oldEvent!.noteTemple),
+                          ),
+                        ),
+                      SizedBox(height: 10),
 
                       Widgets().createResponsiveTopLevelContainer(context, [
                         // your widgets here
@@ -833,16 +844,17 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                   })),
 
                               // button - add supporting team
-                              TextButton(
-                                  onPressed: () async {
-                                    await _showAddSupportTeamDialog(
-                                        context: context);
-                                  },
-                                  child: Text(
-                                    _supportingTeam.isEmpty
-                                        ? "Add supporting team"
-                                        : "Add more members",
-                                  )),
+                              if (widget.readOnly == null)
+                                TextButton(
+                                    onPressed: () async {
+                                      await _showAddSupportTeamDialog(
+                                          context: context);
+                                    },
+                                    child: Text(
+                                      _supportingTeam.isEmpty
+                                          ? "Add supporting team"
+                                          : "Add more members",
+                                    )),
                             ],
                           ),
                         ),
@@ -865,13 +877,14 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                   })),
 
                               // button
-                              TextButton(
-                                  onPressed: () {
-                                    _showAddGuestDialog(context: context);
-                                  },
-                                  child: Text(_guests.isEmpty
-                                      ? "Add guest"
-                                      : "Add more guests")),
+                              if (widget.readOnly == null)
+                                TextButton(
+                                    onPressed: () {
+                                      _showAddGuestDialog(context: context);
+                                    },
+                                    child: Text(_guests.isEmpty
+                                        ? "Add guest"
+                                        : "Add more guests")),
                             ],
                           ),
                         ),
@@ -881,19 +894,16 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                             context,
                             Column(children: [
                               if (_songs.isNotEmpty)
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text("List of songs",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineSmall),
-                                ),
+                                Text("List of songs",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall),
                               ...List.generate(_songs.length, (index) {
                                 return _createSongTile(index);
                               }),
 
                               // button
-                              if (_songs.length < 10)
+                              if (_songs.length < 10 && widget.readOnly == null)
                                 TextButton(
                                     onPressed: () async {
                                       await _showAddSongDialog(
@@ -925,12 +935,13 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                       // submit button
                       SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _onSubmit,
-                        child: widget.oldEvent == null
-                            ? Text("Submit")
-                            : Text("Update"),
-                      ),
+                      if (widget.readOnly == null)
+                        ElevatedButton(
+                          onPressed: _onSubmit,
+                          child: widget.oldEvent == null
+                              ? Text("Submit")
+                              : Text("Update"),
+                        ),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

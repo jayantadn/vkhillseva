@@ -200,6 +200,38 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         }));
   }
 
+  Widget _createGuestTile(int index) {
+    var member = _guests[index];
+    return ListTile(
+        onTap: () {},
+        title: Text(member.name),
+        subtitle: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              Row(
+                children: [
+                  Text(member.honorPrasadam ? "Honor Prasadam" : "No Prasadam"),
+                ],
+              ),
+            ],
+          ),
+        ),
+        trailing: Widgets().createContextMenu(["Edit", "Remove"],
+            (String action) async {
+          switch (action) {
+            case "Edit":
+              await _showAddGuestDialog(context: context, oldUser: member);
+              break;
+            case "Remove":
+              setState(() {
+                _guests.removeAt(index);
+              });
+              break;
+          }
+        }));
+  }
+
   Future<void> _deleteEvent() async {
     // validate if event is in the past
     if (widget.oldEvent!.date.isBefore(DateTime.now())) {
@@ -372,15 +404,21 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     }));
   }
 
-  Future<void> _showAddGuestDialog(BuildContext context) {
-    _guestNameController.clear();
+  Future<void> _showAddGuestDialog(
+      {required BuildContext context, Guest? oldUser}) {
     bool honorPrasadam = false;
+    if (oldUser == null) {
+      _guestNameController.clear();
+    } else {
+      _guestNameController.text = oldUser.name;
+      honorPrasadam = oldUser.honorPrasadam;
+    }
 
     return showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Add guest"),
+          title: Text(oldUser == null ? "Add guest" : "Edit guest"),
           content: SingleChildScrollView(
             child: Column(
               children: [
@@ -419,12 +457,21 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 Navigator.pop(context);
 
                 setState(() {
-                  _guests.add(Guest(
-                      name: _guestNameController.text,
-                      honorPrasadam: honorPrasadam));
+                  if (oldUser == null) {
+                    _guests.add(Guest(
+                        name: _guestNameController.text,
+                        honorPrasadam: honorPrasadam));
+                  } else {
+                    int index = _guests.indexOf(oldUser);
+                    if (index != -1) {
+                      _guests[index] = Guest(
+                          name: _guestNameController.text,
+                          honorPrasadam: honorPrasadam);
+                    }
+                  }
                 });
               },
-              child: Text("Add"),
+              child: Text(oldUser == null ? "Add" : "Update"),
             ),
           ],
         );
@@ -814,18 +861,13 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                               Widgets().createResponsiveTopLevelContainer(
                                   context,
                                   List.generate(_guests.length, (index) {
-                                    var guest = _guests[index];
-                                    return Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                          "${index + 1}. ${guest.name} ${guest.honorPrasadam ? " (Prasadam)" : ""}"),
-                                    );
+                                    return _createGuestTile(index);
                                   })),
 
                               // button
                               TextButton(
                                   onPressed: () {
-                                    _showAddGuestDialog(context);
+                                    _showAddGuestDialog(context: context);
                                   },
                                   child: Text(_guests.isEmpty
                                       ? "Add guest"

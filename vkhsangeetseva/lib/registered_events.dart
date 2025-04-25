@@ -82,17 +82,30 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
     });
 
     // write past events
-    String year = DateTime.now().year.toString();
-    dbpath = "${Const().dbrootSangeetSeva}/PastEvents/$year/${basics.mobile}";
-    await FB().addListToList(path: dbpath, list: pastEvents);
+    if (pastEvents.isNotEmpty) {
+      String year = DateTime.now().year.toString();
+      dbpath = "${Const().dbrootSangeetSeva}/PastEvents/$year/${basics.mobile}";
+      await FB().addListToList(path: dbpath, list: pastEvents);
+    }
 
     // delete past events from the current database
-    dbpath = "${Const().dbrootSangeetSeva}/Events/${basics.mobile}";
-    await FB().setValue(path: dbpath, value: _events);
+    if (_events.isNotEmpty) {
+      dbpath = "${Const().dbrootSangeetSeva}/Events/${basics.mobile}";
+      await FB()
+          .setList(path: dbpath, list: _events, toJson: EventRecord.toJson);
+    }
 
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Widget _createEventCard(int index) {
+    return Widgets().createTopLevelCard(
+        context,
+        ListTile(
+          title: Text(DateFormat("dd MMM, yyyy").format(_events[index].date)),
+        ));
   }
 
   @override
@@ -115,13 +128,9 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
 
                       Widgets().createResponsiveTopLevelContainer(context, [
                         // your widgets here
-                        Widgets().createTopLevelCard(
-                          context,
-                          ListTile(
-                            title: Text("Hello World"),
-                            subtitle: Text("This is a sample card"),
-                          ),
-                        ),
+                        ...List.generate(_events.length, (index) {
+                          return _createEventCard(index);
+                        }),
                       ]),
 
                       // leave some space at bottom

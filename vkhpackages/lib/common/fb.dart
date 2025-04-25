@@ -312,6 +312,19 @@ class FB {
     }
   }
 
+  Future<void> setList({
+    required String path,
+    required List<dynamic> list,
+    required Map<String, dynamic> Function(void) toJson,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
+      await dbref.set(json);
+    } catch (e) {
+      Toaster().error("Error setting data: $e");
+    }
+  }
+
   Future<void> deleteFromList({
     required String listpath,
     required int index,

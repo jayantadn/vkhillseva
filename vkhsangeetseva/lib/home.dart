@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:vkhsangeetseva/registered_events.dart';
 import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/slot_selection.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
+  final String? icon;
 
-  const HomePage({super.key, required this.title});
+  const HomePage({super.key, required this.title, this.icon});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -195,7 +197,17 @@ class _HomePageState extends State<HomePage> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Widgets().createImageButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                RegisteredEvents(
+                                                    title: "Registered Events",
+                                                    icon: widget.icon),
+                                          ),
+                                        );
+                                      },
                                       text: "View registered events",
                                       image:
                                           "assets/images/LauncherIcons/RegisteredEvents.png",
@@ -233,7 +245,8 @@ class _HomePageState extends State<HomePage> {
         // circular progress indicator
         if (_isLoading)
           LoadingOverlay(
-            image: "assets/images/Logo/KrishnaLilaPark_circle.png",
+            image:
+                widget.icon ?? "assets/images/Logo/KrishnaLilaPark_circle.png",
           ),
       ],
     );

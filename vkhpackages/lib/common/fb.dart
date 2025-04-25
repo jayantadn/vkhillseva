@@ -61,6 +61,116 @@ class FB {
     });
   }
 
+  Future<void> addToListOld({
+    required String path,
+    String? child,
+    required Map<String, dynamic> data,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
+      if (child != null) {
+        if (data['timestamp'] != null) {
+          String key = data['timestamp'].toString().replaceAll(".", "^");
+          await dbref.child(key).child(child).set(data);
+        } else {
+          await dbref.push().child(child).set(data);
+        }
+      } else {
+        if (data['timestamp'] != null) {
+          String key = data['timestamp'].toString().replaceAll(".", "^");
+          await dbref.child(key).set(data);
+        } else {
+          await dbref.push().set(data);
+        }
+      }
+    } catch (e) {
+      Toaster().error("Error adding data to list: $e");
+    }
+  }
+
+  Future<int> addToList({
+    required String listpath,
+    required dynamic data,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(listpath);
+      DataSnapshot snap = await dbref.get();
+      if (snap.value == null) {
+        await dbref.set([data]);
+        return 0;
+      } else {
+        List<dynamic> list = List<dynamic>.from(snap.value as List);
+        list.add(data);
+        await dbref.set(list);
+        return list.length - 1;
+      }
+    } catch (e) {
+      Toaster().error("Error adding data to list: $e");
+      return -1;
+    }
+  }
+
+  Future<void> addKVToList({
+    String? dbroot,
+    required String path,
+    required String key,
+    required dynamic value,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
+      await dbref.child(key).set(value);
+    } catch (e) {
+      Toaster().error("Error adding key-value to list: $e");
+    }
+  }
+
+  Future<void> addListToList({
+    String? dbroot,
+    required String path,
+    required List<dynamic> list,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
+      List currentList = await getList(path: path);
+      if (currentList.isNotEmpty) {
+        currentList.addAll(list);
+      } else {
+        currentList = list;
+      }
+      await dbref.set(currentList);
+    } catch (e) {
+      Toaster().error("Error adding list to list: $e");
+    }
+  }
+
+  Future<void> addMapToList({
+    String? dbroot,
+    required String path,
+    String? child,
+    required Map<String, dynamic> data,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
+      if (child != null) {
+        if (data['timestamp'] != null) {
+          String key = data['timestamp'].toString().replaceAll(".", "^");
+          await dbref.child(key).child(child).set(data);
+        } else {
+          await dbref.push().child(child).set(data);
+        }
+      } else {
+        if (data['timestamp'] != null) {
+          String key = data['timestamp'].toString().replaceAll(".", "^");
+          await dbref.child(key).set(data);
+        } else {
+          await dbref.push().set(data);
+        }
+      }
+    } catch (e) {
+      Toaster().error("Error adding data to list: $e");
+    }
+  }
+
   Future<bool> pathExists(String path) async {
     try {
       dynamic snapshot = await FirebaseDatabase.instance.ref(path).get();
@@ -172,6 +282,15 @@ class FB {
     }
   }
 
+  Future<void> setMultipleJson(Map<String, dynamic> jsons) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref();
+      await dbref.update(jsons);
+    } catch (e) {
+      Toaster().error("Error setting data: $e");
+    }
+  }
+
   Future<void> setValue({required String path, required dynamic value}) async {
     try {
       DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
@@ -190,97 +309,6 @@ class FB {
       await dbref.set(json);
     } catch (e) {
       Toaster().error("Error setting data: $e");
-    }
-  }
-
-  Future<void> addToListOld({
-    required String path,
-    String? child,
-    required Map<String, dynamic> data,
-  }) async {
-    try {
-      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
-      if (child != null) {
-        if (data['timestamp'] != null) {
-          String key = data['timestamp'].toString().replaceAll(".", "^");
-          await dbref.child(key).child(child).set(data);
-        } else {
-          await dbref.push().child(child).set(data);
-        }
-      } else {
-        if (data['timestamp'] != null) {
-          String key = data['timestamp'].toString().replaceAll(".", "^");
-          await dbref.child(key).set(data);
-        } else {
-          await dbref.push().set(data);
-        }
-      }
-    } catch (e) {
-      Toaster().error("Error adding data to list: $e");
-    }
-  }
-
-  Future<int> addToList({
-    required String listpath,
-    required dynamic data,
-  }) async {
-    try {
-      DatabaseReference dbref = FirebaseDatabase.instance.ref(listpath);
-      DataSnapshot snap = await dbref.get();
-      if (snap.value == null) {
-        await dbref.set([data]);
-        return 0;
-      } else {
-        List<dynamic> list = List<dynamic>.from(snap.value as List);
-        list.add(data);
-        await dbref.set(list);
-        return list.length - 1;
-      }
-    } catch (e) {
-      Toaster().error("Error adding data to list: $e");
-      return -1;
-    }
-  }
-
-  Future<void> addKVToList({
-    String? dbroot,
-    required String path,
-    required String key,
-    required dynamic value,
-  }) async {
-    try {
-      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
-      await dbref.child(key).set(value);
-    } catch (e) {
-      Toaster().error("Error adding key-value to list: $e");
-    }
-  }
-
-  Future<void> addMapToList({
-    String? dbroot,
-    required String path,
-    String? child,
-    required Map<String, dynamic> data,
-  }) async {
-    try {
-      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
-      if (child != null) {
-        if (data['timestamp'] != null) {
-          String key = data['timestamp'].toString().replaceAll(".", "^");
-          await dbref.child(key).child(child).set(data);
-        } else {
-          await dbref.push().child(child).set(data);
-        }
-      } else {
-        if (data['timestamp'] != null) {
-          String key = data['timestamp'].toString().replaceAll(".", "^");
-          await dbref.child(key).set(data);
-        } else {
-          await dbref.push().set(data);
-        }
-      }
-    } catch (e) {
-      Toaster().error("Error adding data to list: $e");
     }
   }
 

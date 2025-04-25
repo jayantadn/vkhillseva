@@ -29,7 +29,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   // scalars
   bool _isLoading = true;
   PerformerDetails? _mainPerformer;
-  final _minSongs = 4;
+  final _minSongs = 3;
 
   // lists
   final List<SupportUser> _supportingTeam = [];

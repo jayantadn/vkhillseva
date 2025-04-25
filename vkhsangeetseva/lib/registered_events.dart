@@ -1,25 +1,28 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
-class HomePage extends StatefulWidget {
+class RegisteredEvents extends StatefulWidget {
   final String title;
+  final String? icon;
 
-  const HomePage({super.key, required this.title});
+  const RegisteredEvents({super.key, required this.title, this.icon});
 
   @override
   // ignore: library_private_types_in_public_api
-  _HomePageState createState() => _HomePageState();
+  _RegisteredEventsState createState() => _RegisteredEventsState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _RegisteredEventsState extends State<RegisteredEvents> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
 
   // lists
+  final List<EventRecord> _events = [];
 
   // controllers, listeners and focus nodes
 
@@ -33,6 +36,7 @@ class _HomePageState extends State<HomePage> {
   @override
   dispose() {
     // clear all lists
+    _events.clear();
 
     // clear all controllers and focus nodes
 
@@ -47,6 +51,16 @@ class _HomePageState extends State<HomePage> {
     // access control
 
     // perform async operations here
+    await Utils().fetchUserBasics();
+    UserBasics? basics = Utils().getUserBasics();
+    if (basics == null) {
+      Toaster().error("Could not fetch user info");
+      return;
+    }
+    String dbpath = "${Const().dbrootSangeetSeva}/Events/${basics.mobile}";
+    List eventsRaw = await FB().getList(path: dbpath);
+    _events.clear();
+    List<EventRecord> pastEvents = [];
 
     await _lock.synchronized(() async {
       // fetch form values
@@ -54,9 +68,29 @@ class _HomePageState extends State<HomePage> {
       // refresh all child widgets
 
       // perform sync operations here
+
+      // populate events
+      for (var eventRaw in eventsRaw) {
+        EventRecord event =
+            Utils().convertRawToDatatype(eventRaw, EventRecord.fromJson);
+        if (event.date.isBefore(DateTime.now())) {
+          pastEvents.add(event);
+        } else {
+          _events.add(event);
+        }
+      }
     });
 
-    // perform any remaining async operations here
+    // Spawn a thread to write pastEvents in the database
+
+    // write past events
+    String year = DateTime.now().year.toString();
+    dbpath = "${Const().dbrootSangeetSeva}/PastEvents/$year/${basics.mobile}";
+    await FB().addListToList(path: dbpath, list: pastEvents);
+
+    // delete past events from the current database
+    dbpath = "${Const().dbrootSangeetSeva}/Events/${basics.mobile}";
+    await FB().setValue(path: dbpath, value: _events);
 
     setState(() {
       _isLoading = false;
@@ -105,7 +139,8 @@ class _HomePageState extends State<HomePage> {
         // circular progress indicator
         if (_isLoading)
           LoadingOverlay(
-            image: "assets/images/Logo/KrishnaLilaPark_circle.png",
+            image:
+                widget.icon ?? "assets/images/Logo/KrishnaLilaPark_circle.png",
           ),
       ],
     );

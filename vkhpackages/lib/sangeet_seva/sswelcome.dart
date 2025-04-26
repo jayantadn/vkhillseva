@@ -81,7 +81,7 @@ class SSWelcomeState extends State<SSWelcome> {
 
           // all text
           SizedBox(height: 10),
-          Text('SSWelcome', style: Theme.of(context).textTheme.headlineSmall),
+          Text('Welcome', style: Theme.of(context).textTheme.headlineSmall),
           Text(
             _username.isEmpty ? 'Guest' : _username,
             style: Theme.of(context).textTheme.headlineSmall,

@@ -26,8 +26,6 @@ class _CalendarSlotsState extends State<CalendarSlots> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   DateTime _selectedDate = DateTime.now();
-  int _pendingRequests = 0;
-  DateTime _lastCallbackInvoked = DateTime.now();
 
   // lists
   List<int> _bookedSlotsCnt = [];
@@ -36,7 +34,6 @@ class _CalendarSlotsState extends State<CalendarSlots> {
   final List<Slot> _avlSlots = [];
 
   // controllers, listeners and focus nodes
-  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {
@@ -45,55 +42,6 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     // set _numBookings and _numAvlSots to 0
     _bookedSlotsCnt = List.filled(31, 0);
     _avlSlotsCnt = List.filled(31, 0);
-
-// listed to database events
-    FB().listenForChange(
-        "${Const().dbrootSangeetSeva}/PendingRequests",
-        FBCallbacks(
-          // add
-          add: (data) {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
-                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
-            }
-
-            // process the received data
-            _incrementPendingRequests();
-          },
-
-          // edit
-          edit: () {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
-                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
-
-              refresh();
-            }
-          },
-
-          // delete
-          delete: (data) async {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
-                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
-
-              // process the received data
-              _decrementPendingRequests();
-
-              List eventsRaw = await FB().getList(path: data['path']);
-              var eventRaw = eventsRaw[data['index']];
-              EventRecord event =
-                  Utils().convertRawToDatatype(eventRaw, EventRecord.fromJson);
-              calendarKey.currentState!
-                  .fillAvailabilityIndicators(date: event.date);
-            }
-          },
-
-          // get listeners
-          getListeners: (listeners) {
-            _listeners = listeners;
-          },
-        ));
 
     refresh();
   }
@@ -107,9 +55,6 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     _avlSlots.clear();
 
     // clear all controllers and focus nodes
-    for (var element in _listeners) {
-      element.cancel();
-    }
 
     super.dispose();
   }
@@ -121,7 +66,6 @@ class _CalendarSlotsState extends State<CalendarSlots> {
 
     // perform async operations here
     await _fillBookingLists(_selectedDate);
-    _pendingRequests = await _getPendingRequestsCount();
 
     // subscribe to notifications
     try {
@@ -214,18 +158,6 @@ class _CalendarSlotsState extends State<CalendarSlots> {
         }
       }
     }
-  }
-
-  void _decrementPendingRequests() {
-    setState(() {
-      _pendingRequests--;
-    });
-  }
-
-  void _incrementPendingRequests() {
-    setState(() {
-      _pendingRequests++;
-    });
   }
 
   Future<void> _fillBookingLists(DateTime date) async {
@@ -325,34 +257,6 @@ class _CalendarSlotsState extends State<CalendarSlots> {
         }),
       ],
     );
-  }
-
-  Future<int> _getPendingRequestsCount() async {
-    int pendingRequests = 0;
-
-    // get the list of pending requests
-    List<dynamic> pendingRequestsRaw = await FB()
-        .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
-    for (var pendingRequestLinkRaw in pendingRequestsRaw) {
-      Map<String, dynamic> pendingRequestLink =
-          Map<String, dynamic>.from(pendingRequestLinkRaw);
-      String path = pendingRequestLink['path'];
-      int index = pendingRequestLink['index'];
-
-      List pendingRequestsPerUserRaw = await FB().getList(path: path);
-      var pendingRequestPerUserRaw = pendingRequestsPerUserRaw[index];
-      EventRecord pendingRequest = Utils()
-          .convertRawToDatatype(pendingRequestPerUserRaw, EventRecord.fromJson);
-
-      // discard if pending request is in the past
-      if (pendingRequest.date.isBefore(DateTime.now())) {
-        continue;
-      }
-
-      pendingRequests++;
-    }
-
-    return pendingRequests;
   }
 
   Future<void> _showFreeSlotDialog(BuildContext context) async {
@@ -479,132 +383,91 @@ class _CalendarSlotsState extends State<CalendarSlots> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: themeGaruda,
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: AppBar(
-              title: Text(widget.title),
-              actions: [
-                // pending users
-                Stack(children: [
-                  IconButton(
-                    icon: Icon(Icons.notifications),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PendingRequests(
-                            title: 'Pending requests',
-                            icon: widget.icon,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  if (_pendingRequests > 0)
-                    Positioned(
-                      right: 10,
-                      bottom: 10,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PendingRequests(
-                                title: 'Pending requests',
-                                icon: widget.icon,
-                              ),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          padding: EdgeInsets.only(left: 4, right: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          constraints: BoxConstraints(
-                            minWidth: 10,
-                            minHeight: 10,
-                          ),
-                          child: Text(
-                            '$_pendingRequests',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    )
-                ]),
-
-                // registered users
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
+            actions: [
+              // pending users
+              Stack(children: [
                 IconButton(
-                  icon: Icon(Icons.group),
+                  icon: Icon(Icons.notifications),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Profiles(
-                          title: 'Performer Profiles',
+                        builder: (context) => PendingRequests(
+                          title: 'Pending requests',
                           icon: widget.icon,
                         ),
                       ),
                     );
                   },
                 ),
-              ],
-            ),
-            body: RefreshIndicator(
-              onRefresh: refresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      // leave some space at top
-                      SizedBox(height: 10),
+              ]),
 
-                      // calendar
-                      Calendar(
-                        key: calendarKey,
-                        onDaySelected: (DateTime date) async {
-                          await _fillBookingLists(date);
-
-                          setState(() {
-                            _selectedDate = date;
-                          });
-                        },
+              // registered users
+              IconButton(
+                icon: Icon(Icons.group),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Profiles(
+                        title: 'Performer Profiles',
+                        icon: widget.icon,
                       ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          body: RefreshIndicator(
+            onRefresh: refresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    // leave some space at top
+                    SizedBox(height: 10),
 
-                      _createSlotDetails(context),
+                    // calendar
+                    Calendar(
+                      key: calendarKey,
+                      onDaySelected: (DateTime date) async {
+                        await _fillBookingLists(date);
 
-                      // leave some space at bottom
-                      SizedBox(height: 100),
-                    ],
-                  ),
+                        setState(() {
+                          _selectedDate = date;
+                        });
+                      },
+                    ),
+
+                    _createSlotDetails(context),
+
+                    // leave some space at bottom
+                    SizedBox(height: 100),
+                  ],
                 ),
               ),
             ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () async {
-                _showFreeSlotDialog(context);
-              },
-              tooltip: 'Add',
-              child: Icon(Icons.add),
-            ),
           ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              _showFreeSlotDialog(context);
+            },
+            tooltip: 'Add',
+            child: Icon(Icons.add),
+          ),
+        ),
 
-          // circular progress indicator
-          if (_isLoading) LoadingOverlay(image: widget.icon),
-        ],
-      ),
+        // circular progress indicator
+        if (_isLoading) LoadingOverlay(image: widget.icon),
+      ],
     );
   }
 }

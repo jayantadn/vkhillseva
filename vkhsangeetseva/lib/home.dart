@@ -21,6 +21,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // global keys
+  final GlobalKey<WelcomeState> _welcomeKey = GlobalKey<WelcomeState>();
+
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
@@ -79,10 +82,11 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
+    // refresh child widgets
+    await _welcomeKey.currentState?.refresh();
+
     await _lock.synchronized(() async {
       // fetch form values
-
-      // refresh all child widgets
 
       // perform sync operations here
     });
@@ -91,82 +95,6 @@ class _HomePageState extends State<HomePage> {
       _username = Utils().getUsername();
       _isLoading = false;
     });
-  }
-
-  Widget _createWelcome() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(children: [
-        // image
-        Container(
-          height: 200,
-          width: 200,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: Offset(0, 3),
-              ),
-            ],
-          ),
-          child: ClipOval(
-            child: Image.asset(
-              'assets/images/Logo/SangeetSeva.png',
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-
-        // all text
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          'Welcome',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        Text(
-          _username.isEmpty ? 'Guest' : _username,
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        SizedBox(
-          height: 8,
-        ),
-        Text(
-          'ISKCON Vaikuntha Hill',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        Text(
-          'Govinda Sangeet Seva',
-          style: GoogleFonts.pacifico(
-            textStyle: Theme.of(context).textTheme.headlineLarge,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-
-        // signup button
-        SizedBox(
-          height: 10,
-        ),
-        if (_username.isEmpty)
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  Colors.deepOrange, // Change the background color here
-            ),
-            onPressed: () {
-              smsAuth(context, () async {
-                // auth complete
-                await refresh();
-              });
-            },
-            child: Text('Signup / Login'),
-          ),
-      ]),
-    );
   }
 
   Future<void> _logout() async {
@@ -247,7 +175,8 @@ class _HomePageState extends State<HomePage> {
 
                       Widgets().createResponsiveTopLevelContainer(context, [
                         // welcome banner with signup button
-                        Widgets().createTopLevelCard(context, _createWelcome()),
+                        Widgets().createTopLevelCard(context,
+                            Welcome(key: _welcomeKey, onAuthComplete: refresh)),
 
                         // event buttons
                         if (_username.isNotEmpty)

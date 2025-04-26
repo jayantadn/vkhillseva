@@ -4,17 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
-class HomePage extends StatefulWidget {
+class SangeetSeva extends StatefulWidget {
   final String title;
+  final String? splashImagePath;
 
-  const HomePage({super.key, required this.title});
+  const SangeetSeva({super.key, required this.title, this.splashImagePath});
 
   @override
   // ignore: library_private_types_in_public_api
-  _HomePageState createState() => _HomePageState();
+  _SangeetSevaState createState() => _SangeetSevaState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _SangeetSevaState extends State<SangeetSeva> {
+  // global keys
+
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
@@ -48,10 +51,10 @@ class _HomePageState extends State<HomePage> {
 
     // perform async operations here
 
+    // refresh all child widgets
+
     await _lock.synchronized(() async {
       // fetch form values
-
-      // refresh all child widgets
 
       // perform sync operations here
     });
@@ -105,7 +108,9 @@ class _HomePageState extends State<HomePage> {
         // circular progress indicator
         if (_isLoading)
           LoadingOverlay(
-            image: "assets/images/Logo/KrishnaLilaPark_circle.png",
+            image:
+                widget.splashImagePath ??
+                "assets/images/Logo/KrishnaLilaPark_circle.png",
           ),
       ],
     );

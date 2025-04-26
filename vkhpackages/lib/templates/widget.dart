@@ -8,8 +8,8 @@ class Summary extends StatefulWidget {
   State<Summary> createState() => _SummaryState();
 }
 
-// put the global key as a member of the calling class
-// hint: instantiate the class with a global key
+// hint: put the global key as a member of the calling class
+// instantiate the class with a global key
 // final GlobalKey<_SummaryState> summaryKey = GlobalKey<_SummaryState>();
 
 class _SummaryState extends State<Summary> {

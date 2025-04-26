@@ -388,41 +388,7 @@ class _CalendarSlotsState extends State<CalendarSlots> {
         Scaffold(
           appBar: AppBar(
             title: Text(widget.title),
-            actions: [
-              // pending users
-              Stack(children: [
-                IconButton(
-                  icon: Icon(Icons.notifications),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PendingRequests(
-                          title: 'Pending requests',
-                          icon: widget.icon,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ]),
-
-              // registered users
-              IconButton(
-                icon: Icon(Icons.group),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Profiles(
-                        title: 'Performer Profiles',
-                        icon: widget.icon,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
+            actions: [],
           ),
           body: RefreshIndicator(
             onRefresh: refresh,

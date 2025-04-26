@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/sangeet_seva/calendar_slots.dart';
+import 'package:vkhgaruda/sangeet_seva/profiles.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class SangeetSeva extends StatefulWidget {
@@ -172,6 +173,23 @@ class _SangeetSevaState extends State<SangeetSeva> {
           appBar: AppBar(
             title: Text(widget.title),
             actions: [
+              // registered users
+              IconButton(
+                icon: Icon(Icons.group),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Profiles(
+                        title: 'Performer Profiles',
+                        icon: widget.splashImagePath,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              // calendar
               IconButton(
                 icon: const Icon(Icons.calendar_month),
                 onPressed: () {

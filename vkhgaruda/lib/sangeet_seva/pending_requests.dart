@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
@@ -89,8 +88,8 @@ class _PendingRequestsState extends State<PendingRequests> {
     // fetch main performers
     _mainPerformers.clear();
     for (EventRecord pendingRequest in _linkedEventRecords) {
-      PerformerProfile? mainPerformer =
-          await SSUtils().getUserProfile(pendingRequest.mainPerformerMobile);
+      PerformerProfile? mainPerformer = await SSUtils()
+          .getPerformerProfile(pendingRequest.mainPerformerMobile);
       if (mainPerformer != null) _mainPerformers.add(mainPerformer);
     }
 
@@ -109,7 +108,7 @@ class _PendingRequestsState extends State<PendingRequests> {
     title += " (${pendingRequest.slot.from} - ${pendingRequest.slot.to})";
     String performer = _mainPerformers[index].name;
     String profilePicUrl = _mainPerformers[index].profilePicUrl;
-    SSUtils().getUserProfile(pendingRequest.mainPerformerMobile);
+    SSUtils().getPerformerProfile(pendingRequest.mainPerformerMobile);
 
     return Card(
         child: ListTile(

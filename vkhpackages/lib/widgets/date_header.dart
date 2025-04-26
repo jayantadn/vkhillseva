@@ -10,9 +10,6 @@ class DateHeader extends StatefulWidget {
   State<DateHeader> createState() => _DateHeaderState();
 }
 
-final GlobalKey<_DateHeaderState> HistoryHeaderKey =
-    GlobalKey<_DateHeaderState>();
-
 class _DateHeaderState extends State<DateHeader> {
   DateTime _date = DateTime.now();
 
@@ -37,9 +34,7 @@ class _DateHeaderState extends State<DateHeader> {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              child: child,
-            ),
+            Container(child: child),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -97,45 +92,46 @@ class _DateHeaderState extends State<DateHeader> {
           // date
           PopupMenuButton<void>(
             onSelected: (_) {},
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem<void>(
-                enabled: false,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: 300,
-                      height: 300,
-                      child: CalendarDatePicker(
-                        initialDate: _date,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now(),
-                        onDateChanged: (DateTime picked) {
-                          setState(() {
-                            _date = picked;
-                          });
-                          if (widget.callbacks != null) {
-                            widget.callbacks!.onChange(_date);
-                          }
-                          Navigator.pop(context);
-                        },
-                      ),
+            itemBuilder:
+                (BuildContext context) => [
+                  PopupMenuItem<void>(
+                    enabled: false,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: 300,
+                          height: 300,
+                          child: CalendarDatePicker(
+                            initialDate: _date,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime.now(),
+                            onDateChanged: (DateTime picked) {
+                              setState(() {
+                                _date = picked;
+                              });
+                              if (widget.callbacks != null) {
+                                widget.callbacks!.onChange(_date);
+                              }
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _date = DateTime.now();
+                            });
+                            if (widget.callbacks != null) {
+                              widget.callbacks!.onChange(_date);
+                            }
+                            Navigator.pop(context);
+                          },
+                          child: Text('Today'),
+                        ),
+                      ],
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          _date = DateTime.now();
-                        });
-                        if (widget.callbacks != null) {
-                          widget.callbacks!.onChange(_date);
-                        }
-                        Navigator.pop(context);
-                      },
-                      child: Text('Today'),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                  ),
+                ],
             child: Container(
               width: 150.0,
               alignment: Alignment.center,
@@ -179,7 +175,5 @@ class _DateHeaderState extends State<DateHeader> {
 class DateHeaderCallbacks {
   void Function(DateTime) onChange;
 
-  DateHeaderCallbacks({
-    required this.onChange,
-  });
+  DateHeaderCallbacks({required this.onChange});
 }

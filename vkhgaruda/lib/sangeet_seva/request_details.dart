@@ -62,8 +62,8 @@ class _RequestDetailsState extends State<RequestDetails> {
     });
 
     // perform async operations here
-    _mainPerformer =
-        await SSUtils().getUserProfile(widget.eventRecord.mainPerformerMobile);
+    _mainPerformer = await SSUtils()
+        .getPerformerProfile(widget.eventRecord.mainPerformerMobile);
     // TODO for (String supportMobile in widget.eventRecord.supportTeamMobiles) {
     //   PerformerProfile? support = await SSUtils().getUserProfile(supportMobile);
     //   if (support != null) _supportTeam.add(support);

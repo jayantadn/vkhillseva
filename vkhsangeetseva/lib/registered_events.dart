@@ -74,7 +74,9 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
       for (var eventRaw in eventsRaw) {
         EventRecord event =
             Utils().convertRawToDatatype(eventRaw, EventRecord.fromJson);
-        if (event.date.isBefore(DateTime.now())) {
+        DateTime today = DateTime.now();
+        today = DateTime(today.year, today.month, today.day);
+        if (event.date.isBefore(today)) {
           pastEvents.add(event);
         } else {
           _events.add(event);

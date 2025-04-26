@@ -9,7 +9,6 @@ import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
 import 'package:vkhgaruda/widgets/common_widgets.dart';
 import 'package:vkhgaruda/nitya_seva/day_summary.dart';
-import 'package:vkhgaruda/widgets/date_header.dart';
 import 'package:vkhgaruda/widgets/launcher_tile.dart';
 import 'package:vkhgaruda/home/settings.dart';
 import 'package:vkhpackages/vkhpackages.dart';

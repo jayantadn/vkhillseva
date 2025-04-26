@@ -94,13 +94,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       EventRecord performanceRequest = widget.oldEvent!;
 
       // populate the lists
-      _mainPerformer = PerformerProfile.fromJson(userdetailsJson);
-      // TODO for (String mobile in performanceRequest.supportTeamMobiles) {
-      //   PerformerProfile? details = await SSUtils().getPerformerProfile(mobile);
-      //   if (details != null) {
-      //     _supportingTeam.add(details);
-      //   }
-      // }
+      for (SupportUser support in performanceRequest.supportTeam) {
+        _supportingTeam.add(support);
+      }
+
       _guests.addAll(performanceRequest.guests);
       _songs.addAll(performanceRequest.songs);
       _noteController.text = performanceRequest.notePerformer;
@@ -242,7 +239,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   Future<void> _deleteEvent() async {
     // validate if event is in the past
-    if (widget.oldEvent!.date.isBefore(DateTime.now())) {
+    DateTime today = DateTime.now();
+    today = DateTime(today.year, today.month, today.day);
+    if (widget.oldEvent!.date.isBefore(today)) {
       Toaster().error("Can't delete past event");
       return;
     }
@@ -332,7 +331,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       }
 
       // validate if event is in the past
-      if (widget.oldEvent!.date.isBefore(DateTime.now())) {
+      DateTime today = DateTime.now();
+      today = DateTime(today.year, today.month, today.day);
+      if (widget.oldEvent!.date.isBefore(today)) {
         Toaster().error("Can't update past event");
         return;
       }

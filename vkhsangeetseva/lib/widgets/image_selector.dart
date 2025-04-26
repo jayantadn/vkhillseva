@@ -13,9 +13,6 @@ class ImageSelector extends StatefulWidget {
   State<ImageSelector> createState() => _ImageSelectorState();
 }
 
-// ignore: library_private_types_in_public_api
-GlobalKey<_ImageSelectorState> summaryKey = GlobalKey<_ImageSelectorState>();
-
 class _ImageSelectorState extends State<ImageSelector> {
   final Lock _lock = Lock();
 

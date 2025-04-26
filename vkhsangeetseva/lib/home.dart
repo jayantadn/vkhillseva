@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registered_events.dart';
-import 'package:vkhsangeetseva/registration.dart';
 import 'package:vkhsangeetseva/slot_selection.dart';
 
 class HomePage extends StatefulWidget {
@@ -22,7 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // global keys
-  final GlobalKey<WelcomeState> _welcomeKey = GlobalKey<WelcomeState>();
+  final GlobalKey<SSWelcomeState> _welcomeKey = GlobalKey<SSWelcomeState>();
 
   // scalars
   final Lock _lock = Lock();
@@ -175,8 +173,10 @@ class _HomePageState extends State<HomePage> {
 
                       Widgets().createResponsiveTopLevelContainer(context, [
                         // welcome banner with signup button
-                        Widgets().createTopLevelCard(context,
-                            Welcome(key: _welcomeKey, onAuthComplete: refresh)),
+                        Widgets().createTopLevelCard(
+                            context,
+                            SSWelcome(
+                                key: _welcomeKey, onAuthComplete: refresh)),
 
                         // event buttons
                         if (_username.isNotEmpty)

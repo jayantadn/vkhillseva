@@ -16,6 +16,8 @@ class SangeetSeva extends StatefulWidget {
 }
 
 class _SangeetSevaState extends State<SangeetSeva> {
+  // global keys
+
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
@@ -66,7 +68,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = ThemeCreator(primaryColor: Color(0xFFFF9933)).create();
+    ThemeData theme = ThemeCreator(primaryColor: Color(0xFF800000)).create();
     return Theme(
       data: theme,
       child: Stack(
@@ -87,13 +89,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
                         Widgets().createResponsiveTopLevelContainer(context, [
                           // your widgets here
-                          Widgets().createTopLevelCard(
-                            context,
-                            ListTile(
-                              title: Text("Hello World"),
-                              subtitle: Text("This is a sample card"),
-                            ),
-                          ),
+                          Widgets().createTopLevelCard(context, SSWelcome()),
                         ]),
 
                         // leave some space at bottom

@@ -3,20 +3,20 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
-class Welcome extends StatefulWidget {
-  final Function onAuthComplete;
+class SSWelcome extends StatefulWidget {
+  final Function? onAuthComplete;
 
-  const Welcome({super.key, required this.onAuthComplete});
+  const SSWelcome({super.key, this.onAuthComplete});
 
   @override
-  State<Welcome> createState() => WelcomeState();
+  State<SSWelcome> createState() => SSWelcomeState();
 }
 
 // hint: put the global key as a member of the calling class
 // instantiate the class with a global key
-// final GlobalKey<WelcomeState> _welcomeKey = GlobalKey<WelcomeState>();
+// final GlobalKey<SSWelcomeState> _welcomeKey = GlobalKey<SSWelcomeState>();
 
-class WelcomeState extends State<Welcome> {
+class SSWelcomeState extends State<SSWelcome> {
   final Lock _lock = Lock();
   String _username = "";
 
@@ -81,7 +81,7 @@ class WelcomeState extends State<Welcome> {
 
           // all text
           SizedBox(height: 10),
-          Text('Welcome', style: Theme.of(context).textTheme.headlineSmall),
+          Text('SSWelcome', style: Theme.of(context).textTheme.headlineSmall),
           Text(
             _username.isEmpty ? 'Guest' : _username,
             style: Theme.of(context).textTheme.headlineSmall,
@@ -101,16 +101,13 @@ class WelcomeState extends State<Welcome> {
 
           // signup button
           SizedBox(height: 10),
-          if (_username.isEmpty)
+          if (_username.isEmpty && widget.onAuthComplete != null)
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Colors.deepOrange, // Change the background color here
-              ),
               onPressed: () {
                 smsAuth(context, () async {
                   // auth complete.
-                  widget.onAuthComplete();
+
+                  widget.onAuthComplete!();
                 });
               },
               child: Text('Signup / Login'),

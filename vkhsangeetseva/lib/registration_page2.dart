@@ -408,9 +408,15 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       honorPrasadam = oldUser.honorPrasadam;
     }
 
+    FocusNode focusNode = FocusNode();
     return showDialog(
       context: context,
       builder: (context) {
+        // Request focus after the dialog is built
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          focusNode.requestFocus();
+        });
+
         return AlertDialog(
           title: Text(oldUser == null ? "Add guest" : "Edit guest"),
           content: SingleChildScrollView(
@@ -419,6 +425,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 // name
                 TextField(
                   controller: _guestNameController,
+                  focusNode: focusNode,
                   decoration: InputDecoration(labelText: "Name"),
                 ),
 
@@ -484,9 +491,15 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       _taalaController.text = songDetails[2];
     }
 
+    FocusNode focusNode = FocusNode();
     return showDialog(
       context: context,
       builder: (context) {
+        // Request focus after the dialog is built
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          focusNode.requestFocus();
+        });
+
         return AlertDialog(
           title: Text("Add song for event"),
           content: SingleChildScrollView(
@@ -497,6 +510,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                   // title
                   TextFormField(
                     controller: _titleController,
+                    focusNode: focusNode,
                     onChanged: (value) {},
                     decoration: InputDecoration(labelText: "Song title"),
                     validator: (value) {
@@ -592,9 +606,15 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       specialization = oldUser.specialization;
     }
 
+    FocusNode focusNode = FocusNode();
     return showDialog(
       context: context,
       builder: (context) {
+        // Request focus after the dialog is built
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          focusNode.requestFocus();
+        });
+
         return AlertDialog(
           title:
               Text(oldUser == null ? "Add support team" : "Edit support team"),
@@ -629,6 +649,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                   // name
                   TextFormField(
                     controller: supportNameController,
+                    focusNode: focusNode,
                     decoration: InputDecoration(labelText: "Name"),
                     validator: (value) {
                       if (value == null || value.isEmpty) {

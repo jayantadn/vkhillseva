@@ -185,9 +185,9 @@ class NextAvlSlotState extends State<NextAvlSlot> {
     }
 
     // fetch all the created slots
-    String today = DateFormat('yyyy-MM-dd').format(_nextAvailableDate!);
     Map<String, dynamic> kvs = await FB().getValuesByDateRange(
-        path: "${Const().dbrootSangeetSeva}/Slots", startDate: today);
+        path: "${Const().dbrootSangeetSeva}/Slots",
+        startDate: _nextAvailableDate!);
     List<String> slotDates = kvs.keys.toList();
 
     // find the next available slots from the created slots
@@ -398,10 +398,9 @@ class NextAvlSlotState extends State<NextAvlSlot> {
     }
 
     // fetch all the created slots in reverse order
-    String today = DateFormat('yyyy-MM-dd').format(_nextAvailableDate!);
     Map<String, dynamic> kvs = await FB().getValuesByDateRange(
       path: "${Const().dbrootSangeetSeva}/Slots",
-      startDate: today,
+      startDate: _nextAvailableDate!,
     );
     List<String> slotDates = kvs.keys.toList();
     slotDates.sort((a, b) {

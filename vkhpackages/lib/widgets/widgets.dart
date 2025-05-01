@@ -234,7 +234,7 @@ class Widgets {
                 ),
 
               // child widget
-              Padding(padding: const EdgeInsets.all(8.0), child: child),
+              Padding(padding: const EdgeInsets.all(4.0), child: child),
             ],
           ),
         ),

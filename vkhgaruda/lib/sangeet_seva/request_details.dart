@@ -33,7 +33,6 @@ class _RequestDetailsState extends State<RequestDetails> {
   PerformerProfile? _mainPerformer;
 
   // lists
-  final List<PerformerProfile> _supportTeam = [];
 
   // controllers, listeners and focus nodes
   final TextEditingController _noteController = TextEditingController();
@@ -48,7 +47,6 @@ class _RequestDetailsState extends State<RequestDetails> {
   @override
   dispose() {
     // clear all lists
-    _supportTeam.clear();
 
     // clear all controllers and focus nodes
     _noteController.dispose();
@@ -64,10 +62,6 @@ class _RequestDetailsState extends State<RequestDetails> {
     // perform async operations here
     _mainPerformer = await SSUtils()
         .getPerformerProfile(widget.eventRecord.mainPerformerMobile);
-    // TODO for (String supportMobile in widget.eventRecord.supportTeamMobiles) {
-    //   PerformerProfile? support = await SSUtils().getUserProfile(supportMobile);
-    //   if (support != null) _supportTeam.add(support);
-    // }
 
     // refresh all child widgets
 
@@ -248,33 +242,31 @@ class _RequestDetailsState extends State<RequestDetails> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      // leave some space at top
-                      SizedBox(height: 10),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        // leave some space at top
+                        SizedBox(height: 10),
 
-                      // your widgets here
-                      Center(
-                        child: Column(children: [
-                          // date
-                          Text(
-                              DateFormat("EEE, dd MMM, yyyy")
-                                  .format(widget.eventRecord.date),
-                              style: themeGaruda.textTheme.headlineLarge),
+                        Text(
+                            DateFormat("EEE, dd MMM, yyyy")
+                                .format(widget.eventRecord.date),
+                            style: themeGaruda.textTheme.headlineLarge),
 
-                          // slot
-                          Text(
-                              "${widget.eventRecord.slot.from} - ${widget.eventRecord.slot.to}",
-                              style: themeGaruda.textTheme.headlineMedium),
+                        // slot
+                        Text(
+                            "${widget.eventRecord.slot.from} - ${widget.eventRecord.slot.to}",
+                            style: themeGaruda.textTheme.headlineMedium),
+
+                        Column(children: [
+                          // your widgets here
 
                           // main performer
-                          Card(
+                          Widgets().createTopLevelCard(
+                            context: context,
+                            title: "Main performer",
                             child: Column(
                               children: [
-                                Text("Main performer",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall),
                                 ListTile(
                                   onTap: () async {
                                     Navigator.push(
@@ -314,130 +306,114 @@ class _RequestDetailsState extends State<RequestDetails> {
                           ),
 
                           // supporting team
-                          if (_supportTeam.isNotEmpty)
-                            Card(
+                          if (widget.eventRecord.supportTeam.isNotEmpty)
+                            Widgets().createTopLevelCard(
+                              context: context,
+                              title: "Supporting team",
                               child: Column(
                                 children: [
-                                  Text("Supporting team",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineSmall),
-                                  Widgets().createTopLevelResponsiveContainer(
-                                      context,
-                                      List.generate(_supportTeam.length,
-                                          (index) {
-                                        var member = _supportTeam[index];
-                                        return ListTile(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ProfileDetails(
-                                                        title:
-                                                            "Supporting team",
-                                                        icon: widget.icon,
-                                                        userdetails: member),
-                                              ),
-                                            );
-                                          },
-                                          leading: CircleAvatar(
-                                            backgroundImage: NetworkImage(
-                                                member.profilePicUrl),
-                                          ),
-                                          title: Text(
-                                              "${member.salutation} ${member.name}"),
-                                          subtitle: Row(
-                                            children: [
-                                              Icon(Icons.phone),
-                                              Text(member.mobile),
-                                              SizedBox(width: 10),
-                                              Icon(Icons.workspace_premium),
-                                              Text(member.credentials),
-                                            ],
-                                          ),
-                                        );
-                                      })),
+                                  ...List.generate(
+                                      widget.eventRecord.supportTeam.length,
+                                      (index) {
+                                    var member =
+                                        widget.eventRecord.supportTeam[index];
+                                    return ListTile(
+                                      leading: Text(
+                                        "${index + 1}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge,
+                                      ),
+                                      title: Text(
+                                          "${member.salutation} ${member.name}"),
+                                      subtitle: Row(
+                                        children: [
+                                          Icon(Icons.workspace_premium),
+                                          Text(member.specialization),
+                                        ],
+                                      ),
+                                    );
+                                  }),
                                 ],
                               ),
                             ),
 
                           // guests
-                          SizedBox(height: 10),
                           if (widget.eventRecord.guests.isNotEmpty)
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text("Guests",
-                                  style: themeGaruda.textTheme.headlineSmall),
-                            ),
-
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Widgets().createTopLevelResponsiveContainer(
-                                context,
-                                List.generate(widget.eventRecord.guests.length,
-                                    (index) {
-                                  var guest = widget.eventRecord.guests[index];
-                                  return Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                        "${index + 1}. ${guest.name} ${guest.honorPrasadam ? " (Prasadam)" : ""}"),
-                                  );
-                                })),
-                          ),
+                            Widgets().createTopLevelCard(
+                                context: context,
+                                title: "Guests",
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Widgets()
+                                      .createTopLevelResponsiveContainer(
+                                          context,
+                                          List.generate(
+                                              widget.eventRecord.guests.length,
+                                              (index) {
+                                            var guest = widget
+                                                .eventRecord.guests[index];
+                                            return Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                  "${index + 1}. ${guest.name} ${guest.honorPrasadam ? " (Prasadam)" : ""}"),
+                                            );
+                                          })),
+                                )),
 
                           // list of songs
-                          SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("List of songs",
-                                style: themeGaruda.textTheme.headlineSmall),
-                          ),
-                          ...List.generate(widget.eventRecord.songs.length,
-                              (index) {
-                            String song = widget.eventRecord.songs[index];
-                            String title = song.split(":")[0];
-                            String raaga = song.split(":")[1];
-                            String taala = song.split(":")[2];
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "${index + 1}. title: $title",
-                                    ),
-                                    SizedBox(width: 10),
-                                    if (raaga.isNotEmpty) Text("raaga: $raaga"),
-                                    SizedBox(width: 10),
-                                    if (taala.isNotEmpty) Text("taala: $taala"),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }),
+                          Widgets().createTopLevelCard(
+                              context: context,
+                              title: "List of songs",
+                              child: Widgets()
+                                  .createTopLevelResponsiveContainer(
+                                      context,
+                                      List.generate(
+                                          widget.eventRecord.songs.length,
+                                          (index) {
+                                        String song =
+                                            widget.eventRecord.songs[index];
+                                        String title = song.split(":")[0];
+                                        String raaga = song.split(":")[1];
+                                        String taala = song.split(":")[2];
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  "${index + 1}. title: $title",
+                                                ),
+                                                SizedBox(width: 10),
+                                                if (raaga.isNotEmpty)
+                                                  Text("raaga: $raaga"),
+                                                SizedBox(width: 10),
+                                                if (taala.isNotEmpty)
+                                                  Text("taala: $taala"),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }))),
 
                           // performer note
-                          SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Note:",
-                                    style: themeGaruda.textTheme.headlineSmall),
-                                Text(widget.eventRecord.notePerformer)
-                              ],
+                          if (widget.eventRecord.notePerformer.isNotEmpty)
+                            Widgets().createTopLevelCard(
+                              context: context,
+                              title: "Note from performer",
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(widget.eventRecord.noteTemple),
+                              ),
                             ),
-                          ),
                         ]),
-                      ),
 
-                      // leave some space at bottom
-                      SizedBox(height: 100),
-                    ],
+                        // leave some space at bottom
+                        SizedBox(height: 100),
+                      ],
+                    ),
                   ),
                 ),
               ),

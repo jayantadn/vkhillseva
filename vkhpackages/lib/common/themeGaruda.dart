@@ -107,7 +107,11 @@ ThemeData themeGaruda = ThemeData(
 
   // list tile theme
   listTileTheme: ListTileThemeData(
-    titleTextStyle: TextStyle(fontWeight: FontWeight.bold),
+    titleTextStyle: GoogleFonts.lexend(
+      color: textColor,
+      fontSize: 14.0,
+      fontWeight: FontWeight.bold,
+    ),
   ),
 
   // Floating Action Button

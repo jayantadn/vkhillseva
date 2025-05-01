@@ -104,7 +104,6 @@ class _SlotSelectionState extends State<SlotSelection> {
         .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
     for (var requestRaw in requestsRaw) {
       Map<String, dynamic> requestMap = Map<String, dynamic>.from(requestRaw);
-
       String dbpath = requestMap['path'];
       var eventRaw = await FB().getValue(path: dbpath);
       EventRecord event =
@@ -162,11 +161,11 @@ class _SlotSelectionState extends State<SlotSelection> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      Widgets().createResponsiveTopLevelContainer(context, [
+                      Widgets().createTopLevelResponsiveContainer(context, [
                         // your widgets here
                         Widgets().createTopLevelCard(
-                            context,
-                            Padding(
+                            context: context,
+                            child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

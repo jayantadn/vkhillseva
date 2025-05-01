@@ -171,18 +171,18 @@ class _HomePageState extends State<HomePage> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      Widgets().createResponsiveTopLevelContainer(context, [
+                      Widgets().createTopLevelResponsiveContainer(context, [
                         // welcome banner with signup button
                         Widgets().createTopLevelCard(
-                            context,
-                            SSWelcome(
+                            context: context,
+                            child: SSWelcome(
                                 key: _welcomeKey, onAuthComplete: refresh)),
 
                         // event buttons
                         if (_username.isNotEmpty)
                           Widgets().createTopLevelCard(
-                            context,
-                            Center(
+                            context: context,
+                            child: Center(
                               child: Column(children: [
                                 // register event
                                 Padding(

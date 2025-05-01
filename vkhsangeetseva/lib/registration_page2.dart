@@ -170,6 +170,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     return ListTile(
         onTap: () {},
         title: Text("${member.salutation} ${member.name}"),
+        leading: Text(
+          "${index + 1}",
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
         subtitle: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -207,6 +211,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     return ListTile(
         onTap: () {},
         title: Text(member.name),
+        leading: Text(
+          "${index + 1}",
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
         subtitle: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -753,68 +761,58 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                         ),
                       SizedBox(height: 10),
 
-                      Widgets().createResponsiveTopLevelContainer(context, [
+                      Widgets().createTopLevelResponsiveContainer(context, [
                         // your widgets here
 
                         // main performer
                         if (_mainPerformer != null)
                           Widgets().createTopLevelCard(
-                            context,
-                            Column(children: [
-                              Text("Main performer",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall),
-                              ListTile(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => Profile(
-                                        title: "Main performer",
-                                        self: true,
-                                        onProfileSaved: (user) {
-                                          setState(() {
-                                            _mainPerformer = user;
-                                          });
-                                        },
-                                        friendMobile: _mainPerformer!.mobile,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      _mainPerformer!.profilePicUrl),
-                                ),
-                                title: Text(
-                                    "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
-                                subtitle: Widgets().createResponsiveRow(
+                            context: context,
+                            title: "Main performer",
+                            child: ListTile(
+                              onTap: () {
+                                Navigator.push(
                                   context,
-                                  [
-                                    Icon(Icons.phone),
-                                    Text(_mainPerformer!.mobile),
-                                    SizedBox(width: 4),
-                                    Icon(Icons.workspace_premium),
-                                    Text(_mainPerformer!.credentials),
-                                  ],
-                                ),
+                                  MaterialPageRoute(
+                                    builder: (context) => Profile(
+                                      title: "Main performer",
+                                      self: true,
+                                      onProfileSaved: (user) {
+                                        setState(() {
+                                          _mainPerformer = user;
+                                        });
+                                      },
+                                      friendMobile: _mainPerformer!.mobile,
+                                    ),
+                                  ),
+                                );
+                              },
+                              leading: CircleAvatar(
+                                backgroundImage:
+                                    NetworkImage(_mainPerformer!.profilePicUrl),
                               ),
-                            ]),
+                              title: Text(
+                                  "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
+                              subtitle: Widgets().createResponsiveRow(
+                                context,
+                                [
+                                  Icon(Icons.phone),
+                                  Text(_mainPerformer!.mobile),
+                                  SizedBox(width: 4),
+                                  Icon(Icons.workspace_premium),
+                                  Text(_mainPerformer!.credentials),
+                                ],
+                              ),
+                            ),
                           ),
 
                         // supporting team
                         Widgets().createTopLevelCard(
-                          context,
-                          Column(
+                          context: context,
+                          title: "Supporting team",
+                          child: Column(
                             children: [
-                              if (_supportingTeam.isNotEmpty)
-                                Text("Supporting team",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall),
-
-                              Widgets().createResponsiveTopLevelContainer(
+                              Widgets().createTopLevelResponsiveContainer(
                                   context,
                                   List.generate(_supportingTeam.length,
                                       (index) {
@@ -839,16 +837,11 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                         // guests
                         Widgets().createTopLevelCard(
-                          context,
-                          Column(
+                          context: context,
+                          title: "Guests",
+                          child: Column(
                             children: [
-                              if (_guests.isNotEmpty)
-                                Text("Guests",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall),
-
-                              Widgets().createResponsiveTopLevelContainer(
+                              Widgets().createTopLevelResponsiveContainer(
                                   context,
                                   List.generate(_guests.length, (index) {
                                     return _createGuestTile(index);
@@ -869,13 +862,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                         // list of songs
                         Widgets().createTopLevelCard(
-                            context,
-                            Column(children: [
-                              if (_songs.isNotEmpty)
-                                Text("List of songs",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall),
+                            context: context,
+                            title: "List of songs",
+                            child: Column(children: [
                               ...List.generate(_songs.length, (index) {
                                 return _createSongTile(index);
                               }),

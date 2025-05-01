@@ -172,7 +172,7 @@ class Widgets {
     );
   }
 
-  Widget createResponsiveTopLevelContainer(
+  Widget createTopLevelResponsiveContainer(
     BuildContext context,
     List<Widget> children,
   ) {
@@ -195,7 +195,11 @@ class Widgets {
     );
   }
 
-  Widget createTopLevelCard(BuildContext context, Widget child) {
+  Widget createTopLevelCard({
+    required BuildContext context,
+    required Widget child,
+    String? title,
+  }) {
     double maxWidth = maxCardWidth;
     final double screenWidth = MediaQuery.of(context).size.width;
     maxWidth =
@@ -207,7 +211,32 @@ class Widgets {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth, minWidth: maxWidth),
         child: Card(
-          child: Padding(padding: const EdgeInsets.all(8.0), child: child),
+          child: Column(
+            children: [
+              // title
+              if (title != null)
+                Container(
+                  width: double.infinity, // Stretch to full width
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10.0),
+                      topRight: Radius.circular(10.0),
+                    ),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
+
+              // child widget
+              Padding(padding: const EdgeInsets.all(8.0), child: child),
+            ],
+          ),
         ),
       ),
     );

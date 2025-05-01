@@ -199,15 +199,16 @@ class _SangeetSevaState extends State<SangeetSeva> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      Widgets().createResponsiveTopLevelContainer(context, [
+                      Widgets().createTopLevelResponsiveContainer(context, [
                         // your widgets here
 
                         // welcome banner
-                        Widgets().createTopLevelCard(context, SSWelcome()),
+                        Widgets().createTopLevelCard(
+                            context: context, child: SSWelcome()),
 
                         Widgets().createTopLevelCard(
-                            context,
-                            Center(
+                            context: context,
+                            child: Center(
                                 child: Column(children: [
                               // register event
                               Stack(children: [

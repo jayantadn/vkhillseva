@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:vkhpackages/common/themeGaruda.dart';
 
 // imagine a card with a text field and a button
 // primary color (dark): all text
@@ -32,9 +34,17 @@ class ThemeCreator {
         bodyLarge: TextStyle(fontSize: 18.0),
         bodyMedium: TextStyle(fontSize: 14.0),
         bodySmall: TextStyle(fontSize: 12.0),
-        headlineLarge: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-        headlineMedium: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-        headlineSmall: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
+        headlineLarge: GoogleFonts.lexend(color: textColor, fontSize: 24.0),
+        headlineMedium: GoogleFonts.lexend(
+          color: textColor,
+          fontSize: 18.0,
+          fontWeight: FontWeight.bold,
+        ),
+        headlineSmall: GoogleFonts.lexend(
+          color: textColor,
+          fontSize: 14.0,
+          fontWeight: FontWeight.bold,
+        ),
       ),
 
       // appbar theme

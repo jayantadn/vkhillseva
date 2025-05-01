@@ -110,8 +110,8 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
   Widget _createEventCard(int index) {
     EventRecord event = _events[index];
     return Widgets().createTopLevelCard(
-        context,
-        ListTile(
+        context: context,
+        child: ListTile(
           onTap: () {
             if (event.status == "Approved") {
               Navigator.push(
@@ -201,7 +201,7 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      Widgets().createResponsiveTopLevelContainer(context, [
+                      Widgets().createTopLevelResponsiveContainer(context, [
                         // your widgets here
                         ...List.generate(_events.length, (index) {
                           return _createEventCard(index);

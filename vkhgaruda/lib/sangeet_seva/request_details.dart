@@ -320,7 +320,7 @@ class _RequestDetailsState extends State<RequestDetails> {
                                       style: Theme.of(context)
                                           .textTheme
                                           .headlineSmall),
-                                  Widgets().createResponsiveTopLevelContainer(
+                                  Widgets().createTopLevelResponsiveContainer(
                                       context,
                                       List.generate(_supportTeam.length,
                                           (index) {
@@ -371,7 +371,7 @@ class _RequestDetailsState extends State<RequestDetails> {
 
                           Align(
                             alignment: Alignment.centerLeft,
-                            child: Widgets().createResponsiveTopLevelContainer(
+                            child: Widgets().createTopLevelResponsiveContainer(
                                 context,
                                 List.generate(widget.eventRecord.guests.length,
                                     (index) {

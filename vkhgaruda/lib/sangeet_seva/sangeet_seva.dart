@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/sangeet_seva/calendar_slots.dart';
@@ -76,7 +77,8 @@ class _SangeetSevaState extends State<SangeetSeva> {
               var eventRaw = await FB().getValue(path: data['path']);
               EventRecord event =
                   Utils().convertRawToDatatype(eventRaw, EventRecord.fromJson);
-              if (mounted) {
+
+              if (_calendarKey.currentState != null) {
                 _calendarKey.currentState!
                     .fillAvailabilityIndicators(date: event.date);
               }
@@ -113,6 +115,14 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
     // perform async operations here
     _pendingRequests = await _getPendingRequestsCount();
+
+    // subscribe to notifications
+    try {
+      await Notifications().setupFirebaseMessaging();
+      FirebaseMessaging.instance.subscribeToTopic("SSAdmin");
+    } catch (e) {
+      // nothing to do
+    }
 
     await _lock.synchronized(() async {
       // fetch form values

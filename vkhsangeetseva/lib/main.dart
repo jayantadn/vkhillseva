@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registered_events.dart';
 import 'package:vkhsangeetseva/registration_page2.dart';
 import 'package:vkhsangeetseva/slot_selection.dart';
@@ -20,8 +21,9 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   final Widget home = const HomePage(title: "Hare Krishna");
-  final Widget test = RegisteredEvents(
+  final Widget test = Profile(
     title: "test",
+    self: true,
   );
 
   final ThemeData themeSangeetSeva = ThemeCreator(
@@ -34,7 +36,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sangeet Seva',
       theme: themeSangeetSeva,
-      home: home,
+      home: test,
     );
   }
 }

@@ -82,16 +82,14 @@ class _SangeetSevaState extends State<SangeetSeva> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      Widgets().createTopLevelResponsiveContainer(context, [
-                        // your widgets here
-                        Widgets().createTopLevelCard(
-                          context: context,
-                          child: ListTile(
-                            title: Text("Hello World"),
-                            subtitle: Text("This is a sample card"),
-                          ),
+                      // your widgets here
+                      Widgets().createTopLevelCard(
+                        context: context,
+                        child: ListTile(
+                          title: Text("Hello World"),
+                          subtitle: Text("This is a sample card"),
                         ),
-                      ]),
+                      ),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

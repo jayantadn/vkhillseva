@@ -171,78 +171,76 @@ class _HomePageState extends State<HomePage> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      Widgets().createTopLevelResponsiveContainer(context, [
-                        // welcome banner with signup button
+                      // welcome banner with signup button
+                      Widgets().createTopLevelCard(
+                          context: context,
+                          child: SSWelcome(
+                              key: _welcomeKey, onAuthComplete: refresh)),
+
+                      // event buttons
+                      if (_username.isNotEmpty)
                         Widgets().createTopLevelCard(
-                            context: context,
-                            child: SSWelcome(
-                                key: _welcomeKey, onAuthComplete: refresh)),
-
-                        // event buttons
-                        if (_username.isNotEmpty)
-                          Widgets().createTopLevelCard(
-                            context: context,
-                            child: Center(
-                              child: Column(children: [
-                                // register event
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Widgets().createImageButton(
-                                      context: context,
-                                      image:
-                                          "assets/images/LauncherIcons/Register.png",
-                                      text: "Register for an event",
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => SlotSelection(
-                                              title: "Event Registration",
-                                            ),
+                          context: context,
+                          child: Center(
+                            child: Column(children: [
+                              // register event
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Widgets().createImageButton(
+                                    context: context,
+                                    image:
+                                        "assets/images/LauncherIcons/Register.png",
+                                    text: "Register for an event",
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SlotSelection(
+                                            title: "Event Registration",
                                           ),
-                                        );
-                                      },
-                                      fixedWidth: 250),
-                                ),
+                                        ),
+                                      );
+                                    },
+                                    fixedWidth: 250),
+                              ),
 
-                                // view registered events
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Widgets().createImageButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                RegisteredEvents(
-                                                    title: "Registered Events",
-                                                    icon: widget.icon),
-                                          ),
-                                        );
-                                      },
-                                      text: "View registered events",
-                                      image:
-                                          "assets/images/LauncherIcons/RegisteredEvents.png",
-                                      context: context,
-                                      imageOnRight: true,
-                                      fixedWidth: 250),
-                                ),
+                              // view registered events
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Widgets().createImageButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              RegisteredEvents(
+                                                  title: "Registered Events",
+                                                  icon: widget.icon),
+                                        ),
+                                      );
+                                    },
+                                    text: "View registered events",
+                                    image:
+                                        "assets/images/LauncherIcons/RegisteredEvents.png",
+                                    context: context,
+                                    imageOnRight: true,
+                                    fixedWidth: 250),
+                              ),
 
-                                // view past events
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Widgets().createImageButton(
-                                      onPressed: () {},
-                                      text: 'View past events',
-                                      image:
-                                          "assets/images/LauncherIcons/PastEvents.png",
-                                      context: context,
-                                      fixedWidth: 250),
-                                ),
-                              ]),
-                            ),
-                          )
-                      ]),
+                              // view past events
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Widgets().createImageButton(
+                                    onPressed: () {},
+                                    text: 'View past events',
+                                    image:
+                                        "assets/images/LauncherIcons/PastEvents.png",
+                                    context: context,
+                                    fixedWidth: 250),
+                              ),
+                            ]),
+                          ),
+                        ),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

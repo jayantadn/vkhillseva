@@ -69,14 +69,6 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     // perform async operations here
     await _fillBookingLists(_selectedDate);
 
-    // subscribe to notifications
-    try {
-      await Notifications().setupFirebaseMessaging();
-      FirebaseMessaging.instance.subscribeToTopic("SSAdmin");
-    } catch (e) {
-      // nothing to do
-    }
-
     // refresh all child widgets
     _calendarKey.currentState!.refresh();
 

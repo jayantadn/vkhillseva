@@ -126,9 +126,9 @@ class _RequestDetailsState extends State<RequestDetails> {
               .setJson(path: dbpathNew, json: widget.eventRecord.slot.toJson());
         } else {
           if (Utils().isDateWeekend(widget.eventRecord.date)) {
-            await FB().setJson(
-                path: dbpath,
-                json: {"Slot1": widget.eventRecord.slot.toJson()});
+            await FB().setJson(path: dbpath, json: {
+              widget.eventRecord.slot.name: widget.eventRecord.slot.toJson()
+            });
           } else {
             Toaster().error("Invalid slot");
           }

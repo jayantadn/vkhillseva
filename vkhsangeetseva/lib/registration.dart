@@ -24,6 +24,7 @@ class _RegistrationState extends State<Registration> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   DateTime _selectedDate = DateTime.now();
+  final GlobalKey<CalendarState> _calendarKey = GlobalKey<CalendarState>();
 
   // lists
   List<int> _bookedSlotsCnt = [];
@@ -228,10 +229,9 @@ class _RegistrationState extends State<Registration> {
                   UserBasics? basics = Utils().getUserBasics();
                   if (basics != null && mobile == basics.mobile) {
                     String dbpath = requestMap['path'];
-                    List events = await FB().getList(path: dbpath);
-                    int index = requestMap['index'];
-                    EventRecord event = Utils().convertRawToDatatype(
-                        events[index], EventRecord.fromJson);
+                    var eventRaw = await FB().getValue(path: dbpath);
+                    EventRecord event = Utils()
+                        .convertRawToDatatype(eventRaw, EventRecord.fromJson);
                     if (event.date == _selectedDate &&
                         event.slot.from == slot.from &&
                         event.slot.to == slot.to) {
@@ -344,7 +344,7 @@ class _RegistrationState extends State<Registration> {
                             SizedBox(height: 10),
 
                             Calendar(
-                                key: calendarKey,
+                                key: _calendarKey,
                                 onDaySelected: (date) async {
                                   await _fillBookingLists(date);
 

@@ -278,8 +278,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     List pendingEvents = await FB()
         .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
     int indexP = pendingEvents.indexWhere((element) =>
-        element['path'] == "${Const().dbrootSangeetSeva}/Events/$mobile" &&
-        element['index'] == index);
+        element['path'] == "${Const().dbrootSangeetSeva}/Events/$mobile");
     await FB().deleteFromList(
         listpath: "${Const().dbrootSangeetSeva}/PendingRequests",
         index: indexP);
@@ -359,38 +358,16 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     // save to firebase
     UserBasics? basics = Utils().getUserBasics();
     String mobile = "";
-    int index = 0;
+    String dbdate = DateFormat("yyyy-MM-dd").format(performanceRequest.date);
     if (basics == null) {
       Toaster().error("Cant access user data");
       return;
     } else {
       mobile = basics.mobile;
-      if (widget.oldEvent == null) {
-        // fresh entry
-        index = await FB().addToList(
-            listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
-            data: performanceRequest.toJson());
-      } else {
-        // edit entry
-        List<dynamic> list = await FB()
-            .getList(path: "${Const().dbrootSangeetSeva}/Events/$mobile");
-        index = list.indexWhere((element) {
-          EventRecord event =
-              Utils().convertRawToDatatype(element, EventRecord.fromJson);
-          return event.date == widget.oldEvent!.date &&
-              event.slot.from == widget.oldEvent!.slot.from &&
-              event.slot.to == widget.oldEvent!.slot.to;
-        });
-        if (index == -1) {
-          Toaster().error("Event not found");
-          return;
-        } else {
-          await FB().editList(
-              listpath: "${Const().dbrootSangeetSeva}/Events/$mobile",
-              index: index,
-              data: performanceRequest.toJson());
-        }
-      }
+      FB().setJson(
+          path:
+              "${Const().dbrootSangeetSeva}/Events/$mobile/$dbdate/${performanceRequest.slot.name}",
+          json: performanceRequest.toJson());
     }
 
     // add to pending requests
@@ -398,8 +375,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       FB().addToList(
           listpath: "${Const().dbrootSangeetSeva}/PendingRequests",
           data: {
-            "path": "${Const().dbrootSangeetSeva}/Events/$mobile",
-            "index": index
+            "path":
+                "${Const().dbrootSangeetSeva}/Events/$mobile/$dbdate/${performanceRequest.slot.name}",
           });
     }
 

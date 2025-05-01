@@ -10,13 +10,10 @@ class Calendar extends StatefulWidget {
   const Calendar({super.key, required this.onDaySelected});
 
   @override
-  State<Calendar> createState() => _CalendarState();
+  State<Calendar> createState() => CalendarState();
 }
 
-// ignore: library_private_types_in_public_api
-GlobalKey<_CalendarState> calendarKey = GlobalKey<_CalendarState>();
-
-class _CalendarState extends State<Calendar> {
+class CalendarState extends State<Calendar> {
   final Lock _lock = Lock();
   DateTime _selectedDate = DateTime.now();
 

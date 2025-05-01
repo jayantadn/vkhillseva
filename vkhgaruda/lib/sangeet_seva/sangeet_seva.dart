@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/sangeet_seva/calendar_slots.dart';
+import 'package:vkhgaruda/sangeet_seva/pending_requests.dart';
 import 'package:vkhgaruda/sangeet_seva/profiles.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -20,6 +21,7 @@ class SangeetSeva extends StatefulWidget {
 
 class _SangeetSevaState extends State<SangeetSeva> {
   // global keys
+  final GlobalKey<CalendarState> _calendarKey = GlobalKey<CalendarState>();
 
   // scalars
   final Lock _lock = Lock();
@@ -70,12 +72,13 @@ class _SangeetSevaState extends State<SangeetSeva> {
               // process the received data
               _decrementPendingRequests();
 
-              List eventsRaw = await FB().getList(path: data['path']);
-              var eventRaw = eventsRaw[data['index']];
+              var eventRaw = await FB().getValue(path: data['path']);
               EventRecord event =
                   Utils().convertRawToDatatype(eventRaw, EventRecord.fromJson);
-              calendarKey.currentState!
-                  .fillAvailabilityIndicators(date: event.date);
+              if (mounted) {
+                _calendarKey.currentState!
+                    .fillAvailabilityIndicators(date: event.date);
+              }
             }
           },
 
@@ -132,31 +135,9 @@ class _SangeetSevaState extends State<SangeetSeva> {
   }
 
   Future<int> _getPendingRequestsCount() async {
-    int pendingRequests = 0;
-
-    // get the list of pending requests
     List<dynamic> pendingRequestsRaw = await FB()
         .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
-    for (var pendingRequestLinkRaw in pendingRequestsRaw) {
-      Map<String, dynamic> pendingRequestLink =
-          Map<String, dynamic>.from(pendingRequestLinkRaw);
-      String path = pendingRequestLink['path'];
-      int index = pendingRequestLink['index'];
-
-      List pendingRequestsPerUserRaw = await FB().getList(path: path);
-      var pendingRequestPerUserRaw = pendingRequestsPerUserRaw[index];
-      EventRecord pendingRequest = Utils()
-          .convertRawToDatatype(pendingRequestPerUserRaw, EventRecord.fromJson);
-
-      // discard if pending request is in the past
-      if (pendingRequest.date.isBefore(DateTime.now())) {
-        continue;
-      }
-
-      pendingRequests++;
-    }
-
-    return pendingRequests;
+    return pendingRequestsRaw.length;
   }
 
   void _incrementPendingRequests() {
@@ -239,14 +220,15 @@ class _SangeetSevaState extends State<SangeetSeva> {
                                           "assets/images/LauncherIcons/Register.png",
                                       text: "View pending requests",
                                       onPressed: () {
-                                        // Navigator.push(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //     builder: (context) => SlotSelection(
-                                        //       title: "Event Registration",
-                                        //     ),
-                                        //   ),
-                                        // );
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                PendingRequests(
+                                              title: "Pending requests",
+                                            ),
+                                          ),
+                                        );
                                       },
                                       fixedWidth: 250),
                                 ),

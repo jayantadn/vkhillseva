@@ -22,6 +22,8 @@ class CalendarSlots extends StatefulWidget {
 }
 
 class _CalendarSlotsState extends State<CalendarSlots> {
+  final GlobalKey<CalendarState> _calendarKey = GlobalKey<CalendarState>();
+
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
@@ -76,7 +78,7 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     }
 
     // refresh all child widgets
-    calendarKey.currentState!.refresh();
+    _calendarKey.currentState!.refresh();
 
     // perform sync operations here
     await _lock.synchronized(() async {});
@@ -126,7 +128,7 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     );
 
     // refresh the availability indicators
-    calendarKey.currentState!.fillAvailabilityIndicators(date: _selectedDate);
+    _calendarKey.currentState!.fillAvailabilityIndicators(date: _selectedDate);
     await _fillBookingLists(_selectedDate);
 
     setState(() {});
@@ -208,7 +210,6 @@ class _CalendarSlotsState extends State<CalendarSlots> {
                   Map<String, dynamic> eventLink =
                       Map<String, dynamic>.from(eventLinkRaw);
                   String path = eventLink['path'];
-                  int index = eventLink['index'];
 
                   List eventsRaw = await FB().getList(path: path);
                   var eventRaw = eventsRaw[index];
@@ -403,7 +404,7 @@ class _CalendarSlotsState extends State<CalendarSlots> {
 
                     // calendar
                     Calendar(
-                      key: calendarKey,
+                      key: _calendarKey,
                       onDaySelected: (DateTime date) async {
                         await _fillBookingLists(date);
 

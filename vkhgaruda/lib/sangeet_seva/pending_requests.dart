@@ -63,20 +63,16 @@ class _PendingRequestsState extends State<PendingRequests> {
       Map<String, dynamic> pendingRequestLink =
           Map<String, dynamic>.from(pendingRequestLinkRaw);
       String path = pendingRequestLink['path'];
-      int index = pendingRequestLink['index'];
 
-      List pendingRequestsPerUserRaw = await FB().getList(path: path);
-      var pendingRequestPerUserRaw = pendingRequestsPerUserRaw[index];
+      var pendingRequestPerUserRaw = await FB().getValue(path: path);
       EventRecord pendingRequest = Utils()
           .convertRawToDatatype(pendingRequestPerUserRaw, EventRecord.fromJson);
 
       // discard if pending request is in the past
-      if (pendingRequest.date.isBefore(DateTime.now())) {
-        continue;
+      if (pendingRequest.date.isAfter(DateTime.now())) {
+        _pendingRequests.add({'path': path});
+        _linkedEventRecords.add(pendingRequest);
       }
-
-      _pendingRequests.add({'path': path, 'index': index});
-      _linkedEventRecords.add(pendingRequest);
     }
     if (_pendingRequests.length != pendingRequestLinks.length) {
       // outdated requests detected

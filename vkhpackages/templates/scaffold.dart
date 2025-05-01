@@ -16,8 +16,6 @@ class SangeetSeva extends StatefulWidget {
 }
 
 class _SangeetSevaState extends State<SangeetSeva> {
-  // global keys
-
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;

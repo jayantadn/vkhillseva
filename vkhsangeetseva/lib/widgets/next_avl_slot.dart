@@ -89,7 +89,9 @@ class NextAvlSlotState extends State<NextAvlSlot> {
   Future<void> _fetchNextAvailableSlot() async {
     // set the starting search date and the next weekend date
     if (_nextAvailableDate == null) {
-      _nextAvailableDate = DateTime.now();
+      DateTime today = DateTime.now();
+      today = DateTime(today.year, today.month, today.day);
+      _nextAvailableDate = today.add(Duration(days: 1));
       _nextAvailableSlot = null;
     } else {
       List<Slot> slots = [];
@@ -252,7 +254,15 @@ class NextAvlSlotState extends State<NextAvlSlot> {
     // arbitrate against the weekend slots
     bool foundWeekend = false;
     for (int i = 0; i < 10; i++) {
-      for (var slotw in SSConst().weekendSangeetSevaSlots) {
+      List<Slot> weekendSlots = SSConst().weekendSangeetSevaSlots;
+      weekendSlots.sort((a, b) {
+        DateTime timeA =
+            Utils().convertStringToTime(_nextAvailableDate!, a.from);
+        DateTime timeB =
+            Utils().convertStringToTime(_nextAvailableDate!, b.from);
+        return timeA.compareTo(timeB); // forward sort
+      });
+      for (var slotw in weekendSlots) {
         bool avl = await _isSlotAvailable(nextWeekendDate, slotw);
         if (avl) {
           if (_nextAvailableSlot == null) {
@@ -299,7 +309,9 @@ class NextAvlSlotState extends State<NextAvlSlot> {
 
   Future<void> _fetchPreviousAvailableSlot() async {
     if (_nextAvailableDate == null) {
-      _nextAvailableDate = DateTime.now();
+      DateTime today = DateTime.now();
+      today = DateTime(today.year, today.month, today.day);
+      _nextAvailableDate = today.subtract(Duration(days: 1));
       _nextAvailableSlot = null;
     } else {
       List<Slot> slots = [];

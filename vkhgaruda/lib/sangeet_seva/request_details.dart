@@ -92,16 +92,15 @@ class _RequestDetailsState extends State<RequestDetails> {
       // event is pending approval
 
       String path = widget.pendingRequest!['path'];
-      int index = widget.pendingRequest!['index'];
 
       // set the availability flag in Event
-      List eventsRaw = await FB().getList(path: path);
+      var eventRaw = await FB().getValue(path: path);
       EventRecord event =
-          Utils().convertRawToDatatype(eventsRaw[index], EventRecord.fromJson);
+          Utils().convertRawToDatatype(eventRaw, EventRecord.fromJson);
       event.status = action == "Approve" ? "Approved" : "Rejected";
       event.noteTemple = _noteController.text;
-      eventsRaw[index] = event.toJson();
-      await FB().setValue(path: path, value: eventsRaw);
+      eventRaw = event.toJson();
+      await FB().setValue(path: path, value: eventRaw);
 
       // notify the user
       String mobile = widget.eventRecord.mainPerformerMobile;
@@ -148,8 +147,7 @@ class _RequestDetailsState extends State<RequestDetails> {
       for (var pendingRequestRaw in pendingRequestsRaw) {
         Map<String, dynamic> pendingRequest =
             Map<String, dynamic>.from(pendingRequestRaw);
-        if (pendingRequest['path'] == path &&
-            pendingRequest['index'] == index) {
+        if (pendingRequest['path'] == path) {
           pendingRequestsRaw.remove(pendingRequestRaw);
           break;
         }

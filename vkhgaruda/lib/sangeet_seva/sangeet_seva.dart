@@ -304,7 +304,10 @@ class _SangeetSevaState extends State<SangeetSeva> {
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Widgets().createImageButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Toaster()
+                                          .error("Feature not available yet");
+                                    },
                                     text: 'View past events',
                                     image:
                                         "assets/images/LauncherIcons/PastEvents.png",

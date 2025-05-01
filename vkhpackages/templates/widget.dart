@@ -5,14 +5,14 @@ class Summary extends StatefulWidget {
   const Summary({super.key});
 
   @override
-  State<Summary> createState() => _SummaryState();
+  State<Summary> createState() => SummaryState();
 }
 
 // hint: put the global key as a member of the calling class
 // instantiate the class with a global key
 // final GlobalKey<_SummaryState> summaryKey = GlobalKey<_SummaryState>();
 
-class _SummaryState extends State<Summary> {
+class SummaryState extends State<Summary> {
   final Lock _lock = Lock();
 
   @override

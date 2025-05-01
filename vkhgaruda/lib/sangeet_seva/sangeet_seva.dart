@@ -6,13 +6,14 @@ import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/sangeet_seva/calendar_slots.dart';
 import 'package:vkhgaruda/sangeet_seva/pending_requests.dart';
 import 'package:vkhgaruda/sangeet_seva/profiles.dart';
+import 'package:vkhgaruda/sangeet_seva/registered_events.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class SangeetSeva extends StatefulWidget {
   final String title;
-  final String? splashImagePath;
+  final String? splashImage;
 
-  const SangeetSeva({super.key, required this.title, this.splashImagePath});
+  const SangeetSeva({super.key, required this.title, this.splashImage});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -163,7 +164,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
                     MaterialPageRoute(
                       builder: (context) => Profiles(
                         title: 'Performer Profiles',
-                        icon: widget.splashImagePath,
+                        icon: widget.splashImage,
                       ),
                     ),
                   );
@@ -179,7 +180,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
                     MaterialPageRoute(
                       builder: (context) => CalendarSlots(
                         title: "Sangeet seva",
-                        icon: widget.splashImagePath,
+                        icon: widget.splashImage,
                       ),
                     ),
                   );
@@ -270,14 +271,16 @@ class _SangeetSevaState extends State<SangeetSeva> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Widgets().createImageButton(
                                     onPressed: () {
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //     builder: (context) => RegisteredEvents(
-                                      //         title: "Registered Events",
-                                      //         icon: widget.icon),
-                                      //   ),
-                                      // );
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              RegisteredEvents(
+                                                  title: "Registered Events",
+                                                  splashImage:
+                                                      widget.splashImage),
+                                        ),
+                                      );
                                     },
                                     text: "View registered events",
                                     image:
@@ -314,7 +317,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
         // circular progress indicator
         if (_isLoading)
           LoadingOverlay(
-            image: widget.splashImagePath ??
+            image: widget.splashImage ??
                 "assets/images/Logo/KrishnaLilaPark_circle.png",
           ),
       ],

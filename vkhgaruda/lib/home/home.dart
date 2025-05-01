@@ -133,7 +133,7 @@ class _HomePageState extends State<HomePage> {
                                             builder: (context) =>
                                                 const SangeetSeva(
                                                   title: "Sangeet Seva",
-                                                  splashImagePath:
+                                                  splashImage:
                                                       'assets/images/Logo/SangeetSeva.png',
                                                 )),
                                       );

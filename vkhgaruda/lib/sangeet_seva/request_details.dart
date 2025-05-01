@@ -11,7 +11,7 @@ class RequestDetails extends StatefulWidget {
   final String? icon;
   final Map<String, dynamic>? pendingRequest;
   final EventRecord eventRecord;
-  final void Function(String action) callback;
+  final void Function(String action)? callbackDelete;
 
   const RequestDetails(
       {super.key,
@@ -19,7 +19,7 @@ class RequestDetails extends StatefulWidget {
       this.icon,
       this.pendingRequest,
       required this.eventRecord,
-      required this.callback});
+      this.callbackDelete});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -156,8 +156,10 @@ class _RequestDetailsState extends State<RequestDetails> {
           path: "${Const().dbrootSangeetSeva}/PendingRequests",
           value: pendingRequestsRaw);
 
-      // callback
-      widget.callback(action);
+      // callbackDelete
+      if (widget.callbackDelete != null) {
+        widget.callbackDelete!(action);
+      }
     }
   }
 

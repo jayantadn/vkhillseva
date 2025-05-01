@@ -6,9 +6,9 @@ import 'package:vkhpackages/vkhpackages.dart';
 
 class SangeetSeva extends StatefulWidget {
   final String title;
-  final String? splashImagePath;
+  final String? splashImage;
 
-  const SangeetSeva({super.key, required this.title, this.splashImagePath});
+  const SangeetSeva({super.key, required this.title, this.splashImage});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -107,7 +107,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
         if (_isLoading)
           LoadingOverlay(
             image:
-                widget.splashImagePath ??
+                widget.splashImage ??
                 "assets/images/Logo/KrishnaLilaPark_circle.png",
           ),
       ],

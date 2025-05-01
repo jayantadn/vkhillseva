@@ -104,7 +104,6 @@ class _PendingRequestsState extends State<PendingRequests> {
     title += " (${pendingRequest.slot.from} - ${pendingRequest.slot.to})";
     String performer = _mainPerformers[index].name;
     String profilePicUrl = _mainPerformers[index].profilePicUrl;
-    SSUtils().getPerformerProfile(pendingRequest.mainPerformerMobile);
 
     return Card(
         child: ListTile(
@@ -151,7 +150,7 @@ class _PendingRequestsState extends State<PendingRequests> {
                                 title: "Request Details",
                                 pendingRequest: _pendingRequests[index],
                                 eventRecord: _linkedEventRecords[index],
-                                callback: (String action) {
+                                callbackDelete: (String action) {
                                   setState(() {
                                     _linkedEventRecords.removeAt(index);
                                     _pendingRequests.removeAt(index);

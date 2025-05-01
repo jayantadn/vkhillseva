@@ -231,7 +231,7 @@ class _CalendarSlotsState extends State<CalendarSlots> {
                       builder: (context) => RequestDetails(
                         title: 'Event details',
                         eventRecord: bookedEvent!,
-                        callback: (action) {
+                        callbackDelete: (action) {
                           // placeholder for rejecting an approved request
                         },
                       ),

@@ -105,6 +105,11 @@ ThemeData themeGaruda = ThemeData(
     ),
   ),
 
+  // list tile theme
+  listTileTheme: ListTileThemeData(
+    titleTextStyle: TextStyle(fontWeight: FontWeight.bold),
+  ),
+
   // Floating Action Button
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     backgroundColor: accentColor,

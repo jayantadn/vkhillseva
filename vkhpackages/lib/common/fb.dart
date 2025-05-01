@@ -193,16 +193,23 @@ class FB {
 
   Future<Map<String, dynamic>> getValuesByDateRange({
     required String path,
-    required String startDate,
-    String? endDate,
+    required DateTime startDate,
+    DateTime? endDate,
   }) async {
     try {
       DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
 
+      // Format the start and end dates to match the database key format
+      String startDateStr = DateFormat("yyyy-MM-dd").format(startDate);
+      String endDateStr =
+          endDate != null
+              ? DateFormat("yyyy-MM-dd").format(endDate)
+              : startDateStr;
+
       // Create a query to filter by the date range
-      Query query = dbref.orderByKey().startAt(startDate);
+      Query query = dbref.orderByKey().startAt(startDateStr);
       if (endDate != null) {
-        query = query.endAt(endDate);
+        query = query.endAt(endDateStr);
       }
 
       DataSnapshot snapshot = await query.get();

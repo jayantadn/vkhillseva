@@ -56,6 +56,11 @@ class ThemeCreator {
         shadowColor: primaryColor,
       ),
 
+      // list tile theme
+      listTileTheme: ListTileThemeData(
+        titleTextStyle: TextStyle(fontWeight: FontWeight.bold),
+      ),
+
       // Input Fields
       inputDecorationTheme: InputDecorationTheme(
         hintStyle: TextStyle(color: Colors.grey),

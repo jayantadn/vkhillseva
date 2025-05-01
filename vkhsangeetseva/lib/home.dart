@@ -214,8 +214,8 @@ class _HomePageState extends State<HomePage> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               RegisteredEvents(
-                                                  title: "Registered Events",
-                                                  icon: widget.icon),
+                                            title: "Registered Events",
+                                          ),
                                         ),
                                       );
                                     },

@@ -105,20 +105,21 @@ class _PendingRequestsState extends State<PendingRequests> {
     String performer = _mainPerformers[index].name;
     String profilePicUrl = _mainPerformers[index].profilePicUrl;
 
-    return Card(
+    return Widgets().createTopLevelCard(
+        context: context,
         child: ListTile(
-      title: Text(title),
-      leading: CircleAvatar(backgroundImage: NetworkImage(profilePicUrl)),
-      subtitle: Row(
-        children: [
-          Icon(Icons.person),
-          Text(performer),
-          SizedBox(width: 10),
-          Icon(Icons.phone),
-          Text(_mainPerformers[index].mobile),
-        ],
-      ),
-    ));
+          title: Text(title),
+          leading: CircleAvatar(backgroundImage: NetworkImage(profilePicUrl)),
+          subtitle: Row(
+            children: [
+              Icon(Icons.person),
+              Text(performer),
+              SizedBox(width: 10),
+              Icon(Icons.phone),
+              Text(_mainPerformers[index].mobile),
+            ],
+          ),
+        ));
   }
 
   @override

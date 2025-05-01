@@ -211,11 +211,10 @@ class _SangeetSevaState extends State<SangeetSeva> {
                             child: Center(
                                 child: Column(children: [
                               // register event
-                              Stack(children: [
-                                // button
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Widgets().createImageButton(
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Stack(children: [
+                                  Widgets().createImageButton(
                                       context: context,
                                       image:
                                           "assets/images/LauncherIcons/Register.png",
@@ -232,51 +231,39 @@ class _SangeetSevaState extends State<SangeetSeva> {
                                         );
                                       },
                                       fixedWidth: 250),
-                                ),
 
-                                // count
-                                if (_pendingRequests > 0)
-                                  Positioned(
-                                    left: 10,
-                                    top: 10,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        // Navigator.push(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //     builder: (context) =>
-                                        //         PendingRequests(
-                                        //       title: 'Pending requests',
-                                        //       icon: widget.icon,
-                                        //     ),
-                                        //   ),
-                                        // );
-                                      },
-                                      child: Container(
-                                        padding:
-                                            EdgeInsets.only(left: 4, right: 4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        constraints: BoxConstraints(
-                                          minWidth: 10,
-                                          minHeight: 10,
-                                        ),
-                                        child: Text(
-                                          '$_pendingRequests',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
+                                  // count
+                                  if (_pendingRequests > 0)
+                                    Positioned(
+                                      right: 0,
+                                      top: 0,
+                                      child: GestureDetector(
+                                        child: Container(
+                                          padding: EdgeInsets.only(
+                                              left: 4, right: 4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
-                                          textAlign: TextAlign.center,
+                                          constraints: BoxConstraints(
+                                            minWidth: 10,
+                                            minHeight: 10,
+                                          ),
+                                          child: Text(
+                                            '$_pendingRequests',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  )
-                              ]),
+                                    )
+                                ]),
+                              ),
 
                               // view registered events
                               Padding(

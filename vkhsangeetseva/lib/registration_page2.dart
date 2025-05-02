@@ -388,6 +388,13 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           });
     }
 
+    // notify admin
+    String msg = Utils().getUsername();
+    String date = DateFormat("dd MMM yyyy").format(performanceRequest.date);
+    msg += ", $date";
+    Notifications().sendPushNotificationToTopic(
+        topic: "SSAdmin", title: "Event request submitted", body: msg);
+
     // show success message
     await Widgets().showMessage(context,
         "Your request has been submitted.\nYou will be notified once your request is approved");
@@ -782,144 +789,140 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                         ),
                       SizedBox(height: 10),
 
-                      Widgets().createTopLevelResponsiveContainer(context, [
-                        // your widgets here
-
-                        // main performer
-                        if (_mainPerformer != null)
-                          Widgets().createTopLevelCard(
-                            context: context,
-                            title: "Main performer",
-                            child: ListTile(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Profile(
-                                      title: "Main performer",
-                                      self: true,
-                                      onProfileSaved: (user) {
-                                        setState(() {
-                                          _mainPerformer = user;
-                                        });
-                                      },
-                                      friendMobile: _mainPerformer!.mobile,
-                                    ),
-                                  ),
-                                );
-                              },
-                              leading: CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(_mainPerformer!.profilePicUrl),
-                              ),
-                              title: Text(
-                                  "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
-                              subtitle: Widgets().createResponsiveRow(
+                      // main performer
+                      if (_mainPerformer != null)
+                        Widgets().createTopLevelCard(
+                          context: context,
+                          title: "Main performer",
+                          child: ListTile(
+                            onTap: () {
+                              Navigator.push(
                                 context,
-                                [
-                                  Icon(Icons.phone),
-                                  Text(_mainPerformer!.mobile),
-                                  SizedBox(width: 4),
-                                  Icon(Icons.workspace_premium),
-                                  Text(_mainPerformer!.credentials),
-                                ],
-                              ),
+                                MaterialPageRoute(
+                                  builder: (context) => Profile(
+                                    title: "Main performer",
+                                    self: true,
+                                    onProfileSaved: (user) {
+                                      setState(() {
+                                        _mainPerformer = user;
+                                      });
+                                    },
+                                    friendMobile: _mainPerformer!.mobile,
+                                  ),
+                                ),
+                              );
+                            },
+                            leading: CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(_mainPerformer!.profilePicUrl),
+                            ),
+                            title: Text(
+                                "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
+                            subtitle: Widgets().createResponsiveRow(
+                              context,
+                              [
+                                Icon(Icons.phone),
+                                Text(_mainPerformer!.mobile),
+                                SizedBox(width: 4),
+                                Icon(Icons.workspace_premium),
+                                Text(_mainPerformer!.credentials),
+                              ],
                             ),
                           ),
-
-                        // supporting team
-                        Widgets().createTopLevelCard(
-                          context: context,
-                          title: "Supporting team",
-                          child: Column(
-                            children: [
-                              Widgets().createTopLevelResponsiveContainer(
-                                  context,
-                                  List.generate(_supportingTeam.length,
-                                      (index) {
-                                    return _createSupportingTeamTile(index);
-                                  })),
-
-                              // button - add supporting team
-                              if (widget.readOnly == null)
-                                TextButton(
-                                    onPressed: () async {
-                                      await _showAddSupportTeamDialog(
-                                          context: context);
-                                    },
-                                    child: Text(
-                                      _supportingTeam.isEmpty
-                                          ? "Add supporting team"
-                                          : "Add more members",
-                                    )),
-                            ],
-                          ),
                         ),
 
-                        // guests
-                        Widgets().createTopLevelCard(
-                          context: context,
-                          title: "Guests",
-                          child: Column(
-                            children: [
-                              Widgets().createTopLevelResponsiveContainer(
-                                  context,
-                                  List.generate(_guests.length, (index) {
-                                    return _createGuestTile(index);
-                                  })),
-
-                              // button
-                              if (widget.readOnly == null)
-                                TextButton(
-                                    onPressed: () {
-                                      _showAddGuestDialog(context: context);
-                                    },
-                                    child: Text(_guests.isEmpty
-                                        ? "Add guest"
-                                        : "Add more guests")),
-                            ],
-                          ),
-                        ),
-
-                        // list of songs
-                        Widgets().createTopLevelCard(
-                            context: context,
-                            title: "List of songs",
-                            child: Column(children: [
-                              ...List.generate(_songs.length, (index) {
-                                return _createSongTile(index);
-                              }),
-
-                              // button
-                              if (_songs.length < 10 && widget.readOnly == null)
-                                TextButton(
-                                    onPressed: () async {
-                                      await _showAddSongDialog(
-                                          context: context);
-                                    },
-                                    child: Text(_songs.isEmpty
-                                        ? "Add song for event"
-                                        : "Add more songs")),
-                            ])),
-
-                        // performer note
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      // supporting team
+                      Widgets().createTopLevelCard(
+                        context: context,
+                        title: "Supporting team",
+                        child: Column(
                           children: [
-                            Text("Note:",
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall),
-                            TextField(
-                              maxLines: 2,
-                              controller: _noteController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: "optional note for performer",
-                              ),
-                            ),
+                            Widgets().createTopLevelResponsiveContainer(
+                                context,
+                                List.generate(_supportingTeam.length, (index) {
+                                  return _createSupportingTeamTile(index);
+                                })),
+
+                            // button - add supporting team
+                            if (widget.readOnly == null)
+                              TextButton(
+                                  onPressed: () async {
+                                    await _showAddSupportTeamDialog(
+                                        context: context);
+                                  },
+                                  child: Text(
+                                    _supportingTeam.isEmpty
+                                        ? "Add supporting team"
+                                        : "Add more members",
+                                  )),
                           ],
                         ),
-                      ]),
+                      ),
+
+                      // guests
+                      Widgets().createTopLevelCard(
+                        context: context,
+                        title: "Guests",
+                        child: Column(
+                          children: [
+                            Widgets().createTopLevelResponsiveContainer(
+                                context,
+                                List.generate(_guests.length, (index) {
+                                  return _createGuestTile(index);
+                                })),
+
+                            // button
+                            if (widget.readOnly == null)
+                              TextButton(
+                                  onPressed: () {
+                                    _showAddGuestDialog(context: context);
+                                  },
+                                  child: Text(_guests.isEmpty
+                                      ? "Add guest"
+                                      : "Add more guests")),
+                          ],
+                        ),
+                      ),
+
+                      // list of songs
+                      Widgets().createTopLevelCard(
+                          context: context,
+                          title: "List of songs",
+                          child: Column(children: [
+                            ...List.generate(_songs.length, (index) {
+                              return _createSongTile(index);
+                            }),
+
+                            // button
+                            if (_songs.length < 10 && widget.readOnly == null)
+                              TextButton(
+                                  onPressed: () async {
+                                    await _showAddSongDialog(context: context);
+                                  },
+                                  child: Text(_songs.isEmpty
+                                      ? "Add song for event"
+                                      : "Add more songs")),
+                          ])),
+
+                      // performer note
+                      Widgets().createTopLevelCard(
+                          context: context,
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Note:",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall),
+                                TextField(
+                                  maxLines: 2,
+                                  controller: _noteController,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: "optional note for performer",
+                                  ),
+                                ),
+                              ])),
 
                       // submit button
                       SizedBox(height: 20),

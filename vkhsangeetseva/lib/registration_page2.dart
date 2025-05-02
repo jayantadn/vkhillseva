@@ -416,6 +416,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     }
 
     FocusNode focusNode = FocusNode();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     return showDialog(
       context: context,
       builder: (context) {
@@ -427,30 +428,49 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         return AlertDialog(
           title: Text(oldUser == null ? "Add guest" : "Edit guest"),
           content: SingleChildScrollView(
-            child: Column(
-              children: [
-                // name
-                TextField(
-                  controller: _guestNameController,
-                  focusNode: focusNode,
-                  decoration: InputDecoration(labelText: "Name"),
-                ),
+            child: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  // name
+                  TextFormField(
+                    controller: _guestNameController,
+                    focusNode: focusNode,
+                    decoration: InputDecoration(labelText: "Name"),
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.length < 3 ||
+                          value.length > 30) {
+                        return "Please enter a valid name";
+                      }
+                      if (RegExp(r'[0-9!@#$%^&*(),.?":{}|<>]')
+                          .hasMatch(value)) {
+                        return "Numbers and special characters are not allowed";
+                      }
+                      if (_guests.any((guest) => guest.name == value)) {
+                        return "Guest already exists";
+                      }
+                      return null;
+                    },
+                  ),
 
-                // honor prasadam
-                StatefulBuilder(
-                  builder: (context, setState) {
-                    return CheckboxListTile(
-                      title: Text("Honor Prasadam"),
-                      value: honorPrasadam,
-                      onChanged: (newValue) {
-                        setState(() {
-                          honorPrasadam = newValue!;
-                        });
-                      },
-                    );
-                  },
-                )
-              ],
+                  // honor prasadam
+                  StatefulBuilder(
+                    builder: (context, setState) {
+                      return CheckboxListTile(
+                        title: Text("Honor Prasadam"),
+                        value: honorPrasadam,
+                        onChanged: (newValue) {
+                          setState(() {
+                            honorPrasadam = newValue!;
+                          });
+                        },
+                      );
+                    },
+                  )
+                ],
+              ),
             ),
           ),
           actions: [
@@ -460,8 +480,14 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
               },
               child: Text("Cancel"),
             ),
+
+            // add button
             ElevatedButton(
               onPressed: () {
+                if (!formKey.currentState!.validate()) {
+                  return;
+                }
+
                 Navigator.pop(context);
 
                 setState(() {
@@ -516,20 +542,21 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 children: [
                   // title
                   TextFormField(
-                    controller: _titleController,
-                    focusNode: focusNode,
-                    onChanged: (value) {},
-                    decoration: InputDecoration(labelText: "Song title"),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter song title";
-                      }
-                      if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-                        return "Special characters are not allowed";
-                      }
-                      return null;
-                    },
-                  ),
+                      controller: _titleController,
+                      focusNode: focusNode,
+                      onChanged: (value) {},
+                      decoration: InputDecoration(labelText: "Song title"),
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value.length < 3) {
+                          return "Please enter a valid name";
+                        }
+                        if (RegExp(r'[0-9!@#$%^&*(),.?":{}|<>]')
+                            .hasMatch(value)) {
+                          return "Special characters are not allowed";
+                        }
+                      }),
 
                   // Raaga
                   SizedBox(height: 10),
@@ -646,9 +673,20 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       salutation = value!;
                     },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please select a salutation";
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.length < 3 ||
+                          value.length > 30) {
+                        return "Please enter a valid name";
                       }
+                      if (RegExp(r'[0-9!@#$%^&*(),.?":{}|<>]')
+                          .hasMatch(value)) {
+                        return "Special characters are not allowed";
+                      }
+                      if (_supportingTeam.any((s) => s.name == value)) {
+                        return "Member already exists";
+                      }
+
                       return null;
                     },
                   ),
@@ -659,9 +697,20 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                     focusNode: focusNode,
                     decoration: InputDecoration(labelText: "Name"),
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter a name";
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.length < 3 ||
+                          value.length > 30) {
+                        return "Please enter a valid name";
                       }
+                      if (RegExp(r'[0-9!@#$%^&*(),.?":{}|<>]')
+                          .hasMatch(value)) {
+                        return "Numbers and special characters are not allowed";
+                      }
+                      if (_guests.any((guest) => guest.name == value)) {
+                        return "Guest already exists";
+                      }
+
                       return null;
                     },
                   ),

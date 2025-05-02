@@ -149,7 +149,8 @@ class _PendingRequestsState extends State<PendingRequests> {
     });
   }
 
-  Widget _createPendingRequestCard(EventRecord pendingRequest, int index) {
+  Widget _createPendingRequestCard(int index) {
+    EventRecord pendingRequest = _linkedEventRecords[index];
     String title = DateFormat("dd MMM, yyyy").format(pendingRequest.date);
     title += " (${pendingRequest.slot.from} - ${pendingRequest.slot.to})";
     String performer = _mainPerformers[index].name;
@@ -210,8 +211,7 @@ class _PendingRequestsState extends State<PendingRequests> {
                               );
                             }));
                           },
-                          child: _createPendingRequestCard(
-                              _linkedEventRecords[index], index),
+                          child: _createPendingRequestCard(index),
                         );
                       }),
 

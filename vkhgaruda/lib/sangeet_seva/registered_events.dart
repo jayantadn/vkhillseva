@@ -24,7 +24,7 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
 
   // lists
   final List<EventRecord> _events = [];
-  final List<PerformerProfile> _mainPerformers = [];
+  final Map<String, PerformerProfile> _mainPerformers = {};
 
   // controllers, listeners and focus nodes
 
@@ -73,11 +73,22 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
           var mainPerformer =
               await SSUtils().getPerformerProfile(event.mainPerformerMobile);
           if (mainPerformer != null) {
-            _mainPerformers.add(mainPerformer);
+            _mainPerformers[mainPerformer.mobile] = mainPerformer;
           }
         }
       }
     }
+
+    // sort events by date
+    _events.sort((a, b) {
+      if (a.date.isBefore(b.date)) {
+        return -1;
+      } else if (a.date.isAfter(b.date)) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
 
     // refresh all child widgets
 
@@ -97,8 +108,13 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
   Widget _createEventCard(index) {
     String title = DateFormat("dd MMM, yyyy").format(_events[index].date);
     title += " (${_events[index].slot.from} - ${_events[index].slot.to})";
-    String performer = _mainPerformers[index].name;
-    String profilePicUrl = _mainPerformers[index].profilePicUrl;
+    String mobile = _events[index].mainPerformerMobile;
+    if (_mainPerformers[mobile] == null) {
+      Toaster().error("Could not find user");
+      return const SizedBox();
+    }
+    String performer = _mainPerformers[mobile]!.name;
+    String profilePicUrl = _mainPerformers[mobile]!.profilePicUrl;
 
     return Card(
         child: ListTile(
@@ -112,7 +128,7 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
           Text(performer),
           SizedBox(width: 10),
           Icon(Icons.phone),
-          Text(_mainPerformers[index].mobile),
+          Text(mobile),
         ],
       ),
     ));

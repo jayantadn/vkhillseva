@@ -47,17 +47,11 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
     // access control
 
-    // perform async operations here
-
-    // refresh all child widgets
-
     await _lock.synchronized(() async {
-      // fetch form values
-
-      // perform sync operations here
+      // your code here
     });
 
-    // perform any remaining async operations here
+    // refresh all child widgets
 
     setState(() {
       _isLoading = false;

@@ -49,54 +49,45 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
       _isLoading = true;
     });
 
-    // access control
+    await _lock.synchronized(() async {
+      // fetch user basic data
+      await Utils().fetchUserBasics();
+      UserBasics? userBasics = Utils().getUserBasics();
+      if (userBasics == null) {
+        Toaster().error(
+          "Unable to fetch user data.",
+        );
+        return;
+      }
 
-    // perform async operations here
-
-    // fetch user basic data
-    await Utils().fetchUserBasics();
-    UserBasics? userBasics = Utils().getUserBasics();
-    if (userBasics == null) {
-      Toaster().error(
-        "Unable to fetch user data.",
-      );
-      return;
-    }
-
-    // populate registered events list
-    _events.clear();
-    String dbpath = "${Const().dbrootSangeetSeva}/Events/${userBasics.mobile}";
-    var kvs = await FB()
-        .getValuesByDateRange(path: dbpath, startDate: DateTime.now());
-    if (kvs.isNotEmpty) {
-      for (var kv in kvs.entries) {
-        var eventsRaw = kv.value;
-        for (var eventMap in eventsRaw.entries) {
-          var eventRaw = eventMap.value;
-          EventRecord event =
-              Utils().convertRawToDatatype(eventRaw, EventRecord.fromJson);
-          _events.add(event);
+      // populate registered events list
+      _events.clear();
+      String dbpath =
+          "${Const().dbrootSangeetSeva}/Events/${userBasics.mobile}";
+      var kvs = await FB()
+          .getValuesByDateRange(path: dbpath, startDate: DateTime.now());
+      if (kvs.isNotEmpty) {
+        for (var kv in kvs.entries) {
+          var eventsRaw = kv.value;
+          for (var eventMap in eventsRaw.entries) {
+            var eventRaw = eventMap.value;
+            EventRecord event =
+                Utils().convertRawToDatatype(eventRaw, EventRecord.fromJson);
+            _events.add(event);
+          }
         }
       }
-    }
 
-    // sort events by date
-    _events.sort((a, b) {
-      if (a.date.isBefore(b.date)) {
-        return -1;
-      } else if (a.date.isAfter(b.date)) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-
-    // refresh all child widgets
-
-    await _lock.synchronized(() async {
-      // fetch form values
-
-      // perform sync operations here
+      // sort events by date
+      _events.sort((a, b) {
+        if (a.date.isBefore(b.date)) {
+          return -1;
+        } else if (a.date.isAfter(b.date)) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
     });
 
     // perform any remaining async operations here

@@ -101,58 +101,57 @@ class _PendingRequestsState extends State<PendingRequests> {
 
     // perform async operations here
 
-    // fetch pending requests
-    _linkedEventRecords.clear();
-    List<Map<String, dynamic>> pendingRequests = [];
-    List<dynamic> pendingRequestLinks = await FB()
-        .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
-    for (var pendingRequestLinkRaw in pendingRequestLinks) {
-      Map<String, dynamic> pendingRequestLink =
-          Map<String, dynamic>.from(pendingRequestLinkRaw);
-      String path = pendingRequestLink['path'];
+    await _lock.synchronized(() async {
+      // fetch pending requests
+      _linkedEventRecords.clear();
+      List<Map<String, dynamic>> pendingRequests = [];
+      List<dynamic> pendingRequestLinks = await FB()
+          .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
+      for (var pendingRequestLinkRaw in pendingRequestLinks) {
+        Map<String, dynamic> pendingRequestLink =
+            Map<String, dynamic>.from(pendingRequestLinkRaw);
+        String path = pendingRequestLink['path'];
 
-      var pendingRequestPerUserRaw = await FB().getValue(path: path);
-      EventRecord pendingRequest = Utils()
-          .convertRawToDatatype(pendingRequestPerUserRaw, EventRecord.fromJson);
+        var pendingRequestPerUserRaw = await FB().getValue(path: path);
+        EventRecord pendingRequest = Utils().convertRawToDatatype(
+            pendingRequestPerUserRaw, EventRecord.fromJson);
 
-      // discard if pending request is in the past
-      if (pendingRequest.date.isAfter(DateTime.now())) {
-        pendingRequests.add({'path': path});
-        _linkedEventRecords.add(pendingRequest);
+        // discard if pending request is in the past
+        if (pendingRequest.date.isAfter(DateTime.now())) {
+          pendingRequests.add({'path': path});
+          _linkedEventRecords.add(pendingRequest);
+        }
       }
-    }
-    if (pendingRequests.length != pendingRequestLinks.length) {
-      // outdated requests detected
-      await FB().setValue(
-          path: "${Const().dbrootSangeetSeva}/PendingRequests",
-          value: pendingRequests);
-    }
-
-    // fetch main performers
-
-    for (EventRecord pendingRequest in _linkedEventRecords) {
-      PerformerProfile? mainPerformer = await SSUtils()
-          .getPerformerProfile(pendingRequest.mainPerformerMobile);
-      if (mainPerformer != null) {
-        _mainPerformers[mainPerformer.mobile] = mainPerformer;
+      if (pendingRequests.length != pendingRequestLinks.length) {
+        // outdated requests detected
+        await FB().setValue(
+            path: "${Const().dbrootSangeetSeva}/PendingRequests",
+            value: pendingRequests);
       }
-    }
 
-    // sort the linked event records
-    _linkedEventRecords.sort((a, b) {
-      if (a.date.isBefore(b.date)) {
-        return -1;
-      } else if (a.date.isAfter(b.date)) {
-        return 1;
-      } else {
-        return 0;
+      // fetch main performers
+
+      for (EventRecord pendingRequest in _linkedEventRecords) {
+        PerformerProfile? mainPerformer = await SSUtils()
+            .getPerformerProfile(pendingRequest.mainPerformerMobile);
+        if (mainPerformer != null) {
+          _mainPerformers[mainPerformer.mobile] = mainPerformer;
+        }
       }
+
+      // sort the linked event records
+      _linkedEventRecords.sort((a, b) {
+        if (a.date.isBefore(b.date)) {
+          return -1;
+        } else if (a.date.isAfter(b.date)) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+
+      // refresh all child widgets
     });
-
-    // refresh all child widgets
-
-    // perform sync operations here
-    await _lock.synchronized(() async {});
 
     setState(() {
       _isLoading = false;

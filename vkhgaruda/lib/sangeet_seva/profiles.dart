@@ -48,21 +48,18 @@ class _ProfilesState extends State<Profiles> {
       _isLoading = true;
     });
 
-    // perform async operations here
-    _performers.clear();
-    List<dynamic> usersRawList = await FB().getList(
-      path: "${Const().dbrootSangeetSeva}/Users",
-    );
-    for (var userRaw in usersRawList) {
-      Map<String, dynamic> userJson = Map<String, dynamic>.from(userRaw);
-      PerformerProfile user = PerformerProfile.fromJson(userJson);
-      _performers.add(user);
-    }
-
-    // refresh all child widgets
-
-    // perform sync operations here
-    await _lock.synchronized(() async {});
+    await _lock.synchronized(() async {
+      // perform async operations here
+      _performers.clear();
+      List<dynamic> usersRawList = await FB().getList(
+        path: "${Const().dbrootSangeetSeva}/Users",
+      );
+      for (var userRaw in usersRawList) {
+        Map<String, dynamic> userJson = Map<String, dynamic>.from(userRaw);
+        PerformerProfile user = PerformerProfile.fromJson(userJson);
+        _performers.add(user);
+      }
+    });
 
     setState(() {
       _isLoading = false;

@@ -24,9 +24,8 @@ class _PendingRequestsState extends State<PendingRequests> {
   DateTime _lastCallbackInvoked = DateTime.now();
 
   // lists
-  final List<Map<String, dynamic>> _pendingRequests = [];
   final List<EventRecord> _linkedEventRecords = [];
-  final List<PerformerProfile> _mainPerformers = [];
+  final Map<String, PerformerProfile> _mainPerformers = {};
 
   // controllers, listeners and focus nodes
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
@@ -86,7 +85,6 @@ class _PendingRequestsState extends State<PendingRequests> {
   dispose() {
     // clear all lists
     _linkedEventRecords.clear();
-    _pendingRequests.clear();
     _mainPerformers.clear();
 
     // clear all controllers and focus nodes
@@ -106,7 +104,7 @@ class _PendingRequestsState extends State<PendingRequests> {
 
     // fetch pending requests
     _linkedEventRecords.clear();
-    _pendingRequests.clear();
+    List<Map<String, dynamic>> pendingRequests = [];
     List<dynamic> pendingRequestLinks = await FB()
         .getList(path: "${Const().dbrootSangeetSeva}/PendingRequests");
     for (var pendingRequestLinkRaw in pendingRequestLinks) {
@@ -120,15 +118,15 @@ class _PendingRequestsState extends State<PendingRequests> {
 
       // discard if pending request is in the past
       if (pendingRequest.date.isAfter(DateTime.now())) {
-        _pendingRequests.add({'path': path});
+        pendingRequests.add({'path': path});
         _linkedEventRecords.add(pendingRequest);
       }
     }
-    if (_pendingRequests.length != pendingRequestLinks.length) {
+    if (pendingRequests.length != pendingRequestLinks.length) {
       // outdated requests detected
       await FB().setValue(
           path: "${Const().dbrootSangeetSeva}/PendingRequests",
-          value: _pendingRequests);
+          value: pendingRequests);
     }
 
     // fetch main performers
@@ -136,8 +134,21 @@ class _PendingRequestsState extends State<PendingRequests> {
     for (EventRecord pendingRequest in _linkedEventRecords) {
       PerformerProfile? mainPerformer = await SSUtils()
           .getPerformerProfile(pendingRequest.mainPerformerMobile);
-      if (mainPerformer != null) _mainPerformers.add(mainPerformer);
+      if (mainPerformer != null) {
+        _mainPerformers[mainPerformer.mobile] = mainPerformer;
+      }
     }
+
+    // sort the linked event records
+    _linkedEventRecords.sort((a, b) {
+      if (a.date.isBefore(b.date)) {
+        return -1;
+      } else if (a.date.isAfter(b.date)) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
 
     // refresh all child widgets
 
@@ -153,8 +164,10 @@ class _PendingRequestsState extends State<PendingRequests> {
     EventRecord pendingRequest = _linkedEventRecords[index];
     String title = DateFormat("dd MMM, yyyy").format(pendingRequest.date);
     title += " (${pendingRequest.slot.from} - ${pendingRequest.slot.to})";
-    String performer = _mainPerformers[index].name;
-    String profilePicUrl = _mainPerformers[index].profilePicUrl;
+    String performer =
+        _mainPerformers[pendingRequest.mainPerformerMobile]!.name;
+    String profilePicUrl =
+        _mainPerformers[pendingRequest.mainPerformerMobile]!.profilePicUrl;
 
     return Widgets().createTopLevelCard(
         context: context,
@@ -167,7 +180,7 @@ class _PendingRequestsState extends State<PendingRequests> {
               Text(performer),
               SizedBox(width: 10),
               Icon(Icons.phone),
-              Text(_mainPerformers[index].mobile),
+              Text(_mainPerformers[pendingRequest.mainPerformerMobile]!.mobile),
             ],
           ),
         ));
@@ -194,18 +207,30 @@ class _PendingRequestsState extends State<PendingRequests> {
 
                       // your widgets here
                       ...List.generate(_linkedEventRecords.length, (index) {
+                        // get the path of the pending request
+                        EventRecord event = _linkedEventRecords[index];
+                        String mobile = event.mainPerformerMobile;
+                        String date =
+                            DateFormat("yyyy-MM-dd").format(event.date);
+                        String slot = event.slot.name;
+                        String path =
+                            "${Const().dbrootSangeetSeva}/Events/$mobile/$date/$slot";
+                        Map<String, dynamic> pendingRequest = {
+                          'path': path,
+                        };
+
+                        // create the card
                         return GestureDetector(
                           onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
                               return RequestDetails(
                                 title: "Request Details",
-                                pendingRequest: _pendingRequests[index],
+                                pendingRequest: pendingRequest,
                                 eventRecord: _linkedEventRecords[index],
                                 callbackDelete: (String action) {
                                   setState(() {
                                     _linkedEventRecords.removeAt(index);
-                                    _pendingRequests.removeAt(index);
                                   });
                                 },
                               );

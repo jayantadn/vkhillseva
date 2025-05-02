@@ -81,6 +81,39 @@ class _RequestDetailsState extends State<RequestDetails> {
       if (action == "Approve") {
         Toaster().error("Event is already approved");
         return;
+      } else {
+        // reject an approved event
+
+        // delete from booked events
+        String dbdate =
+            DateFormat("yyyy-MM-dd").format(widget.eventRecord.date);
+        String slotName = widget.eventRecord.slot.name;
+        String bookedEventPath =
+            "${Const().dbrootSangeetSeva}/BookedEvents/$dbdate";
+        String eventPath =
+            "${Const().dbrootSangeetSeva}/Events/${widget.eventRecord.mainPerformerMobile}/$dbdate/$slotName";
+        List bookedEventsRaw = await FB().getList(path: bookedEventPath);
+        List bookedEventsOutput = [];
+        for (var bookedEventRaw in bookedEventsRaw) {
+          Map<String, dynamic> bookedEvent =
+              Map<String, dynamic>.from(bookedEventRaw);
+          if (bookedEvent['path'] != eventPath) {
+            bookedEventsOutput.add({"path": bookedEvent['path']});
+          }
+        }
+        await FB().setValue(path: bookedEventPath, value: bookedEventsOutput);
+
+        // change status of event
+        widget.eventRecord.status = "Rejected";
+        widget.eventRecord.noteTemple = _noteController.text;
+        widget.eventRecord.slot.avl = true;
+        await FB().setJson(path: eventPath, json: widget.eventRecord.toJson());
+
+        // mark the availability of the slot
+        String slotPath =
+            "${Const().dbrootSangeetSeva}/Slots/$dbdate/$slotName";
+        await FB()
+            .setJson(path: slotPath, json: widget.eventRecord.slot.toJson());
       }
     } else {
       // event is pending approval
@@ -218,13 +251,12 @@ class _RequestDetailsState extends State<RequestDetails> {
               title: Text(widget.title),
               actions: [
                 // reject button
-                if (widget.pendingRequest != null)
-                  IconButton(
-                    icon: Icon(Icons.close),
-                    onPressed: () {
-                      _showActionDialog("Reject");
-                    },
-                  ),
+                IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () {
+                    _showActionDialog("Reject");
+                  },
+                ),
 
                 // approve button
                 if (widget.pendingRequest != null)

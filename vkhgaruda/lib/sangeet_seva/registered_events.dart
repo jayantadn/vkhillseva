@@ -139,7 +139,9 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(title: Text(widget.title)),
+          appBar: AppBar(
+            title: Text(widget.title),
+          ),
           body: RefreshIndicator(
             onRefresh: refresh,
             child: SingleChildScrollView(

@@ -85,7 +85,6 @@ class _PendingRequestsState extends State<PendingRequests> {
   dispose() {
     // clear all lists
     _linkedEventRecords.clear();
-    _mainPerformers.clear();
 
     // clear all controllers and focus nodes
     for (var element in _listeners) {
@@ -130,7 +129,7 @@ class _PendingRequestsState extends State<PendingRequests> {
     }
 
     // fetch main performers
-    _mainPerformers.clear();
+
     for (EventRecord pendingRequest in _linkedEventRecords) {
       PerformerProfile? mainPerformer = await SSUtils()
           .getPerformerProfile(pendingRequest.mainPerformerMobile);
@@ -228,11 +227,7 @@ class _PendingRequestsState extends State<PendingRequests> {
                                 title: "Request Details",
                                 pendingRequest: pendingRequest,
                                 eventRecord: _linkedEventRecords[index],
-                                callbackDelete: (String action) {
-                                  setState(() {
-                                    _linkedEventRecords.removeAt(index);
-                                  });
-                                },
+                                callbackDelete: (String action) {},
                               );
                             }));
                           },

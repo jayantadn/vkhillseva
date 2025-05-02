@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
@@ -21,16 +22,85 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  DateTime _lastCallbackInvoked = DateTime.now();
 
   // lists
   final List<EventRecord> _events = [];
   final Map<String, PerformerProfile> _mainPerformers = {};
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   // controllers, listeners and focus nodes
 
   @override
   initState() {
     super.initState();
+
+    FB().listenForChange(
+        "${Const().dbrootSangeetSeva}/BookedEvents",
+        FBCallbacks(
+          // add
+          add: (data) async {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+            }
+
+            // process the received data
+            // assuming only one data is received
+            String eventPath = data[0]['path'];
+            var eventRaw = await FB().getJson(path: eventPath);
+            EventRecord event =
+                Utils().convertRawToDatatype(eventRaw, EventRecord.fromJson);
+            var mainPerformer =
+                await SSUtils().getPerformerProfile(event.mainPerformerMobile);
+
+            setState(() {
+              _events.add(event);
+
+              if (mainPerformer != null) {
+                _mainPerformers[mainPerformer.mobile] = mainPerformer;
+              }
+            });
+          },
+
+          // edit
+          edit: () {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              refresh();
+            }
+          },
+
+          // delete
+          delete: (data) async {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              // process the received data
+              // assuming only one data is received
+              String eventPath = data[0]['path'];
+              var eventRaw = await FB().getJson(path: eventPath);
+
+              setState(() {
+                EventRecord event = Utils()
+                    .convertRawToDatatype(eventRaw, EventRecord.fromJson);
+
+                _events.removeWhere((EventRecord element) =>
+                    element.date == event.date &&
+                    element.slot.from == event.slot.from &&
+                    element.slot.to == event.slot.to);
+              });
+            }
+          },
+
+          // get listeners
+          getListeners: (listeners) {
+            _listeners = listeners;
+          },
+        ));
 
     refresh();
   }
@@ -42,6 +112,9 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
     _mainPerformers.clear();
 
     // clear all controllers and focus nodes
+    for (var element in _listeners) {
+      element.cancel();
+    }
 
     super.dispose();
   }

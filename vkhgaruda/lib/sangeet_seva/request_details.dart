@@ -114,6 +114,18 @@ class _RequestDetailsState extends State<RequestDetails> {
             "${Const().dbrootSangeetSeva}/Slots/$dbdate/$slotName";
         await FB()
             .setJson(path: slotPath, json: widget.eventRecord.slot.toJson());
+
+        // notify the user
+        String mobile = widget.eventRecord.mainPerformerMobile;
+        String fcmToken = await Utils().getFcmToken(mobile);
+        Notifications().sendPushNotification(
+            fcmToken: fcmToken,
+            title:
+                action == "Approve" ? "Request approved" : "Request rejected",
+            body:
+                "Request for ${DateFormat("EEE, dd MMM, yyyy").format(widget.eventRecord.date)} is ${action == 'Approve' ? 'approved' : 'rejected'}",
+            imageUrl:
+                "https://firebasestorage.googleapis.com/v0/b/garuda-1ba07.firebasestorage.app/o/SANGEETSEVA_01%2FAppIcons%2FSangeetSeva_64x64.png?alt=media&token=9e6777cc-014b-4c15-85e4-8c5c0a5282d1");
       }
     } else {
       // event is pending approval

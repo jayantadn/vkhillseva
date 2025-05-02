@@ -235,6 +235,12 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
                         }),
                       ]),
 
+                      // empty message
+                      if (_events.isEmpty)
+                        Center(
+                          child: Text("No events found"),
+                        ),
+
                       // leave some space at bottom
                       SizedBox(height: 100),
                     ],

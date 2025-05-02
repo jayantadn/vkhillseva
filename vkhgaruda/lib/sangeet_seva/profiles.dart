@@ -137,6 +137,12 @@ class _ProfilesState extends State<Profiles> {
                             },
                           ),
 
+                          // empty message
+                          if (_performers.isEmpty)
+                            Center(
+                              child: Text("No profiles found"),
+                            ),
+
                           // leave some space at bottom
                           SizedBox(height: 100),
                         ])))),

@@ -389,9 +389,7 @@ class _ProfileState extends State<Profile> {
                           SizedBox(height: 10),
                           DropdownButton<String>(
                             isExpanded: true,
-                            value: selectedExpertiseType == "Vocal"
-                                ? SSConst().vocalSkills[0]
-                                : SSConst().instrumentSkills[0],
+                            value: selectedSkill,
                             onChanged: (String? newValue) {
                               setState(() {
                                 selectedSkill = newValue!;

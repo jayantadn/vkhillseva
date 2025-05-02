@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
@@ -20,6 +21,7 @@ class _PendingRequestsState extends State<PendingRequests> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  DateTime _lastCallbackInvoked = DateTime.now();
 
   // lists
   final List<Map<String, dynamic>> _pendingRequests = [];
@@ -27,10 +29,55 @@ class _PendingRequestsState extends State<PendingRequests> {
   final List<PerformerProfile> _mainPerformers = [];
 
   // controllers, listeners and focus nodes
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {
     super.initState();
+
+    // listen for changes in the database
+    FB().listenForChange(
+        "${Const().dbrootSangeetSeva}/PendingRequests",
+        FBCallbacks(
+          // add
+          add: (data) {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+            }
+
+            // process the received data
+            // directly refreshing, because there are two lists involved, which is difficult to manage
+            refresh();
+          },
+
+          // edit
+          edit: () {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              refresh();
+            }
+          },
+
+          // delete
+          delete: (data) async {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              // process the received data
+              // directly refreshing, because there are two lists involved, which is difficult to manage
+              refresh();
+            }
+          },
+
+          // get listeners
+          getListeners: (listeners) {
+            _listeners = listeners;
+          },
+        ));
 
     refresh();
   }
@@ -43,6 +90,9 @@ class _PendingRequestsState extends State<PendingRequests> {
     _mainPerformers.clear();
 
     // clear all controllers and focus nodes
+    for (var element in _listeners) {
+      element.cancel();
+    }
 
     super.dispose();
   }

@@ -141,6 +141,30 @@ class _ProfileState extends State<Profile> {
     });
   }
 
+  Widget _createSangeetSadhanaTile(int index) {
+    return ListTile(
+      leading: Text(
+        (index + 1).toString(),
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      title: Text(
+        "${_exp[index].category} - ${_exp[index].subcategory} (${_exp[index].yrs} years)",
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      trailing: IconButton(
+        icon: Icon(
+          Icons.delete,
+          size: 16,
+        ),
+        onPressed: () {
+          setState(() {
+            _exp.removeAt(index);
+          });
+        },
+      ),
+    );
+  }
+
   Future<void> _handleExistingUser(BuildContext context) async {
     // fetch existing user details
     String dbpath =
@@ -273,6 +297,7 @@ class _ProfileState extends State<Profile> {
         Toaster().error('Error uploading file: $e');
       }
 
+      _profilePicUrl = downloadUrl;
       Toaster().info('Image uploaded successfully');
     } else {
       Toaster().error('No image selected');
@@ -280,7 +305,6 @@ class _ProfileState extends State<Profile> {
 
     setState(() {
       _isLoading = false;
-      _profilePicUrl = downloadUrl;
     });
   }
 
@@ -695,8 +719,7 @@ class _ProfileState extends State<Profile> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ...List.generate(_exp.length, (index) {
-                                    return Text(
-                                        "${index + 1}. ${_exp[index].category} - ${_exp[index].subcategory} - ${_exp[index].yrs} years");
+                                    return _createSangeetSadhanaTile(index);
                                   }),
                                 ],
                               ),

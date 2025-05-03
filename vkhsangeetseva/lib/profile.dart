@@ -214,13 +214,39 @@ class _ProfileState extends State<Profile> {
       return;
     }
 
+    XFile? image;
     final ImagePicker picker = ImagePicker();
-    XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    await showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.camera_alt),
+              title: Text('Take a photo'),
+              onTap: () async {
+                image = await picker.pickImage(source: ImageSource.camera);
+                Navigator.of(context).pop();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library),
+              title: Text('Choose from gallery'),
+              onTap: () async {
+                image = await picker.pickImage(source: ImageSource.gallery);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
 
     String downloadUrl = '';
     if (image != null) {
       // compress the image
-      final rawImage = await image.readAsBytes();
+      final rawImage = await image!.readAsBytes();
       final ByteData? byteData = await resizeImage(
           Uint8List.view(rawImage.buffer),
           height: _imagesize.toInt());
@@ -246,6 +272,8 @@ class _ProfileState extends State<Profile> {
       } catch (e) {
         Toaster().error('Error uploading file: $e');
       }
+
+      Toaster().info('Image uploaded successfully');
     } else {
       Toaster().error('No image selected');
     }

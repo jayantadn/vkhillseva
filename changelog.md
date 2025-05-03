@@ -1,3 +1,10 @@
+# 6.4.0
+- feature: welcome banner for sangeet seva
+- feature: view registered events
+- feature: notify admin for new event requests
+- feature: reject approved request
+- fix: selected skill in sangeet sadhana
+
 # 6.3.0
 - feature: new theme generator
 - fix: reset next available slot when no slots are found

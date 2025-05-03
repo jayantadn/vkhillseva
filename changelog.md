@@ -1,3 +1,6 @@
+# 6.4.1
+- fix: minor fixes
+
 # 6.4.0
 - feature: welcome banner for sangeet seva
 - feature: view registered events

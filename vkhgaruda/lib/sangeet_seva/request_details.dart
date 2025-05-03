@@ -420,25 +420,27 @@ class _RequestDetailsState extends State<RequestDetails> {
                                         String title = song.split(":")[0];
                                         String raaga = song.split(":")[1];
                                         String taala = song.split(":")[2];
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8.0),
-                                          child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Row(
-                                              children: [
-                                                Text(
-                                                  "${index + 1}. title: $title",
-                                                ),
-                                                SizedBox(width: 10),
-                                                if (raaga.isNotEmpty)
-                                                  Text("raaga: $raaga"),
-                                                SizedBox(width: 10),
-                                                if (taala.isNotEmpty)
-                                                  Text("taala: $taala"),
-                                              ],
-                                            ),
+                                        return ListTile(
+                                          leading: Text(
+                                            "${index + 1}",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
                                           ),
+                                          title: Text(title),
+                                          subtitle: (raaga.isEmpty &&
+                                                  taala.isEmpty)
+                                              ? null
+                                              : Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    if (raaga.isNotEmpty)
+                                                      Text("Raaga: $raaga"),
+                                                    if (taala.isNotEmpty)
+                                                      Text("Taala: $taala"),
+                                                  ],
+                                                ),
                                         );
                                       }))),
 

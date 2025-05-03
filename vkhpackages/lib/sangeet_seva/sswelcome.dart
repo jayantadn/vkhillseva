@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SSWelcome extends StatefulWidget {
   final Function? onAuthComplete;
@@ -19,6 +20,7 @@ class SSWelcome extends StatefulWidget {
 class SSWelcomeState extends State<SSWelcome> {
   final Lock _lock = Lock();
   String _username = "";
+  String _version = "";
 
   @override
   void initState() {
@@ -38,6 +40,8 @@ class SSWelcomeState extends State<SSWelcome> {
 
   Future<void> refresh() async {
     // perform async work here
+    final packageInfo = await PackageInfo.fromPlatform();
+    _version = packageInfo.version;
 
     // get username from local storage
     await Utils().fetchUserBasics();
@@ -98,6 +102,16 @@ class SSWelcomeState extends State<SSWelcome> {
               color: Theme.of(context).colorScheme.primary,
             ),
           ),
+          if (_version.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'app ver $_version',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall!.copyWith(color: Colors.grey),
+              ),
+            ),
 
           // signup button
           SizedBox(height: 10),

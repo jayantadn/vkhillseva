@@ -20,7 +20,10 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
-  final Widget home = const HomePage(title: "Hare Krishna");
+  final Widget home = const HomePage(
+    title: "Hare Krishna",
+    icon: "assets/images/Logo/SangeetSeva.png",
+  );
   final Widget test = Profile(
     title: "test",
     self: true,

@@ -773,7 +773,9 @@ class _ProfileState extends State<Profile> {
                               // upload audio clip
                               SizedBox(height: 20),
                               Text(
-                                "Upload audio clip of your performance",
+                                (_youtubeLinks.isEmpty && _audioClips.isEmpty)
+                                    ? "Upload audio clip of your performance"
+                                    : "Upload audio clip (optional)",
                                 style:
                                     Theme.of(context).textTheme.headlineSmall,
                               ),

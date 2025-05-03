@@ -38,9 +38,6 @@ class _WelcomeState extends State<Welcome> {
     // perform async work here
     final packageInfo = await PackageInfo.fromPlatform();
     _version = packageInfo.version;
-    // get version
-
-    // _version = await Utils().checkForUpdates("vkhillgaruda");
 
     if (Utils().getUsername().isEmpty) {
       await Utils().fetchUserBasics();
@@ -98,7 +95,9 @@ class _WelcomeState extends State<Welcome> {
       ),
       if (_version.isNotEmpty)
         Text('Garuda v$_version',
-            style: Theme.of(context).textTheme.headlineSmall),
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  color: Colors.grey,
+                )),
     ]);
   }
 }

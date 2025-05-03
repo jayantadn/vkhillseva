@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:fast_image_resizer/fast_image_resizer.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -39,6 +40,7 @@ class _ProfileState extends State<Profile> {
   String _profilePicUrl = '';
   late String _salutation;
   PerformerProfile? _userDetailsOld;
+  final double _imagesize = 150;
 
   // lists
 
@@ -55,7 +57,6 @@ class _ProfileState extends State<Profile> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _credController = TextEditingController();
-  final TextEditingController _experienceController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -208,6 +209,11 @@ class _ProfileState extends State<Profile> {
   }
 
   Future<void> _pickAndUploadImage() async {
+    if (widget.self != null && widget.self == false) {
+      Toaster().error('You cannot change other\'s profile picture');
+      return;
+    }
+
     final ImagePicker picker = ImagePicker();
     XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
@@ -215,8 +221,9 @@ class _ProfileState extends State<Profile> {
     if (image != null) {
       // compress the image
       final rawImage = await image.readAsBytes();
-      final ByteData? byteData =
-          await resizeImage(Uint8List.view(rawImage.buffer), height: 250);
+      final ByteData? byteData = await resizeImage(
+          Uint8List.view(rawImage.buffer),
+          height: _imagesize.toInt());
       if (byteData == null) {
         Toaster().error('Error compressing image');
         return;
@@ -239,16 +246,12 @@ class _ProfileState extends State<Profile> {
       } catch (e) {
         Toaster().error('Error uploading file: $e');
       }
-
-      Toaster().info('Image uploaded');
-      setState(() {
-        _isLoading = false;
-      });
     } else {
       Toaster().error('No image selected');
     }
 
     setState(() {
+      _isLoading = false;
       _profilePicUrl = downloadUrl;
     });
   }
@@ -538,24 +541,26 @@ class _ProfileState extends State<Profile> {
                     Align(
                       alignment: Alignment.center,
                       child: Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                        ),
-                        child: _profilePicUrl.isEmpty
-                            ? TextButton(
-                                onPressed: _pickAndUploadImage,
-                                child: Text("Upload"))
-                            : ClipRRect(
-                                child: Image.network(
-                                  _profilePicUrl,
-                                  fit: BoxFit.cover,
-                                  width: 150,
-                                  height: 150,
-                                ),
-                              ),
-                      ),
+                          width: _imagesize,
+                          height: _imagesize,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                          ),
+                          child: _profilePicUrl.isEmpty
+                              ? TextButton(
+                                  onPressed: _pickAndUploadImage,
+                                  child: Text("Upload"))
+                              : ClipRRect(
+                                  child: GestureDetector(
+                                    onTap: _pickAndUploadImage,
+                                    child: Image.network(
+                                      _profilePicUrl,
+                                      fit: BoxFit.cover,
+                                      width: _imagesize,
+                                      height: _imagesize,
+                                    ),
+                                  ),
+                                )),
                     ),
                     if (_profilePicUrl.isEmpty)
                       Center(child: Text("Upload your profile picture")),
@@ -797,7 +802,7 @@ class _ProfileState extends State<Profile> {
                         String dbpath =
                             "${Const().dbrootSangeetSeva}/Users/${_mobileController.text}";
                         bool exists = await FB().pathExists(dbpath);
-                        if (exists) {
+                        if (exists && (widget.self != null && !widget.self!)) {
                           await _handleExistingUser(context);
                         } else {
                           await _save();

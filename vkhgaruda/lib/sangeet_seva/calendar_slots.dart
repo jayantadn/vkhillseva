@@ -413,7 +413,35 @@ class _CalendarSlotsState extends State<CalendarSlots> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
-              _showFreeSlotDialog(context);
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: Icon(Icons.event_available),
+                          title: Text('Single slot'),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            await _showFreeSlotDialog(context);
+                          },
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.event_note),
+                          title: Text('Multiple slots'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            // Add logic for handling multiple slots here
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
             },
             tooltip: 'Add',
             child: Icon(Icons.add),

@@ -70,14 +70,36 @@ class CalendarState extends State<Calendar> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('${day.day}'),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (int i = 0; i < _bookedSlotsCnt[day.day - 1]; i++)
-                    Icon(Icons.circle, color: Colors.red, size: 5),
-                  for (int i = 0; i < _avlSlotsCnt[day.day - 1]; i++)
-                    Icon(Icons.circle, color: Colors.green, size: 5),
-                ],
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  double maxWidth = constraints.maxWidth;
+                  int maxCircles =
+                      (maxWidth / 6).floor(); // 6 is the size + spacing
+                  int totalCircles =
+                      _bookedSlotsCnt[day.day - 1] + _avlSlotsCnt[day.day - 1];
+                  bool overflow = totalCircles > maxCircles;
+
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for (
+                        int i = 0;
+                        i < _bookedSlotsCnt[day.day - 1] && i < maxCircles;
+                        i++
+                      )
+                        Icon(Icons.circle, color: Colors.red, size: 5),
+                      for (
+                        int i = 0;
+                        i < _avlSlotsCnt[day.day - 1] &&
+                            i + _bookedSlotsCnt[day.day - 1] < maxCircles;
+                        i++
+                      )
+                        Icon(Icons.circle, color: Colors.green, size: 5),
+                      if (overflow)
+                        Icon(Icons.circle, color: Colors.grey, size: 5),
+                    ],
+                  );
+                },
               ),
             ],
           ),

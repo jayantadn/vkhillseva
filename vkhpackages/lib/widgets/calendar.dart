@@ -96,7 +96,7 @@ class CalendarState extends State<Calendar> {
                       )
                         Icon(Icons.circle, color: Colors.green, size: 5),
                       if (overflow)
-                        Icon(Icons.circle, color: Colors.grey, size: 5),
+                        Icon(Icons.circle, color: Colors.black, size: 5),
                     ],
                   );
                 },

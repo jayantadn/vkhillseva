@@ -124,6 +124,63 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     return true;
   }
 
+  Future<bool> _addMultipleSlots(
+    String startTime,
+    String endTime,
+    double duration,
+  ) async {
+    // validations
+    if (startTime == "__:__" || endTime == "__:__") {
+      Toaster().error("Please enter both start and end time");
+      return false;
+    }
+
+    // validate if end time is greater than start time at least by duration
+    try {
+      final DateTime startDateTime =
+          Utils().convertStringToTime(_selectedDate, startTime);
+      final DateTime endDateTime =
+          Utils().convertStringToTime(_selectedDate, endTime);
+
+      // Calculate the duration in minutes
+      int durationInMinutes = (duration * 60).round();
+
+      // Add the duration to the start time
+      final DateTime requiredEndDateTime =
+          startDateTime.add(Duration(minutes: durationInMinutes));
+
+      if (endDateTime.isBefore(requiredEndDateTime)) {
+        Toaster().error(
+            "End time should be greater than start time by at least $duration hours");
+        return false;
+      }
+    } catch (e) {
+      // Handle parsing errors
+      Toaster().error('Error parsing time: $e');
+    }
+
+    // add to database
+    // String dbDate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+    // await FB().addKVToList(
+    //   path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
+    //   key: name,
+    //   value: Slot(
+    //           name: name,
+    //           avl: true,
+    //           from: Utils().convertTimeStringTo12HrFormat(startTime),
+    //           to: Utils().convertTimeStringTo12HrFormat(endTime))
+    //       .toJson(),
+    // );
+
+    // refresh the availability indicators
+    _calendarKey.currentState!.fillAvailabilityIndicators(date: _selectedDate);
+    await _fillBookingLists(_selectedDate);
+
+    setState(() {});
+
+    return true;
+  }
+
   Future<void> _addWeekendFreeSlots(DateTime date) async {
     if (date.weekday == 6 || date.weekday == 7) {
       // fetch the slots for the date
@@ -248,7 +305,153 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     );
   }
 
-  Future<void> _showFreeSlotDialog(BuildContext context) async {
+  Future<void> _showAddMultiSlotDialog(BuildContext context) async {
+    // validation if selected date is in the past
+    if (_selectedDate.isBefore(DateTime.now().subtract(Duration(days: 1)))) {
+      Toaster().error("Date is in the past");
+      return;
+    }
+
+    // get the total number of slots
+    int totalSlots = await SlotUtils().getTotalSlotsCount(_selectedDate);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController nameController = TextEditingController(
+          text: "Slot${totalSlots + 1}",
+        );
+        TextEditingController startTimeController = TextEditingController(
+          text: "__:__",
+        );
+        TextEditingController endTimeController = TextEditingController(
+          text: "__:__",
+        );
+        double duration = 1.5;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Add multiple free slot'),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // start time
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(width: 50, child: Text("From:")),
+                        Text(startTimeController.text),
+                        IconButton(
+                          onPressed: () async {
+                            TimeOfDay? picked = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (picked != null) {
+                              setState(() {
+                                startTimeController.text = picked.format(
+                                  context,
+                                );
+                              });
+                            }
+                          },
+                          icon: Icon(Icons.access_time),
+                        ),
+                      ],
+                    ),
+
+                    // end time
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(width: 50, child: Text("To:")),
+                        Text(endTimeController.text),
+                        IconButton(
+                          onPressed: () async {
+                            TimeOfDay? picked = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (picked != null) {
+                              setState(() {
+                                endTimeController.text = picked.format(context);
+                              });
+                            }
+                          },
+                          icon: Icon(Icons.access_time),
+                        ),
+                      ],
+                    ),
+
+                    // duration
+                    SizedBox(height: 10),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(width: 100, child: Text("Duration:")),
+                          IconButton(
+                            icon: Icon(Icons.remove),
+                            onPressed: () {
+                              setState(() {
+                                if (duration > 0.5) {
+                                  duration -= 0.5;
+                                }
+                              });
+                            },
+                          ),
+                          Text(
+                            "${duration.toStringAsFixed(1)} hrs",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: () {
+                              setState(() {
+                                duration += 0.5;
+                              });
+                            },
+                          ),
+                        ]),
+                  ],
+                ),
+              ),
+
+              // buttons
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('Add'),
+                  onPressed: () async {
+                    bool success = await _addMultipleSlots(
+                        startTimeController.text,
+                        endTimeController.text,
+                        duration);
+
+                    if (success) {
+                      Navigator.of(context).pop();
+                      nameController.dispose();
+                      startTimeController.dispose();
+                      endTimeController.dispose();
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _showAddSingleSlotDialog(BuildContext context) async {
     // validation if selected date is in the past
     if (_selectedDate.isBefore(DateTime.now().subtract(Duration(days: 1)))) {
       Toaster().error("Date is in the past");
@@ -426,15 +629,15 @@ class _CalendarSlotsState extends State<CalendarSlots> {
                           title: Text('Single slot'),
                           onTap: () async {
                             Navigator.pop(context);
-                            await _showFreeSlotDialog(context);
+                            await _showAddSingleSlotDialog(context);
                           },
                         ),
                         ListTile(
                           leading: Icon(Icons.event_note),
                           title: Text('Multiple slots'),
-                          onTap: () {
+                          onTap: () async {
                             Navigator.pop(context);
-                            // Add logic for handling multiple slots here
+                            await _showAddMultiSlotDialog(context);
                           },
                         ),
                       ],

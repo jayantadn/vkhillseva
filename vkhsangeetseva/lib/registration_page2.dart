@@ -1045,26 +1045,27 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       ),
 
                       // performer note
-                      Widgets().createTopLevelCard(
-                        context: context,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Note:",
-                              style: Theme.of(context).textTheme.headlineSmall,
+                      // Widgets().createTopLevelCard(
+                      //   context: context,
+                      //   child:
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Note:",
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          TextField(
+                            maxLines: 2,
+                            controller: _noteController,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: "optional note for performer",
                             ),
-                            TextField(
-                              maxLines: 2,
-                              controller: _noteController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: "optional note for performer",
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
+                      // ),
 
                       // submit button
                       SizedBox(height: 20),

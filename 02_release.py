@@ -145,18 +145,18 @@ def release(app):
         sys.exit(1)
 
     if branch_name != 'main':
-        # print("Undo main patch for testing")
-        # main_file = f'{rootdir}/{app}/lib/main.dart'
-        # search_string = '      home: test,'
-        # replacement_string = '      home: home,\n'
-        # with open(main_file, 'r') as file:
-        #     lines = file.readlines()
-        # with open(main_file, 'w') as file:
-        #     for line in lines:
-        #         if search_string in line:
-        #             file.write(replacement_string)
-        #         else:
-        #             file.write(line)
+        print("Undo main patch for testing")
+        main_file = f'{rootdir}/{app}/lib/main.dart'
+        search_string = '      home: test,'
+        replacement_string = '      home: home,\n'
+        with open(main_file, 'r') as file:
+            lines = file.readlines()
+        with open(main_file, 'w') as file:
+            for line in lines:
+                if search_string in line:
+                    file.write(replacement_string)
+                else:
+                    file.write(line)
 
         print("Applying dart fix")
         os.chdir(f"{rootdir}/{app}")

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:vkhsangeetseva/test.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/home.dart';
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
     title: "Hare Krishna",
     icon: "assets/images/Logo/SangeetSeva.png",
   );
-  final Widget test = Test(
+  final Widget test = HomePage(
     title: "test",
   );
 
@@ -35,7 +34,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sangeet Seva',
       theme: themeSangeetSeva,
-      home: test,
+      home: home,
     );
   }
 }

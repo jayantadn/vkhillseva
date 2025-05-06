@@ -226,7 +226,7 @@ def release(app):
 
 def main():
     set_parameters()
-    release("vkhgaruda")
+    # release("vkhgaruda")
     release("vkhsangeetseva")
 
 if __name__ == '__main__':

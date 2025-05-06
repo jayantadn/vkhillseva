@@ -619,6 +619,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       ).hasMatch(value)) {
                         return "Special characters are not allowed";
                       }
+                      return null;
                     },
                   ),
 

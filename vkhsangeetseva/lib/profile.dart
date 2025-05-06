@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:fast_image_resizer/fast_image_resizer.dart';
 import 'package:firebase_storage/firebase_storage.dart';

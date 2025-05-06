@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhpackages/common/const.dart';
-import 'package:vkhpackages/common/datatypes.dart';
-import 'package:vkhpackages/common/fb.dart';
-import 'package:vkhpackages/common/utils.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class NextAvlSlot extends StatefulWidget {

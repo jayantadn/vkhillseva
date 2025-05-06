@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhsangeetseva/profile.dart';
-import 'package:vkhsangeetseva/registered_events.dart';
-import 'package:vkhsangeetseva/registration_page2.dart';
-import 'package:vkhsangeetseva/slot_selection.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/home.dart';

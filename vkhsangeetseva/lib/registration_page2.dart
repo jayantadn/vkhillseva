@@ -148,33 +148,31 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         style: Theme.of(context).textTheme.bodyLarge,
       ),
       title: Text(title),
-      subtitle:
-          (raaga.isNotEmpty && taala.isNotEmpty)
-              ? Row(
-                children: [
-                  Text("raaga: $raaga"),
-                  SizedBox(width: 10),
-                  Text("taala: $taala"),
-                ],
-              )
-              : null,
-      trailing:
-          widget.readOnly != null
-              ? null
-              : Widgets().createContextMenu(["Edit", "Delete"], (
-                String action,
-              ) {
-                switch (action) {
-                  case "Edit":
-                    _showAddSongDialog(context: context, index: index);
-                    break;
-                  case "Delete":
-                    setState(() {
-                      _songs.removeAt(index);
-                    });
-                    break;
-                }
-              }),
+      subtitle: (raaga.isNotEmpty && taala.isNotEmpty)
+          ? Row(
+              children: [
+                Text("raaga: $raaga"),
+                SizedBox(width: 10),
+                Text("taala: $taala"),
+              ],
+            )
+          : null,
+      trailing: widget.readOnly != null
+          ? null
+          : Widgets().createContextMenu(["Edit", "Delete"], (
+              String action,
+            ) {
+              switch (action) {
+                case "Edit":
+                  _showAddSongDialog(context: context, index: index);
+                  break;
+                case "Delete":
+                  setState(() {
+                    _songs.removeAt(index);
+                  });
+                  break;
+              }
+            }),
     );
   }
 
@@ -201,26 +199,25 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           ],
         ),
       ),
-      trailing:
-          widget.readOnly != null
-              ? null
-              : Widgets().createContextMenu(["Edit", "Remove"], (
-                String action,
-              ) async {
-                switch (action) {
-                  case "Edit":
-                    await _showAddSupportTeamDialog(
-                      context: context,
-                      oldUser: member,
-                    );
-                    break;
-                  case "Remove":
-                    setState(() {
-                      _supportingTeam.removeAt(index);
-                    });
-                    break;
-                }
-              }),
+      trailing: widget.readOnly != null
+          ? null
+          : Widgets().createContextMenu(["Edit", "Remove"], (
+              String action,
+            ) async {
+              switch (action) {
+                case "Edit":
+                  await _showAddSupportTeamDialog(
+                    context: context,
+                    oldUser: member,
+                  );
+                  break;
+                case "Remove":
+                  setState(() {
+                    _supportingTeam.removeAt(index);
+                  });
+                  break;
+              }
+            }),
     );
   }
 
@@ -245,26 +242,25 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           ],
         ),
       ),
-      trailing:
-          widget.readOnly != null
-              ? null
-              : Widgets().createContextMenu(["Edit", "Remove"], (
-                String action,
-              ) async {
-                switch (action) {
-                  case "Edit":
-                    await _showAddGuestDialog(
-                      context: context,
-                      oldUser: member,
-                    );
-                    break;
-                  case "Remove":
-                    setState(() {
-                      _guests.removeAt(index);
-                    });
-                    break;
-                }
-              }),
+      trailing: widget.readOnly != null
+          ? null
+          : Widgets().createContextMenu(["Edit", "Remove"], (
+              String action,
+            ) async {
+              switch (action) {
+                case "Edit":
+                  await _showAddGuestDialog(
+                    context: context,
+                    oldUser: member,
+                  );
+                  break;
+                case "Remove":
+                  setState(() {
+                    _guests.removeAt(index);
+                  });
+                  break;
+              }
+            }),
     );
   }
 
@@ -729,17 +725,15 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                   // salutation
                   DropdownButtonFormField<String>(
                     decoration: InputDecoration(labelText: "Salutation"),
-                    value:
-                        salutation.isNotEmpty
-                            ? salutation
-                            : SSConst().salutations.first,
-                    items:
-                        SSConst().salutations.map((salutation) {
-                          return DropdownMenuItem<String>(
-                            value: salutation,
-                            child: Text(salutation),
-                          );
-                        }).toList(),
+                    value: salutation.isNotEmpty
+                        ? salutation
+                        : SSConst().salutations.first,
+                    items: SSConst().salutations.map((salutation) {
+                      return DropdownMenuItem<String>(
+                        value: salutation,
+                        child: Text(salutation),
+                      );
+                    }).toList(),
                     onChanged: (value) {
                       salutation = value!;
                     },
@@ -792,17 +786,16 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                   DropdownButtonFormField<String>(
                     decoration: InputDecoration(labelText: "Specialization"),
                     value: specialization,
-                    items:
-                        [
-                          "Vocalist",
-                          ...SSConst().instrumentSkills,
-                          "Other",
-                        ].map((specialization) {
-                          return DropdownMenuItem<String>(
-                            value: specialization,
-                            child: Text(specialization),
-                          );
-                        }).toList(),
+                    items: [
+                      "Vocalist",
+                      ...SSConst().instrumentSkills,
+                      "Other",
+                    ].map((specialization) {
+                      return DropdownMenuItem<String>(
+                        value: specialization,
+                        child: Text(specialization),
+                      );
+                    }).toList(),
                     onChanged: (value) {
                       specialization = value!;
                     },
@@ -860,245 +853,233 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Scaffold(
-          appBar: AppBar(
-            title: Text(widget.title),
-            actions: [
-              if (widget.oldEvent != null && widget.readOnly == null)
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    Widgets().showConfirmDialog(
-                      context,
-                      "Are you sure you want to delete this event?",
-                      "Delete",
-                      () async {
-                        await _deleteEvent();
-                      },
-                    );
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: [
+          if (widget.oldEvent != null && widget.readOnly == null)
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                Widgets().showConfirmDialog(
+                  context,
+                  "Are you sure you want to delete this event?",
+                  "Delete",
+                  () async {
+                    await _deleteEvent();
                   },
-                ),
-            ],
-          ),
-          body: RefreshIndicator(
-            onRefresh: refresh,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: Column(
-                    children: [
-                      // leave some space at top
-                      SizedBox(height: 10),
+                );
+              },
+            ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Column(
+                children: [
+                  // leave some space at top
+                  SizedBox(height: 10),
 
-                      // date
-                      Text(
-                        DateFormat(
-                          "EEE, dd MMM, yyyy",
-                        ).format(widget.selectedDate),
-                        style: Theme.of(context).textTheme.headlineLarge,
+                  // date
+                  Text(
+                    DateFormat(
+                      "EEE, dd MMM, yyyy",
+                    ).format(widget.selectedDate),
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  ),
+
+                  // slot
+                  Text(
+                    "${widget.slot.from} - ${widget.slot.to}",
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+
+                  // temple notes
+                  SizedBox(height: 10),
+                  if (widget.oldEvent != null &&
+                      widget.oldEvent!.noteTemple.isNotEmpty)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.yellow,
+                        border: Border.all(color: Colors.black, width: 2),
                       ),
-
-                      // slot
-                      Text(
-                        "${widget.slot.from} - ${widget.slot.to}",
-                        style: Theme.of(context).textTheme.headlineMedium,
+                      child: ListTile(
+                        title: Text("Notes from temple"),
+                        subtitle: Text(widget.oldEvent!.noteTemple),
                       ),
+                    ),
+                  SizedBox(height: 10),
 
-                      // temple notes
-                      SizedBox(height: 10),
-                      if (widget.oldEvent != null &&
-                          widget.oldEvent!.noteTemple.isNotEmpty)
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.yellow,
-                            border: Border.all(color: Colors.black, width: 2),
-                          ),
-                          child: ListTile(
-                            title: Text("Notes from temple"),
-                            subtitle: Text(widget.oldEvent!.noteTemple),
+                  // main performer
+                  if (_mainPerformer != null)
+                    Widgets().createTopLevelCard(
+                      context: context,
+                      title: "Main performer",
+                      child: ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Profile(
+                                title: "Main performer",
+                                self: true,
+                                onProfileSaved: (user) {
+                                  setState(() {
+                                    _mainPerformer = user;
+                                  });
+                                },
+                                friendMobile: _mainPerformer!.mobile,
+                              ),
+                            ),
+                          );
+                        },
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            _mainPerformer!.profilePicUrl,
                           ),
                         ),
-                      SizedBox(height: 10),
+                        title: Text(
+                          "${_mainPerformer!.salutation} ${_mainPerformer!.name}",
+                        ),
+                        subtitle: Widgets().createResponsiveRow(context, [
+                          Icon(Icons.phone),
+                          Text(_mainPerformer!.mobile),
+                          SizedBox(width: 4),
+                          Icon(Icons.workspace_premium),
+                          Text(_mainPerformer!.credentials),
+                        ]),
+                      ),
+                    ),
 
-                      // main performer
-                      if (_mainPerformer != null)
-                        Widgets().createTopLevelCard(
-                          context: context,
-                          title: "Main performer",
-                          child: ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => Profile(
-                                        title: "Main performer",
-                                        self: true,
-                                        onProfileSaved: (user) {
-                                          setState(() {
-                                            _mainPerformer = user;
-                                          });
-                                        },
-                                        friendMobile: _mainPerformer!.mobile,
-                                      ),
-                                ),
+                  // supporting team
+                  Widgets().createTopLevelCard(
+                    context: context,
+                    title: "Supporting team",
+                    child: Column(
+                      children: [
+                        Widgets().createTopLevelResponsiveContainer(
+                          context,
+                          List.generate(_supportingTeam.length, (index) {
+                            return _createSupportingTeamTile(index);
+                          }),
+                        ),
+
+                        // button - add supporting team
+                        if (widget.readOnly == null)
+                          TextButton(
+                            onPressed: () async {
+                              await _showAddSupportTeamDialog(
+                                context: context,
                               );
                             },
-                            leading: CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                _mainPerformer!.profilePicUrl,
-                              ),
+                            child: Text(
+                              _supportingTeam.isEmpty
+                                  ? "Add supporting team"
+                                  : "Add more members",
                             ),
-                            title: Text(
-                              "${_mainPerformer!.salutation} ${_mainPerformer!.name}",
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  // guests
+                  Widgets().createTopLevelCard(
+                    context: context,
+                    title: "Guests",
+                    child: Column(
+                      children: [
+                        Widgets().createTopLevelResponsiveContainer(
+                          context,
+                          List.generate(_guests.length, (index) {
+                            return _createGuestTile(index);
+                          }),
+                        ),
+
+                        // button
+                        if (widget.readOnly == null)
+                          TextButton(
+                            onPressed: () {
+                              _showAddGuestDialog(context: context);
+                            },
+                            child: Text(
+                              _guests.isEmpty ? "Add guest" : "Add more guests",
                             ),
-                            subtitle: Widgets().createResponsiveRow(context, [
-                              Icon(Icons.phone),
-                              Text(_mainPerformer!.mobile),
-                              SizedBox(width: 4),
-                              Icon(Icons.workspace_premium),
-                              Text(_mainPerformer!.credentials),
-                            ]),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  // list of songs
+                  Widgets().createTopLevelCard(
+                    context: context,
+                    title: "List of songs",
+                    child: Column(
+                      children: [
+                        ...List.generate(_songs.length, (index) {
+                          return _createSongTile(index);
+                        }),
+
+                        // button
+                        if (_songs.length < 10 && widget.readOnly == null)
+                          TextButton(
+                            onPressed: () async {
+                              await _showAddSongDialog(context: context);
+                            },
+                            child: Text(
+                              _songs.isEmpty
+                                  ? "Add song for event"
+                                  : "Add more songs",
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  // performer note
+                  Widgets().createTopLevelCard(
+                    context: context,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Note:",
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        TextField(
+                          maxLines: 2,
+                          controller: _noteController,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: "optional note for performer",
                           ),
                         ),
-
-                      // supporting team
-                      Widgets().createTopLevelCard(
-                        context: context,
-                        title: "Supporting team",
-                        child: Column(
-                          children: [
-                            Widgets().createTopLevelResponsiveContainer(
-                              context,
-                              List.generate(_supportingTeam.length, (index) {
-                                return _createSupportingTeamTile(index);
-                              }),
-                            ),
-
-                            // button - add supporting team
-                            if (widget.readOnly == null)
-                              TextButton(
-                                onPressed: () async {
-                                  await _showAddSupportTeamDialog(
-                                    context: context,
-                                  );
-                                },
-                                child: Text(
-                                  _supportingTeam.isEmpty
-                                      ? "Add supporting team"
-                                      : "Add more members",
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-
-                      // guests
-                      Widgets().createTopLevelCard(
-                        context: context,
-                        title: "Guests",
-                        child: Column(
-                          children: [
-                            Widgets().createTopLevelResponsiveContainer(
-                              context,
-                              List.generate(_guests.length, (index) {
-                                return _createGuestTile(index);
-                              }),
-                            ),
-
-                            // button
-                            if (widget.readOnly == null)
-                              TextButton(
-                                onPressed: () {
-                                  _showAddGuestDialog(context: context);
-                                },
-                                child: Text(
-                                  _guests.isEmpty
-                                      ? "Add guest"
-                                      : "Add more guests",
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-
-                      // list of songs
-                      Widgets().createTopLevelCard(
-                        context: context,
-                        title: "List of songs",
-                        child: Column(
-                          children: [
-                            ...List.generate(_songs.length, (index) {
-                              return _createSongTile(index);
-                            }),
-
-                            // button
-                            if (_songs.length < 10 && widget.readOnly == null)
-                              TextButton(
-                                onPressed: () async {
-                                  await _showAddSongDialog(context: context);
-                                },
-                                child: Text(
-                                  _songs.isEmpty
-                                      ? "Add song for event"
-                                      : "Add more songs",
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-
-                      // performer note
-                      Widgets().createTopLevelCard(
-                        context: context,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Note:",
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            TextField(
-                              maxLines: 2,
-                              controller: _noteController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: "optional note for performer",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // submit button
-                      SizedBox(height: 20),
-                      if (widget.readOnly == null)
-                        ElevatedButton(
-                          onPressed: _onSubmit,
-                          child:
-                              widget.oldEvent == null
-                                  ? Text("Submit")
-                                  : Text("Update"),
-                        ),
-
-                      // leave some space at bottom
-                      // SizedBox(height: 100),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+
+                  // submit button
+                  SizedBox(height: 20),
+                  if (widget.readOnly == null)
+                    ElevatedButton(
+                      onPressed: _onSubmit,
+                      child: widget.oldEvent == null
+                          ? Text("Submit")
+                          : Text("Update"),
+                    ),
+
+                  // leave some space at bottom
+                  SizedBox(height: 100),
+                ],
               ),
             ),
           ),
         ),
-
-        // circular progress indicator
-        if (_isLoading)
-          LoadingOverlay(image: "assets/images/Logo/SangeetSeva.png"),
-      ],
+      ),
     );
   }
 }

@@ -856,6 +856,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     return Stack(
       children: [
         Scaffold(
+          resizeToAvoidBottomInset: true,
           appBar: AppBar(
             title: Text(widget.title),
             actions: [

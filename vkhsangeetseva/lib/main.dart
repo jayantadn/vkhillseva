@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:vkhsangeetseva/profile.dart';
+import 'package:vkhsangeetseva/test.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/home.dart';
@@ -21,9 +21,8 @@ class MyApp extends StatelessWidget {
     title: "Hare Krishna",
     icon: "assets/images/Logo/SangeetSeva.png",
   );
-  final Widget test = Profile(
+  final Widget test = Test(
     title: "test",
-    self: true,
   );
 
   final ThemeData themeSangeetSeva = ThemeCreator(

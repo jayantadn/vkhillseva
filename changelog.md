@@ -1,4 +1,6 @@
 # 6.5.0
+
+# 6.5.0
 - fix: max slots in a day
 
 # 6.5.0

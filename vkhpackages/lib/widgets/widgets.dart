@@ -242,61 +242,79 @@ class Widgets {
     );
   }
 
-  Future<void> createTopModal({
+  Future<void> createResponsiveDialog({
     required BuildContext context,
     String? title,
     required Widget child,
     required List<Widget> actions,
   }) async {
-    await showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: Colors.black45,
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (
-        BuildContext buildContext,
-        Animation animation,
-        Animation secondaryAnimation,
-      ) {
-        return Align(
-          alignment: Alignment.topCenter,
-          child: Material(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(10.0),
-              bottomRight: Radius.circular(10.0),
-            ),
-            child: IntrinsicHeight(
-              // Ensures the height is based on the child
-              child: createTopLevelCard(
-                context: context,
-                title: title,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      child,
-                      SizedBox(height: 10),
-                      if (actions.isNotEmpty)
-                        createResponsiveRow(context, actions),
-                    ],
+    final double screenHeight = MediaQuery.of(context).size.height;
+
+    if (screenHeight > 1000) {
+      // show dialog for desktop
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title ?? ''),
+            content: SingleChildScrollView(child: child),
+            actions: actions,
+          );
+        },
+      );
+    } else {
+      // show top modal for mobile
+      await showGeneralDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierLabel:
+            MaterialLocalizations.of(context).modalBarrierDismissLabel,
+        barrierColor: Colors.black45,
+        transitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (
+          BuildContext buildContext,
+          Animation animation,
+          Animation secondaryAnimation,
+        ) {
+          return Align(
+            alignment: Alignment.topCenter,
+            child: Material(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10.0),
+                bottomRight: Radius.circular(10.0),
+              ),
+              child: IntrinsicHeight(
+                // Ensures the height is based on the child
+                child: createTopLevelCard(
+                  context: context,
+                  title: title,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        child,
+                        SizedBox(height: 10),
+                        if (actions.isNotEmpty)
+                          createResponsiveRow(context, actions),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: Offset(0, -1),
-            end: Offset(0, 0),
-          ).animate(animation),
-          child: child,
-        );
-      },
-    );
+          );
+        },
+        transitionBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(0, -1),
+              end: Offset(0, 0),
+            ).animate(animation),
+            child: child,
+          );
+        },
+      );
+    }
   }
 
   Future<void> showMessage(BuildContext context, String msg) {

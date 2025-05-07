@@ -580,7 +580,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       focusNode.requestFocus();
     });
 
-    Widgets().createTopModal(
+    Widgets().createResponsiveDialog(
         context: context,
         title: "Add note for performer",
         child: Column(
@@ -626,7 +626,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       focusNode.requestFocus();
     });
 
-    await Widgets().createTopModal(
+    await Widgets().createResponsiveDialog(
       context: context,
       title: "Add song for event",
       child: Form(
@@ -745,7 +745,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       focusNode.requestFocus();
     });
 
-    await Widgets().createTopModal(
+    await Widgets().createResponsiveDialog(
       context: context,
       title: oldUser == null ? "Add support team" : "Edit support team",
       child: Form(

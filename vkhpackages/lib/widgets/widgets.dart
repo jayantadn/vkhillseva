@@ -246,6 +246,7 @@ class Widgets {
     required BuildContext context,
     String? title,
     required Widget child,
+    required List<Widget> actions,
   }) async {
     await showGeneralDialog(
       context: context,
@@ -261,12 +262,25 @@ class Widgets {
         return Align(
           alignment: Alignment.topCenter,
           child: Material(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(10.0),
+              bottomRight: Radius.circular(10.0),
+            ),
             child: IntrinsicHeight(
               // Ensures the height is based on the child
               child: createTopLevelCard(
                 context: context,
                 title: title,
-                child: SingleChildScrollView(child: child),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      child,
+                      SizedBox(height: 10),
+                      if (actions.isNotEmpty)
+                        createResponsiveRow(context, actions),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

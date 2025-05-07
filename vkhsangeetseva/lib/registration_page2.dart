@@ -594,16 +594,17 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                setState(() {});
-              },
-              child: Text("Save"),
-            ),
           ],
-        ));
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {});
+            },
+            child: Text("Save"),
+          ),
+        ]);
   }
 
   Future<void> _showAddSongDialog({required BuildContext context, int? index}) {
@@ -723,7 +724,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   Future<void> _showAddSupportTeamDialog({
     required BuildContext context,
     SupportUser? oldUser,
-  }) {
+  }) async {
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     String salutation = "";
@@ -738,25 +739,24 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     }
 
     FocusNode focusNode = FocusNode();
-    return showDialog(
-      context: context,
-      builder: (context) {
-        // Request focus after the dialog is built
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          focusNode.requestFocus();
-        });
+    // Request focus after the dialog is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      focusNode.requestFocus();
+    });
 
-        return AlertDialog(
-          title: Text(
-            oldUser == null ? "Add support team" : "Edit support team",
-          ),
-          content: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  // salutation
-                  DropdownButtonFormField<String>(
+    await Widgets().showTopModal(
+      context: context,
+      title: oldUser == null ? "Add support team" : "Edit support team",
+      child: Form(
+        key: formKey,
+        child: Column(
+          children: [
+            Row(
+              children: [
+                // salutation
+                Expanded(
+                  flex: 3, // 30% of the horizontal space
+                  child: DropdownButtonFormField<String>(
                     decoration: InputDecoration(labelText: "Salutation"),
                     value: salutation.isNotEmpty
                         ? salutation
@@ -789,9 +789,14 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       return null;
                     },
                   ),
+                ),
 
-                  // name
-                  TextFormField(
+                SizedBox(width: 10), // Add some spacing between the widgets
+
+                // name
+                Expanded(
+                  flex: 7, // Remaining 70% of the horizontal space
+                  child: TextFormField(
                     controller: supportNameController,
                     focusNode: focusNode,
                     decoration: InputDecoration(labelText: "Name"),
@@ -814,73 +819,68 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       return null;
                     },
                   ),
-
-                  // specialization
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecoration(labelText: "Specialization"),
-                    value: specialization,
-                    items: [
-                      "Vocalist",
-                      ...SSConst().instrumentSkills,
-                      "Other",
-                    ].map((specialization) {
-                      return DropdownMenuItem<String>(
-                        value: specialization,
-                        child: Text(specialization),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      specialization = value!;
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please select a specialization";
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (!formKey.currentState!.validate()) {
-                  return;
-                }
 
-                Navigator.pop(context);
-
-                SupportUser user = SupportUser(
-                  salutation: salutation,
-                  name: supportNameController.text,
-                  specialization: specialization,
-                  friendMobile: _mainPerformer!.mobile,
+            // specialization
+            SizedBox(height: 10),
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(labelText: "Specialization"),
+              value: specialization,
+              items: [
+                "Vocalist",
+                ...SSConst().instrumentSkills,
+                "Other",
+              ].map((specialization) {
+                return DropdownMenuItem<String>(
+                  value: specialization,
+                  child: Text(specialization),
                 );
-
-                setState(() {
-                  if (oldUser == null) {
-                    _supportingTeam.add(user);
-                  } else {
-                    int index = _supportingTeam.indexOf(oldUser);
-                    if (index != -1) {
-                      _supportingTeam[index] = user;
-                    }
-                  }
-                });
+              }).toList(),
+              onChanged: (value) {
+                specialization = value!;
               },
-              child: Text(oldUser == null ? "Add" : "Update"),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please select a specialization";
+                }
+                return null;
+              },
             ),
           ],
-        );
-      },
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            if (!formKey.currentState!.validate()) {
+              return;
+            }
+
+            Navigator.pop(context);
+
+            SupportUser user = SupportUser(
+              salutation: salutation,
+              name: supportNameController.text,
+              specialization: specialization,
+              friendMobile: _mainPerformer!.mobile,
+            );
+
+            setState(() {
+              if (oldUser == null) {
+                _supportingTeam.add(user);
+              } else {
+                int index = _supportingTeam.indexOf(oldUser);
+                if (index != -1) {
+                  _supportingTeam[index] = user;
+                }
+              }
+            });
+          },
+          child: Text(oldUser == null ? "Add" : "Update"),
+        ),
+      ],
     );
   }
 

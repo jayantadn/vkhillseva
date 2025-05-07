@@ -461,115 +461,105 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     // get the total number of slots
     int totalSlots = await SlotUtils().getTotalSlotsCount(_selectedDate);
 
-    showDialog(
+    TextEditingController nameController = TextEditingController(
+      text: "Slot${totalSlots + 1}",
+    );
+    TextEditingController startTimeController = TextEditingController(
+      text: "__:__",
+    );
+    TextEditingController endTimeController = TextEditingController(
+      text: "__:__",
+    );
+
+    Widgets().createResponsiveDialog(
       context: context,
-      builder: (BuildContext context) {
-        TextEditingController nameController = TextEditingController(
-          text: "Slot${totalSlots + 1}",
-        );
-        TextEditingController startTimeController = TextEditingController(
-          text: "__:__",
-        );
-        TextEditingController endTimeController = TextEditingController(
-          text: "__:__",
-        );
+      child: StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text('Add a free slot'),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // slot name
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(hintText: "Slot name"),
+                  ),
 
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text('Add a free slot'),
-              content: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // slot name
-                    TextField(
-                      controller: nameController,
-                      decoration: InputDecoration(hintText: "Slot name"),
-                    ),
+                  // start time
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(width: 50, child: Text("From:")),
+                      Text(startTimeController.text),
+                      IconButton(
+                        onPressed: () async {
+                          TimeOfDay? picked = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              startTimeController.text = picked.format(
+                                context,
+                              );
+                            });
+                          }
+                        },
+                        icon: Icon(Icons.access_time),
+                      ),
+                    ],
+                  ),
 
-                    // start time
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(width: 50, child: Text("From:")),
-                        Text(startTimeController.text),
-                        IconButton(
-                          onPressed: () async {
-                            TimeOfDay? picked = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.now(),
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                startTimeController.text = picked.format(
-                                  context,
-                                );
-                              });
-                            }
-                          },
-                          icon: Icon(Icons.access_time),
-                        ),
-                      ],
-                    ),
-
-                    // end time
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(width: 50, child: Text("To:")),
-                        Text(endTimeController.text),
-                        IconButton(
-                          onPressed: () async {
-                            TimeOfDay? picked = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.now(),
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                endTimeController.text = picked.format(context);
-                              });
-                            }
-                          },
-                          icon: Icon(Icons.access_time),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  // end time
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(width: 50, child: Text("To:")),
+                      Text(endTimeController.text),
+                      IconButton(
+                        onPressed: () async {
+                          TimeOfDay? picked = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              endTimeController.text = picked.format(context);
+                            });
+                          }
+                        },
+                        icon: Icon(Icons.access_time),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-
-              // buttons
-              actions: <Widget>[
-                TextButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: Text('Add'),
-                  onPressed: () async {
-                    bool success = await _addFreeSlot(
-                      nameController.text,
-                      startTimeController.text,
-                      endTimeController.text,
-                    );
-
-                    if (success) {
-                      Navigator.of(context).pop();
-                      nameController.dispose();
-                      startTimeController.dispose();
-                      endTimeController.dispose();
-                    }
-                  },
-                ),
-              ],
+            ),
+          );
+        },
+      ),
+      actions: <Widget>[
+        ElevatedButton(
+          child: Text('Add'),
+          onPressed: () async {
+            bool success = await _addFreeSlot(
+              nameController.text,
+              startTimeController.text,
+              endTimeController.text,
             );
+
+            if (success) {
+              Navigator.of(context).pop();
+              nameController.dispose();
+              startTimeController.dispose();
+              endTimeController.dispose();
+            }
           },
-        );
-      },
+        ),
+      ],
     );
   }
 
@@ -580,7 +570,37 @@ class _CalendarSlotsState extends State<CalendarSlots> {
         Scaffold(
           appBar: AppBar(
             title: Text(widget.title),
-            actions: [],
+            actions: [
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () async {
+                  Widgets().createResponsiveDialog(
+                      context: context,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.event_available),
+                            title: Text('Single slot'),
+                            onTap: () async {
+                              Navigator.pop(context);
+                              await _showAddSingleSlotDialog(context);
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.event_note),
+                            title: Text('Multiple slots'),
+                            onTap: () async {
+                              Navigator.pop(context);
+                              await _showAddMultiSlotDialog(context);
+                            },
+                          ),
+                        ],
+                      ),
+                      actions: []);
+                },
+              ),
+            ],
           ),
           body: RefreshIndicator(
             onRefresh: refresh,
@@ -613,41 +633,6 @@ class _CalendarSlotsState extends State<CalendarSlots> {
                 ),
               ),
             ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              showModalBottomSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  return Container(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          leading: Icon(Icons.event_available),
-                          title: Text('Single slot'),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            await _showAddSingleSlotDialog(context);
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.event_note),
-                          title: Text('Multiple slots'),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            await _showAddMultiSlotDialog(context);
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-            tooltip: 'Add',
-            child: Icon(Icons.add),
           ),
         ),
 

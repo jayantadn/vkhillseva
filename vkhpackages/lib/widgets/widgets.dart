@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 class Widgets {
   static final Widgets _instance = Widgets._internal();
   static final double maxCardWidth = 400;
+  static final double maxScreenHeight = 1000;
 
   factory Widgets() {
     return _instance;
@@ -250,7 +251,7 @@ class Widgets {
   }) async {
     final double screenHeight = MediaQuery.of(context).size.height;
 
-    if (screenHeight > 1000) {
+    if (screenHeight > maxScreenHeight) {
       // show dialog for desktop
       await showDialog(
         context: context,

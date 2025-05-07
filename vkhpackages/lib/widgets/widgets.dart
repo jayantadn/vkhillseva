@@ -242,7 +242,7 @@ class Widgets {
     );
   }
 
-  Future<void> showTopModal({
+  Future<void> createTopModal({
     required BuildContext context,
     String? title,
     required Widget child,

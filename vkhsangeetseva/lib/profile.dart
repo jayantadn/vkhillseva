@@ -408,150 +408,126 @@ class _ProfileState extends State<Profile> {
     final TextEditingController othersController = TextEditingController();
     final TextEditingController yearsController = TextEditingController();
 
-    showDialog(
+    await Widgets().createTopModal(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          // title for dialog
-          title: Text('Sangeet sadhana details',
-              style: Theme.of(context).textTheme.headlineMedium),
-          content: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  // stateful widgets
-                  StatefulBuilder(
-                    builder: (BuildContext context, StateSetter setState) {
-                      return Column(
-                        children: [
-                          // radio for vocal/instrumental
-                          RadioRow(
-                            items: ["Vocal", "Instrumental"],
-                            onChanged: (String value) {
-                              setState(() {
-                                selectedExpertiseType = value;
-                                selectedSkill = value == "Vocal"
-                                    ? SSConst().vocalSkills[0]
-                                    : SSConst().instrumentSkills[0];
-                              });
-                            },
+      title: 'Sangeet sadhana details',
+      child: Form(
+        key: formKey,
+        child: Column(
+          children: [
+            // stateful widgets
+            SizedBox(height: 10),
+            StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  children: [
+                    // radio for vocal/instrumental
+                    RadioRow(
+                      items: ["Vocal", "Instrumental"],
+                      onChanged: (String value) {
+                        setState(() {
+                          selectedExpertiseType = value;
+                          selectedSkill = value == "Vocal"
+                              ? SSConst().vocalSkills[0]
+                              : SSConst().instrumentSkills[0];
+                        });
+                      },
+                    ),
+
+                    // dropdown for skills
+                    SizedBox(height: 10),
+                    DropdownButton<String>(
+                      isExpanded: true,
+                      value: selectedSkill,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedSkill = newValue!;
+                        });
+                      },
+                      items: selectedExpertiseType == "Vocal"
+                          ? SSConst()
+                              .vocalSkills
+                              .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList()
+                          : SSConst()
+                              .instrumentSkills
+                              .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                    ),
+
+                    // hidden box for others
+                    if (selectedSkill == "Others")
+                      TextFormField(
+                          controller: othersController,
+                          decoration: InputDecoration(
+                            labelText: 'Please specify',
                           ),
-
-                          // dropdown for skills
-                          SizedBox(height: 10),
-                          DropdownButton<String>(
-                            isExpanded: true,
-                            value: selectedSkill,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedSkill = newValue!;
-                              });
-                            },
-                            items: selectedExpertiseType == "Vocal"
-                                ? SSConst()
-                                    .vocalSkills
-                                    .map<DropdownMenuItem<String>>(
-                                        (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList()
-                                : SSConst()
-                                    .instrumentSkills
-                                    .map<DropdownMenuItem<String>>(
-                                        (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                          ),
-
-                          // hidden box for others
-                          SizedBox(height: 10),
-                          if (selectedSkill == "Others")
-                            TextFormField(
-                                controller: othersController,
-                                decoration: InputDecoration(
-                                  labelText: 'Please specify',
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Provide valid input';
-                                  }
-                                  return null;
-                                }),
-                        ],
-                      );
-                    },
-                  ),
-
-                  // Stateless widgets
-                  // exp in years
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: yearsController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(labelText: "Years of sadhana"),
-                    validator: (value) {
-                      if (value == null ||
-                          value.isEmpty ||
-                          int.parse(value) < 0) {
-                        return 'Provide valid input';
-                      }
-                      return null;
-                    },
-                  )
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                // clear all local lists
-
-                // clear all local controllers and focus nodes
-
-                // close the dialog
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Add'),
-              onPressed: () {
-                // validate
-                if (!formKey.currentState!.validate()) {
-                  return;
-                }
-
-                // Handle the add logic here
-                SangeetExp exp = SangeetExp(
-                  category: selectedExpertiseType,
-                  subcategory: selectedSkill == "Others"
-                      ? othersController.text
-                      : selectedSkill,
-                  yrs: int.parse(yearsController.text),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Provide valid input';
+                            }
+                            return null;
+                          }),
+                  ],
                 );
-                setState(() {
-                  _exp.add(exp);
-                });
-
-                // clear all local lists
-
-                // clear all local controllers and focus nodes
-
-                // close the dialog
-                Navigator.of(context).pop();
               },
             ),
+
+            // Stateless widgets
+            // exp in years
+            SizedBox(height: 10),
+            TextFormField(
+              controller: yearsController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: "Years of sadhana"),
+              validator: (value) {
+                if (value == null || value.isEmpty || int.parse(value) < 0) {
+                  return 'Provide valid input';
+                }
+                return null;
+              },
+            )
           ],
-        );
-      },
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+          child: Text('Add'),
+          onPressed: () {
+            // validate
+            if (!formKey.currentState!.validate()) {
+              return;
+            }
+
+            // Handle the add logic here
+            SangeetExp exp = SangeetExp(
+              category: selectedExpertiseType,
+              subcategory: selectedSkill == "Others"
+                  ? othersController.text
+                  : selectedSkill,
+              yrs: int.parse(yearsController.text),
+            );
+            setState(() {
+              _exp.add(exp);
+            });
+
+            // clear all local lists
+
+            // clear all local controllers and focus nodes
+
+            // close the dialog
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
     );
   }
 

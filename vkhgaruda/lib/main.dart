@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'package:vkhgaruda/sangeet_seva/calendar_slots.dart';
-import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 

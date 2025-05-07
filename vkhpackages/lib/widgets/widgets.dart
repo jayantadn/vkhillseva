@@ -243,7 +243,7 @@ class Widgets {
     );
   }
 
-  Future<void> createResponsiveDialog({
+  Future<void> showResponsiveDialog({
     required BuildContext context,
     String? title,
     required Widget child,
@@ -287,19 +287,24 @@ class Widgets {
               ),
               child: IntrinsicHeight(
                 // Ensures the height is based on the child
-                child: createTopLevelCard(
-                  context: context,
-                  title: title,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        child,
-                        SizedBox(height: 10),
-                        if (actions.isNotEmpty)
-                          createResponsiveRow(context, actions),
-                      ],
+                child: Column(
+                  children: [
+                    SizedBox(height: 50),
+                    createTopLevelCard(
+                      context: context,
+                      title: title,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            child,
+                            SizedBox(height: 10),
+                            if (actions.isNotEmpty)
+                              createResponsiveRow(context, actions),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),

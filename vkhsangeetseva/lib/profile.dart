@@ -408,7 +408,7 @@ class _ProfileState extends State<Profile> {
     final TextEditingController othersController = TextEditingController();
     final TextEditingController yearsController = TextEditingController();
 
-    await Widgets().createResponsiveDialog(
+    await Widgets().showResponsiveDialog(
       context: context,
       title: 'Sangeet sadhana details',
       child: Form(

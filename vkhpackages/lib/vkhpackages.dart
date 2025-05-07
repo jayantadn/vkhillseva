@@ -10,6 +10,7 @@ export 'common/theme.dart';
 export 'common/themeGaruda.dart';
 export 'common/notification.dart';
 export 'common/utils.dart';
+export 'common/time.dart';
 
 export 'widgets/widgets.dart';
 export 'widgets/auth.dart';

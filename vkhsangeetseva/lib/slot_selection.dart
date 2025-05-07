@@ -118,7 +118,7 @@ class _SlotSelectionState extends State<SlotSelection> {
 
     // check if slot is in the past
     DateTime now = DateTime.now();
-    List<int> hrMin = Utils().convertTimeToHrMin(slot.from);
+    List<int> hrMin = Utils().convertTo24hrFormat(slot.from);
     DateTime slotDateTime = DateTime(
       date.year,
       date.month,

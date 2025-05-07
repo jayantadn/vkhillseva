@@ -76,7 +76,7 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     });
   }
 
-  Future<bool> _addFreeSlot(
+  Future<bool> _addSingleSlot(
     String name,
     String startTime,
     String endTime,
@@ -90,9 +90,9 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     // check if end time is greater than start time
     try {
       final DateTime startDateTime =
-          Utils().convertStringToTime(_selectedDate, startTime);
+          Time().convertStringToTime(_selectedDate, startTime);
       final DateTime endDateTime =
-          Utils().convertStringToTime(_selectedDate, endTime);
+          Time().convertStringToTime(_selectedDate, endTime);
       if (endDateTime.isBefore(startDateTime)) {
         Toaster().error("End time should be greater than start time");
         return false;
@@ -110,8 +110,8 @@ class _CalendarSlotsState extends State<CalendarSlots> {
       value: Slot(
               name: name,
               avl: true,
-              from: Utils().convertTimeStringTo12HrFormat(startTime),
-              to: Utils().convertTimeStringTo12HrFormat(endTime))
+              from: Time().convertTimeStringTo12HrFormat(startTime),
+              to: Time().convertTimeStringTo12HrFormat(endTime))
           .toJson(),
     );
 
@@ -138,9 +138,9 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     // validate if end time is greater than start time at least by duration
     try {
       final DateTime startDateTime =
-          Utils().convertStringToTime(_selectedDate, startTime);
+          Time().convertStringToTime(_selectedDate, startTime);
       final DateTime endDateTime =
-          Utils().convertStringToTime(_selectedDate, endTime);
+          Time().convertStringToTime(_selectedDate, endTime);
 
       // Calculate the duration in minutes
       int durationInMinutes = (duration * 60).round();
@@ -159,18 +159,38 @@ class _CalendarSlotsState extends State<CalendarSlots> {
       Toaster().error('Error parsing time: $e');
     }
 
-    // add to database
-    // String dbDate = DateFormat("yyyy-MM-dd").format(_selectedDate);
-    // await FB().addKVToList(
-    //   path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
-    //   key: name,
-    //   value: Slot(
-    //           name: name,
-    //           avl: true,
-    //           from: Utils().convertTimeStringTo12HrFormat(startTime),
-    //           to: Utils().convertTimeStringTo12HrFormat(endTime))
-    //       .toJson(),
-    // );
+    // loop through start and end time and add slots
+    DateTime startDateTime =
+        Time().convertStringToTime(_selectedDate, startTime);
+    DateTime endDateTime = Time().convertStringToTime(_selectedDate, endTime);
+    while (startDateTime.isBefore(endDateTime)) {
+      DateTime slotEndTime =
+          startDateTime.add(Duration(minutes: (duration * 60).round()));
+
+      if (slotEndTime.isAfter(endDateTime)) {
+        break;
+      }
+
+      String startString = DateFormat("HHmm").format(startDateTime);
+      String endString = DateFormat("HHmm").format(slotEndTime);
+      String slotName = "Slot_${startString}_${endString}";
+      Slot slot = Slot(
+        name: slotName,
+        avl: true,
+        from: Time().convertDateTimeTo12hrFormat(startDateTime),
+        to: Time().convertDateTimeTo12hrFormat(slotEndTime),
+      );
+
+      startDateTime = slotEndTime;
+
+      // add to database
+      String dbDate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+      await FB().addKVToList(
+        path: "${Const().dbrootSangeetSeva}/Slots/$dbDate",
+        key: slotName,
+        value: slot.toJson(),
+      );
+    }
 
     // refresh the availability indicators
     _calendarKey.currentState!.fillAvailabilityIndicators(date: _selectedDate);
@@ -228,6 +248,10 @@ class _CalendarSlotsState extends State<CalendarSlots> {
       }
     }
     slotsRaw.clear();
+
+    // sort the slots based on from time
+    _bookedSlots.sort((a, b) => a.from.compareTo(b.from));
+    _avlSlots.sort((a, b) => a.from.compareTo(b.from));
 
     // add the weekend fixed slots
     await _addWeekendFreeSlots(date);
@@ -315,139 +339,125 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     // get the total number of slots
     int totalSlots = await SlotUtils().getTotalSlotsCount(_selectedDate);
 
-    showDialog(
+    TextEditingController nameController = TextEditingController(
+      text: "Slot${totalSlots + 1}",
+    );
+    TextEditingController startTimeController = TextEditingController(
+      text: "__:__",
+    );
+    TextEditingController endTimeController = TextEditingController(
+      text: "__:__",
+    );
+    double duration = 1.5;
+
+    await Widgets().showResponsiveDialog(
       context: context,
-      builder: (BuildContext context) {
-        TextEditingController nameController = TextEditingController(
-          text: "Slot${totalSlots + 1}",
-        );
-        TextEditingController startTimeController = TextEditingController(
-          text: "__:__",
-        );
-        TextEditingController endTimeController = TextEditingController(
-          text: "__:__",
-        );
-        double duration = 1.5;
-
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text('Add multiple free slot'),
-              content: SingleChildScrollView(
-                child: Column(
+      child: StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text('Add multiple free slots'),
+            content: Column(
+              children: [
+                // start time
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // start time
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(width: 50, child: Text("From:")),
-                        Text(startTimeController.text),
-                        IconButton(
-                          onPressed: () async {
-                            TimeOfDay? picked = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.now(),
+                    SizedBox(width: 50, child: Text("From:")),
+                    Text(startTimeController.text),
+                    IconButton(
+                      onPressed: () async {
+                        TimeOfDay? picked = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (picked != null) {
+                          setState(() {
+                            startTimeController.text = picked.format(
+                              context,
                             );
-                            if (picked != null) {
-                              setState(() {
-                                startTimeController.text = picked.format(
-                                  context,
-                                );
-                              });
-                            }
-                          },
-                          icon: Icon(Icons.access_time),
-                        ),
-                      ],
+                          });
+                        }
+                      },
+                      icon: Icon(Icons.access_time),
                     ),
-
-                    // end time
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(width: 50, child: Text("To:")),
-                        Text(endTimeController.text),
-                        IconButton(
-                          onPressed: () async {
-                            TimeOfDay? picked = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.now(),
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                endTimeController.text = picked.format(context);
-                              });
-                            }
-                          },
-                          icon: Icon(Icons.access_time),
-                        ),
-                      ],
-                    ),
-
-                    // duration
-                    SizedBox(height: 10),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(width: 100, child: Text("Duration:")),
-                          IconButton(
-                            icon: Icon(Icons.remove),
-                            onPressed: () {
-                              setState(() {
-                                if (duration > 0.5) {
-                                  duration -= 0.5;
-                                }
-                              });
-                            },
-                          ),
-                          Text(
-                            "${duration.toStringAsFixed(1)} hrs",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: () {
-                              setState(() {
-                                duration += 0.5;
-                              });
-                            },
-                          ),
-                        ]),
                   ],
                 ),
-              ),
 
-              // buttons
-              actions: <Widget>[
-                TextButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                // end time
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(width: 50, child: Text("To:")),
+                    Text(endTimeController.text),
+                    IconButton(
+                      onPressed: () async {
+                        TimeOfDay? picked = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (picked != null) {
+                          setState(() {
+                            endTimeController.text = picked.format(context);
+                          });
+                        }
+                      },
+                      icon: Icon(Icons.access_time),
+                    ),
+                  ],
                 ),
-                TextButton(
-                  child: Text('Add'),
-                  onPressed: () async {
-                    bool success = await _addMultipleSlots(
-                        startTimeController.text,
-                        endTimeController.text,
-                        duration);
 
-                    if (success) {
-                      Navigator.of(context).pop();
-                      nameController.dispose();
-                      startTimeController.dispose();
-                      endTimeController.dispose();
-                    }
-                  },
-                ),
+                // duration
+                SizedBox(height: 10),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(width: 100, child: Text("Duration:")),
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          setState(() {
+                            if (duration > 0.5) {
+                              duration -= 0.5;
+                            }
+                          });
+                        },
+                      ),
+                      Text(
+                        "${duration.toStringAsFixed(1)} hrs",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          setState(() {
+                            duration += 0.5;
+                          });
+                        },
+                      ),
+                    ]),
               ],
-            );
+            ),
+          );
+        },
+      ),
+      actions: <Widget>[
+        ElevatedButton(
+          child: Text('Add'),
+          onPressed: () async {
+            bool success = await _addMultipleSlots(
+                startTimeController.text, endTimeController.text, duration);
+
+            if (success) {
+              Navigator.of(context).pop();
+              nameController.dispose();
+              startTimeController.dispose();
+              endTimeController.dispose();
+            }
           },
-        );
-      },
+        ),
+      ],
     );
   }
 
@@ -471,7 +481,7 @@ class _CalendarSlotsState extends State<CalendarSlots> {
       text: "__:__",
     );
 
-    Widgets().createResponsiveDialog(
+    Widgets().showResponsiveDialog(
       context: context,
       child: StatefulBuilder(
         builder: (context, setState) {
@@ -545,7 +555,7 @@ class _CalendarSlotsState extends State<CalendarSlots> {
         ElevatedButton(
           child: Text('Add'),
           onPressed: () async {
-            bool success = await _addFreeSlot(
+            bool success = await _addSingleSlot(
               nameController.text,
               startTimeController.text,
               endTimeController.text,
@@ -574,7 +584,7 @@ class _CalendarSlotsState extends State<CalendarSlots> {
               IconButton(
                 icon: Icon(Icons.add),
                 onPressed: () async {
-                  Widgets().createResponsiveDialog(
+                  Widgets().showResponsiveDialog(
                       context: context,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,

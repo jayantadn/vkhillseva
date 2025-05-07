@@ -607,7 +607,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         ]);
   }
 
-  Future<void> _showAddSongDialog({required BuildContext context, int? index}) {
+  Future<void> _showAddSongDialog(
+      {required BuildContext context, int? index}) async {
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     _titleController.clear();
 
@@ -619,105 +620,105 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     }
 
     FocusNode focusNode = FocusNode();
-    return showDialog(
+
+    // Request focus after the dialog is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      focusNode.requestFocus();
+    });
+
+    await Widgets().showTopModal(
       context: context,
-      builder: (context) {
-        // Request focus after the dialog is built
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          focusNode.requestFocus();
-        });
+      title: "Add song for event",
+      child: Form(
+        key: formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              // title
+              TextFormField(
+                controller: _titleController,
+                focusNode: focusNode,
+                onChanged: (value) {},
+                decoration: InputDecoration(labelText: "Song title"),
+                validator: (value) {
+                  if (value == null || value.isEmpty || value.length < 3) {
+                    return "Please enter a valid name";
+                  }
+                  if (RegExp(
+                    r'[0-9!@#$%^&*(),.?":{}|<>]',
+                  ).hasMatch(value)) {
+                    return "Special characters are not allowed";
+                  }
+                  return null;
+                },
+              ),
 
-        return AlertDialog(
-          title: Text("Add song for event"),
-          content: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
+              SizedBox(height: 10),
+              Row(
                 children: [
-                  // title
-                  TextFormField(
-                    controller: _titleController,
-                    focusNode: focusNode,
-                    onChanged: (value) {},
-                    decoration: InputDecoration(labelText: "Song title"),
-                    validator: (value) {
-                      if (value == null || value.isEmpty || value.length < 3) {
-                        return "Please enter a valid name";
-                      }
-                      if (RegExp(
-                        r'[0-9!@#$%^&*(),.?":{}|<>]',
-                      ).hasMatch(value)) {
-                        return "Special characters are not allowed";
-                      }
-                      return null;
-                    },
-                  ),
-
                   // Raaga
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: _raagaController,
-                    onChanged: (value) {},
-                    decoration: InputDecoration(labelText: "Raaga"),
-                    validator: (value) {
-                      if (value != null &&
-                          RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-                        return "Special characters are not allowed";
-                      }
-                      return null;
-                    },
+                  Expanded(
+                    child: TextFormField(
+                      controller: _raagaController,
+                      onChanged: (value) {},
+                      decoration: InputDecoration(labelText: "Raaga"),
+                      validator: (value) {
+                        if (value != null &&
+                            RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                          return "Special characters are not allowed";
+                        }
+                        return null;
+                      },
+                    ),
                   ),
 
                   // Taala
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: _taalaController,
-                    onChanged: (value) {},
-                    decoration: InputDecoration(labelText: "Taala"),
-                    validator: (value) {
-                      if (value != null &&
-                          RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-                        return "Special characters are not allowed";
-                      }
-                      return null;
-                    },
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _taalaController,
+                      onChanged: (value) {},
+                      decoration: InputDecoration(labelText: "Taala"),
+                      validator: (value) {
+                        if (value != null &&
+                            RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                          return "Special characters are not allowed";
+                        }
+                        return null;
+                      },
+                    ),
                   ),
                 ],
               ),
-            ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (!formKey.currentState!.validate()) {
-                  return;
-                }
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            if (!formKey.currentState!.validate()) {
+              return;
+            }
 
-                setState(() {
-                  if (index == null) {
-                    _songs.add(
-                      "${_titleController.text}:${_raagaController.text}:${_taalaController.text}",
-                    );
-                  } else {
-                    // edit mode
-                    _songs[index] =
-                        "${_titleController.text}:${_raagaController.text}:${_taalaController.text}";
-                  }
-                });
+            setState(() {
+              if (index == null) {
+                _songs.add(
+                  "${_titleController.text}:${_raagaController.text}:${_taalaController.text}",
+                );
+              } else {
+                // edit mode
+                _songs[index] =
+                    "${_titleController.text}:${_raagaController.text}:${_taalaController.text}";
+              }
+            });
 
-                Navigator.pop(context);
-              },
-              child: Text(index == null ? "Add" : "Update"),
-            ),
-          ],
-        );
-      },
+            Navigator.pop(context);
+          },
+          child: Text(index == null ? "Add" : "Update"),
+        ),
+      ],
     );
   }
 

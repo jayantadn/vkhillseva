@@ -262,6 +262,7 @@ class Widgets {
         return Align(
           alignment: Alignment.topCenter,
           child: Material(
+            color: Colors.grey[100],
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(10.0),
               bottomRight: Radius.circular(10.0),

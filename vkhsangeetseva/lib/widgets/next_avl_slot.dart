@@ -129,9 +129,9 @@ class NextAvlSlotState extends State<NextAvlSlot> {
 
       // sort the slots by time
       slots.sort((a, b) {
-        DateTime timeA = Utils().convertStringToTime(
+        DateTime timeA = Time().convertStringToTime(
             _nextAvailableDate!, a.from); // Convert to DateTime
-        DateTime timeB = Utils().convertStringToTime(
+        DateTime timeB = Time().convertStringToTime(
             _nextAvailableDate!, b.from); // Convert to DateTime
         return timeA.compareTo(timeB); // Compare the times
       });
@@ -151,10 +151,10 @@ class NextAvlSlotState extends State<NextAvlSlot> {
           _nextAvailableSlot = null;
         } else {
           for (Slot slot in slots) {
-            DateTime currentSlot = Utils().convertStringToTime(
+            DateTime currentSlot = Time().convertStringToTime(
                 _nextAvailableDate!, _nextAvailableSlot!.from);
             DateTime newSlot =
-                Utils().convertStringToTime(_nextAvailableDate!, slot.from);
+                Time().convertStringToTime(_nextAvailableDate!, slot.from);
 
             if (newSlot.isAfter(currentSlot)) {
               _nextAvailableSlot = slot;
@@ -205,7 +205,7 @@ class NextAvlSlotState extends State<NextAvlSlot> {
             break;
           } else if (_nextAvailableSlot != null) {
             if (slot.avl == true) {
-              if (Utils().convertStringToTime(date, slot.from).isAfter(Utils()
+              if (Time().convertStringToTime(date, slot.from).isAfter(Time()
                   .convertStringToTime(
                       _nextAvailableDate!, _nextAvailableSlot!.from))) {
                 _nextAvailableDate = date;
@@ -230,7 +230,7 @@ class NextAvlSlotState extends State<NextAvlSlot> {
             break;
           } else if (_nextAvailableSlot != null) {
             if (slot.avl == true) {
-              if (Utils().convertStringToTime(date, slot.from).isAfter(Utils()
+              if (Time().convertStringToTime(date, slot.from).isAfter(Time()
                   .convertStringToTime(
                       _nextAvailableDate!, _nextAvailableSlot!.from))) {
                 _nextAvailableDate = date;
@@ -253,9 +253,9 @@ class NextAvlSlotState extends State<NextAvlSlot> {
       List<Slot> weekendSlots = SSConst().weekendSangeetSevaSlots;
       weekendSlots.sort((a, b) {
         DateTime timeA =
-            Utils().convertStringToTime(_nextAvailableDate!, a.from);
+            Time().convertStringToTime(_nextAvailableDate!, a.from);
         DateTime timeB =
-            Utils().convertStringToTime(_nextAvailableDate!, b.from);
+            Time().convertStringToTime(_nextAvailableDate!, b.from);
         return timeA.compareTo(timeB); // forward sort
       });
       for (var slotw in weekendSlots) {
@@ -272,10 +272,10 @@ class NextAvlSlotState extends State<NextAvlSlot> {
             foundWeekend = true;
             break;
           } else {
-            DateTime nextslot = Utils().convertStringToTime(
+            DateTime nextslot = Time().convertStringToTime(
                 _nextAvailableDate!, _nextAvailableSlot!.from);
             DateTime nextweekendslot =
-                Utils().convertStringToTime(nextWeekendDate, slotw.from);
+                Time().convertStringToTime(nextWeekendDate, slotw.from);
             if (nextslot.isAfter(nextweekendslot)) {
               _nextAvailableDate = nextWeekendDate;
               _nextAvailableSlot = slotw;
@@ -346,9 +346,9 @@ class NextAvlSlotState extends State<NextAvlSlot> {
 
       // sort the slots by time in descending order
       slots.sort((a, b) {
-        DateTime timeA = Utils().convertStringToTime(
+        DateTime timeA = Time().convertStringToTime(
             _nextAvailableDate!, a.from); // Convert to DateTime
-        DateTime timeB = Utils().convertStringToTime(
+        DateTime timeB = Time().convertStringToTime(
             _nextAvailableDate!, b.from); // Convert to DateTime
         return timeB.compareTo(timeA); // Compare the times
       });
@@ -368,10 +368,10 @@ class NextAvlSlotState extends State<NextAvlSlot> {
           _nextAvailableSlot = null;
         } else {
           for (Slot slot in slots) {
-            DateTime currentSlot = Utils().convertStringToTime(
+            DateTime currentSlot = Time().convertStringToTime(
                 _nextAvailableDate!, _nextAvailableSlot!.from);
             DateTime newSlot =
-                Utils().convertStringToTime(_nextAvailableDate!, slot.from);
+                Time().convertStringToTime(_nextAvailableDate!, slot.from);
 
             if (newSlot.isBefore(currentSlot)) {
               _nextAvailableSlot = slot;
@@ -424,7 +424,7 @@ class NextAvlSlotState extends State<NextAvlSlot> {
             break;
           } else if (_nextAvailableSlot != null) {
             if (slot.avl == true) {
-              if (Utils().convertStringToTime(date, slot.from).isBefore(Utils()
+              if (Time().convertStringToTime(date, slot.from).isBefore(Time()
                   .convertStringToTime(
                       _nextAvailableDate!, _nextAvailableSlot!.from))) {
                 _nextAvailableDate = date;
@@ -447,9 +447,9 @@ class NextAvlSlotState extends State<NextAvlSlot> {
       List<Slot> weekendSlots = SSConst().weekendSangeetSevaSlots;
       weekendSlots.sort((a, b) {
         DateTime timeA =
-            Utils().convertStringToTime(_nextAvailableDate!, a.from);
+            Time().convertStringToTime(_nextAvailableDate!, a.from);
         DateTime timeB =
-            Utils().convertStringToTime(_nextAvailableDate!, b.from);
+            Time().convertStringToTime(_nextAvailableDate!, b.from);
         return timeB.compareTo(timeA); // Reverse sort
       });
       for (var slot in SSConst().weekendSangeetSevaSlots) {
@@ -466,10 +466,10 @@ class NextAvlSlotState extends State<NextAvlSlot> {
             foundWeekend = true;
             break;
           } else {
-            DateTime nextslot = Utils().convertStringToTime(
+            DateTime nextslot = Time().convertStringToTime(
                 _nextAvailableDate!, _nextAvailableSlot!.from);
             DateTime nextweekendslot =
-                Utils().convertStringToTime(_nextAvailableDate!, slot.from);
+                Time().convertStringToTime(_nextAvailableDate!, slot.from);
             if (nextslot.isBefore(nextweekendslot)) {
               _nextAvailableDate = _nextAvailableDate;
               _nextAvailableSlot = slot;

@@ -5,6 +5,7 @@ import 'package:fast_image_resizer/fast_image_resizer.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vkhpackages/widgets/radio_row.dart';
@@ -45,7 +46,7 @@ class _ProfileState extends State<Profile> {
 
   List<SangeetExp> _exp = [];
 
-  List<String> _youtubeLinks = ["", "", ""];
+  List<String> _youtubeLinks = [];
   List<String> _audioClips = [
     "",
     "",
@@ -126,9 +127,9 @@ class _ProfileState extends State<Profile> {
         _youtubeLinks = _userDetailsOld!.youtubeUrls;
         _audioClips = _userDetailsOld!.audioClipUrls;
 
-        while (_youtubeLinks.length < 3) {
-          _youtubeLinks.add("");
-        }
+        // while (_youtubeLinks.length < 3) {
+        //   _youtubeLinks.add("");
+        // }
         while (_audioClips.length < 3) {
           _audioClips.add("");
         }
@@ -158,6 +159,40 @@ class _ProfileState extends State<Profile> {
         onPressed: () {
           setState(() {
             _exp.removeAt(index);
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _createYoutubeTile(int index) {
+    return ListTile(
+      leading: Text(
+        (index + 1).toString(),
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      title: GestureDetector(
+        onTap: () {
+          if (_youtubeLinks[index].isNotEmpty) {
+            launchUrl(Uri.parse(_youtubeLinks[index]));
+          }
+        },
+        child: Text(
+          _youtubeLinks[index],
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.blue,
+                decoration: TextDecoration.underline,
+              ),
+        ),
+      ),
+      trailing: IconButton(
+        icon: Icon(
+          Icons.delete,
+          size: 16,
+        ),
+        onPressed: () {
+          setState(() {
+            _youtubeLinks.removeAt(index);
           });
         },
       ),
@@ -531,6 +566,77 @@ class _ProfileState extends State<Profile> {
     );
   }
 
+  Future<void> _showDialogYoutube(BuildContext context) async {
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    final TextEditingController youtubeController = TextEditingController();
+    final FocusNode youtubeFocusNode = FocusNode();
+
+    // Request focus after the dialog is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      youtubeFocusNode.requestFocus();
+    });
+
+    await Widgets().showResponsiveDialog(
+      context: context,
+      title: 'Youtube links',
+      child: Form(
+        key: formKey,
+        child: Column(
+          children: [
+            SizedBox(height: 10),
+            TextFormField(
+              controller: youtubeController,
+              focusNode: youtubeFocusNode,
+              decoration:
+                  InputDecoration(labelText: "link to your performance"),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Provide valid input';
+                }
+
+                if (!RegExp(
+                        r'^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$')
+                    .hasMatch(value)) {
+                  return 'Please enter a valid youtube link';
+                }
+
+                // check if the link is already present
+                if (_youtubeLinks.contains(value)) {
+                  return 'This link is already added';
+                }
+
+                return null;
+              },
+            )
+          ],
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+          child: Text('Add'),
+          onPressed: () {
+            // validate
+            if (!formKey.currentState!.validate()) {
+              return;
+            }
+
+            // Handle the add logic here
+            setState(() {
+              _youtubeLinks.add(youtubeController.text);
+            });
+
+            // clear all local lists
+
+            // clear all local controllers and focus nodes
+
+            // close the dialog
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+  }
+
   String _getFileNameFromUrl(String url) {
     if (url.isEmpty) return "No files selected";
 
@@ -682,7 +788,6 @@ class _ProfileState extends State<Profile> {
                         )),
 
                     // sangeet exp details
-                    // salutation
                     Widgets().createTopLevelCard(
                         context: context,
                         title: "Sangeet sadhana details",
@@ -706,7 +811,9 @@ class _ProfileState extends State<Profile> {
                                 onPressed: () async {
                                   await _showDialogSangeetExp(context);
                                 },
-                                child: Text("Add sangeet sadhana details")),
+                                child: Text(_exp.isEmpty
+                                    ? "Add sangeet sadhana details"
+                                    : "Add more ...")),
                           ],
                         )),
 
@@ -719,31 +826,28 @@ class _ProfileState extends State<Profile> {
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             children: [
-                              ...List.generate(_youtubeLinks.length, (index) {
-                                return Column(
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    if (index == 0 ||
-                                        _youtubeLinks[index - 1].isNotEmpty)
-                                      TextFormField(
-                                        controller: TextEditingController()
-                                          ..text =
-                                              (_youtubeLinks[index].isNotEmpty)
-                                                  ? _youtubeLinks[index]
-                                                  : "",
-                                        decoration: InputDecoration(
-                                          labelText: index == 0
-                                              ? 'Youtube link for your performance'
-                                              : 'Another youtube link (optional)',
-                                          hintText:
-                                              "e.g. https://www.youtube.com/watch?v=123",
-                                        ),
-                                        onChanged: (value) {
-                                          _youtubeLinks[index] = value;
-                                        },
-                                      ),
+                                    ...List.generate(_youtubeLinks.length,
+                                        (index) {
+                                      return _createYoutubeTile(index);
+                                    }),
                                   ],
-                                );
-                              }),
+                                ),
+                              ),
+
+                              // button for sangeet exp
+                              SizedBox(height: 20),
+                              TextButton(
+                                  onPressed: () async {
+                                    await _showDialogYoutube(context);
+                                  },
+                                  child: Text(_youtubeLinks.isEmpty
+                                      ? "Add youtube link"
+                                      : "Add more youtube links")),
 
                               // upload audio clip
                               SizedBox(height: 20),

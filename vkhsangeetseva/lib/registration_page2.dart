@@ -41,10 +41,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   // controllers, listeners and focus nodes
   final TextEditingController _guestNameController = TextEditingController();
-  final TextEditingController _noteController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _raagaController = TextEditingController();
   final TextEditingController _taalaController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
 
   @override
   initState() {
@@ -62,10 +62,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     // clear all controllers and focus nodes
     _guestNameController.dispose();
-    _noteController.dispose();
     _titleController.dispose();
     _raagaController.dispose();
     _taalaController.dispose();
+    _noteController.dispose();
 
     super.dispose();
   }
@@ -573,6 +573,39 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     );
   }
 
+  Future<void> _showAddNoteDialog(BuildContext context) async {
+    FocusNode focusNode = FocusNode();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      focusNode.requestFocus();
+    });
+
+    Widgets().showTopModal(
+        context: context,
+        title: "Add note for performer",
+        child: Column(
+          children: [
+            TextField(
+              focusNode: focusNode,
+              maxLines: 3,
+              controller: _noteController,
+              decoration: InputDecoration(
+                hintText: "Enter your note here",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {});
+              },
+              child: Text("Save"),
+            ),
+          ],
+        ));
+  }
+
   Future<void> _showAddSongDialog({required BuildContext context, int? index}) {
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     _titleController.clear();
@@ -893,28 +926,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       style: Theme.of(context).textTheme.headlineLarge,
                     ),
 
-                    // performer note
-                    Widgets().createTopLevelCard(
-                      context: context,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Note:",
-                            style: Theme.of(context).textTheme.headlineSmall,
-                          ),
-                          TextField(
-                            maxLines: 2,
-                            controller: _noteController,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              hintText: "optional note for performer",
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
                     // slot
                     Text(
                       "${widget.slot.from} - ${widget.slot.to}",
@@ -1060,6 +1071,33 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                     : "Add more songs",
                               ),
                             ),
+                        ],
+                      ),
+                    ),
+
+                    // performer note
+                    Widgets().createTopLevelCard(
+                      context: context,
+                      title: "Note from performer",
+                      child: Column(
+                        children: [
+                          if (_noteController.text.isNotEmpty)
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                _noteController.text,
+                              ),
+                            ),
+                          TextButton(
+                            onPressed: () async {
+                              await _showAddNoteDialog(context);
+                            },
+                            child: Text(
+                              _noteController.text.isEmpty
+                                  ? "Add some notes"
+                                  : "Edit notes",
+                            ),
+                          ),
                         ],
                       ),
                     ),

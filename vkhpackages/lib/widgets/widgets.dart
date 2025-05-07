@@ -242,6 +242,48 @@ class Widgets {
     );
   }
 
+  Future<void> showTopModal({
+    required BuildContext context,
+    String? title,
+    required Widget child,
+  }) async {
+    await showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black45,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (
+        BuildContext buildContext,
+        Animation animation,
+        Animation secondaryAnimation,
+      ) {
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Material(
+            child: IntrinsicHeight(
+              // Ensures the height is based on the child
+              child: createTopLevelCard(
+                context: context,
+                title: title,
+                child: SingleChildScrollView(child: child),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: Offset(0, -1),
+            end: Offset(0, 0),
+          ).animate(animation),
+          child: child,
+        );
+      },
+    );
+  }
+
   Future<void> showMessage(BuildContext context, String msg) {
     return showDialog<void>(
       context: context,

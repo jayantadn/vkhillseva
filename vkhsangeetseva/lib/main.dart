@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:vkhsangeetseva/registration_page2.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/home.dart';
@@ -20,9 +21,11 @@ class MyApp extends StatelessWidget {
     title: "Hare Krishna",
     icon: "assets/images/Logo/SangeetSeva.png",
   );
-  final Widget test = HomePage(
-    title: "test",
-  );
+  final Widget test = RegistrationPage2(
+      title: "test",
+      selectedDate: DateTime.now(),
+      slot:
+          Slot(avl: true, from: "10:00 AM", to: "11:00 AM", name: "Test Slot"));
 
   final ThemeData themeSangeetSeva = ThemeCreator(
     primaryColor: Color(0xFF6A0DAD),
@@ -34,7 +37,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sangeet Seva',
       theme: themeSangeetSeva,
-      home: home,
+      home: test,
     );
   }
 }

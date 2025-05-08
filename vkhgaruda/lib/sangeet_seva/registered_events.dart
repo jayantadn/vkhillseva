@@ -187,10 +187,10 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
       leading: CircleAvatar(backgroundImage: NetworkImage(profilePicUrl)),
       subtitle: Row(
         children: [
-          Icon(Icons.person),
+          Icon(Icons.person, size: 16),
           Text(performer),
           SizedBox(width: 10),
-          Icon(Icons.phone),
+          Icon(Icons.phone, size: 16),
           Text(mobile),
         ],
       ),

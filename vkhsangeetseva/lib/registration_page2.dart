@@ -391,6 +391,12 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       }
     }
 
+    // validate number of performers
+    if (_performers.isEmpty) {
+      Toaster().error("Please enter at least 1 performer");
+      return;
+    }
+
     // validate list of songs
     if (_songs.length < _minSongs) {
       Toaster().error("Please enter at least $_minSongs songs");
@@ -990,11 +996,11 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       ),
                     SizedBox(height: 10),
 
-                    // event responsible
+                    // event requester
                     if (_eventResponsible != null)
                       Widgets().createTopLevelCard(
                         context: context,
-                        title: "Event responsible",
+                        title: "Event requester",
                         child: ListTile(
                           onTap: () {
                             Navigator.push(

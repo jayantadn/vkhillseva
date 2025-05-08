@@ -30,7 +30,7 @@ class _RequestDetailsState extends State<RequestDetails> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  PerformerProfile? _mainPerformer;
+  PerformerProfile? _eventRequester;
 
   // lists
 
@@ -60,7 +60,7 @@ class _RequestDetailsState extends State<RequestDetails> {
     });
 
     // perform async operations here
-    _mainPerformer = await SSUtils()
+    _eventRequester = await SSUtils()
         .getPerformerProfile(widget.eventRecord.mainPerformerMobile);
 
     // refresh all child widgets
@@ -305,10 +305,10 @@ class _RequestDetailsState extends State<RequestDetails> {
                         Column(children: [
                           // your widgets here
 
-                          // main performer
+                          // event requester
                           Widgets().createTopLevelCard(
                             context: context,
-                            title: "Main performer",
+                            title: "Event requester",
                             child: Column(
                               children: [
                                 ListTile(
@@ -317,31 +317,31 @@ class _RequestDetailsState extends State<RequestDetails> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => ProfileDetails(
-                                            title: "Main performer",
+                                            title: "Profile",
                                             icon: widget.icon,
-                                            userdetails: _mainPerformer!),
+                                            userdetails: _eventRequester!),
                                       ),
                                     );
                                   },
-                                  leading: _mainPerformer == null
+                                  leading: _eventRequester == null
                                       ? Text("")
                                       : CircleAvatar(
                                           backgroundImage: NetworkImage(
-                                              _mainPerformer!.profilePicUrl),
+                                              _eventRequester!.profilePicUrl),
                                         ),
-                                  title: _mainPerformer == null
+                                  title: _eventRequester == null
                                       ? Text("")
                                       : Text(
-                                          "${_mainPerformer!.salutation} ${_mainPerformer!.name}"),
-                                  subtitle: _mainPerformer == null
+                                          "${_eventRequester!.salutation} ${_eventRequester!.name}"),
+                                  subtitle: _eventRequester == null
                                       ? Text("")
                                       : Row(
                                           children: [
                                             Icon(Icons.phone),
-                                            Text(_mainPerformer!.mobile),
+                                            Text(_eventRequester!.mobile),
                                             SizedBox(width: 10),
                                             Icon(Icons.workspace_premium),
-                                            Text(_mainPerformer!.credentials),
+                                            Text(_eventRequester!.credentials),
                                           ],
                                         ),
                                 ),
@@ -349,11 +349,11 @@ class _RequestDetailsState extends State<RequestDetails> {
                             ),
                           ),
 
-                          // supporting team
+                          // performers
                           if (widget.eventRecord.supportTeam.isNotEmpty)
                             Widgets().createTopLevelCard(
                               context: context,
-                              title: "Supporting team",
+                              title: "Performers",
                               child: Column(
                                 children: [
                                   ...List.generate(

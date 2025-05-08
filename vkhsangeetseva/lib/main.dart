@@ -22,11 +22,13 @@ class MyApp extends StatelessWidget {
     title: "Hare Krishna",
     icon: "assets/images/Logo/SangeetSeva.png",
   );
-  // final Widget test = RegistrationPage2(
-  //     title: "test",
-  //     selectedDate: DateTime.now(),
-  //     slot:
-  //         Slot(avl: true, from: "10:00 AM", to: "11:00 AM", name: "Test Slot"));
+
+  final Widget reg = RegistrationPage2(
+      title: "test",
+      selectedDate: DateTime.now(),
+      slot:
+          Slot(avl: true, from: "10:00 AM", to: "11:00 AM", name: "Test Slot"));
+
   final Widget test = const Profile(
     title: "test",
     self: true,
@@ -42,7 +44,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sangeet Seva',
       theme: themeSangeetSeva,
-      home: test,
+      home: reg,
     );
   }
 }

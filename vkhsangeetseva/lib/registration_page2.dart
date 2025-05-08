@@ -31,11 +31,11 @@ class RegistrationPage2 extends StatefulWidget {
 class _RegistrationPage2State extends State<RegistrationPage2> {
   // scalars
   bool _isLoading = true;
-  PerformerProfile? _mainPerformer;
+  PerformerProfile? _eventResponsible;
   final _minSongs = 3;
 
   // lists
-  final List<SupportUser> _supportingTeam = [];
+  final List<SupportUser> _performers = [];
   final List<Guest> _guests = [];
   final List<String> _songs = [];
 
@@ -56,7 +56,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   @override
   dispose() {
     // clear all lists
-    _supportingTeam.clear();
+    _performers.clear();
     _guests.clear();
     _songs.clear();
 
@@ -98,7 +98,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
       // populate the lists
       for (SupportUser support in performanceRequest.supportTeam) {
-        _supportingTeam.add(support);
+        _performers.add(support);
       }
 
       _guests.addAll(performanceRequest.guests);
@@ -123,7 +123,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 self: true,
                 onProfileSaved: (user) {
                   setState(() {
-                    _mainPerformer = user;
+                    _eventResponsible = user;
                   });
                 },
               );
@@ -131,7 +131,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           ),
         );
       } else {
-        _mainPerformer = PerformerProfile.fromJson(userdetailsJson);
+        _eventResponsible = PerformerProfile.fromJson(userdetailsJson);
       }
     });
   }
@@ -176,8 +176,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     );
   }
 
-  Widget _createSupportingTeamTile(int index) {
-    var member = _supportingTeam[index];
+  Widget _createPerfomerTile(int index) {
+    var member = _performers[index];
     return ListTile(
       onTap: () {},
       title: Text("${member.salutation} ${member.name}"),
@@ -191,7 +191,12 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           children: [
             Row(
               children: [
-                Icon(Icons.workspace_premium),
+                Icon(
+                  member.specialization == "Vocalist"
+                      ? Icons.mic
+                      : Icons.music_note,
+                  size: 16,
+                ),
                 SizedBox(width: 5),
                 Text(member.specialization),
               ],
@@ -206,14 +211,14 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
             ) async {
               switch (action) {
                 case "Edit":
-                  await _showAddSupportTeamDialog(
+                  await _showAddPerformerDialog(
                     context: context,
                     oldUser: member,
                   );
                   break;
                 case "Remove":
                   setState(() {
-                    _supportingTeam.removeAt(index);
+                    _performers.removeAt(index);
                   });
                   break;
               }
@@ -396,8 +401,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     EventRecord performanceRequest = EventRecord(
       date: widget.selectedDate,
       slot: widget.slot,
-      mainPerformerMobile: _mainPerformer!.mobile,
-      supportTeam: _supportingTeam,
+      mainPerformerMobile: _eventResponsible!.mobile,
+      supportTeam: _performers,
       guests: _guests,
       songs: _songs,
       notePerformer: _noteController.text,
@@ -722,20 +727,22 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     );
   }
 
-  Future<void> _showAddSupportTeamDialog({
+  Future<void> _showAddPerformerDialog({
     required BuildContext context,
     SupportUser? oldUser,
   }) async {
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-    String salutation = "";
-    TextEditingController supportNameController = TextEditingController();
+    String salutation = SSConst().salutations.first;
+    TextEditingController performerNameController = TextEditingController();
+    TextEditingController otherController = TextEditingController();
     String specialization = "Vocalist";
+    String other_specialization = "";
 
     // edit mode
     if (oldUser != null) {
       salutation = oldUser.salutation;
-      supportNameController.text = oldUser.name;
+      performerNameController.text = oldUser.name;
       specialization = oldUser.specialization;
     }
 
@@ -747,7 +754,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     await Widgets().showResponsiveDialog(
       context: context,
-      title: oldUser == null ? "Add support team" : "Edit support team",
+      title: oldUser == null ? "Add performer" : "Edit performer",
       child: Form(
         key: formKey,
         child: Column(
@@ -783,7 +790,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       ).hasMatch(value)) {
                         return "Special characters are not allowed";
                       }
-                      if (_supportingTeam.any((s) => s.name == value)) {
+                      if (_performers.any((s) => s.name == value)) {
                         return "Member already exists";
                       }
 
@@ -798,7 +805,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 Expanded(
                   flex: 7, // Remaining 70% of the horizontal space
                   child: TextFormField(
-                    controller: supportNameController,
+                    controller: performerNameController,
                     focusNode: focusNode,
                     decoration: InputDecoration(labelText: "Name"),
                     validator: (value) {
@@ -809,11 +816,12 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                         return "Please enter a valid name";
                       }
                       if (RegExp(
-                        r'[0-9!@#$%^&*(),.?":{}|<>]',
+                        r'[0-9!@#$%^&*(),;.?":{}|<>]',
                       ).hasMatch(value)) {
                         return "Numbers and special characters are not allowed";
                       }
-                      if (_guests.any((guest) => guest.name == value)) {
+                      if (_performers
+                          .any((performer) => performer.name == value)) {
                         return "Guest already exists";
                       }
 
@@ -826,27 +834,58 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
             // specialization
             SizedBox(height: 10),
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(labelText: "Specialization"),
-              value: specialization,
-              items: [
-                "Vocalist",
-                ...SSConst().instrumentSkills,
-                "Other",
-              ].map((specialization) {
-                return DropdownMenuItem<String>(
-                  value: specialization,
-                  child: Text(specialization),
+            StatefulBuilder(
+              builder: (context, setState) {
+                return Column(
+                  children: [
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(labelText: "Specialization"),
+                      value: specialization,
+                      items: [
+                        "Vocalist",
+                        ...SSConst().instrumentSkills,
+                      ].map((specialization) {
+                        return DropdownMenuItem<String>(
+                          value: specialization,
+                          child: Text(specialization),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          specialization = value!;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please select a specialization";
+                        }
+                        return null;
+                      },
+                    ),
+
+                    // other specialization
+                    if (specialization == "Other")
+                      TextFormField(
+                        controller: otherController,
+                        decoration:
+                            InputDecoration(labelText: "Other specialization"),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter a specialization";
+                          }
+                          if (RegExp(
+                            r'[0-9!@#$%^&*(),;.?":{}|<>]',
+                          ).hasMatch(value)) {
+                            return "Numbers and special characters are not allowed";
+                          }
+                          return null;
+                        },
+                        onChanged: (value) {
+                          other_specialization = value;
+                        },
+                      ),
+                  ],
                 );
-              }).toList(),
-              onChanged: (value) {
-                specialization = value!;
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Please select a specialization";
-                }
-                return null;
               },
             ),
           ],
@@ -863,18 +902,20 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
             SupportUser user = SupportUser(
               salutation: salutation,
-              name: supportNameController.text,
-              specialization: specialization,
-              friendMobile: _mainPerformer!.mobile,
+              name: performerNameController.text,
+              specialization: specialization == "Other"
+                  ? other_specialization
+                  : specialization,
+              friendMobile: _eventResponsible!.mobile,
             );
 
             setState(() {
               if (oldUser == null) {
-                _supportingTeam.add(user);
+                _performers.add(user);
               } else {
-                int index = _supportingTeam.indexOf(oldUser);
+                int index = _performers.indexOf(oldUser);
                 if (index != -1) {
-                  _supportingTeam[index] = user;
+                  _performers[index] = user;
                 }
               }
             });
@@ -949,57 +990,63 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       ),
                     SizedBox(height: 10),
 
-                    // main performer
-                    if (_mainPerformer != null)
+                    // event responsible
+                    if (_eventResponsible != null)
                       Widgets().createTopLevelCard(
                         context: context,
-                        title: "Main performer",
+                        title: "Event responsible",
                         child: ListTile(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => Profile(
-                                  title: "Main performer",
+                                  title: "Profile",
                                   self: true,
                                   onProfileSaved: (user) {
                                     setState(() {
-                                      _mainPerformer = user;
+                                      _eventResponsible = user;
                                     });
                                   },
-                                  friendMobile: _mainPerformer!.mobile,
+                                  friendMobile: _eventResponsible!.mobile,
                                 ),
                               ),
                             );
                           },
                           leading: CircleAvatar(
                             backgroundImage: NetworkImage(
-                              _mainPerformer!.profilePicUrl,
+                              _eventResponsible!.profilePicUrl,
                             ),
                           ),
                           title: Text(
-                            "${_mainPerformer!.salutation} ${_mainPerformer!.name}",
+                            "${_eventResponsible!.salutation} ${_eventResponsible!.name}",
                           ),
                           subtitle: Widgets().createResponsiveRow(context, [
-                            Icon(Icons.phone),
-                            Text(_mainPerformer!.mobile),
+                            Icon(
+                              Icons.phone,
+                              size: 16,
+                            ),
+                            Text(_eventResponsible!.mobile),
                             SizedBox(width: 4),
-                            Icon(Icons.workspace_premium),
-                            Text(_mainPerformer!.credentials),
+                            Icon(
+                              Icons.workspace_premium,
+                              size: 16,
+                            ),
+                            Text(_eventResponsible!.credentials),
                           ]),
                         ),
                       ),
 
-                    // supporting team
+                    // Performers
                     Widgets().createTopLevelCard(
                       context: context,
-                      title: "Supporting team",
+                      title: "Performers",
                       child: Column(
                         children: [
                           Widgets().createTopLevelResponsiveContainer(
                             context,
-                            List.generate(_supportingTeam.length, (index) {
-                              return _createSupportingTeamTile(index);
+                            List.generate(_performers.length, (index) {
+                              return _createPerfomerTile(index);
                             }),
                           ),
 
@@ -1007,14 +1054,14 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           if (widget.readOnly == null)
                             TextButton(
                               onPressed: () async {
-                                await _showAddSupportTeamDialog(
+                                await _showAddPerformerDialog(
                                   context: context,
                                 );
                               },
                               child: Text(
-                                _supportingTeam.isEmpty
-                                    ? "Add supporting team"
-                                    : "Add more members",
+                                _performers.isEmpty
+                                    ? "Add performer"
+                                    : "Add more",
                               ),
                             ),
                         ],

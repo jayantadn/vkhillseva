@@ -40,7 +40,7 @@ class SSConst {
     'Kartaal',
     'Violin',
     'Keyboard',
-    'Others',
+    'Other',
   ];
 
   final List<Slot> weekendSangeetSevaSlots = [

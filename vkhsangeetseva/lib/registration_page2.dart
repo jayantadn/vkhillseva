@@ -36,7 +36,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   // lists
   final List<SupportUser> _performers = [];
-  final List<Guest> _guests = [];
+  int _guests = 0;
   final List<String> _songs = [];
 
   // controllers, listeners and focus nodes
@@ -57,7 +57,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   dispose() {
     // clear all lists
     _performers.clear();
-    _guests.clear();
     _songs.clear();
 
     // clear all controllers and focus nodes
@@ -101,7 +100,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         _performers.add(support);
       }
 
-      _guests.addAll(performanceRequest.guests);
+      _guests = performanceRequest.guests;
       _songs.addAll(performanceRequest.songs);
       _noteController.text = performanceRequest.notePerformer;
     }
@@ -226,27 +225,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     );
   }
 
-  Widget _createGuestTile(int index) {
-    var member = _guests[index];
+  Widget _createGuestTile() {
     return ListTile(
       onTap: () {},
-      title: Text(member.name),
-      leading: Text(
-        "${index + 1}",
-        style: Theme.of(context).textTheme.bodyLarge,
-      ),
-      subtitle: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            Row(
-              children: [
-                Text(member.honorPrasadam ? "Honor Prasadam" : "No Prasadam"),
-              ],
-            ),
-          ],
-        ),
-      ),
+      title: Text("Number of guests: $_guests"),
       trailing: widget.readOnly != null
           ? null
           : Widgets().createContextMenu(["Edit", "Remove"], (
@@ -1068,35 +1050,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                 _performers.isEmpty
                                     ? "Add performer"
                                     : "Add more",
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-
-                    // guests
-                    Widgets().createTopLevelCard(
-                      context: context,
-                      title: "Guests",
-                      child: Column(
-                        children: [
-                          Widgets().createTopLevelResponsiveContainer(
-                            context,
-                            List.generate(_guests.length, (index) {
-                              return _createGuestTile(index);
-                            }),
-                          ),
-
-                          // button
-                          if (widget.readOnly == null)
-                            TextButton(
-                              onPressed: () {
-                                _showAddGuestDialog(context: context);
-                              },
-                              child: Text(
-                                _guests.isEmpty
-                                    ? "Add guest"
-                                    : "Add more guests",
                               ),
                             ),
                         ],

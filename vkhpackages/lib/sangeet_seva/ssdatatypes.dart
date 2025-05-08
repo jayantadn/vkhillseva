@@ -35,7 +35,7 @@ class EventRecord {
   final Slot slot;
   final String mainPerformerMobile;
   final List<SupportUser> supportTeam;
-  final List<Guest> guests;
+  final int guests;
   final List<String> songs;
   String status;
   final String notePerformer;
@@ -65,16 +65,7 @@ class EventRecord {
         return json['songs'][index];
       }),
       status: json['status'] as String,
-      guests:
-          json['guests'] == null
-              ? []
-              : List.generate(json['guests'].length, (index) {
-                dynamic guestRaw = json['guests'][index];
-                Map<String, dynamic> guestMap = Map<String, dynamic>.from(
-                  guestRaw,
-                );
-                return Guest.fromJson(guestMap);
-              }),
+      guests: json['guests'],
       supportTeam:
           json['supportTeam'] == null
               ? []
@@ -94,7 +85,7 @@ class EventRecord {
       'slot': slot.toJson(),
       'mainPerformer': mainPerformerMobile,
       'supportTeam': supportTeam.map((e) => e.toJson()).toList(),
-      'guests': guests.map((e) => e.toJson()).toList(),
+      'guests': guests,
       'songs': songs,
       'status': status,
       'notePerformer': notePerformer,

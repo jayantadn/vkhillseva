@@ -348,7 +348,7 @@ class _CalendarSlotsState extends State<CalendarSlots> {
     TextEditingController endTimeController = TextEditingController(
       text: "__:__",
     );
-    double duration = 1.5;
+    double duration = 2.0;
 
     await Widgets().showResponsiveDialog(
       context: context,

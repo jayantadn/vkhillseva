@@ -102,31 +102,33 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     }
 
     // preferred event time
-    DateTime startTime =
-        Time().convertStringToTime(widget.selectedDate, widget.slot.from);
-    DateTime endTime =
-        Time().convertStringToTime(widget.selectedDate, widget.slot.to);
-    if (endTime.difference(startTime).inMinutes > SSConst().maxEventDuration) {
-      List<Map<String, dynamic>> eventTimes = [];
-      DateTime startEvent = startTime;
-      for (var i = 0; i < 10; i++) {
-        DateTime endEvent = startEvent.add(
-          Duration(minutes: SSConst().maxEventDuration),
-        );
-        if (endEvent.isAfter(endTime)) {
-          break;
+    if (widget.readOnly == null || widget.readOnly == false) {
+      DateTime startTime =
+          Time().convertStringToTime(widget.selectedDate, widget.slot.from);
+      DateTime endTime =
+          Time().convertStringToTime(widget.selectedDate, widget.slot.to);
+      if (endTime.difference(startTime).inMinutes >
+          SSConst().maxEventDuration) {
+        List<Map<String, dynamic>> eventTimes = [];
+        DateTime startEvent = startTime;
+        for (var i = 0; i < 10; i++) {
+          DateTime endEvent = startEvent.add(
+            Duration(minutes: SSConst().maxEventDuration),
+          );
+          if (endEvent.isAfter(endTime)) {
+            break;
+          }
+          eventTimes.add({"start": startEvent, "end": endEvent});
+          startEvent = startEvent.add(
+            Duration(minutes: 30),
+          );
         }
-        eventTimes.add({"start": startEvent, "end": endEvent});
-        startEvent = startEvent.add(
-          Duration(minutes: 30),
+        await _showPreferredTimeDialog(
+          context: context,
+          eventTimes: eventTimes,
         );
       }
-      await _showPreferredTimeDialog(
-        context: context,
-        eventTimes: eventTimes,
-      );
     }
-
     // refresh all child widgets
 
     // perform sync operations here

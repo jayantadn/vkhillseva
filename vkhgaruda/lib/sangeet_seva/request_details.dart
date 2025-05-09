@@ -203,7 +203,15 @@ class _RequestDetailsState extends State<RequestDetails> {
   }
 
   void _showActionDialog(String action) {
-    _noteController.clear();
+    if (_noteController.text.isEmpty) {
+      _noteController.text = SSConst()
+          .templeNotes
+          .asMap()
+          .entries
+          .map((entry) => "${entry.key + 1}. ${entry.value}\n")
+          .join();
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -215,9 +223,10 @@ class _RequestDetailsState extends State<RequestDetails> {
               children: [
                 Text("Are you sure you want to $action this request?"),
                 SizedBox(height: 10),
-                Text("Note:", style: themeGaruda.textTheme.headlineSmall),
+                Text("Note for performers:",
+                    style: themeGaruda.textTheme.headlineSmall),
                 TextField(
-                  maxLines: 2,
+                  maxLines: 3,
                   controller: _noteController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),

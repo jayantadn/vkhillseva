@@ -49,4 +49,20 @@ class SSConst {
   ];
 
   final maxEventDuration = 90; // mins
+
+  // temple notes
+  final List<String> templeNotes = [
+    "All artists can come up the Hill directly through their respective vehicle",
+    "Please inform the security personnel that they are performing the Sangeetha Seva at the  Govinda temple this evening",
+    "Can use the escalator/lift",
+    "Share the vehicle number(s)",
+    "Contact Securtiy Kamal near Garuda temple for the facilities",
+    "Tune your musicial instruments well in advance",
+    "Mike testing and adjustments should be done well in advance",
+    "Sengeet Seva will be closed between 6:45pm and 7:15pm",
+    "You can attend the 7pm arati and visit all other parivara temples( can be done earlier itself)",
+    "Participate in sankalpa, arati and receive the phala-pushpa prasadam",
+    "Dinner prasada for the artists (10 person) will be arranged",
+    "Note: our temple devotee will address for a minute before the start of the seva",
+  ];
 }

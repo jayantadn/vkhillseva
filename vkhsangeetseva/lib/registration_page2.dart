@@ -89,20 +89,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       Toaster().error("User not found");
     }
 
-    if (widget.oldEvent != null) {
-      // populate the data structure
-      EventRecord performanceRequest = widget.oldEvent!;
-
-      // populate the lists
-      for (SupportUser support in performanceRequest.supportTeam) {
-        _performers.add(support);
-      }
-
-      _guests = performanceRequest.guests;
-      _songs.addAll(performanceRequest.songs);
-      _noteController.text = performanceRequest.notePerformer;
-    }
-
     // refresh all child widgets
 
     // perform sync operations here
@@ -129,6 +115,26 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         );
       } else {
         _eventResponsible = PerformerProfile.fromJson(userdetailsJson);
+      }
+
+      // performers
+      _performers.clear();
+      _performers.add(SupportUser(
+          salutation: _eventResponsible!.salutation,
+          name: _eventResponsible!.name,
+          friendMobile: _eventResponsible!.mobile,
+          specialization: "Vocalist"));
+
+      if (widget.oldEvent != null) {
+        // populate the data structure
+        EventRecord performanceRequest = widget.oldEvent!;
+
+        // populate the lists
+        _performers.addAll(performanceRequest.supportTeam);
+
+        _guests = performanceRequest.guests;
+        _songs.addAll(performanceRequest.songs);
+        _noteController.text = performanceRequest.notePerformer;
       }
     });
   }
@@ -763,9 +769,10 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       ).hasMatch(value)) {
                         return "Numbers and special characters are not allowed";
                       }
-                      if (_performers
-                          .any((performer) => performer.name == value)) {
-                        return "Guest already exists";
+                      if (oldUser == null &&
+                          _performers
+                              .any((performer) => performer.name == value)) {
+                        return "Performer already exists";
                       }
 
                       return null;
@@ -1007,7 +1014,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                               child: Text(
                                 _performers.isEmpty
                                     ? "Add performer"
-                                    : "Add more",
+                                    : "Add more performers",
                               ),
                             ),
 

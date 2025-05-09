@@ -350,17 +350,17 @@ class _RequestDetailsState extends State<RequestDetails> {
                           ),
 
                           // performers
-                          if (widget.eventRecord.supportTeam.isNotEmpty)
+                          if (widget.eventRecord.performers.isNotEmpty)
                             Widgets().createTopLevelCard(
                               context: context,
                               title: "Performers",
                               child: Column(
                                 children: [
                                   ...List.generate(
-                                      widget.eventRecord.supportTeam.length,
+                                      widget.eventRecord.performers.length,
                                       (index) {
                                     var member =
-                                        widget.eventRecord.supportTeam[index];
+                                        widget.eventRecord.performers[index];
                                     return ListTile(
                                       leading: Text(
                                         "${index + 1}",

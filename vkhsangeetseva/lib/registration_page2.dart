@@ -31,11 +31,11 @@ class RegistrationPage2 extends StatefulWidget {
 class _RegistrationPage2State extends State<RegistrationPage2> {
   // scalars
   bool _isLoading = true;
-  PerformerProfile? _eventResponsible;
+  PerformerProfile? _requester;
   final _minSongs = 3;
 
   // lists
-  final List<SupportUser> _performers = [];
+  final List<Performer> _performers = [];
   int _guests = 0;
   final List<String> _songs = [];
 
@@ -106,7 +106,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 self: true,
                 onProfileSaved: (user) {
                   setState(() {
-                    _eventResponsible = user;
+                    _requester = user;
                   });
                 },
               );
@@ -114,15 +114,14 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           ),
         );
       } else {
-        _eventResponsible = PerformerProfile.fromJson(userdetailsJson);
+        _requester = PerformerProfile.fromJson(userdetailsJson);
       }
 
       // performers
       _performers.clear();
-      _performers.add(SupportUser(
-          salutation: _eventResponsible!.salutation,
-          name: _eventResponsible!.name,
-          friendMobile: _eventResponsible!.mobile,
+      _performers.add(Performer(
+          salutation: _requester!.salutation,
+          name: _requester!.name,
           specialization: "Vocalist"));
 
       if (widget.oldEvent != null) {
@@ -130,7 +129,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         EventRecord performanceRequest = widget.oldEvent!;
 
         // populate the lists
-        _performers.addAll(performanceRequest.supportTeam);
+        _performers.addAll(performanceRequest.performers);
 
         _guests = performanceRequest.guests;
         _songs.addAll(performanceRequest.songs);
@@ -392,8 +391,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     EventRecord performanceRequest = EventRecord(
       date: widget.selectedDate,
       slot: widget.slot,
-      eventRequesterMobile: _eventResponsible!.mobile,
-      supportTeam: _performers,
+      eventRequesterMobile: _requester!.mobile,
+      performers: _performers,
       guests: _guests,
       songs: _songs,
       notePerformer: _noteController.text,
@@ -678,7 +677,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   Future<void> _showAddPerformerDialog({
     required BuildContext context,
-    SupportUser? oldUser,
+    Performer? oldUser,
   }) async {
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -850,13 +849,12 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
             Navigator.pop(context);
 
-            SupportUser user = SupportUser(
+            Performer user = Performer(
               salutation: salutation,
               name: performerNameController.text,
               specialization: specialization == "Other"
                   ? other_specialization
                   : specialization,
-              friendMobile: _eventResponsible!.mobile,
             );
 
             setState(() {
@@ -941,7 +939,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                     SizedBox(height: 10),
 
                     // event requester
-                    if (_eventResponsible != null)
+                    if (_requester != null)
                       Widgets().createTopLevelCard(
                         context: context,
                         title: "Event requester",
@@ -955,34 +953,34 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                   self: true,
                                   onProfileSaved: (user) {
                                     setState(() {
-                                      _eventResponsible = user;
+                                      _requester = user;
                                     });
                                   },
-                                  friendMobile: _eventResponsible!.mobile,
+                                  friendMobile: _requester!.mobile,
                                 ),
                               ),
                             );
                           },
                           leading: CircleAvatar(
                             backgroundImage: NetworkImage(
-                              _eventResponsible!.profilePicUrl,
+                              _requester!.profilePicUrl,
                             ),
                           ),
                           title: Text(
-                            "${_eventResponsible!.salutation} ${_eventResponsible!.name}",
+                            "${_requester!.salutation} ${_requester!.name}",
                           ),
                           subtitle: Widgets().createResponsiveRow(context, [
                             Icon(
                               Icons.phone,
                               size: 16,
                             ),
-                            Text(_eventResponsible!.mobile),
+                            Text(_requester!.mobile),
                             SizedBox(width: 4),
                             Icon(
                               Icons.workspace_premium,
                               size: 16,
                             ),
-                            Text(_eventResponsible!.credentials),
+                            Text(_requester!.credentials),
                           ]),
                         ),
                       ),

@@ -1,21 +1,18 @@
-class SupportUser {
+class Performer {
   String salutation;
   String name;
-  String friendMobile;
   String specialization;
 
-  SupportUser({
+  Performer({
     required this.salutation,
     required this.name,
-    required this.friendMobile,
     required this.specialization,
   });
 
-  factory SupportUser.fromJson(Map<String, dynamic> json) {
-    return SupportUser(
+  factory Performer.fromJson(Map<String, dynamic> json) {
+    return Performer(
       salutation: json['salutation'] as String,
       name: json['name'] as String,
-      friendMobile: json['friendMobile'] as String,
       specialization: json['specialization'] as String,
     );
   }
@@ -24,7 +21,6 @@ class SupportUser {
     return {
       'salutation': salutation,
       'name': name,
-      'friendMobile': friendMobile,
       'specialization': specialization,
     };
   }
@@ -34,7 +30,7 @@ class EventRecord {
   final DateTime date;
   final Slot slot;
   final String eventRequesterMobile;
-  final List<SupportUser> supportTeam;
+  final List<Performer> performers;
   final int guests;
   final List<String> songs;
   String status;
@@ -45,7 +41,7 @@ class EventRecord {
     required this.date,
     required this.slot,
     required this.eventRequesterMobile,
-    required this.supportTeam,
+    required this.performers,
     required this.guests,
     required this.songs,
     this.status = 'Pending',
@@ -66,15 +62,15 @@ class EventRecord {
       }),
       status: json['status'] as String,
       guests: json['guests'],
-      supportTeam:
-          json['supportTeam'] == null
+      performers:
+          json['performers'] == null
               ? []
-              : List.generate(json['supportTeam'].length, (index) {
-                dynamic supportRaw = json['supportTeam'][index];
+              : List.generate(json['performers'].length, (index) {
+                dynamic supportRaw = json['performers'][index];
                 Map<String, dynamic> supportMap = Map<String, dynamic>.from(
                   supportRaw,
                 );
-                return SupportUser.fromJson(supportMap);
+                return Performer.fromJson(supportMap);
               }),
     );
   }
@@ -84,7 +80,7 @@ class EventRecord {
       'date': date.toIso8601String(),
       'slot': slot.toJson(),
       'mainPerformer': eventRequesterMobile,
-      'supportTeam': supportTeam.map((e) => e.toJson()).toList(),
+      'performers': performers.map((e) => e.toJson()).toList(),
       'guests': guests,
       'songs': songs,
       'status': status,

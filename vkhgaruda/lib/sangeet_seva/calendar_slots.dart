@@ -171,8 +171,9 @@ class _CalendarSlotsState extends State<CalendarSlots> {
         break;
       }
 
-      String startString = DateFormat("HHmm").format(startDateTime);
-      String endString = DateFormat("HHmm").format(slotEndTime);
+      String startString =
+          DateFormat("HHmm").format(startDateTime).padLeft(4, '0');
+      String endString = DateFormat("HHmm").format(slotEndTime).padLeft(4, '0');
       String slotName = "Slot_${startString}_${endString}";
       Slot slot = Slot(
         name: slotName,

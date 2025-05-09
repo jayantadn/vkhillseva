@@ -61,7 +61,7 @@ class _RequestDetailsState extends State<RequestDetails> {
 
     // perform async operations here
     _eventRequester = await SSUtils()
-        .getPerformerProfile(widget.eventRecord.mainPerformerMobile);
+        .getPerformerProfile(widget.eventRecord.eventRequesterMobile);
 
     // refresh all child widgets
 
@@ -91,7 +91,7 @@ class _RequestDetailsState extends State<RequestDetails> {
         String bookedEventPath =
             "${Const().dbrootSangeetSeva}/BookedEvents/$dbdate";
         String eventPath =
-            "${Const().dbrootSangeetSeva}/Events/${widget.eventRecord.mainPerformerMobile}/$dbdate/$slotName";
+            "${Const().dbrootSangeetSeva}/Events/${widget.eventRecord.eventRequesterMobile}/$dbdate/$slotName";
         List bookedEventsRaw = await FB().getList(path: bookedEventPath);
         List bookedEventsOutput = [];
         for (var bookedEventRaw in bookedEventsRaw) {
@@ -116,7 +116,7 @@ class _RequestDetailsState extends State<RequestDetails> {
             .setJson(path: slotPath, json: widget.eventRecord.slot.toJson());
 
         // notify the user
-        String mobile = widget.eventRecord.mainPerformerMobile;
+        String mobile = widget.eventRecord.eventRequesterMobile;
         String fcmToken = await Utils().getFcmToken(mobile);
         Notifications().sendPushNotification(
             fcmToken: fcmToken,
@@ -142,7 +142,7 @@ class _RequestDetailsState extends State<RequestDetails> {
       await FB().setValue(path: path, value: eventRaw);
 
       // notify the user
-      String mobile = widget.eventRecord.mainPerformerMobile;
+      String mobile = widget.eventRecord.eventRequesterMobile;
       String fcmToken = await Utils().getFcmToken(mobile);
       Notifications().sendPushNotification(
           fcmToken: fcmToken,
@@ -378,32 +378,16 @@ class _RequestDetailsState extends State<RequestDetails> {
                                       ),
                                     );
                                   }),
+
+                                  // guests
+                                  if (widget.eventRecord.guests > 0)
+                                    ListTile(
+                                      title: Text(
+                                          "Number of guests: ${widget.eventRecord.guests}"),
+                                    ),
                                 ],
                               ),
                             ),
-
-                          // guests
-                          if (widget.eventRecord.guests.isNotEmpty)
-                            Widgets().createTopLevelCard(
-                                context: context,
-                                title: "Guests",
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Widgets()
-                                      .createTopLevelResponsiveContainer(
-                                          context,
-                                          List.generate(
-                                              widget.eventRecord.guests.length,
-                                              (index) {
-                                            var guest = widget
-                                                .eventRecord.guests[index];
-                                            return Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Text(
-                                                  "${index + 1}. ${guest.name} ${guest.honorPrasadam ? " (Prasadam)" : ""}"),
-                                            );
-                                          })),
-                                )),
 
                           // list of songs
                           Widgets().createTopLevelCard(

@@ -52,7 +52,7 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
             EventRecord event =
                 Utils().convertRawToDatatype(eventRaw, EventRecord.fromJson);
             var mainPerformer =
-                await SSUtils().getPerformerProfile(event.mainPerformerMobile);
+                await SSUtils().getPerformerProfile(event.eventRequesterMobile);
 
             setState(() {
               _events.add(event);
@@ -141,7 +141,7 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
             _events.add(event);
 
             var mainPerformer =
-                await SSUtils().getPerformerProfile(event.mainPerformerMobile);
+                await SSUtils().getPerformerProfile(event.eventRequesterMobile);
             if (mainPerformer != null) {
               _mainPerformers[mainPerformer.mobile] = mainPerformer;
             }
@@ -171,7 +171,7 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
   Widget _createEventCard(index) {
     String title = DateFormat("dd MMM, yyyy").format(_events[index].date);
     title += " (${_events[index].slot.from} - ${_events[index].slot.to})";
-    String mobile = _events[index].mainPerformerMobile;
+    String mobile = _events[index].eventRequesterMobile;
     if (_mainPerformers[mobile] == null) {
       Toaster().error("Could not find user");
       return const SizedBox();

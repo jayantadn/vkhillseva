@@ -386,7 +386,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     EventRecord performanceRequest = EventRecord(
       date: widget.selectedDate,
       slot: widget.slot,
-      mainPerformerMobile: _eventResponsible!.mobile,
+      eventRequesterMobile: _eventResponsible!.mobile,
       supportTeam: _performers,
       guests: _guests,
       songs: _songs,

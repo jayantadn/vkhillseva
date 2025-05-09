@@ -133,7 +133,7 @@ class _PendingRequestsState extends State<PendingRequests> {
 
       for (EventRecord pendingRequest in _linkedEventRecords) {
         PerformerProfile? mainPerformer = await SSUtils()
-            .getPerformerProfile(pendingRequest.mainPerformerMobile);
+            .getPerformerProfile(pendingRequest.eventRequesterMobile);
         if (mainPerformer != null) {
           _mainPerformers[mainPerformer.mobile] = mainPerformer;
         }
@@ -163,9 +163,9 @@ class _PendingRequestsState extends State<PendingRequests> {
     String title = DateFormat("dd MMM, yyyy").format(pendingRequest.date);
     title += " (${pendingRequest.slot.from} - ${pendingRequest.slot.to})";
     String performer =
-        _mainPerformers[pendingRequest.mainPerformerMobile]!.name;
+        _mainPerformers[pendingRequest.eventRequesterMobile]!.name;
     String profilePicUrl =
-        _mainPerformers[pendingRequest.mainPerformerMobile]!.profilePicUrl;
+        _mainPerformers[pendingRequest.eventRequesterMobile]!.profilePicUrl;
 
     return Widgets().createTopLevelCard(
         context: context,
@@ -178,7 +178,8 @@ class _PendingRequestsState extends State<PendingRequests> {
               Text(performer),
               SizedBox(width: 10),
               Icon(Icons.phone),
-              Text(_mainPerformers[pendingRequest.mainPerformerMobile]!.mobile),
+              Text(
+                  _mainPerformers[pendingRequest.eventRequesterMobile]!.mobile),
             ],
           ),
         ));
@@ -207,7 +208,7 @@ class _PendingRequestsState extends State<PendingRequests> {
                       ...List.generate(_linkedEventRecords.length, (index) {
                         // get the path of the pending request
                         EventRecord event = _linkedEventRecords[index];
-                        String mobile = event.mainPerformerMobile;
+                        String mobile = event.eventRequesterMobile;
                         String date =
                             DateFormat("yyyy-MM-dd").format(event.date);
                         String slot = event.slot.name;

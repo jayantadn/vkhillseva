@@ -33,7 +33,7 @@ class SupportUser {
 class EventRecord {
   final DateTime date;
   final Slot slot;
-  final String mainPerformerMobile;
+  final String eventRequesterMobile;
   final List<SupportUser> supportTeam;
   final int guests;
   final List<String> songs;
@@ -44,7 +44,7 @@ class EventRecord {
   EventRecord({
     required this.date,
     required this.slot,
-    required this.mainPerformerMobile,
+    required this.eventRequesterMobile,
     required this.supportTeam,
     required this.guests,
     required this.songs,
@@ -56,7 +56,7 @@ class EventRecord {
   factory EventRecord.fromJson(Map<String, dynamic> json) {
     return EventRecord(
       date: DateTime.parse(json['date'] as String),
-      mainPerformerMobile: json['mainPerformer'] as String,
+      eventRequesterMobile: json['mainPerformer'] as String,
 
       notePerformer: json['notePerformer'] as String,
       noteTemple: json['noteTemple'] as String,
@@ -83,7 +83,7 @@ class EventRecord {
     return {
       'date': date.toIso8601String(),
       'slot': slot.toJson(),
-      'mainPerformer': mainPerformerMobile,
+      'mainPerformer': eventRequesterMobile,
       'supportTeam': supportTeam.map((e) => e.toJson()).toList(),
       'guests': guests,
       'songs': songs,

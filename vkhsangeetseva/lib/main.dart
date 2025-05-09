@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sangeet Seva',
       theme: themeSangeetSeva,
-      home: reg,
+      home: home,
     );
   }
 }

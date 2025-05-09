@@ -328,6 +328,7 @@ class Widgets {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          title: Text('Attention!'),
           content: Text(msg),
           actions: <Widget>[
             TextButton(

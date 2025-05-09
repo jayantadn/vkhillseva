@@ -462,7 +462,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     await Widgets().showResponsiveDialog(
         context: context,
-        title: "Add number of guests",
+        title: "Number of guests",
         child: Form(
             key: formKey,
             child: TextFormField(
@@ -511,6 +511,11 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 });
 
                 Navigator.pop(context);
+
+                if (_guests + _performers.length > 10) {
+                  Widgets().showMessage(context,
+                      "Nominal charges for prasadam will apply for more than 10 members");
+                }
               },
               child: Text("OK"))
         ]);
@@ -988,6 +993,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                             }),
                           ),
 
+                          // guest count
+                          if (_guests > 0) _createGuestTile(),
+
                           // button - add performer team
                           if (widget.readOnly == null)
                             TextButton(
@@ -1004,7 +1012,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                             ),
 
                           // button - add guest team
-                          if (widget.readOnly == null)
+                          if (widget.readOnly == null && _guests == 0)
                             TextButton(
                               onPressed: () async {
                                 await _showAddGuestDialog(

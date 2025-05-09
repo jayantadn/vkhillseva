@@ -40,7 +40,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   final List<String> _songs = [];
 
   // controllers, listeners and focus nodes
-  final TextEditingController _guestNameController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _raagaController = TextEditingController();
   final TextEditingController _taalaController = TextEditingController();
@@ -60,7 +59,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     _songs.clear();
 
     // clear all controllers and focus nodes
-    _guestNameController.dispose();
     _titleController.dispose();
     _raagaController.dispose();
     _taalaController.dispose();
@@ -238,12 +236,11 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                 case "Edit":
                   await _showAddGuestDialog(
                     context: context,
-                    oldUser: member,
                   );
                   break;
                 case "Remove":
                   setState(() {
-                    _guests.removeAt(index);
+                    _guests = 0;
                   });
                   break;
               }
@@ -453,117 +450,70 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   Future<void> _showAddGuestDialog({
     required BuildContext context,
-    Guest? oldUser,
-  }) {
-    bool honorPrasadam = false;
-    if (oldUser == null) {
-      _guestNameController.clear();
-    } else {
-      _guestNameController.text = oldUser.name;
-      honorPrasadam = oldUser.honorPrasadam;
-    }
-
+  }) async {
     FocusNode focusNode = FocusNode();
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-    return showDialog(
-      context: context,
-      builder: (context) {
-        // Request focus after the dialog is built
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          focusNode.requestFocus();
-        });
+    int guests = _guests;
 
-        return AlertDialog(
-          title: Text(oldUser == null ? "Add guest" : "Edit guest"),
-          content: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  // name
-                  TextFormField(
-                    controller: _guestNameController,
-                    focusNode: focusNode,
-                    decoration: InputDecoration(labelText: "Name"),
-                    validator: (value) {
-                      if (value == null ||
-                          value.isEmpty ||
-                          value.length < 3 ||
-                          value.length > 30) {
-                        return "Please enter a valid name";
-                      }
-                      if (RegExp(
-                        r'[0-9!@#$%^&*(),.?":{}|<>]',
-                      ).hasMatch(value)) {
-                        return "Numbers and special characters are not allowed";
-                      }
-                      if (_guests.any((guest) => guest.name == value)) {
-                        return "Guest already exists";
-                      }
-                      return null;
-                    },
-                  ),
+    // Request focus after the dialog is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      focusNode.requestFocus();
+    });
 
-                  // honor prasadam
-                  StatefulBuilder(
-                    builder: (context, setState) {
-                      return CheckboxListTile(
-                        title: Text("Honor Prasadam"),
-                        value: honorPrasadam,
-                        onChanged: (newValue) {
-                          setState(() {
-                            honorPrasadam = newValue!;
-                          });
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
+    await Widgets().showResponsiveDialog(
+        context: context,
+        title: "Add number of guests",
+        child: Form(
+            key: formKey,
+            child: TextFormField(
+              focusNode: focusNode,
+              keyboardType: TextInputType.number,
+              initialValue: guests.toString(),
+              onChanged: (value) {
+                guests = int.parse(value);
               },
-              child: Text("Cancel"),
-            ),
-
-            // add button
-            ElevatedButton(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please enter a valid number";
+                }
+                if (int.tryParse(value) == null) {
+                  return "Please enter a valid number";
+                }
+                if (RegExp(
+                  r'[!@#$%^&*(),.?":{}|<>]',
+                ).hasMatch(value)) {
+                  return "Special characters not allowed";
+                }
+                if (int.parse(value) < 0) {
+                  return "Number of guests can't be negative";
+                }
+                return null;
+              },
+              onTap: () {
+                // Select all text when the field gains focus
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  focusNode.requestFocus();
+                  (focusNode.context as EditableTextState)
+                      .selectAll(SelectionChangedCause.tap);
+                });
+              },
+            )),
+        actions: [
+          // ok button
+          ElevatedButton(
               onPressed: () {
                 if (!formKey.currentState!.validate()) {
                   return;
                 }
 
-                Navigator.pop(context);
-
                 setState(() {
-                  if (oldUser == null) {
-                    _guests.add(
-                      Guest(
-                        name: _guestNameController.text,
-                        honorPrasadam: honorPrasadam,
-                      ),
-                    );
-                  } else {
-                    int index = _guests.indexOf(oldUser);
-                    if (index != -1) {
-                      _guests[index] = Guest(
-                        name: _guestNameController.text,
-                        honorPrasadam: honorPrasadam,
-                      );
-                    }
-                  }
+                  _guests = guests;
                 });
+
+                Navigator.pop(context);
               },
-              child: Text(oldUser == null ? "Add" : "Update"),
-            ),
-          ],
-        );
-      },
-    );
+              child: Text("OK"))
+        ]);
   }
 
   Future<void> _showAddNoteDialog(BuildContext context) async {
@@ -1038,7 +988,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                             }),
                           ),
 
-                          // button - add supporting team
+                          // button - add performer team
                           if (widget.readOnly == null)
                             TextButton(
                               onPressed: () async {
@@ -1051,6 +1001,17 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                     ? "Add performer"
                                     : "Add more",
                               ),
+                            ),
+
+                          // button - add guest team
+                          if (widget.readOnly == null)
+                            TextButton(
+                              onPressed: () async {
+                                await _showAddGuestDialog(
+                                  context: context,
+                                );
+                              },
+                              child: Text("Add guests"),
                             ),
                         ],
                       ),

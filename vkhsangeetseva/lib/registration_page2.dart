@@ -33,6 +33,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   bool _isLoading = true;
   PerformerProfile? _requester;
   final _minSongs = 3;
+  late DateTime _eventStart;
+  late DateTime _eventEnd;
 
   // lists
   final List<Performer> _performers = [];
@@ -48,6 +50,16 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
   @override
   initState() {
     super.initState();
+
+    // set the event start and end time
+    _eventStart = Time().convertStringToTime(
+      widget.selectedDate,
+      widget.slot.from,
+    );
+    _eventEnd = Time().convertStringToTime(
+      widget.selectedDate,
+      widget.slot.to,
+    );
 
     refresh();
   }
@@ -87,6 +99,32 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       );
     } else {
       Toaster().error("User not found");
+    }
+
+    // preferred event time
+    DateTime startTime =
+        Time().convertStringToTime(widget.selectedDate, widget.slot.from);
+    DateTime endTime =
+        Time().convertStringToTime(widget.selectedDate, widget.slot.to);
+    if (endTime.difference(startTime).inMinutes > SSConst().maxEventDuration) {
+      List<Map<String, dynamic>> eventTimes = [];
+      DateTime startEvent = startTime;
+      for (var i = 0; i < 10; i++) {
+        DateTime endEvent = startEvent.add(
+          Duration(minutes: SSConst().maxEventDuration),
+        );
+        if (endEvent.isAfter(endTime)) {
+          break;
+        }
+        eventTimes.add({"start": startEvent, "end": endEvent});
+        startEvent = startEvent.add(
+          Duration(minutes: 30),
+        );
+      }
+      await _showPreferredTimeDialog(
+        context: context,
+        eventTimes: eventTimes,
+      );
     }
 
     // refresh all child widgets
@@ -391,6 +429,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     EventRecord performanceRequest = EventRecord(
       date: widget.selectedDate,
       slot: widget.slot,
+      eventStart: _eventStart,
+      eventEnd: _eventEnd,
       eventRequesterMobile: _requester!.mobile,
       performers: _performers,
       guests: _guests,
@@ -874,6 +914,35 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     );
   }
 
+  Future<void> _showPreferredTimeDialog({
+    required BuildContext context,
+    required List<Map<String, dynamic>> eventTimes,
+  }) async {
+    await Widgets().showResponsiveDialog(
+        context: context,
+        title: "Select preferred time slot",
+        child: Column(
+          children: [
+            ...List.generate(eventTimes.length, (index) {
+              String start = Time()
+                  .convertDateTimeTo12hrFormat(eventTimes[index]["start"]);
+              String end =
+                  Time().convertDateTimeTo12hrFormat(eventTimes[index]["end"]);
+              return OutlinedButton(
+                  onPressed: () {
+                    setState(() {
+                      _eventStart = eventTimes[index]["start"];
+                      _eventEnd = eventTimes[index]["end"];
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: Text("$start - $end"));
+            }),
+          ],
+        ),
+        actions: []);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -918,7 +987,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
                     // slot
                     Text(
-                      "${widget.slot.from} - ${widget.slot.to}",
+                      "${Time().convertDateTimeTo12hrFormat(_eventStart)} - ${Time().convertDateTimeTo12hrFormat(_eventEnd)}",
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
 

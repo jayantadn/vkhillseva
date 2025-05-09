@@ -29,6 +29,8 @@ class Performer {
 class EventRecord {
   final DateTime date;
   final Slot slot;
+  DateTime eventStart;
+  DateTime eventEnd;
   final String eventRequesterMobile;
   final List<Performer> performers;
   final int guests;
@@ -40,6 +42,8 @@ class EventRecord {
   EventRecord({
     required this.date,
     required this.slot,
+    required this.eventStart,
+    required this.eventEnd,
     required this.eventRequesterMobile,
     required this.performers,
     required this.guests,
@@ -57,6 +61,8 @@ class EventRecord {
       notePerformer: json['notePerformer'] as String,
       noteTemple: json['noteTemple'] as String,
       slot: Slot.fromJson(Map<String, dynamic>.from(json['slot'])),
+      eventStart: DateTime.parse(json['eventStart'] as String),
+      eventEnd: DateTime.parse(json['eventEnd'] as String),
       songs: List.generate(json['songs'].length, (index) {
         return json['songs'][index];
       }),
@@ -79,6 +85,8 @@ class EventRecord {
     return {
       'date': date.toIso8601String(),
       'slot': slot.toJson(),
+      'eventStart': eventStart.toIso8601String(),
+      'eventEnd': eventEnd.toIso8601String(),
       'mainPerformer': eventRequesterMobile,
       'performers': performers.map((e) => e.toJson()).toList(),
       'guests': guests,

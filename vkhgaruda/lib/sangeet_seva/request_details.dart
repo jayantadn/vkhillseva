@@ -299,7 +299,7 @@ class _RequestDetailsState extends State<RequestDetails> {
 
                         // slot
                         Text(
-                            "${widget.eventRecord.slot.from} - ${widget.eventRecord.slot.to}",
+                            "${Time().convertDateTimeTo12hrFormat(widget.eventRecord.eventStart)} - ${Time().convertDateTimeTo12hrFormat(widget.eventRecord.eventEnd)}",
                             style: themeGaruda.textTheme.headlineMedium),
 
                         Column(children: [

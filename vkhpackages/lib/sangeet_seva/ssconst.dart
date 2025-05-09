@@ -47,4 +47,6 @@ class SSConst {
     Slot(name: "MorningSlot", avl: true, from: "10:00 AM", to: "01:00 PM"),
     Slot(name: "EveningSlot", avl: true, from: "05:00 PM", to: "08:00 PM"),
   ];
+
+  final maxEventDuration = 90; // mins
 }

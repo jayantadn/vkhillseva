@@ -161,7 +161,8 @@ class _PendingRequestsState extends State<PendingRequests> {
   Widget _createPendingRequestCard(int index) {
     EventRecord pendingRequest = _linkedEventRecords[index];
     String title = DateFormat("dd MMM, yyyy").format(pendingRequest.date);
-    title += " (${pendingRequest.slot.from} - ${pendingRequest.slot.to})";
+    title +=
+        " (${Time().convertDateTimeTo12hrFormat(pendingRequest.eventStart)} - ${Time().convertDateTimeTo12hrFormat(pendingRequest.eventEnd)})";
     String performer =
         _mainPerformers[pendingRequest.eventRequesterMobile]!.name;
     String profilePicUrl =

@@ -170,7 +170,8 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
 
   Widget _createEventCard(index) {
     String title = DateFormat("dd MMM, yyyy").format(_events[index].date);
-    title += " (${_events[index].slot.from} - ${_events[index].slot.to})";
+    title +=
+        " (${Time().convertDateTimeTo12hrFormat(_events[index].eventStart)} - ${Time().convertDateTimeTo12hrFormat(_events[index].eventEnd)})";
     String mobile = _events[index].eventRequesterMobile;
     if (_mainPerformers[mobile] == null) {
       Toaster().error("Could not find user");

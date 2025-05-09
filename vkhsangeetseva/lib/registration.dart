@@ -47,7 +47,7 @@ class _RegistrationState extends State<Registration> {
   @override
   dispose() {
     // clear all lists
-    _bookedSlotsCnt.clear();
+    _bookedSlotsCnt = List.filled(31, 0);
     _avlSlotsCnt.clear();
     _avlSlots.clear();
 

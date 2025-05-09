@@ -99,7 +99,8 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
 
   Widget _createEventCard(int index) {
     String title = DateFormat("dd MMM, yyyy").format(_events[index].date);
-    title += " (${_events[index].slot.from} - ${_events[index].slot.to})";
+    title +=
+        " (${Time().convertDateTimeTo12hrFormat(_events[index].eventStart)} - ${Time().convertDateTimeTo12hrFormat(_events[index].eventEnd)})";
 
     EventRecord event = _events[index];
 

@@ -103,30 +103,33 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
     // preferred event time
     if (widget.readOnly == null || widget.readOnly == false) {
-      DateTime startTime =
-          Time().convertStringToTime(widget.selectedDate, widget.slot.from);
-      DateTime endTime =
-          Time().convertStringToTime(widget.selectedDate, widget.slot.to);
-      if (endTime.difference(startTime).inMinutes >
-          SSConst().maxEventDuration) {
-        List<Map<String, dynamic>> eventTimes = [];
-        DateTime startEvent = startTime;
-        for (var i = 0; i < 10; i++) {
-          DateTime endEvent = startEvent.add(
-            Duration(minutes: SSConst().maxEventDuration),
-          );
-          if (endEvent.isAfter(endTime)) {
-            break;
+      if (widget.oldEvent != null) {
+        _eventStart = widget.oldEvent!.eventStart;
+        _eventEnd = widget.oldEvent!.eventEnd;
+      } else {
+        if (_eventEnd.difference(_eventStart).inMinutes >
+            SSConst().maxEventDuration) {
+          DateTime startTime = _eventStart;
+          DateTime endTime = _eventEnd;
+          List<Map<String, dynamic>> eventTimes = [];
+          DateTime startEvent = startTime;
+          for (var i = 0; i < 10; i++) {
+            DateTime endEvent = startEvent.add(
+              Duration(minutes: SSConst().maxEventDuration),
+            );
+            if (endEvent.isAfter(endTime)) {
+              break;
+            }
+            eventTimes.add({"start": startEvent, "end": endEvent});
+            startEvent = startEvent.add(
+              Duration(minutes: 30),
+            );
           }
-          eventTimes.add({"start": startEvent, "end": endEvent});
-          startEvent = startEvent.add(
-            Duration(minutes: 30),
+          await _showPreferredTimeDialog(
+            context: context,
+            eventTimes: eventTimes,
           );
         }
-        await _showPreferredTimeDialog(
-          context: context,
-          eventTimes: eventTimes,
-        );
       }
     }
     // refresh all child widgets
@@ -159,11 +162,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
       // performers
       _performers.clear();
-      _performers.add(Performer(
-          salutation: _requester!.salutation,
-          name: _requester!.name,
-          specialization: "Vocalist"));
-
       if (widget.oldEvent != null) {
         // populate the data structure
         EventRecord performanceRequest = widget.oldEvent!;
@@ -174,6 +172,13 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         _guests = performanceRequest.guests;
         _songs.addAll(performanceRequest.songs);
         _noteController.text = performanceRequest.notePerformer;
+      }
+      Performer self = Performer(
+          salutation: _requester!.salutation,
+          name: _requester!.name,
+          specialization: "Vocalist");
+      if (_performers.isEmpty) {
+        _performers.add(self);
       }
     });
   }
@@ -1062,12 +1067,11 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       title: "Performers",
                       child: Column(
                         children: [
-                          Widgets().createTopLevelResponsiveContainer(
-                            context,
-                            List.generate(_performers.length, (index) {
+                          Column(children: [
+                            ...List.generate(_performers.length, (index) {
                               return _createPerfomerTile(index);
                             }),
-                          ),
+                          ]),
 
                           // guest count
                           if (_guests > 0) _createGuestTile(),

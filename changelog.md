@@ -1,3 +1,19 @@
+# 6.6.0
+- fix: add support team as top modal
+- fix: add song dialog
+- fix: sangeet sadhana details
+- feature: responsive dialog
+- fix: modal for single slot creation dialog
+- feature: add multiple slots
+- fix: youtube links redesigned
+- fix: handle others while adding performers in event request
+- feature: guest count
+- feature: UI changes for guest
+- feature: Event requester as default performer
+- feature: slot preference
+- feature: notes from temple is pre-populated
+- fix: multiple main performer
+
 # 6.5.0
 - fix: max slots in a day
 

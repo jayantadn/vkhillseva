@@ -118,7 +118,13 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
     // subscribe to notifications
     try {
-      await Notifications().setupFirebaseMessaging();
+      await Notifications().setupFirebaseMessaging().timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          Toaster().error("Failed to setup notifications");
+          return;
+        },
+      );
       FirebaseMessaging.instance.subscribeToTopic("SSAdmin");
     } catch (e) {
       // nothing to do

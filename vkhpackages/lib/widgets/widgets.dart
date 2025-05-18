@@ -289,7 +289,7 @@ class Widgets {
                 // Ensures the height is based on the child
                 child: Column(
                   children: [
-                    SizedBox(height: 50),
+                    if (!kIsWeb) SizedBox(height: 50),
                     createTopLevelCard(
                       context: context,
                       title: title,

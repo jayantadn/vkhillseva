@@ -44,11 +44,15 @@ class SSConst {
   ];
 
   final List<Slot> weekendSangeetSevaSlots = [
-    Slot(name: "MorningSlot", avl: true, from: "10:00 AM", to: "01:00 PM"),
+    Slot(name: "MorningSlot", avl: true, from: "10:30 AM", to: "01:00 PM"),
     Slot(name: "EveningSlot", avl: true, from: "05:00 PM", to: "08:00 PM"),
   ];
 
-  final maxEventDuration = 90; // mins
+  final List<Map<String, dynamic>> aartiTimings = [
+    {"name": "Sandhya Aarti", "from": "07:00 PM", "to": "07:15 PM"},
+  ];
+
+  final maxEventDuration = 60; // mins
 
   // temple notes
   final List<String> templeNotes = [

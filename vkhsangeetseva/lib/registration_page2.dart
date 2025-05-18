@@ -109,25 +109,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       } else {
         if (_eventEnd.difference(_eventStart).inMinutes >
             SSConst().maxEventDuration) {
-          DateTime startTime = _eventStart;
-          DateTime endTime = _eventEnd;
-          List<Map<String, dynamic>> eventTimes = [];
-          DateTime startEvent = startTime;
-          for (var i = 0; i < 10; i++) {
-            DateTime endEvent = startEvent.add(
-              Duration(minutes: SSConst().maxEventDuration),
-            );
-            if (endEvent.isAfter(endTime)) {
-              break;
-            }
-            eventTimes.add({"start": startEvent, "end": endEvent});
-            startEvent = startEvent.add(
-              Duration(minutes: 30),
-            );
-          }
           await _showPreferredTimeDialog(
             context: context,
-            eventTimes: eventTimes,
           );
         }
       }
@@ -923,8 +906,45 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
 
   Future<void> _showPreferredTimeDialog({
     required BuildContext context,
-    required List<Map<String, dynamic>> eventTimes,
   }) async {
+    DateTime startTime = _eventStart;
+    DateTime endTime = _eventEnd;
+    List<Map<String, dynamic>> eventTimes = [];
+    DateTime startEvent = startTime;
+    for (var i = 0; i < 10; i++) {
+      DateTime endEvent = startEvent.add(
+        Duration(minutes: SSConst().maxEventDuration),
+      );
+      if (endEvent.isAfter(endTime)) {
+        break;
+      }
+
+      // check if aati falls in this time slot
+      bool isAartiTime = false;
+      for (Map<String, dynamic> aartiTiming in SSConst().aartiTimings) {
+        DateTime aartiStart = Time().convertStringToTime(
+          widget.selectedDate,
+          aartiTiming["from"],
+        );
+        DateTime aartiEnd = Time().convertStringToTime(
+          widget.selectedDate,
+          aartiTiming["to"],
+        );
+        if (startEvent.isBefore(aartiStart) && endEvent.isAfter(aartiEnd)) {
+          isAartiTime = true;
+          break;
+        }
+      }
+      if (isAartiTime) {
+        continue;
+      }
+
+      eventTimes.add({"start": startEvent, "end": endEvent});
+      startEvent = startEvent.add(
+        Duration(minutes: 30),
+      );
+    }
+
     await Widgets().showResponsiveDialog(
         context: context,
         title: "Select preferred time slot",

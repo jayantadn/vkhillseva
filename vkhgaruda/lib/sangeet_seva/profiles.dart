@@ -20,9 +20,11 @@ class _ProfilesState extends State<Profiles> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  String _tab = "Performers";
 
   // lists
   final List<PerformerProfile> _performers = [];
+  final List<Performer> _supporters = [];
 
   // controllers, listeners and focus nodes
 
@@ -37,6 +39,7 @@ class _ProfilesState extends State<Profiles> {
   dispose() {
     // clear all lists
     _performers.clear();
+    _supporters.clear();
 
     // clear all controllers and focus nodes
 
@@ -50,6 +53,8 @@ class _ProfilesState extends State<Profiles> {
 
     await _lock.synchronized(() async {
       // perform async operations here
+
+      // performers
       _performers.clear();
       List<dynamic> usersRawList = await FB().getList(
         path: "${Const().dbrootSangeetSeva}/Users",
@@ -58,6 +63,12 @@ class _ProfilesState extends State<Profiles> {
         Map<String, dynamic> userJson = Map<String, dynamic>.from(userRaw);
         PerformerProfile user = PerformerProfile.fromJson(userJson);
         _performers.add(user);
+      }
+
+      // supporters
+      _supporters.clear();
+      for (PerformerProfile user in _performers) {
+        _supporters.addAll(user.referrals);
       }
     });
 
@@ -88,21 +99,41 @@ class _ProfilesState extends State<Profiles> {
           children: [
             Row(
               children: [
-                Icon(Icons.phone),
+                Icon(
+                  Icons.phone,
+                  size: 16,
+                ),
                 SizedBox(width: 5),
                 Text(member.mobile),
               ],
             ),
-            SizedBox(width: 4),
+            SizedBox(width: 10),
             Row(
               children: [
-                Icon(Icons.workspace_premium),
+                Icon(
+                  Icons.workspace_premium,
+                  size: 16,
+                ),
                 SizedBox(width: 5),
                 Text(member.credentials),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _createSupporterCard(int index) {
+    var member = _supporters[index];
+    return ListTile(
+      title: Text("${member.salutation} ${member.name}"),
+      subtitle: Row(
+        children: [
+          Icon(Icons.workspace_premium, size: 16),
+          SizedBox(width: 5),
+          Text(member.specialization),
+        ],
       ),
     );
   }
@@ -127,18 +158,41 @@ class _ProfilesState extends State<Profiles> {
                           // leave some space at top
                           SizedBox(height: 10),
 
-                          // performers list
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: _performers.length,
-                            itemBuilder: (context, index) {
-                              return Card(child: _createPerformerCard(index));
+                          // radio performers vs supporters
+                          RadioRow(
+                            items: ["Performers", "Supporters"],
+                            onChanged: (value) {
+                              setState(() {
+                                _tab = value;
+                              });
                             },
                           ),
 
+                          // performers list
+                          if (_tab == "Performers")
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: _performers.length,
+                              itemBuilder: (context, index) {
+                                return Card(child: _createPerformerCard(index));
+                              },
+                            ),
+
+                          // supporters list
+                          if (_tab == "Supporters")
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: _supporters.length,
+                              itemBuilder: (context, index) {
+                                return Card(child: _createSupporterCard(index));
+                              },
+                            ),
+
                           // empty message
-                          if (_performers.isEmpty)
+                          if ((_tab == "Performers" && _performers.isEmpty) ||
+                              (_tab == "Supporters" && _supporters.isEmpty))
                             Center(
                               child: Text("No profiles found"),
                             ),

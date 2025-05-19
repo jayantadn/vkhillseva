@@ -66,14 +66,16 @@ class _RadioRowState extends State<RadioRow> {
                     ),
                   ),
                   padding: EdgeInsets.all(8),
-                  child: Text(
-                    item,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color:
-                          _selectedItem == item
-                              ? Colors.white
-                              : Theme.of(context).colorScheme.primary,
+                  child: Center(
+                    child: Text(
+                      item,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color:
+                            _selectedItem == item
+                                ? Colors.white
+                                : Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                   ),
                 ),

@@ -124,8 +124,8 @@ class _ProfilesState extends State<Profiles> {
     );
   }
 
-  Widget _createSupporterCard(int index) {
-    var member = _supporters[index];
+  Widget _createSupporterCard(int indexSupporter, int indexPerformer) {
+    var member = _supporters[indexSupporter];
     return ListTile(
       title: Text("${member.salutation} ${member.name}"),
       subtitle: Row(

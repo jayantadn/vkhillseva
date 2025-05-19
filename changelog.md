@@ -1,3 +1,7 @@
+# 6.6.1
+- fix: seva slot duration made one hour
+- feature: save list of supporters
+
 # 6.6.0
 - fix: add support team as top modal
 - fix: add song dialog

@@ -63,6 +63,15 @@ class _RegistrationState extends State<Registration> {
 
     // perform async operations here
 
+    // setup notifications
+    await Notifications().setupFirebaseMessaging().timeout(
+      const Duration(seconds: 10),
+      onTimeout: () {
+        Toaster().error("Failed to setup notifications");
+        return;
+      },
+    );
+
     // check if profile is set
     await Utils().fetchUserBasics();
     UserBasics? basics = Utils().getUserBasics();

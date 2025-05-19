@@ -402,7 +402,7 @@ class _ProfileState extends State<Profile> {
 
     // set the FCM token
     String? fcmToken = await Notifications().setupFirebaseMessaging().timeout(
-      const Duration(seconds: 30),
+      const Duration(seconds: 10),
       onTimeout: () {
         Toaster().error("Failed to setup notifications");
         return;

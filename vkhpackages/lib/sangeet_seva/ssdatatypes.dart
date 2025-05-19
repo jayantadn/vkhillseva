@@ -98,24 +98,6 @@ class EventRecord {
   }
 }
 
-class Guest {
-  final String name;
-  final bool honorPrasadam;
-
-  Guest({required this.name, required this.honorPrasadam});
-
-  factory Guest.fromJson(Map<String, dynamic> json) {
-    return Guest(
-      name: json['name'] as String,
-      honorPrasadam: json['honorPrasadam'] as bool,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'name': name, 'honorPrasadam': honorPrasadam};
-  }
-}
-
 class SangeetExp {
   final String category;
   final String subcategory;
@@ -180,6 +162,7 @@ class PerformerProfile {
   final List<SangeetExp> exps;
   final List<String> youtubeUrls;
   final List<String> audioClipUrls;
+  final List<Performer> referrals;
   String? fcmToken;
   String? friendMobile;
 
@@ -192,6 +175,7 @@ class PerformerProfile {
     required this.exps,
     required this.youtubeUrls,
     required this.audioClipUrls,
+    required this.referrals,
     this.fcmToken,
     this.friendMobile,
   });
@@ -220,6 +204,15 @@ class PerformerProfile {
           json['audioClipUrls'] == null
               ? []
               : List<String>.from(json['audioClipUrls']),
+      referrals:
+          json['referrals'] == null
+              ? []
+              : List<Performer>.from(
+                json['referrals'].map(
+                  (e) =>
+                      Performer.fromJson(Map<String, dynamic>.from(e as Map)),
+                ),
+              ),
       fcmToken: json['fcmToken'],
       friendMobile: json['friendMobile'],
     );
@@ -235,6 +228,7 @@ class PerformerProfile {
       'exps': exps.map((e) => e.toJson()).toList(),
       'youtubeUrls': youtubeUrls,
       'audioClipUrls': audioClipUrls,
+      'referrals': referrals.map((e) => e.toJson()).toList(),
       'fcmToken': fcmToken,
       'friendMobile': friendMobile,
     };

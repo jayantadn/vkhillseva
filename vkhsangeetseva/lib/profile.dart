@@ -397,6 +397,7 @@ class _ProfileState extends State<Profile> {
         credentials: _credController.text,
         youtubeUrls: _youtubeLinks.where((link) => link.isNotEmpty).toList(),
         audioClipUrls: _audioClips.where((link) => link.isNotEmpty).toList(),
+        referrals: [],
         friendMobile: widget.friendMobile);
 
     // set the FCM token

@@ -445,6 +445,22 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       );
     }
 
+    // update referrals
+    String dbpath = "${Const().dbrootSangeetSeva}/Users/$mobile/referrals";
+    List<dynamic> existingReferrals = await FB().getList(path: dbpath);
+    final List<Performer> referrals = [];
+    // Add performers to referrals, skipping the one whose name matches _requester!.name
+    referrals.addAll(
+      _performers.where((p) => p.name != _requester!.name),
+    );
+    for (var referral in referrals) {
+      if (!existingReferrals.contains(referral)) {
+        existingReferrals.add(referral);
+      }
+    }
+    await FB()
+        .setList(path: dbpath, list: referrals, toJson: (p) => p.toJson());
+
     // add to pending requests
     if (widget.oldEvent == null || widget.oldEvent!.status != "Pending") {
       FB().addToList(

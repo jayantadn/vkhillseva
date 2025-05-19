@@ -119,7 +119,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
     // subscribe to notifications
     try {
       await Notifications().setupFirebaseMessaging().timeout(
-        const Duration(seconds: 30),
+        const Duration(seconds: 15),
         onTimeout: () {
           Toaster().error("Failed to setup notifications");
           return;

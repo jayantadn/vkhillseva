@@ -1075,6 +1075,15 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
           appBar: AppBar(
             title: Text(widget.title),
             actions: [
+              // advisory button
+              IconButton(
+                icon: Icon(Icons.info_outline),
+                onPressed: () async {
+                  await _showAdvisory();
+                },
+              ),
+
+              // delete button
               if (widget.oldEvent != null && widget.readOnly == null)
                 IconButton(
                   icon: Icon(Icons.delete),

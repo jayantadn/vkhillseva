@@ -24,7 +24,8 @@ class _ProfilesState extends State<Profiles> {
 
   // lists
   final List<PerformerProfile> _performers = [];
-  final List<Performer> _supporters = [];
+  final List<Map<int, Performer>> _supporters =
+      []; // Map<PerformerIndex, Referral>
 
   // controllers, listeners and focus nodes
 
@@ -68,7 +69,9 @@ class _ProfilesState extends State<Profiles> {
       // supporters
       _supporters.clear();
       for (PerformerProfile user in _performers) {
-        _supporters.addAll(user.referrals);
+        for (var value in user.referrals) {
+          _supporters.add({_performers.indexOf(user): value});
+        }
       }
     });
 
@@ -124,15 +127,44 @@ class _ProfilesState extends State<Profiles> {
     );
   }
 
-  Widget _createSupporterCard(int indexSupporter, int indexPerformer) {
-    var member = _supporters[indexSupporter];
+  Widget _createSupporterCard(int indexSupporter) {
+    Map<int, Performer> memberMap = _supporters[indexSupporter];
+    int indexPerformer = memberMap.keys.first;
+    Performer member = memberMap.values.first;
     return ListTile(
       title: Text("${member.salutation} ${member.name}"),
       subtitle: Row(
         children: [
+          // specialization
           Icon(Icons.workspace_premium, size: 16),
           SizedBox(width: 5),
           Text(member.specialization),
+
+          // referred by
+          SizedBox(width: 10),
+          Icon(Icons.person, size: 16),
+          SizedBox(width: 5),
+          Text("Referred by: "),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileDetails(
+                    title: "Profile details",
+                    userdetails: _performers[indexPerformer],
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              _performers[indexPerformer].name,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
         ],
       ),
     );

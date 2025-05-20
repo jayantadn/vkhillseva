@@ -421,6 +421,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       return;
     }
 
+    // show advisory
+    await _showAdvisory();
+
     // populate the data structure
     EventRecord performanceRequest = EventRecord(
       date: widget.selectedDate,
@@ -934,6 +937,16 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       String advisory = advisoryRaw as String;
       advisories.add(advisory);
     }
+    bool checkboxState = false;
+
+    // local storage key for "do not show this message again"
+    String str = "DNSAdv";
+    str += widget.selectedDate.toIso8601String();
+    str += widget.slot.name;
+    String? dns = await LS().read(str);
+    if (dns != null) {
+      return;
+    }
 
     if (advisories.isNotEmpty) {
       await showDialog(
@@ -941,9 +954,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         builder: (context) => AlertDialog(
           title: const Text('Standard advisory'),
           content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: advisories
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              ...advisories
                   .asMap()
                   .entries
                   .map((entry) => Padding(
@@ -951,11 +964,35 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                         child: Text('${entry.key + 1}. ${entry.value}'),
                       ))
                   .toList(),
-            ),
+            ]),
           ),
           actions: [
+            Row(
+              children: [
+                StatefulBuilder(
+                  builder: (context, setState) => Checkbox(
+                    value: checkboxState,
+                    onChanged: (value) {
+                      setState(() {
+                        checkboxState = value!;
+                      });
+                    },
+                  ),
+                ),
+                const Text("Do not show this message again"),
+              ],
+            ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                Navigator.of(context).pop();
+
+                if (checkboxState) {
+                  LS().write(
+                    str,
+                    "true",
+                  );
+                }
+              },
               child: const Text('OK'),
             ),
           ],

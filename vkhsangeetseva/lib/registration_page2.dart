@@ -61,6 +61,12 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
       widget.slot.to,
     );
 
+    if (widget.oldEvent != null &&
+        widget.oldEvent!.status == "Approved" &&
+        widget.oldEvent!.date.isAfter(DateTime.now())) {
+      _showAdvisory();
+    }
+
     refresh();
   }
 
@@ -918,6 +924,44 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         ),
       ],
     );
+  }
+
+  Future<void> _showAdvisory() async {
+    String dbpath = "${Const().dbrootSangeetSeva}/Settings/Advisory";
+    List advisoriesRaw = await FB().getList(path: dbpath);
+    List<String> advisories = [];
+    for (var advisoryRaw in advisoriesRaw) {
+      String advisory = advisoryRaw as String;
+      advisories.add(advisory);
+    }
+
+    if (advisories.isNotEmpty) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Standard advisory'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: advisories
+                  .asMap()
+                  .entries
+                  .map((entry) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Text('${entry.key + 1}. ${entry.value}'),
+                      ))
+                  .toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   Future<void> _showPreferredTimeDialog({

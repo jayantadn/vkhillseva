@@ -19,6 +19,7 @@ class Const {
   final double toolbarIconSize = 32;
   final int morningCutoff = 14;
   final int maxImageSize = 500; // kB
+  final String delimiter = "~";
 
   final nityaSeva = {
     'amounts': [

@@ -31,6 +31,7 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
   initState() {
     super.initState();
 
+
     refresh();
   }
 
@@ -164,6 +165,8 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
       ),
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/sangeet_seva/advisory.dart';
 import 'package:vkhgaruda/sangeet_seva/calendar_slots.dart';
 import 'package:vkhgaruda/sangeet_seva/pending_requests.dart';
 import 'package:vkhgaruda/sangeet_seva/profiles.dart';
@@ -200,6 +201,29 @@ class _SangeetSevaState extends State<SangeetSeva> {
                       ),
                     ),
                   );
+                },
+              ),
+
+              // settings
+              IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  Widgets().showResponsiveDialog(
+                      context: context,
+                      child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Advisory(
+                                  title: "Advisory settings",
+                                  splashImage: widget.splashImage,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text("Advisory settings")),
+                      actions: []);
                 },
               ),
             ],

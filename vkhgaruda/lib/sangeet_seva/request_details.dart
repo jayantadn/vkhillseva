@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/sangeet_seva/advisory.dart';
 import 'package:vkhgaruda/sangeet_seva/profile_details.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -203,15 +204,6 @@ class _RequestDetailsState extends State<RequestDetails> {
   }
 
   void _showActionDialog(String action) {
-    if (_noteController.text.isEmpty) {
-      _noteController.text = SSConst()
-          .templeNotes
-          .asMap()
-          .entries
-          .map((entry) => "${entry.key + 1}. ${entry.value}\n")
-          .join();
-    }
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -226,12 +218,41 @@ class _RequestDetailsState extends State<RequestDetails> {
                 Text("Note for performers:",
                     style: themeGaruda.textTheme.headlineSmall),
                 TextField(
-                  maxLines: 3,
+                  maxLines: 2,
                   controller: _noteController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                   ),
                 ),
+
+                // advisory
+                SizedBox(height: 10),
+                if (action == "Approve")
+                  Row(
+                    children: [
+                      Text("Standard advisory added"),
+                      SizedBox(width: 10),
+                      IconButton(
+                        icon: Icon(
+                          Icons.info_outline,
+                          size: 16,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Advisory(
+                                title: "Advisory settings",
+                              ),
+                            ),
+                          );
+                        },
+                        tooltip: 'View',
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
+                      ),
+                    ],
+                  )
               ],
             ),
           ),

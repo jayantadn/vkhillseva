@@ -64,9 +64,51 @@ class _AdvisoryState extends State<Advisory> {
     });
   }
 
-  Future<void> _onAdd() async {}
+  Future<void> _onAdd() async {
+    final TextEditingController controller = TextEditingController();
 
-  Future<void> _onDelete(int index) async {}
+    await Widgets().showResponsiveDialog(
+        context: context,
+        child: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: "Advisory",
+            hintText: "Enter advisory",
+          ),
+          autofocus: true,
+          maxLines: 4,
+        ),
+        actions: [
+          TextButton(
+              onPressed: () async {
+                setState(() {
+                  _advisories.add(controller.text);
+                });
+
+                Navigator.of(context).pop();
+
+                await FB().setValue(
+                    path: "${Const().dbrootSangeetSeva}/Settings/Advisory",
+                    value: _advisories);
+              },
+              child: Text("Add"))
+        ]);
+  }
+
+  Future<void> _onDelete(int index) async {
+    await Widgets().showConfirmDialog(context, "Are you sure?", "Delete",
+        () async {
+      setState(() {
+        _advisories.removeAt(index);
+      });
+
+      Navigator.of(context).pop();
+
+      await FB().setValue(
+          path: "${Const().dbrootSangeetSeva}/Settings/Advisory",
+          value: _advisories);
+    });
+  }
 
   Future<void> _onEdit(int index) async {
     final TextEditingController controller =
@@ -105,7 +147,17 @@ class _AdvisoryState extends State<Advisory> {
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(title: Text(widget.title)),
+          appBar: AppBar(
+            title: Text(widget.title),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () async {
+                  await _onAdd();
+                },
+              ),
+            ],
+          ),
           body: RefreshIndicator(
             onRefresh: refresh,
             child: SingleChildScrollView(

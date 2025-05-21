@@ -353,6 +353,7 @@ class Widgets {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          title: Text('Confirm'),
           content: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(msg),

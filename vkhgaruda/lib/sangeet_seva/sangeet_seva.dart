@@ -210,6 +210,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
                 onPressed: () {
                   Widgets().showResponsiveDialog(
                       context: context,
+                      title: "Settings",
                       child: ElevatedButton(
                           onPressed: () {
                             Navigator.push(

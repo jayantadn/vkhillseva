@@ -25,6 +25,7 @@ class _TicketPageState extends State<TicketPage> {
   bool _isLoading = true;
   DateTime _lastCallbackInvoked = DateTime.now();
   String _username = "Guest";
+  bool _isAdmin = false;
 
   // lists
   final List<Ticket> _tickets = [];
@@ -36,6 +37,10 @@ class _TicketPageState extends State<TicketPage> {
   initState() {
     super.initState();
 
+    // check if user is admin
+    _checkIfAdmin();
+
+    // firebase listeners
     String dbDate = DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
     String sessionKey =
         widget.session.timestamp.toIso8601String().replaceAll(".", "^");
@@ -143,6 +148,11 @@ class _TicketPageState extends State<TicketPage> {
       _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       _isLoading = false;
     });
+  }
+
+  Future<void> _checkIfAdmin() async {
+    _isAdmin = await Utils().isAdmin();
+    setState(() {});
   }
 
   Widget _createTicketTile(int sl, Ticket ticket) {
@@ -541,7 +551,9 @@ class _TicketPageState extends State<TicketPage> {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
-                                .copyWith(color: Theme.of(context).colorScheme.primary),
+                                .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
                           ),
                         ),
 
@@ -618,7 +630,9 @@ class _TicketPageState extends State<TicketPage> {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
-                                .copyWith(color: Theme.of(context).colorScheme.primary),
+                                .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
                           ),
                         ),
 
@@ -639,9 +653,14 @@ class _TicketPageState extends State<TicketPage> {
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        border: Border.all(color: Theme.of(context).colorScheme.primary),
+                                        border: Border.all(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary),
                                         color: mode == m
-                                            ? Theme.of(context).colorScheme.primary
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .primary
                                             : Colors.transparent,
                                         borderRadius:
                                             BorderRadius.circular(8.0),
@@ -664,7 +683,9 @@ class _TicketPageState extends State<TicketPage> {
                                                   .copyWith(
                                                     color: mode == m
                                                         ? Colors.white
-                                                        : Theme.of(context).colorScheme.primary,
+                                                        : Theme.of(context)
+                                                            .colorScheme
+                                                            .primary,
                                                   ),
                                             ),
                                           ],
@@ -687,7 +708,9 @@ class _TicketPageState extends State<TicketPage> {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
-                                .copyWith(color: Theme.of(context).colorScheme.primary),
+                                .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
                           ),
                         ),
 
@@ -876,11 +899,13 @@ class _TicketPageState extends State<TicketPage> {
                 children: [
                   Text(
                     widget.session.name,
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.secondary),
                   ),
                   Text(
                     DateFormat("dd MMM, yyyy").format(widget.session.timestamp),
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).colorScheme.secondary),
                   ),
                 ],
               ),

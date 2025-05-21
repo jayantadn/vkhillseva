@@ -167,6 +167,28 @@ class Utils {
     await FB().setJson(path: dbpath, json: details.toJson());
   }
 
+  Future<bool> isAdmin() async {
+    UserBasics? basics = getUserBasics();
+    if (basics == null) {
+      await fetchUserBasics();
+      basics = getUserBasics();
+      if (basics == null) {
+        Toaster().error("Could not fetch user details");
+        return false;
+      }
+    }
+
+    List adminsRaw = await FB().getList(
+      path: "${Const().dbrootGaruda}/Settings/UserManagement/Admin",
+    );
+    List<String> admins = adminsRaw.map((e) => e.toString()).toList();
+    if (admins.isNotEmpty && admins.contains(basics.mobile)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   bool isDateWeekend(DateTime date) {
     return date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
   }

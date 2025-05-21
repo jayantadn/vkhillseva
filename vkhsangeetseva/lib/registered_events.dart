@@ -31,7 +31,6 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
   initState() {
     super.initState();
 
-
     refresh();
   }
 
@@ -115,7 +114,7 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
                 builder: (context) => RegistrationPage2(
                   selectedDate: event.date,
                   slot: event.slot,
-                  title: "Update event",
+                  title: "Event details",
                   icon: widget.splashImage,
                   oldEvent: event,
                   readOnly: true,
@@ -129,7 +128,7 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
                 builder: (context) => RegistrationPage2(
                   selectedDate: event.date,
                   slot: event.slot,
-                  title: "Update event",
+                  title: "Event details",
                   icon: widget.splashImage,
                   oldEvent: event,
                 ),
@@ -165,8 +164,6 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
       ),
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {

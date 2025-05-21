@@ -158,8 +158,8 @@ class _RequestDetailsState extends State<RequestDetails> {
       String dbpath = "${Const().dbrootSangeetSeva}/BookedEvents/$dbdate";
       await FB().addToList(listpath: dbpath, data: widget.pendingRequest!);
 
-      // mark the availability of the slot
       if (action == "Approve") {
+        // mark the availability of the slot
         widget.eventRecord.slot.avl = false;
         String dbdate =
             DateFormat("yyyy-MM-dd").format(widget.eventRecord.date);
@@ -292,6 +292,29 @@ class _RequestDetailsState extends State<RequestDetails> {
             appBar: AppBar(
               title: Text(widget.title),
               actions: [
+                // whatsapp button
+                IconButton(
+                  icon: Image.asset(
+                    'assets/images/Common/WhatsApp.png',
+                    width: 24,
+                    height: 24,
+                  ),
+                  onPressed: () async {
+                    String mobile =
+                        "91${widget.eventRecord.eventRequesterMobile}";
+
+                    String message = "Instructions for the program:\n\n";
+                    List advisories = await FB().getList(
+                        path: "${Const().dbrootSangeetSeva}/Settings/Advisory");
+                    for (var advisory in advisories) {
+                      message +=
+                          "${advisories.indexOf(advisory) + 1}. $advisory\n";
+                    }
+
+                    await Utils().sendWhatsAppMessage(mobile, message);
+                  },
+                ),
+
                 // reject button
                 IconButton(
                   icon: Icon(Icons.close),

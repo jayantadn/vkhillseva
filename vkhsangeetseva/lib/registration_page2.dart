@@ -979,7 +979,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                     },
                   ),
                 ),
-                const Text("Do not show this message again"),
+                const Text("Do not show this again"),
               ],
             ),
             TextButton(
@@ -1109,6 +1109,27 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                   children: [
                     // leave some space at top
                     SizedBox(height: 10),
+
+                    // approval status
+                    if (widget.oldEvent != null &&
+                        widget.oldEvent!.status == "Approved")
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 1, horizontal: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color: Colors.green.shade700, width: 2),
+                        ),
+                        child: Text(
+                          "Approved",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
 
                     // date
                     Text(

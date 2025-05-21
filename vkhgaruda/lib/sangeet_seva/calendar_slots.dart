@@ -47,7 +47,7 @@ class _CalendarSlotsState extends State<CalendarSlots> {
   @override
   dispose() {
     // clear all lists
-    _bookedSlotsCnt.clear();
+    _bookedSlotsCnt = List.filled(31, 0);
     _avlSlotsCnt.clear();
     _bookedSlots.clear();
     _avlSlots.clear();

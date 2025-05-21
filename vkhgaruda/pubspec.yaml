@@ -40,13 +40,13 @@ dependencies:
   flutter_typeahead: ^5.2.0
   pdf: ^3.11.1
   printing: ^5.13.4
-  url_launcher: ^6.3.1
   table_calendar: ^3.2.0
   vkhpackages:
     path: ../vkhpackages
   firebase_messaging: ^15.2.4
   fluttertoast: ^8.2.12
   package_info_plus: ^8.3.0
+  url_launcher: ^6.3.1
   
 
 dev_dependencies:
@@ -89,6 +89,7 @@ flutter:
     - assets/images/Common/morning.png
     - assets/images/Common/evening.png
     - assets/images/Common/add.png
+    - assets/images/Common/WhatsApp.png
     - assets/images/Festivals/RamNavami.png
     - assets/images/Festivals/Balarama.png
     - assets/images/Festivals/AkshayaTritiya.png

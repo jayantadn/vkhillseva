@@ -128,7 +128,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
       );
       FirebaseMessaging.instance.subscribeToTopic("SSAdmin");
     } catch (e) {
-      // nothing to do
+      Toaster().error("Failed to setup notifications");
     }
 
     await _lock.synchronized(() async {

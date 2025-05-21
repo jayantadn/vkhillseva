@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const Landing(title: "Hare Krishna");
-  final Widget test = const Advisory(
+  final Widget test = const SangeetSeva(
     title: "Testing",
   );
 
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Garuda',
       theme: themeGaruda,
-      home: test,
+      home: home,
     );
   }
 }

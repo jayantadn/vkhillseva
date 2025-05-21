@@ -2,6 +2,7 @@ import subprocess
 import sys
 import os
 import shutil
+import json
 
 reltype = ""
 hostingsite = ""
@@ -15,7 +16,14 @@ def run_command(command):
         sys.exit(1)
     return result.stdout.strip()
 
-def update_changelog(version):       
+def update_changelog(version):
+    print("updating effort")
+    with open('.timetracker', 'r') as f:
+        timetracker_data = json.load(f)
+        effort_sec = timetracker_data['total']
+        effort_hr = effort_sec // 3600
+    os.unlink('.timetracker')
+
     print("generate the changelog from git log")
     base_branch = run_command('git merge-base origin/main HEAD')
     logs = run_command(f'git log {base_branch}..HEAD --pretty=%B')
@@ -33,6 +41,7 @@ def update_changelog(version):
         existing_contents = file.read()
     with open('changelog.md', 'w') as file:
         file.write(f'# {version}\n')
+        file.write(f'## Effort for this release: {effort_hr} hrs\n')
         for log_message in log_messages:
             file.write(f'- {log_message}\n')
         file.write('\n')  

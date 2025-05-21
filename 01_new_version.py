@@ -93,12 +93,17 @@ def main():
 
 
 
-    print("Read the value of the 'version' key")
-    os.chdir(rootdir)
-    version_file = 'vkhgaruda/pubspec.yaml'
-    search_string = "version"
-    value = get_value_from_file(version_file, search_string)
-    oldversion = value.split('+')[0]
+    print("Get the latest remote branch")
+    if len(sys.argv) > 1:
+        oldversion = sys.argv[1]
+    else:
+        try:
+            output = subprocess.check_output(["git", "ls-remote", "--heads", "origin"]).decode("utf-8")
+            branches = [line.split("\t")[1].split("refs/heads/")[1] for line in output.splitlines()]
+            branches = [branch for branch in branches if branch.count('.') == 2 and all(part.isdigit() for part in branch.split('.'))]
+            oldversion = max(branches, key=Version)
+        except subprocess.CalledProcessError:
+            print("Failed to retrieve remote branches")
 
     print("Increment the version number based on user selection")
     if version_type == "major":

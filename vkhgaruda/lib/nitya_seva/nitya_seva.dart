@@ -340,10 +340,10 @@ class _NityaSevaState extends State<NityaSeva> {
                                         decoration: BoxDecoration(
                                           color:
                                               selectedSevaType == "Pushpanjali"
-                                                  ? accentColor
+                                                  ? Theme.of(context).colorScheme.primary
                                                   : Colors.transparent,
                                           border:
-                                              Border.all(color: accentColor),
+                                              Border.all(color: Theme.of(context).colorScheme.primary),
                                           borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(8),
                                             bottomLeft: Radius.circular(8),
@@ -360,7 +360,7 @@ class _NityaSevaState extends State<NityaSeva> {
                                                 color: selectedSevaType ==
                                                         "Pushpanjali"
                                                     ? Colors.white
-                                                    : accentColor,
+                                                    : Theme.of(context).colorScheme.primary,
                                               ),
                                         ),
                                       ),
@@ -377,14 +377,14 @@ class _NityaSevaState extends State<NityaSeva> {
                                         decoration: BoxDecoration(
                                           color: selectedSevaType ==
                                                   "Kumkum Archana"
-                                              ? accentColor
+                                              ? Theme.of(context).colorScheme.primary
                                               : Colors.transparent,
                                           border: Border(
-                                            top: BorderSide(color: accentColor),
+                                            top: BorderSide(color: Theme.of(context).colorScheme.primary),
                                             right:
-                                                BorderSide(color: accentColor),
+                                                BorderSide(color: Theme.of(context).colorScheme.primary),
                                             bottom:
-                                                BorderSide(color: accentColor),
+                                                BorderSide(color: Theme.of(context).colorScheme.primary),
                                           ),
                                           borderRadius: BorderRadius.only(
                                             topRight: Radius.circular(8),
@@ -402,7 +402,7 @@ class _NityaSevaState extends State<NityaSeva> {
                                                 color: selectedSevaType ==
                                                         "Kumkum Archana"
                                                     ? Colors.white
-                                                    : accentColor,
+                                                    : Theme.of(context).colorScheme.primary,
                                               ),
                                         ),
                                       ),

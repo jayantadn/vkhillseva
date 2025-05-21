@@ -193,7 +193,7 @@ class _TallyNotesPageState extends State<TallyCashPage> {
     var diff = total - _sumCash!;
     var msg = Text(
       'Do you want to save?',
-      style: TextStyle(color: primaryColor),
+      style: TextStyle(color: Theme.of(context).colorScheme.primary),
     );
     if (diff > 0) {
       msg = Text(
@@ -255,7 +255,7 @@ class _TallyNotesPageState extends State<TallyCashPage> {
             width: 60,
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: primaryColor,
+              color: Theme.of(context).colorScheme.primary,
               border: Border.all(color: Colors.black),
               borderRadius: BorderRadius.circular(12.0),
             ),

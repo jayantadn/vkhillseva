@@ -541,7 +541,7 @@ class _TicketPageState extends State<TicketPage> {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
-                                .copyWith(color: accentColor),
+                                .copyWith(color: Theme.of(context).colorScheme.primary),
                           ),
                         ),
 
@@ -618,7 +618,7 @@ class _TicketPageState extends State<TicketPage> {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
-                                .copyWith(color: accentColor),
+                                .copyWith(color: Theme.of(context).colorScheme.primary),
                           ),
                         ),
 
@@ -639,9 +639,9 @@ class _TicketPageState extends State<TicketPage> {
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        border: Border.all(color: primaryColor),
+                                        border: Border.all(color: Theme.of(context).colorScheme.primary),
                                         color: mode == m
-                                            ? primaryColor
+                                            ? Theme.of(context).colorScheme.primary
                                             : Colors.transparent,
                                         borderRadius:
                                             BorderRadius.circular(8.0),
@@ -664,7 +664,7 @@ class _TicketPageState extends State<TicketPage> {
                                                   .copyWith(
                                                     color: mode == m
                                                         ? Colors.white
-                                                        : primaryColor,
+                                                        : Theme.of(context).colorScheme.primary,
                                                   ),
                                             ),
                                           ],
@@ -687,7 +687,7 @@ class _TicketPageState extends State<TicketPage> {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
-                                .copyWith(color: accentColor),
+                                .copyWith(color: Theme.of(context).colorScheme.primary),
                           ),
                         ),
 

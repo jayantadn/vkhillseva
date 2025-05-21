@@ -11,6 +11,7 @@ import 'package:vkhpackages/common/themeGaruda.dart';
 class ThemeCreator {
   Color primaryColor;
   Color secondaryColor = Colors.white;
+  Color textColor = Colors.black;
 
   ThemeCreator({required this.primaryColor});
 

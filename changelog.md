@@ -1,3 +1,10 @@
+# 6.7.0
+- feature: show supporter profile
+- feature: referrals shown in profiles
+- feature: standard advisory for client
+- feature: edit advisory
+- feature: add and delete advisory
+
 # 6.6.1
 - fix: seva slot duration made one hour
 - feature: save list of supporters

@@ -130,8 +130,8 @@ class Utils {
     return formatter.format(number);
   }
 
-  Future<String> getFcmToken(String mobile) async {
-    String token = await FB().getValue(
+  Future<String?> getFcmToken(String mobile) async {
+    String? token = await FB().getValue(
       path: "${Const().dbrootSangeetSeva}/Users/$mobile/fcmToken",
     );
     return token;

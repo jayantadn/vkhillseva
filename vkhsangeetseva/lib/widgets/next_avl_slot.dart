@@ -535,7 +535,7 @@ class NextAvlSlotState extends State<NextAvlSlot> {
             children: [
               Text(
                 _nextAvailableDate != null
-                    ? DateFormat('dd MMM yyyy').format(_nextAvailableDate!)
+                    ? DateFormat('EEE, dd MMM yyyy').format(_nextAvailableDate!)
                     : "No slots...",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),

@@ -6,6 +6,7 @@ class Session {
   final String icon;
   final String sevakarta;
   final DateTime timestamp;
+  SessionLock? sessionLock;
 
   Session(
       {required this.name,
@@ -14,7 +15,8 @@ class Session {
       required this.defaultPaymentMode,
       required this.icon,
       required this.sevakarta,
-      required this.timestamp});
+      required this.timestamp,
+      SessionLock? sessionLock});
 
   Map<String, dynamic> toJson() {
     return {
@@ -25,6 +27,7 @@ class Session {
       'icon': icon,
       'sevakarta': sevakarta,
       'timestamp': timestamp.toIso8601String(),
+      'sessionLock': sessionLock?.toJson(),
     };
   }
 
@@ -37,8 +40,48 @@ class Session {
       icon: json['icon'],
       sevakarta: json['sevakarta'],
       timestamp: DateTime.parse(json['timestamp']),
+      sessionLock: json['sessionLock'] != null
+          ? SessionLock.fromJson(json['sessionLock'])
+          : null,
     );
 
     return session;
+  }
+}
+
+class SessionLock {
+  final bool isLocked;
+  final String lockedBy;
+  final DateTime lockedTime;
+  final String unlockedBy;
+  final DateTime unlockedTime;
+
+  SessionLock(
+      {required this.isLocked,
+      required this.lockedBy,
+      required this.lockedTime,
+      required this.unlockedBy,
+      required this.unlockedTime});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'isLocked': isLocked,
+      'lockedBy': lockedBy,
+      'lockedTime': lockedTime.toIso8601String(),
+      'unlockedBy': unlockedBy,
+      'unlockedTime': unlockedTime.toIso8601String(),
+    };
+  }
+
+  factory SessionLock.fromJson(Map<String, dynamic> json) {
+    SessionLock sessionLock = SessionLock(
+      isLocked: json['isLocked'],
+      lockedBy: json['lockedBy'],
+      lockedTime: DateTime.parse(json['lockedTime']),
+      unlockedBy: json['unlockedBy'],
+      unlockedTime: DateTime.parse(json['unlockedTime']),
+    );
+
+    return sessionLock;
   }
 }

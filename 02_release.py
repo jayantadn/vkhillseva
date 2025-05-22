@@ -196,7 +196,7 @@ def release(app):
             else:
                 run_command(f'git commit -m "release {branch_name}"')
             run_command('git push origin')
-            if branch_name != "main":
+            if branch_name != "main" and reltype == 'release':
                 run_command('git checkout main')
                 run_command('git pull')
                 run_command(f'git merge {branch_name}')

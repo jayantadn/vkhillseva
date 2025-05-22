@@ -8,7 +8,6 @@ import 'package:synchronized/synchronized.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:vkhpackages/widgets/radio_row.dart';
 import 'package:file_picker/file_picker.dart';
 
 class Profile extends StatefulWidget {

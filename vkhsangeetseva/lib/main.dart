@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:vkhsangeetseva/profile.dart';
 import 'package:vkhsangeetseva/registration_page2.dart';
 import 'package:vkhsangeetseva/slot_selection.dart';
 import 'firebase_options.dart';
@@ -44,7 +43,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sangeet Seva',
       theme: themeSangeetSeva,
-      home: test,
+      home: home,
     );
   }
 }

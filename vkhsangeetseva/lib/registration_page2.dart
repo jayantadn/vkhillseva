@@ -740,7 +740,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     TextEditingController performerNameController = TextEditingController();
     TextEditingController otherController = TextEditingController();
     String specialization = "Vocalist";
-    String other_specialization = "";
+    String otherSpecialization = "";
 
     // edit mode
     if (oldUser != null) {
@@ -885,7 +885,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           return null;
                         },
                         onChanged: (value) {
-                          other_specialization = value;
+                          otherSpecialization = value;
                         },
                       ),
                   ],
@@ -908,7 +908,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
               salutation: salutation,
               name: performerNameController.text,
               specialization: specialization == "Other"
-                  ? other_specialization
+                  ? otherSpecialization
                   : specialization,
             );
 
@@ -963,7 +963,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Text('${entry.key + 1}. ${entry.value}'),
                       ))
-                  .toList(),
+                  ,
             ]),
           ),
           actions: [

@@ -7,7 +7,7 @@ import 'package:vkhgaruda/nitya_seva/laddu/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
-import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
+import 'package:vkhgaruda/common/datatypes.dart';
 
 class Log extends StatefulWidget {
   final DateTime? session;

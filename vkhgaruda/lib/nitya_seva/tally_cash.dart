@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:vkhgaruda/common/datatypes.dart';
 
 class TallyCashPage extends StatefulWidget {
   const TallyCashPage({super.key});

@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/common/datatypes.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/session_summary.dart';
 import 'package:vkhgaruda/nitya_seva/tally_cash.dart';
@@ -25,7 +26,7 @@ class _TicketPageState extends State<TicketPage> {
   bool _isLoading = true;
   DateTime _lastCallbackInvoked = DateTime.now();
   String _username = "Guest";
-  bool _isAdmin = false;
+  bool _isSessionLocked = false;
 
   // lists
   final List<Ticket> _tickets = [];
@@ -36,9 +37,6 @@ class _TicketPageState extends State<TicketPage> {
   @override
   initState() {
     super.initState();
-
-    // check if user is admin
-    _checkIfAdmin();
 
     // firebase listeners
     String dbDate = DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
@@ -148,11 +146,6 @@ class _TicketPageState extends State<TicketPage> {
       _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       _isLoading = false;
     });
-  }
-
-  Future<void> _checkIfAdmin() async {
-    _isAdmin = await Utils().isAdmin();
-    setState(() {});
   }
 
   Widget _createTicketTile(int sl, Ticket ticket) {
@@ -933,6 +926,65 @@ class _TicketPageState extends State<TicketPage> {
                   },
                 ),
 
+                // lock session
+                if (!_isSessionLocked)
+                  IconButton(
+                    icon: Icon(Icons.lock_open, size: 32),
+                    onPressed: () {
+                      CommonWidgets().confirm(
+                        context: context,
+                        msg:
+                            "Are you sure to lock this session? Tickets cannot be added or modified after this.",
+                        callbacks: ConfirmationCallbacks(onConfirm: () {
+                          setState(() {
+                            _isSessionLocked = true;
+                          });
+                        }),
+                      );
+                    },
+                  ),
+
+                // unlock session
+                if (_isSessionLocked)
+                  IconButton(
+                    icon: Icon(Icons.lock, size: 32),
+                    onPressed: () async {
+                      List adminsRaw = await FB().getList(
+                          path:
+                              "${Const().dbrootGaruda}/Settings/UserManagement/Admin");
+                      List<String> admins =
+                          adminsRaw.map((e) => e.toString()).toList();
+
+                      UserBasics? user = Utils().getUserBasics();
+                      if (user == null) {
+                        Utils().fetchUserBasics();
+                        user = Utils().getUserBasics();
+                      }
+
+                      if (user == null) {
+                        Widgets().showMessage(context,
+                            "You cannot unlock the session. Please contact admin to do it.");
+                        return;
+                      }
+                      if (!admins.contains(user.mobile)) {
+                        Widgets().showMessage(context,
+                            "You cannot unlock the session. Please contact admin to do it.");
+                        return;
+                      }
+
+                      CommonWidgets().confirm(
+                        context: context,
+                        msg:
+                            "Are you sure to unlock this session? Tickets can be added or modified after this.",
+                        callbacks: ConfirmationCallbacks(onConfirm: () {
+                          setState(() {
+                            _isSessionLocked = false;
+                          });
+                        }),
+                      );
+                    },
+                  ),
+
                 // menu button
                 CommonWidgets().createPopupMenu([
                   // tally cash button
@@ -995,48 +1047,5 @@ class _TicketPageState extends State<TicketPage> {
         ],
       ),
     );
-  }
-}
-
-class Ticket {
-  final DateTime timestamp;
-  final int amount;
-  final String mode;
-  final int ticketNumber;
-  final String user;
-  final String note;
-  final String seva;
-
-  Ticket(
-      {required this.timestamp,
-      required this.amount,
-      required this.mode,
-      required this.ticketNumber,
-      required this.user,
-      required this.note,
-      required this.seva});
-
-  factory Ticket.fromJson(Map<String, dynamic> json) {
-    return Ticket(
-      timestamp: DateTime.parse(json['timestamp']),
-      amount: json['amount'],
-      mode: json['mode'],
-      ticketNumber: json['ticketNumber'],
-      user: json['user'],
-      note: json['note'],
-      seva: json['seva'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'timestamp': timestamp.toIso8601String(),
-      'amount': amount,
-      'mode': mode,
-      'ticketNumber': ticketNumber,
-      'user': user,
-      'note': note,
-      'seva': seva,
-    };
   }
 }

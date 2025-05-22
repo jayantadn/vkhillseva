@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
+import 'package:vkhgaruda/common/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class TallyUpiCardPage extends StatefulWidget {

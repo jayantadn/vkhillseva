@@ -53,6 +53,9 @@ def set_parameters():
 
     rootdir = run_command('git rev-parse --show-toplevel')
     
+    input("Stop the time tracker if running. Press Enter to continue...")
+
+    # set release type
     if len(sys.argv) == 2:
         reltype = sys.argv[1]
     else:

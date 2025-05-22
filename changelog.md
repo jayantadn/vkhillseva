@@ -1,3 +1,8 @@
+# 7.1.0
+## Effort for this release: 1 hrs
+- feature: theme change
+- feature: lock button
+
 # 6.7.0
 - feature: show supporter profile
 - feature: referrals shown in profiles

@@ -50,26 +50,26 @@ class Session {
 }
 
 class SessionLock {
-  final bool isLocked;
-  final String lockedBy;
-  final DateTime lockedTime;
-  final String unlockedBy;
-  final DateTime unlockedTime;
+  bool isLocked;
+  String? lockedBy;
+  DateTime? lockedTime;
+  String? unlockedBy;
+  DateTime? unlockedTime;
 
   SessionLock(
       {required this.isLocked,
-      required this.lockedBy,
-      required this.lockedTime,
-      required this.unlockedBy,
-      required this.unlockedTime});
+      this.lockedBy,
+      this.lockedTime,
+      this.unlockedBy,
+      this.unlockedTime});
 
   Map<String, dynamic> toJson() {
     return {
       'isLocked': isLocked,
       'lockedBy': lockedBy,
-      'lockedTime': lockedTime.toIso8601String(),
+      'lockedTime': lockedTime?.toIso8601String(),
       'unlockedBy': unlockedBy,
-      'unlockedTime': unlockedTime.toIso8601String(),
+      'unlockedTime': unlockedTime?.toIso8601String(),
     };
   }
 

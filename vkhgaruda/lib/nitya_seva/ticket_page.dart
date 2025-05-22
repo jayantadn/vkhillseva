@@ -126,12 +126,18 @@ class _TicketPageState extends State<TicketPage> {
       });
     }
 
+    await Utils().fetchUserBasics();
     _username = Utils().getUsername();
 
-    // fetch tickets
+    // check if session is locked
     String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
     String dbSession =
         widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+    Map<String, dynamic> sessionLock = await FB().getJson(
+        path:
+            "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Settings/SessionLock");
+
+    // fetch tickets
     List ticketsJson = await FB().getList(
         path: "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets");
     await _lock.synchronized(() async {
@@ -145,333 +151,8 @@ class _TicketPageState extends State<TicketPage> {
     setState(() {
       _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       _isLoading = false;
+      _isSessionLocked = sessionLock['isLocked'] ?? false;
     });
-  }
-
-  Widget _createTicketTile(int sl, Ticket ticket) {
-    double sizeOfContainer = 80;
-    String time = DateFormat("HH:mm").format(ticket.timestamp);
-
-    Color color = Const()
-        .nityaSeva['amounts']!
-        .firstWhere((element) => element.keys.first == ticket.amount.toString())
-        .values
-        .first['color']! as Color;
-
-    return Dismissible(
-      key: Key(ticket.ticketNumber.toString()),
-      background: Container(
-        color: Colors.blue,
-        alignment: Alignment.centerLeft,
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: Icon(Icons.edit, color: Colors.white),
-      ),
-      secondaryBackground: Container(
-        color: Colors.red,
-        alignment: Alignment.centerRight,
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: Icon(Icons.delete, color: Colors.white),
-      ),
-      confirmDismiss: (direction) async {
-        if (direction == DismissDirection.startToEnd) {
-          _addEditTicket(context, ticket);
-          return false;
-        } else if (direction == DismissDirection.endToStart) {
-          _deleteTicket(ticket);
-          return false;
-        }
-        return false;
-      },
-      child: Row(
-        children: [
-          // left badge
-          Container(
-            height: sizeOfContainer,
-            width: sizeOfContainer,
-            decoration: BoxDecoration(
-              color: color,
-              border: Border.all(color: Colors.grey),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // serial number
-                Text(sl.toString(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineLarge!
-                        .copyWith(color: Colors.black)),
-
-                // ticket number
-                Text("#${ticket.ticketNumber}",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge!
-                        .copyWith(fontWeight: FontWeight.bold)),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              height: sizeOfContainer,
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: Colors.grey),
-                  right: BorderSide(color: Colors.grey),
-                  bottom: BorderSide(color: Colors.grey),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(children: [
-                            // seva name headline
-                            Flexible(
-                              child: Text(
-                                ticket.seva,
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-
-                            // note icon
-                            SizedBox(width: 8),
-                            if (ticket.note.isNotEmpty)
-                              GestureDetector(
-                                onTap: () {
-                                  // Handle note click event
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text('Note'),
-                                        content: Text(ticket.note),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text('Close'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    color: Colors.yellow,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(1.0),
-                                    child: Text('Note',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(color: Colors.black)),
-                                  ),
-                                ),
-                              ),
-                          ]),
-
-                          // other details
-                          SizedBox(height: 2),
-                          Text(
-                            "${ticket.user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
-                            style: Theme.of(context).textTheme.bodyMedium,
-                            softWrap: true,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<String> _getSevaNames(int amount) {
-    List<String> ret = [];
-
-    for (var seva in Const().nityaSeva['amounts']!) {
-      if (seva.keys.first == amount.toString()) {
-        List sevas = seva.values.first['sevas'] as List;
-        for (var seva in sevas) {
-          ret.add(seva['name']);
-        }
-      }
-    }
-
-    return ret;
-  }
-
-  List<String> _prevalidateTicket(Ticket ticket) {
-    List<String> errors = [];
-    List<Ticket> filteredTickets =
-        _tickets.where((t) => t.amount == ticket.amount).toList();
-
-    // check if ticket number is > 0
-    if (ticket.ticketNumber <= 0) {
-      errors.add("Ticket number should be greater than 0");
-    }
-
-    // check if ticket number is unique
-    if (filteredTickets
-        .where((t) => t.ticketNumber == ticket.ticketNumber)
-        .isNotEmpty) {
-      errors.add("Ticket number already exists");
-    }
-
-    // check if ticket number is contiguous
-    if (filteredTickets.isNotEmpty && filteredTickets.length > 1) {
-      if (ticket.ticketNumber - filteredTickets.first.ticketNumber != 1) {
-        errors.add("Ticket number should be contiguous");
-      }
-    }
-
-    // check if ticket is entered in another date
-    DateTime now = DateTime.now();
-    if (widget.session.timestamp.day != now.day ||
-        widget.session.timestamp.month != now.month ||
-        widget.session.timestamp.year != now.year) {
-      errors.add("Ticket from another date");
-    }
-
-    return errors;
-  }
-
-  Future<List<String>> _prevalidateDelete(Ticket ticket) async {
-    List<String> errors = [];
-
-    // check if ticket is from another date
-    DateTime now = DateTime.now();
-    if (ticket.timestamp.day != now.day ||
-        ticket.timestamp.month != now.month ||
-        ticket.timestamp.year != now.year) {
-      errors.add("Ticket created in older date");
-    }
-
-    // check if ticket is not from latest session
-    String dbDate = DateFormat("yyyy-MM-dd").format(now);
-    var sessionsList =
-        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
-    List<Session> sessions = [];
-    for (var sessionRaw in sessionsList) {
-      Map<String, dynamic> s =
-          Map<String, dynamic>.from(sessionRaw['Settings']);
-      sessions.add(Session.fromJson(s));
-    }
-    sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    if (sessions.isNotEmpty) {
-      DateTime lastSession = sessions.last.timestamp;
-      if (lastSession != widget.session.timestamp) {
-        errors.add("Ticket from another session");
-      }
-    }
-
-    sessions.clear();
-    return errors;
-  }
-
-  Future<List<String>> _postvalidateTicket() async {
-    List<String> errors = [];
-
-    await refresh();
-
-    // create a map of tickets as per amount
-    Map<int, List<Ticket>> ticketsMap = {};
-    for (var ticket in _tickets) {
-      if (!ticketsMap.containsKey(ticket.amount)) {
-        ticketsMap[ticket.amount] = [];
-      }
-      ticketsMap[ticket.amount]!.add(ticket);
-    }
-
-    // check if ticket numbers are unique
-    if (_tickets.length != _tickets.toSet().length) {
-      errors.add("Duplicate ticket numbers found");
-    }
-
-    // check for each key, whether the list of tickets have contiguous numbers
-    ticketsMap.forEach((amount, tickets) {
-      tickets.sort((a, b) => a.ticketNumber.compareTo(b.ticketNumber));
-      for (int i = 0; i < tickets.length - 1; i++) {
-        if (tickets[i + 1].ticketNumber - tickets[i].ticketNumber != 1) {
-          errors.add("Ticket numbers for amount $amount are not contiguous");
-          break;
-        }
-      }
-    });
-
-    // check if ticket is created in the correct session
-    String dbDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-    var sessionsList =
-        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
-    if (sessionsList.isEmpty) {
-      errors.add("No sessions found for today");
-    } else {
-      List<Session> sessions = [];
-      for (var sessionRaw in sessionsList) {
-        Map<String, dynamic> sessionMap =
-            Map<String, dynamic>.from(sessionRaw['Settings']);
-        sessions.add(Session.fromJson(sessionMap));
-      }
-      sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-      if (sessions.last.timestamp != widget.session.timestamp) {
-        errors.add("Ticket created in old session");
-      }
-    }
-
-    return errors;
-  }
-
-  Future<void> _deleteTicket(Ticket ticket) async {
-    List<String> errors = await _prevalidateDelete(ticket);
-
-    if (errors.isNotEmpty) {
-      String? action = await CommonWidgets().createErrorDialog(
-        context: context,
-        errors: errors,
-      );
-
-      if (action == "Cancel") {
-        return;
-      }
-    }
-
-    CommonWidgets().confirm(
-        context: context,
-        msg: "Are you sure you want to delete this ticket?",
-        callbacks: ConfirmationCallbacks(onConfirm: () {
-          // delete ticket from list
-          setState(() {
-            _tickets.remove(ticket);
-          });
-          _lastCallbackInvoked = DateTime.now();
-
-          // delete ticket from database
-          String dbDate =
-              DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
-          String dbSession =
-              widget.session.timestamp.toIso8601String().replaceAll(".", "^");
-          String key = ticket.timestamp.toIso8601String().replaceAll(".", "^");
-          FB().deleteValue(
-              path:
-                  "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key");
-        }));
   }
 
   void _addEditTicket(context, Ticket? ticket) {
@@ -878,6 +559,428 @@ class _TicketPageState extends State<TicketPage> {
     );
   }
 
+  Widget _createTicketTile(int sl, Ticket ticket) {
+    double sizeOfContainer = 80;
+    String time = DateFormat("HH:mm").format(ticket.timestamp);
+
+    Color color = Const()
+        .nityaSeva['amounts']!
+        .firstWhere((element) => element.keys.first == ticket.amount.toString())
+        .values
+        .first['color']! as Color;
+
+    return Dismissible(
+      key: Key(ticket.ticketNumber.toString()),
+      background: Container(
+        color: Colors.blue,
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Icon(Icons.edit, color: Colors.white),
+      ),
+      secondaryBackground: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Icon(Icons.delete, color: Colors.white),
+      ),
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          _addEditTicket(context, ticket);
+          return false;
+        } else if (direction == DismissDirection.endToStart) {
+          _deleteTicket(ticket);
+          return false;
+        }
+        return false;
+      },
+      child: Row(
+        children: [
+          // left badge
+          Container(
+            height: sizeOfContainer,
+            width: sizeOfContainer,
+            decoration: BoxDecoration(
+              color: color,
+              border: Border.all(color: Colors.grey),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // serial number
+                Text(sl.toString(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineLarge!
+                        .copyWith(color: Colors.black)),
+
+                // ticket number
+                Text("#${ticket.ticketNumber}",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge!
+                        .copyWith(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Container(
+              height: sizeOfContainer,
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Colors.grey),
+                  right: BorderSide(color: Colors.grey),
+                  bottom: BorderSide(color: Colors.grey),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(children: [
+                            // seva name headline
+                            Flexible(
+                              child: Text(
+                                ticket.seva,
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+
+                            // note icon
+                            SizedBox(width: 8),
+                            if (ticket.note.isNotEmpty)
+                              GestureDetector(
+                                onTap: () {
+                                  // Handle note click event
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Note'),
+                                        content: Text(ticket.note),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Close'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    color: Colors.yellow,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(1.0),
+                                    child: Text('Note',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(color: Colors.black)),
+                                  ),
+                                ),
+                              ),
+                          ]),
+
+                          // other details
+                          SizedBox(height: 2),
+                          Text(
+                            "${ticket.user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            softWrap: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<String> _getSevaNames(int amount) {
+    List<String> ret = [];
+
+    for (var seva in Const().nityaSeva['amounts']!) {
+      if (seva.keys.first == amount.toString()) {
+        List sevas = seva.values.first['sevas'] as List;
+        for (var seva in sevas) {
+          ret.add(seva['name']);
+        }
+      }
+    }
+
+    return ret;
+  }
+
+  Future<void> _onUnlockSession() async {
+    // check if user is admin
+    List adminsRaw = await FB()
+        .getList(path: "${Const().dbrootGaruda}/Settings/UserManagement/Admin");
+    List<String> admins = adminsRaw.map((e) => e.toString()).toList();
+    UserBasics? user = Utils().getUserBasics();
+    if (user == null || user.name.isEmpty) {
+      await Utils().fetchUserBasics();
+      user = Utils().getUserBasics();
+    }
+    if (user == null) {
+      Widgets().showMessage(context,
+          "You cannot unlock the session. Please contact admin to do it.");
+      return;
+    }
+    if (!admins.contains(user.mobile)) {
+      Widgets().showMessage(context,
+          "You cannot unlock the session. Please contact admin to do it.");
+      return;
+    }
+
+    CommonWidgets().confirm(
+      context: context,
+      msg:
+          "Are you sure to unlock this session? Tickets can be added or modified after this.",
+      callbacks: ConfirmationCallbacks(onConfirm: () async {
+        // push to fb
+        SessionLock sessionLock;
+        if (widget.session.sessionLock == null) {
+          sessionLock = SessionLock(
+            isLocked: false,
+            unlockedBy: _username,
+            unlockedTime: DateTime.now(),
+          );
+        } else {
+          sessionLock = widget.session.sessionLock!;
+          sessionLock.isLocked = false;
+          sessionLock.unlockedBy = _username;
+          sessionLock.unlockedTime = DateTime.now();
+        }
+        widget.session.sessionLock = sessionLock;
+        String dbdate =
+            DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
+        String key =
+            widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+        await FB().setJson(
+            path:
+                "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings/SessionLock",
+            json: sessionLock.toJson());
+
+        // unlock the session
+        setState(() {
+          _isSessionLocked = false;
+        });
+      }),
+    );
+  }
+
+  void _onLockSession() {
+    CommonWidgets().confirm(
+      context: context,
+      msg:
+          "Are you sure to lock this session? Tickets cannot be added or modified after this.",
+      callbacks: ConfirmationCallbacks(onConfirm: () async {
+        // push to fb
+        SessionLock sessionLock;
+        if (widget.session.sessionLock == null) {
+          sessionLock = SessionLock(
+            isLocked: true,
+            lockedBy: _username,
+            lockedTime: DateTime.now(),
+          );
+        } else {
+          sessionLock = widget.session.sessionLock!;
+          sessionLock.isLocked = true;
+          sessionLock.lockedBy = _username;
+          sessionLock.lockedTime = DateTime.now();
+        }
+        widget.session.sessionLock = sessionLock;
+        String dbdate =
+            DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
+        String key =
+            widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+        await FB().setJson(
+            path:
+                "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings/SessionLock",
+            json: sessionLock.toJson());
+
+        // lock the UI
+        setState(() {
+          _isSessionLocked = true;
+        });
+      }),
+    );
+  }
+
+  List<String> _prevalidateTicket(Ticket ticket) {
+    List<String> errors = [];
+    List<Ticket> filteredTickets =
+        _tickets.where((t) => t.amount == ticket.amount).toList();
+
+    // check if ticket number is > 0
+    if (ticket.ticketNumber <= 0) {
+      errors.add("Ticket number should be greater than 0");
+    }
+
+    // check if ticket number is unique
+    if (filteredTickets
+        .where((t) => t.ticketNumber == ticket.ticketNumber)
+        .isNotEmpty) {
+      errors.add("Ticket number already exists");
+    }
+
+    // check if ticket number is contiguous
+    if (filteredTickets.isNotEmpty && filteredTickets.length > 1) {
+      if (ticket.ticketNumber - filteredTickets.first.ticketNumber != 1) {
+        errors.add("Ticket number should be contiguous");
+      }
+    }
+
+    // check if ticket is entered in another date
+    DateTime now = DateTime.now();
+    if (widget.session.timestamp.day != now.day ||
+        widget.session.timestamp.month != now.month ||
+        widget.session.timestamp.year != now.year) {
+      errors.add("Ticket from another date");
+    }
+
+    return errors;
+  }
+
+  Future<List<String>> _prevalidateDelete(Ticket ticket) async {
+    List<String> errors = [];
+
+    // check if ticket is from another date
+    DateTime now = DateTime.now();
+    if (ticket.timestamp.day != now.day ||
+        ticket.timestamp.month != now.month ||
+        ticket.timestamp.year != now.year) {
+      errors.add("Ticket created in older date");
+    }
+
+    // check if ticket is not from latest session
+    String dbDate = DateFormat("yyyy-MM-dd").format(now);
+    var sessionsList =
+        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
+    List<Session> sessions = [];
+    for (var sessionRaw in sessionsList) {
+      Map<String, dynamic> s =
+          Map<String, dynamic>.from(sessionRaw['Settings']);
+      sessions.add(Session.fromJson(s));
+    }
+    sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    if (sessions.isNotEmpty) {
+      DateTime lastSession = sessions.last.timestamp;
+      if (lastSession != widget.session.timestamp) {
+        errors.add("Ticket from another session");
+      }
+    }
+
+    sessions.clear();
+    return errors;
+  }
+
+  Future<List<String>> _postvalidateTicket() async {
+    List<String> errors = [];
+
+    await refresh();
+
+    // create a map of tickets as per amount
+    Map<int, List<Ticket>> ticketsMap = {};
+    for (var ticket in _tickets) {
+      if (!ticketsMap.containsKey(ticket.amount)) {
+        ticketsMap[ticket.amount] = [];
+      }
+      ticketsMap[ticket.amount]!.add(ticket);
+    }
+
+    // check if ticket numbers are unique
+    if (_tickets.length != _tickets.toSet().length) {
+      errors.add("Duplicate ticket numbers found");
+    }
+
+    // check for each key, whether the list of tickets have contiguous numbers
+    ticketsMap.forEach((amount, tickets) {
+      tickets.sort((a, b) => a.ticketNumber.compareTo(b.ticketNumber));
+      for (int i = 0; i < tickets.length - 1; i++) {
+        if (tickets[i + 1].ticketNumber - tickets[i].ticketNumber != 1) {
+          errors.add("Ticket numbers for amount $amount are not contiguous");
+          break;
+        }
+      }
+    });
+
+    // check if ticket is created in the correct session
+    String dbDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+    var sessionsList =
+        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
+    if (sessionsList.isEmpty) {
+      errors.add("No sessions found for today");
+    } else {
+      List<Session> sessions = [];
+      for (var sessionRaw in sessionsList) {
+        Map<String, dynamic> sessionMap =
+            Map<String, dynamic>.from(sessionRaw['Settings']);
+        sessions.add(Session.fromJson(sessionMap));
+      }
+      sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+      if (sessions.last.timestamp != widget.session.timestamp) {
+        errors.add("Ticket created in old session");
+      }
+    }
+
+    return errors;
+  }
+
+  Future<void> _deleteTicket(Ticket ticket) async {
+    List<String> errors = await _prevalidateDelete(ticket);
+
+    if (errors.isNotEmpty) {
+      String? action = await CommonWidgets().createErrorDialog(
+        context: context,
+        errors: errors,
+      );
+
+      if (action == "Cancel") {
+        return;
+      }
+    }
+
+    CommonWidgets().confirm(
+        context: context,
+        msg: "Are you sure you want to delete this ticket?",
+        callbacks: ConfirmationCallbacks(onConfirm: () {
+          // delete ticket from list
+          setState(() {
+            _tickets.remove(ticket);
+          });
+          _lastCallbackInvoked = DateTime.now();
+
+          // delete ticket from database
+          String dbDate =
+              DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
+          String dbSession =
+              widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+          String key = ticket.timestamp.toIso8601String().replaceAll(".", "^");
+          FB().deleteValue(
+              path:
+                  "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key");
+        }));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -930,59 +1033,14 @@ class _TicketPageState extends State<TicketPage> {
                 if (!_isSessionLocked)
                   IconButton(
                     icon: Icon(Icons.lock_open, size: 32),
-                    onPressed: () {
-                      CommonWidgets().confirm(
-                        context: context,
-                        msg:
-                            "Are you sure to lock this session? Tickets cannot be added or modified after this.",
-                        callbacks: ConfirmationCallbacks(onConfirm: () {
-                          setState(() {
-                            _isSessionLocked = true;
-                          });
-                        }),
-                      );
-                    },
+                    onPressed: _onLockSession,
                   ),
 
                 // unlock session
                 if (_isSessionLocked)
                   IconButton(
                     icon: Icon(Icons.lock, size: 32),
-                    onPressed: () async {
-                      List adminsRaw = await FB().getList(
-                          path:
-                              "${Const().dbrootGaruda}/Settings/UserManagement/Admin");
-                      List<String> admins =
-                          adminsRaw.map((e) => e.toString()).toList();
-
-                      UserBasics? user = Utils().getUserBasics();
-                      if (user == null) {
-                        Utils().fetchUserBasics();
-                        user = Utils().getUserBasics();
-                      }
-
-                      if (user == null) {
-                        Widgets().showMessage(context,
-                            "You cannot unlock the session. Please contact admin to do it.");
-                        return;
-                      }
-                      if (!admins.contains(user.mobile)) {
-                        Widgets().showMessage(context,
-                            "You cannot unlock the session. Please contact admin to do it.");
-                        return;
-                      }
-
-                      CommonWidgets().confirm(
-                        context: context,
-                        msg:
-                            "Are you sure to unlock this session? Tickets can be added or modified after this.",
-                        callbacks: ConfirmationCallbacks(onConfirm: () {
-                          setState(() {
-                            _isSessionLocked = false;
-                          });
-                        }),
-                      );
-                    },
+                    onPressed: _onUnlockSession,
                   ),
 
                 // menu button
@@ -1017,27 +1075,53 @@ class _TicketPageState extends State<TicketPage> {
             // body
             body: RefreshIndicator(
               onRefresh: refresh,
-              child: _tickets.isEmpty
-                  ? Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text(
-                          "Click '+' to add a ticket",
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: _tickets.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: _createTicketTile(
-                              _tickets.length - index, _tickets[index]),
-                        );
-                      },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        // leave some space at top
+                        SizedBox(height: 10),
+
+                        // empty message
+                        if (_tickets.isEmpty)
+                          Align(
+                            alignment: Alignment.topCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Text(
+                                "Click '+' to add a ticket",
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium,
+                              ),
+                            ),
+                          ),
+
+                        // lock status
+                        if (_isSessionLocked)
+                          Widgets().createTopLevelCard(
+                              context: context,
+                              child: ListTile(
+                                leading: Icon(Icons.lock),
+                                title: Text(
+                                    "Session is locked. No further modifications are allowed. If changes are needed, please ask admin to unlock."),
+                              )),
+
+                        // list of tickets
+                        ...List.generate(_tickets.length, (index) {
+                          return _createTicketTile(
+                              _tickets.length - index, _tickets[index]);
+                        }),
+
+                        // leave some space at bottom
+                        SizedBox(height: 100),
+                      ],
                     ),
+                  ),
+                ),
+              ),
             ),
           ),
 

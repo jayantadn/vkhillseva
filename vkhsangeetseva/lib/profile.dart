@@ -39,7 +39,7 @@ class _ProfileState extends State<Profile> {
   String _profilePicUrl = '';
   late String _salutation;
   PerformerProfile? _userDetailsOld;
-  final double _imagesize = 150;
+  final double _imagesize = 200;
 
   // lists
 

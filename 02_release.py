@@ -246,6 +246,7 @@ def main():
     set_parameters()
     release("vkhgaruda")
     release("vkhsangeetseva")
+    input("Time for testing the release. Press Enter to continue...")
 
 if __name__ == '__main__':
     main()

@@ -4,18 +4,6 @@
 - fix: notification deny
 - fix: dont merge test version to main
 
-# 6.9.1
-## Effort for this release: 0 hrs
-- fix: approval
-- fix: notification deny
-- fix: dont merge test version to main
-
-# 6.9.1
-## Effort for this release: 0 hrs
-- fix: approval
-- fix: notification deny
-- fix: dont merge test version to main
-
 # 7.1.0
 ## Effort for this release: 1 hrs
 - feature: theme change

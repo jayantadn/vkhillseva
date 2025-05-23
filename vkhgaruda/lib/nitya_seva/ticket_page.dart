@@ -654,21 +654,19 @@ class _TicketPageState extends State<TicketPage> {
                 ),
               ),
             ),
-
-          // context menu
-          Widgets().createContextMenu(
-            ["Edit", "Delete"],
-            (value) {
-              if (value == "Edit") {
-                _addEditTicket(context, ticket);
-              } else if (value == "Delete") {
-                _deleteTicket(ticket);
-              }
-            },
-          ),
         ]),
-        dense: true,
-        minVerticalPadding: 0,
+
+        // context menu
+        trailing: Widgets().createContextMenu(
+          ["Edit", "Delete"],
+          (value) {
+            if (value == "Edit") {
+              _addEditTicket(context, ticket);
+            } else if (value == "Delete") {
+              _deleteTicket(ticket);
+            }
+          },
+        ),
       ),
     );
   }

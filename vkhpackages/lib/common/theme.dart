@@ -67,6 +67,8 @@ class ThemeCreator {
           color: textColor,
           fontWeight: FontWeight.bold,
         ),
+        dense: true,
+        minVerticalPadding: 0,
       ),
 
       // Input Fields

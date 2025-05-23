@@ -15,21 +15,31 @@ class NSUtils {
     // init
   }
 
-  Future<void> lockSession(String sessionPath, SessionLock sessionLock) async {
+  Future<SessionLock?> lockSession(
+      {required String sessionPath, String? username}) async {
     // get the session
     var sessionJson = await FB().getJson(path: sessionPath);
     if (sessionJson.isEmpty) {
       Toaster().error("Unable to lock. Session not found");
-      return;
+      return null;
     }
     Session session = Session.fromJson(sessionJson);
 
+    SessionLock? sessionLock = session.sessionLock;
+    if (sessionLock == null) {
+      sessionLock = SessionLock(
+        isLocked: true,
+      );
+    } else {
+      sessionLock.isLocked = true;
+    }
+    sessionLock.lockedBy = username ?? "Autolock";
+    sessionLock.lockedTime = DateTime.now();
+
     // push to fb
-    String dbdate = DateFormat('yyyy-MM-dd').format(session.timestamp);
-    String key = session.timestamp.toIso8601String().replaceAll(".", "^");
-    await FB().setJson(
-        path:
-            "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings/sessionLock",
-        json: sessionLock.toJson());
+    await FB()
+        .setJson(path: "$sessionPath/sessionLock", json: sessionLock.toJson());
+
+    return sessionLock;
   }
 }

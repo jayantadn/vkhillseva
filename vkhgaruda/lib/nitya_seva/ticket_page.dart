@@ -721,6 +721,42 @@ class _TicketPageState extends State<TicketPage> {
     );
   }
 
+  Future<void> _deleteTicket(Ticket ticket) async {
+    List<String> errors = await _prevalidateDelete(ticket);
+
+    if (errors.isNotEmpty) {
+      String? action = await CommonWidgets().createErrorDialog(
+        context: context,
+        errors: errors,
+      );
+
+      if (action == "Cancel") {
+        return;
+      }
+    }
+
+    CommonWidgets().confirm(
+        context: context,
+        msg: "Are you sure you want to delete this ticket?",
+        callbacks: ConfirmationCallbacks(onConfirm: () {
+          // delete ticket from list
+          setState(() {
+            _tickets.remove(ticket);
+          });
+          _lastCallbackInvoked = DateTime.now();
+
+          // delete ticket from database
+          String dbDate =
+              DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
+          String dbSession =
+              widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+          String key = ticket.timestamp.toIso8601String().replaceAll(".", "^");
+          FB().deleteValue(
+              path:
+                  "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key");
+        }));
+  }
+
   List<String> _getSevaNames(int amount) {
     List<String> ret = [];
 
@@ -801,29 +837,14 @@ class _TicketPageState extends State<TicketPage> {
           "Are you sure to lock this session? Tickets cannot be added or modified after this.",
       callbacks: ConfirmationCallbacks(onConfirm: () async {
         // update session data
-        SessionLock sessionLock;
-        if (widget.session.sessionLock == null) {
-          sessionLock = SessionLock(
-            isLocked: true,
-            lockedBy: _username,
-            lockedTime: DateTime.now(),
-          );
-        } else {
-          sessionLock = widget.session.sessionLock!;
-          sessionLock.isLocked = true;
-          sessionLock.lockedBy = _username;
-          sessionLock.lockedTime = DateTime.now();
-        }
-        widget.session.sessionLock = sessionLock;
-
-        // update database
         String dbdate =
             DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
         String key =
             widget.session.timestamp.toIso8601String().replaceAll(".", "^");
         String sessionPath =
             "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings";
-        NSUtils().lockSession(sessionPath, sessionLock);
+        widget.session.sessionLock = await NSUtils()
+            .lockSession(sessionPath: sessionPath, username: _username);
 
         // lock the UI
         setState(() {
@@ -954,42 +975,6 @@ class _TicketPageState extends State<TicketPage> {
     return errors;
   }
 
-  Future<void> _deleteTicket(Ticket ticket) async {
-    List<String> errors = await _prevalidateDelete(ticket);
-
-    if (errors.isNotEmpty) {
-      String? action = await CommonWidgets().createErrorDialog(
-        context: context,
-        errors: errors,
-      );
-
-      if (action == "Cancel") {
-        return;
-      }
-    }
-
-    CommonWidgets().confirm(
-        context: context,
-        msg: "Are you sure you want to delete this ticket?",
-        callbacks: ConfirmationCallbacks(onConfirm: () {
-          // delete ticket from list
-          setState(() {
-            _tickets.remove(ticket);
-          });
-          _lastCallbackInvoked = DateTime.now();
-
-          // delete ticket from database
-          String dbDate =
-              DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
-          String dbSession =
-              widget.session.timestamp.toIso8601String().replaceAll(".", "^");
-          String key = ticket.timestamp.toIso8601String().replaceAll(".", "^");
-          FB().deleteValue(
-              path:
-                  "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key");
-        }));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -1016,12 +1001,13 @@ class _TicketPageState extends State<TicketPage> {
               ),
               actions: [
                 // add button
-                IconButton(
-                  icon: Icon(Icons.add, size: 32),
-                  onPressed: () {
-                    _addEditTicket(context, null);
-                  },
-                ),
+                if (!_isSessionLocked)
+                  IconButton(
+                    icon: Icon(Icons.add, size: 32),
+                    onPressed: () {
+                      _addEditTicket(context, null);
+                    },
+                  ),
 
                 // summary button
                 IconButton(
@@ -1095,7 +1081,7 @@ class _TicketPageState extends State<TicketPage> {
                         SizedBox(height: 10),
 
                         // empty message
-                        if (_tickets.isEmpty)
+                        if (_tickets.isEmpty && !_isSessionLocked)
                           Align(
                             alignment: Alignment.topCenter,
                             child: Padding(
@@ -1115,7 +1101,7 @@ class _TicketPageState extends State<TicketPage> {
                               child: ListTile(
                                 leading: Icon(Icons.lock),
                                 title: Text(
-                                    "Session is locked. No further modifications are allowed. If changes are needed, please ask admin to unlock."),
+                                    "Session is locked. No further modifications are allowed. Please ask admin to unlock for changes."),
                               )),
 
                         // list of tickets

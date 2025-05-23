@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/common/nsutils.dart';
 import 'package:vkhgaruda/nitya_seva/festival.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/laddu.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
@@ -183,23 +184,10 @@ class _NityaSevaState extends State<NityaSeva> {
         if (timestamp.isBefore(DateTime.now()
             .subtract(Duration(hours: Const().sessionLockDuration)))) {
           String dbDate = DateFormat('yyyy-MM-dd').format(timestamp);
-          String dbpathLock =
-              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$element/Settings/sessionLock";
-          var sessionLockJson =
-              await FB().getJson(path: dbpathLock, silent: true);
-          SessionLock sessionLock;
-          if (sessionLockJson.isEmpty) {
-            sessionLock = SessionLock(
-              isLocked: true,
-            );
-            FB().setValue(path: dbpathLock, value: sessionLock.toJson());
-          } else {
-            sessionLock = SessionLock.fromJson(sessionLockJson);
-            sessionLock.isLocked = true;
-          }
-          sessionLock.lockedBy = "Autolock";
-          sessionLock.lockedTime = DateTime.now();
-          await FB().setJson(path: dbpathLock, json: sessionLock.toJson());
+          String dbpathSession =
+              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$element/Settings";
+
+          await NSUtils().lockSession(sessionPath: dbpathSession);
 
           Toaster().info(
             "Session Autolocked: ${element.toString()}",

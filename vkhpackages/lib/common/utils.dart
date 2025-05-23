@@ -66,6 +66,28 @@ class Utils {
     }
   }
 
+  Future<UserBasics?> fetchOrGetUserBasics() async {
+    if (_userbasics == null) {
+      await fetchUserBasics();
+    }
+    return _userbasics;
+  }
+
+  Future<bool> getAdminStatus() async {
+    UserBasics? basics = await fetchOrGetUserBasics();
+    if (basics != null) {
+      List adminsRaw = await FB().getList(
+        path: "${Const().dbrootGaruda}/Settings/UserManagement/Admin",
+      );
+      List<String> admins = adminsRaw.map((e) => e.toString()).toList();
+      if (admins.contains(basics.mobile)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   String getFestivalIcon(String festival) {
     for (var seva in festivalIcons) {
       if (seva['name'] == festival) {

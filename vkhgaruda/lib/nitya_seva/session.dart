@@ -79,7 +79,7 @@ class SessionLock {
     SessionLock sessionLock = SessionLock(
       isLocked: json['isLocked'],
       lockedBy: json['lockedBy'],
-      lockedTime: DateTime.parse(json['lockedTime']),
+      lockedTime: json['lockedTime'] == null ? null : DateTime.parse(json['lockedTime']),
       unlockedBy: json['unlockedBy'],
       unlockedTime: json['unlockedTime'] == null ? null : DateTime.parse(json['unlockedTime']),
     );

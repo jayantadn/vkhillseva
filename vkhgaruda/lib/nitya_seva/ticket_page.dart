@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/common/datatypes.dart';
+import 'package:vkhgaruda/common/nsutils.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/session_summary.dart';
 import 'package:vkhgaruda/nitya_seva/tally_cash.dart';
@@ -133,9 +134,16 @@ class _TicketPageState extends State<TicketPage> {
     String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
     String dbSession =
         widget.session.timestamp.toIso8601String().replaceAll(".", "^");
-    Map<String, dynamic> sessionLock = await FB().getJson(
-        path:
-            "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Settings/SessionLock");
+    String lockPath =
+        "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Settings/sessionLock";
+    Map<String, dynamic> sessionLock = {};
+    if (await FB().pathExists(lockPath)) {
+      sessionLock = await FB().getJson(path: lockPath);
+    } else {
+      sessionLock = {
+        "isLocked": false,
+      };
+    }
 
     // fetch tickets
     List ticketsJson = await FB().getList(
@@ -775,7 +783,7 @@ class _TicketPageState extends State<TicketPage> {
             widget.session.timestamp.toIso8601String().replaceAll(".", "^");
         await FB().setJson(
             path:
-                "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings/SessionLock",
+                "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings/sessionLock",
             json: sessionLock.toJson());
 
         // unlock the session
@@ -792,7 +800,7 @@ class _TicketPageState extends State<TicketPage> {
       msg:
           "Are you sure to lock this session? Tickets cannot be added or modified after this.",
       callbacks: ConfirmationCallbacks(onConfirm: () async {
-        // push to fb
+        // update session data
         SessionLock sessionLock;
         if (widget.session.sessionLock == null) {
           sessionLock = SessionLock(
@@ -807,14 +815,15 @@ class _TicketPageState extends State<TicketPage> {
           sessionLock.lockedTime = DateTime.now();
         }
         widget.session.sessionLock = sessionLock;
+
+        // update database
         String dbdate =
             DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
         String key =
             widget.session.timestamp.toIso8601String().replaceAll(".", "^");
-        await FB().setJson(
-            path:
-                "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings/SessionLock",
-            json: sessionLock.toJson());
+        String sessionPath =
+            "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings";
+        NSUtils().lockSession(sessionPath, sessionLock);
 
         // lock the UI
         setState(() {

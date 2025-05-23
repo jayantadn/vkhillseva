@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'datatypes.dart';
 
 class Const {
   static final Const _instance = Const._internal();
@@ -20,6 +19,7 @@ class Const {
   final int morningCutoff = 14;
   final int maxImageSize = 500; // kB
   final String delimiter = "~";
+  final int sessionLockDuration = 5; // hours
 
   final nityaSeva = {
     'amounts': [

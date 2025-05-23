@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/nitya_seva/festival.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/laddu.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
@@ -28,6 +29,7 @@ class _NityaSevaState extends State<NityaSeva> {
   DateTime _selectedDate = DateTime.now();
   DateTime _lastCallbackInvoked = DateTime.now();
   String _username = "Guest";
+  final _lock = Lock();
 
   // lists
   final List<FestivalSettings> _sevaList = [];
@@ -40,7 +42,10 @@ class _NityaSevaState extends State<NityaSeva> {
   initState() {
     super.initState();
 
-    // listed to database events
+    // auto lock any old open session
+    _autoLockOldSessions();
+
+    // listen to database events
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
     FB().listenForChange(
         "${Const().dbrootGaruda}/NityaSeva/$dbDate",
@@ -165,6 +170,50 @@ class _NityaSevaState extends State<NityaSeva> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _autoLockOldSessions() async {
+    String dbpath = "${Const().dbrootGaruda}/NityaSeva/OpenSessions";
+    List openSessions = await FB().getList(path: dbpath);
+    List openSessionsNew = [];
+    if (openSessions.isNotEmpty) {
+      for (var element in openSessions) {
+        String dbTimestamp = element.toString().replaceAll("^", ".");
+        DateTime timestamp = DateTime.parse(dbTimestamp);
+        if (timestamp.isBefore(DateTime.now()
+            .subtract(Duration(hours: Const().sessionLockDuration)))) {
+          String dbDate = DateFormat('yyyy-MM-dd').format(timestamp);
+          String dbpathLock =
+              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$element/Settings/sessionLock";
+          var sessionLockJson =
+              await FB().getJson(path: dbpathLock, silent: true);
+          SessionLock sessionLock;
+          if (sessionLockJson.isEmpty) {
+            sessionLock = SessionLock(
+              isLocked: true,
+            );
+            FB().setValue(path: dbpathLock, value: sessionLock.toJson());
+          } else {
+            sessionLock = SessionLock.fromJson(sessionLockJson);
+            sessionLock.isLocked = true;
+          }
+          sessionLock.lockedBy = "Autolock";
+          sessionLock.lockedTime = DateTime.now();
+          await FB().setJson(path: dbpathLock, json: sessionLock.toJson());
+
+          Toaster().info(
+            "Session Autolocked: ${element.toString()}",
+          );
+        } else {
+          openSessionsNew.add(element);
+        }
+      }
+      if (openSessionsNew.isNotEmpty) {
+        FB().setValue(path: dbpath, value: openSessionsNew);
+      } else {
+        FB().deleteValue(path: dbpath);
+      }
+    }
   }
 
   List<String> _preValidation(Session session) {
@@ -340,10 +389,14 @@ class _NityaSevaState extends State<NityaSeva> {
                                         decoration: BoxDecoration(
                                           color:
                                               selectedSevaType == "Pushpanjali"
-                                                  ? Theme.of(context).colorScheme.primary
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .primary
                                                   : Colors.transparent,
-                                          border:
-                                              Border.all(color: Theme.of(context).colorScheme.primary),
+                                          border: Border.all(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary),
                                           borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(8),
                                             bottomLeft: Radius.circular(8),
@@ -360,7 +413,9 @@ class _NityaSevaState extends State<NityaSeva> {
                                                 color: selectedSevaType ==
                                                         "Pushpanjali"
                                                     ? Colors.white
-                                                    : Theme.of(context).colorScheme.primary,
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .primary,
                                               ),
                                         ),
                                       ),
@@ -375,16 +430,26 @@ class _NityaSevaState extends State<NityaSeva> {
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: selectedSevaType ==
-                                                  "Kumkum Archana"
-                                              ? Theme.of(context).colorScheme.primary
-                                              : Colors.transparent,
+                                          color:
+                                              selectedSevaType ==
+                                                      "Kumkum Archana"
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .primary
+                                                  : Colors.transparent,
                                           border: Border(
-                                            top: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                            right:
-                                                BorderSide(color: Theme.of(context).colorScheme.primary),
-                                            bottom:
-                                                BorderSide(color: Theme.of(context).colorScheme.primary),
+                                            top: BorderSide(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary),
+                                            right: BorderSide(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary),
+                                            bottom: BorderSide(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary),
                                           ),
                                           borderRadius: BorderRadius.only(
                                             topRight: Radius.circular(8),
@@ -402,7 +467,9 @@ class _NityaSevaState extends State<NityaSeva> {
                                                 color: selectedSevaType ==
                                                         "Kumkum Archana"
                                                     ? Colors.white
-                                                    : Theme.of(context).colorScheme.primary,
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .primary,
                                               ),
                                         ),
                                       ),
@@ -520,6 +587,7 @@ class _NityaSevaState extends State<NityaSeva> {
                                     );
 
                                     if (session == null) {
+                                      // edit mode
                                       List<String> errors =
                                           _preValidation(newSession);
                                       String? ret = 'Proceed';
@@ -536,6 +604,20 @@ class _NityaSevaState extends State<NityaSeva> {
                                           child: "Settings",
                                           data: newSession.toJson(),
                                         );
+
+                                        // mark as open session
+                                        String path =
+                                            "${Const().dbrootGaruda}/NityaSeva/OpenSessions";
+                                        String data = newSession.timestamp
+                                            .toIso8601String()
+                                            .replaceAll(".", "^");
+                                        if (await FB().pathExists(path)) {
+                                          await FB().addToList(
+                                              listpath: path, data: data);
+                                        } else {
+                                          await FB().setValue(
+                                              path: path, value: [data]);
+                                        }
 
                                         setState(() {
                                           _sessions.add(newSession);

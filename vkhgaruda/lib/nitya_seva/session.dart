@@ -1,3 +1,5 @@
+import 'package:vkhpackages/vkhpackages.dart';
+
 class Session {
   final String name;
   final String type;
@@ -41,7 +43,7 @@ class Session {
       sevakarta: json['sevakarta'],
       timestamp: DateTime.parse(json['timestamp']),
       sessionLock: json['sessionLock'] != null
-          ? SessionLock.fromJson(json['sessionLock'])
+          ? Utils().convertRawToDatatype(json['sessionLock'], SessionLock.fromJson)
           : null,
     );
 
@@ -79,7 +81,7 @@ class SessionLock {
       lockedBy: json['lockedBy'],
       lockedTime: DateTime.parse(json['lockedTime']),
       unlockedBy: json['unlockedBy'],
-      unlockedTime: DateTime.parse(json['unlockedTime']),
+      unlockedTime: json['unlockedTime'] == null ? null : DateTime.parse(json['unlockedTime']),
     );
 
     return sessionLock;

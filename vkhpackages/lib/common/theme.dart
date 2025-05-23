@@ -59,9 +59,12 @@ class ThemeCreator {
 
       // list tile theme
       listTileTheme: ListTileThemeData(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 0.0,
+          vertical: 0.0,
+        ),
         titleTextStyle: GoogleFonts.lexend(
           color: textColor,
-          fontSize: 14.0,
           fontWeight: FontWeight.bold,
         ),
       ),

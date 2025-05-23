@@ -355,7 +355,8 @@ class _TicketPageState extends State<TicketPage> {
                                               width: 20,
                                               height: 20,
                                               child: Image.asset(Const()
-                                                  .paymentModes[m]!['icon']!),
+                                                      .paymentModes[m]!['icon']
+                                                  as String),
                                             ),
                                             Text(
                                               m,
@@ -568,8 +569,7 @@ class _TicketPageState extends State<TicketPage> {
   }
 
   Widget _createTicketTile(int sl, Ticket ticket) {
-    double sizeOfContainer = 80;
-    String time = DateFormat("HH:mm").format(ticket.timestamp);
+    String time = DateFormat("HH:mm:ss").format(ticket.timestamp);
 
     Color color = Const()
         .nityaSeva['amounts']!
@@ -577,146 +577,98 @@ class _TicketPageState extends State<TicketPage> {
         .values
         .first['color']! as Color;
 
-    return Dismissible(
-      key: Key(ticket.ticketNumber.toString()),
-      background: Container(
-        color: Colors.blue,
-        alignment: Alignment.centerLeft,
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: Icon(Icons.edit, color: Colors.white),
-      ),
-      secondaryBackground: Container(
-        color: Colors.red,
-        alignment: Alignment.centerRight,
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: Icon(Icons.delete, color: Colors.white),
-      ),
-      confirmDismiss: (direction) async {
-        if (direction == DismissDirection.startToEnd) {
-          _addEditTicket(context, ticket);
-          return false;
-        } else if (direction == DismissDirection.endToStart) {
-          _deleteTicket(ticket);
-          return false;
-        }
-        return false;
-      },
-      child: Row(
-        children: [
-          // left badge
-          Container(
-            height: sizeOfContainer,
-            width: sizeOfContainer,
-            decoration: BoxDecoration(
-              color: color,
-              border: Border.all(color: Colors.grey),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // serial number
-                Text(sl.toString(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineLarge!
-                        .copyWith(color: Colors.black)),
-
-                // ticket number
-                Text("#${ticket.ticketNumber}",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge!
-                        .copyWith(fontWeight: FontWeight.bold)),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              height: sizeOfContainer,
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: Colors.grey),
-                  right: BorderSide(color: Colors.grey),
-                  bottom: BorderSide(color: Colors.grey),
+    return Widgets().createTopLevelCard(
+      context: context,
+      title: ticket.seva,
+      color: color,
+      child: ListTile(
+        // ticket count
+        leading: CircleAvatar(
+          backgroundColor: color,
+          child: Text(
+            sl.toString(),
+            style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                  color: Colors.white,
                 ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(children: [
-                            // seva name headline
-                            Flexible(
-                              child: Text(
-                                ticket.seva,
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
+          ),
+        ),
 
-                            // note icon
-                            SizedBox(width: 8),
-                            if (ticket.note.isNotEmpty)
-                              GestureDetector(
-                                onTap: () {
-                                  // Handle note click event
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text('Note'),
-                                        content: Text(ticket.note),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text('Close'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    color: Colors.yellow,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(1.0),
-                                    child: Text('Note',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(color: Colors.black)),
-                                  ),
-                                ),
-                              ),
-                          ]),
+        // seva name
+        title: Text(
+          "Ticket# ${ticket.ticketNumber},  Amount: ₹${ticket.amount}",
+          overflow: TextOverflow.ellipsis,
+          style:
+              Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16),
+        ),
 
-                          // other details
-                          SizedBox(height: 2),
-                          Text(
-                            "${ticket.user}, Time: $time, Amount: ${ticket.amount} - ${ticket.mode}",
-                            style: Theme.of(context).textTheme.bodyMedium,
-                            softWrap: true,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+        subtitle: Widgets().createResponsiveRow(context, [
+          // time and user
+          Text(
+            "$time, ${ticket.user}, ",
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+
+          // payment mode
+          Text(
+            ticket.mode,
+            style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                color: Const().paymentModes[ticket.mode]!['color'] as Color),
+          ),
+
+          // note icon
+          SizedBox(width: 8),
+          if (ticket.note.isNotEmpty)
+            GestureDetector(
+              onTap: () {
+                // Handle note click event
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Note'),
+                      content: Text(ticket.note),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  color: Colors.yellow,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(1.0),
+                  child: Text('Note',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: Colors.black)),
                 ),
               ),
             ),
+
+          // context menu
+          Widgets().createContextMenu(
+            ["Edit", "Delete"],
+            (value) {
+              if (value == "Edit") {
+                _addEditTicket(context, ticket);
+              } else if (value == "Delete") {
+                _deleteTicket(ticket);
+              }
+            },
           ),
-        ],
+        ]),
+        dense: true,
+        minVerticalPadding: 0,
       ),
     );
   }

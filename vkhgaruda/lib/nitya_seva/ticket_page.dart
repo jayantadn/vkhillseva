@@ -30,6 +30,7 @@ class _TicketPageState extends State<TicketPage> {
   String _username = "Guest";
   bool _isSessionLocked = false;
   bool _isAdmin = false;
+  int _nextFestivalTicketNumber = 0;
 
   // lists
   final List<Ticket> _tickets = [];
@@ -173,7 +174,11 @@ class _TicketPageState extends State<TicketPage> {
 
     // if no tickets, display the next ticket numbers
     if (_tickets.isEmpty) {
-      _showNextTicketNumbers(context);
+      if (widget.session.name == "Nitya Seva") {
+        _showNextTicketNumbers(context);
+      } else {
+        _showFestivalStartingTicketNumber(context);
+      }
     }
   }
 
@@ -733,13 +738,22 @@ class _TicketPageState extends State<TicketPage> {
     List<Ticket> filteredTickets =
         _tickets.where((ticket) => ticket.amount == amount).toList();
     if (filteredTickets.isEmpty) {
-      String lastTicketNumberPath =
-          "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers/$amount";
-      int? nextTicketNumber = await FB().getValue(path: lastTicketNumberPath);
-      if (nextTicketNumber == null) {
-        ticketNumber = 1;
+      if (widget.session.name == "Nitya Seva") {
+        String lastTicketNumberPath =
+            "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers/$amount";
+        int? nextTicketNumber = await FB().getValue(path: lastTicketNumberPath);
+        if (nextTicketNumber == null) {
+          ticketNumber = 1;
+        } else {
+          ticketNumber = nextTicketNumber;
+        }
       } else {
-        ticketNumber = nextTicketNumber;
+        if (_nextFestivalTicketNumber == 0) {
+          Toaster().error(
+              "Could not fetch next ticket number. Please contact admin.");
+        } else {
+          return _nextFestivalTicketNumber;
+        }
       }
     } else {
       ticketNumber = filteredTickets.first.ticketNumber + 1;
@@ -897,6 +911,58 @@ class _TicketPageState extends State<TicketPage> {
     return errors;
   }
 
+  Future<void> _showFestivalStartingTicketNumber(BuildContext context) async {
+    bool isNewBook = false;
+    TextEditingController ticketNumberController =
+        TextEditingController(text: "1");
+
+    Widget body = StatefulBuilder(builder: (context, setDialogState) {
+      return Column(
+        children: [
+          CheckboxListTile(
+            title: Text("Please check the following"),
+            subtitle: Text("Separate ticket book issued for festival?"),
+            value: isNewBook,
+            onChanged: (value) {
+              setDialogState(() {
+                isNewBook = value!;
+              });
+            },
+          ),
+
+          // text input field
+          SizedBox(height: 8),
+          if (isNewBook)
+            TextField(
+              decoration: InputDecoration(labelText: "Starting ticket number"),
+              controller: ticketNumberController,
+              keyboardType: TextInputType.number,
+            ),
+        ],
+      );
+    });
+
+    Widgets().showResponsiveDialog(
+        context: context,
+        title: "Festival service",
+        child: body,
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+
+              if (isNewBook) {
+                _nextFestivalTicketNumber =
+                    int.tryParse(ticketNumberController.text) ?? 1;
+              } else {
+                _showNextTicketNumbers(context);
+              }
+            },
+            child: Text("OK"),
+          ),
+        ]);
+  }
+
   Future<void> _showNextTicketNumbers(BuildContext context) async {
     Map<String, dynamic> ticketSettings = {};
     String ticketNumbersPath =
@@ -938,11 +1004,13 @@ class _TicketPageState extends State<TicketPage> {
     Widgets().showResponsiveDialog(
         context: context,
         title: "Next Ticket Numbers",
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text("Please verify the next ticket number in books."),
-          ...rows,
-          Text("If there is any mismatch, please contact admin.")
-        ]),
+        child: rows.isEmpty
+            ? Text("No records found. Please contact admin.")
+            : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text("Please verify the next ticket number in books."),
+                ...rows,
+                Text("If there is any mismatch, please contact admin.")
+              ]),
         actions: [
           if (_isAdmin)
             ElevatedButton(

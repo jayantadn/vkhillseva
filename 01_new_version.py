@@ -9,11 +9,11 @@ reltype = ""
 hostingsite = ""
 rootdir = ""
 
-def create_or_switch_branch(newversion):
+def create_or_switch_branch(newversion, oldversion):
     """Create a new branch """
-    subprocess.check_output(["git", "checkout", "main"])
+    subprocess.check_output(["git", "checkout", oldversion])
     subprocess.check_output(["git", "pull"])
-    subprocess.check_output(["git", "checkout", "-b", newversion, "main"])
+    subprocess.check_output(["git", "checkout", "-b", newversion, oldversion])
     print(f"Created and switched to new branch: {newversion}")
 
 def run_command(command):
@@ -129,7 +129,7 @@ def main():
 
     print("Checkout a new branch based on the latest branch")
     try:
-        create_or_switch_branch(newversion)
+        create_or_switch_branch(newversion, oldversion)
         set_value_in_file('vkhgaruda/pubspec.yaml', "version", f'{newversion}+1')
         set_value_in_file('vkhsangeetseva/pubspec.yaml', "version", f'{newversion}+1')
     except subprocess.CalledProcessError:

@@ -152,6 +152,8 @@ class _TicketSettingsPageState extends State<TicketSettingsPage> {
                                       await FB().setJson(
                                           path: ticketNumbersPath,
                                           json: ticketNumbers);
+
+                                      Toaster().info("Saved successfully");
                                     })),
                           ],
                         ),

@@ -41,28 +41,31 @@ class NSUtils {
         .setJson(path: "$sessionPath/sessionLock", json: sessionLock.toJson());
 
     // store the last used ticket numbers
-    String ticketNumbersPath =
-        "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
-    Map<String, dynamic> nextTicketNumbers =
-        await FB().getJson(path: ticketNumbersPath, silent: true);
-    List<String> pathSections = sessionPath.split('/');
-    if (pathSections.isNotEmpty) {
-      pathSections.removeLast();
-    }
-    String ticketsPath = pathSections.join('/');
-    ticketsPath += "/Tickets";
-    var t = await FB().getJson(path: ticketsPath, silent: true);
-    if (t.isNotEmpty) {
-      for (var entry in t.entries) {
-        Ticket ticket =
-            Utils().convertRawToDatatype(entry.value, Ticket.fromJson);
-        String key = ticket.amount.toString();
-        int value = nextTicketNumbers[key] ?? 1;
-        if (ticket.ticketNumber > value) {
-          nextTicketNumbers[key] = ticket.ticketNumber;
-        }
+    if (session.name == "Nitya Seva") {
+      String ticketNumbersPath =
+          "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
+      Map<String, dynamic> nextTicketNumbers =
+          await FB().getJson(path: ticketNumbersPath, silent: true);
+      List<String> pathSections = sessionPath.split('/');
+      if (pathSections.isNotEmpty) {
+        pathSections.removeLast();
       }
-      await FB().setJson(path: ticketNumbersPath, json: nextTicketNumbers);
+      String ticketsPath = pathSections.join('/');
+      ticketsPath += "/Tickets";
+
+      var t = await FB().getJson(path: ticketsPath, silent: true);
+      if (t.isNotEmpty) {
+        for (var entry in t.entries) {
+          Ticket ticket =
+              Utils().convertRawToDatatype(entry.value, Ticket.fromJson);
+          String key = ticket.amount.toString();
+          int value = nextTicketNumbers[key] ?? 1;
+          if (ticket.ticketNumber >= value) {
+            nextTicketNumbers[key] = ticket.ticketNumber + 1;
+          }
+        }
+        await FB().setJson(path: ticketNumbersPath, json: nextTicketNumbers);
+      }
     }
 
     return sessionLock;

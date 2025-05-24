@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const Landing(title: "Hare Krishna");
-  final Widget test = const TicketSettingsPage(
+  final Widget test = const NityaSeva(
     title: "Testing",
   );
 

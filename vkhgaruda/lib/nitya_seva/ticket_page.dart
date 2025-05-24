@@ -28,6 +28,7 @@ class _TicketPageState extends State<TicketPage> {
   DateTime _lastCallbackInvoked = DateTime.now();
   String _username = "Guest";
   bool _isSessionLocked = false;
+  bool _isAdmin = false;
 
   // lists
   final List<Ticket> _tickets = [];
@@ -161,6 +162,11 @@ class _TicketPageState extends State<TicketPage> {
       _isLoading = false;
       _isSessionLocked = sessionLock['isLocked'] ?? false;
     });
+
+    // if no tickets, display the next ticket numbers
+    if (_tickets.isEmpty) {
+      _showNextTicketNumbers(context);
+    }
   }
 
   Future<void> _addEditTicket(context, Ticket? ticket) async {
@@ -881,6 +887,62 @@ class _TicketPageState extends State<TicketPage> {
     }
 
     return errors;
+  }
+
+  Future<void> _showNextTicketNumbers(BuildContext context) async {
+    Map<String, dynamic> ticketSettings = {};
+    String ticketNumbersPath =
+        "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
+    ticketSettings = await FB().getJson(path: ticketNumbersPath, silent: true);
+
+    List<Widget> rows = List.generate(ticketSettings.length, (index) {
+      String key = ticketSettings.keys.elementAt(index);
+      int value = ticketSettings[key] ?? 1;
+
+      int labelWidth = 4;
+
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            // label - occupies 30% of the available width
+            Expanded(
+              flex: labelWidth,
+              child: Text(
+                "              ₹$key: ",
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+
+            // input field
+            Expanded(
+              flex: 10 - labelWidth,
+              child: Text(
+                value.toString(),
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+
+    Widgets().showResponsiveDialog(
+        context: context,
+        title: "Next Ticket Numbers",
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text("Please verify the next ticket number in books."),
+          ...rows,
+          Text("If there is any mismatch, please contact admin.")
+        ]),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("OK"),
+          )
+        ]);
   }
 
   @override

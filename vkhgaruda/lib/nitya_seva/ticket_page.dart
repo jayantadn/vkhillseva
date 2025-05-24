@@ -163,7 +163,7 @@ class _TicketPageState extends State<TicketPage> {
     });
   }
 
-  void _addEditTicket(context, Ticket? ticket) {
+  Future<void> _addEditTicket(context, Ticket? ticket) async {
     // locals
     int amount = ticket == null ? widget.session.defaultAmount : ticket.amount;
     int ticketNumber = ticket == null ? 0 : ticket.ticketNumber;
@@ -183,9 +183,7 @@ class _TicketPageState extends State<TicketPage> {
 
     // field values
     if (ticket == null) {
-      if (filteredTickets.isNotEmpty) {
-        ticketNumber = filteredTickets.first.ticketNumber + 1;
-      }
+      ticketNumber = await _getNextTicketNumber(amount);
     }
     ticketNumberController.text = ticketNumber.toString();
     sevaNames = _getSevaNames(amount);
@@ -253,20 +251,12 @@ class _TicketPageState extends State<TicketPage> {
                                 return Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: GestureDetector(
-                                    onTap: () {
+                                    onTap: () async {
+                                      amount = int.parse(seva.keys.first);
+                                      ticketNumberController.text =
+                                          (await _getNextTicketNumber(amount))
+                                              .toString();
                                       setDialogState(() {
-                                        amount = int.parse(seva.keys.first);
-                                        filteredTickets = _tickets
-                                            .where((ticket) =>
-                                                ticket.amount == amount)
-                                            .toList();
-                                        ticketNumberController.text =
-                                            (filteredTickets.isNotEmpty
-                                                    ? filteredTickets.first
-                                                            .ticketNumber +
-                                                        1
-                                                    : 0)
-                                                .toString();
                                         sevaNames = _getSevaNames(amount);
                                         sevaName = sevaNames.isNotEmpty
                                             ? sevaNames[0]
@@ -722,6 +712,30 @@ class _TicketPageState extends State<TicketPage> {
     }
 
     return ret;
+  }
+
+  Future<int> _getNextTicketNumber(int amount) async {
+    int ticketNumber = 0;
+    List<Ticket> filteredTickets =
+        _tickets.where((ticket) => ticket.amount == amount).toList();
+    if (filteredTickets.isEmpty) {
+      String lastTicketNumberPath =
+          "${Const().dbrootGaruda}/NityaSeva/LastUsedTicketNumbers/$amount";
+      int? lastTicketNumber = await FB().getValue(path: lastTicketNumberPath);
+      if (lastTicketNumber == null) {
+        ticketNumber = 1;
+      } else {
+        ticketNumber = lastTicketNumber + 1;
+      }
+    } else {
+      ticketNumber = filteredTickets.first.ticketNumber + 1;
+    }
+
+    if (ticketNumber == 0) {
+      ticketNumber = 1;
+      Toaster().error("Could not get ticket number.");
+    }
+    return ticketNumber;
   }
 
   void _onLockSession() {

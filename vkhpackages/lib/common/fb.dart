@@ -241,7 +241,7 @@ class FB {
     }
   }
 
-  Future<List<dynamic>> getList({String? dbroot, required String path}) async {
+  Future<List<dynamic>> getList({required String path}) async {
     try {
       DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
       DataSnapshot snapshot = await dbref.get();

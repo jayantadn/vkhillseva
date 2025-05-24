@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:vkhgaruda/common/datatypes.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -38,6 +39,31 @@ class NSUtils {
     // push to fb
     await FB()
         .setJson(path: "$sessionPath/sessionLock", json: sessionLock.toJson());
+
+    // store the last used ticket numbers
+    String ticketNumbersPath =
+        "${Const().dbrootGaruda}/NityaSeva/LastUsedTicketNumbers";
+    Map<String, dynamic> lastUsedTicketNumbers =
+        await FB().getJson(path: ticketNumbersPath, silent: true);
+    List<String> pathSections = sessionPath.split('/');
+    if (pathSections.isNotEmpty) {
+      pathSections.removeLast();
+    }
+    String ticketsPath = pathSections.join('/');
+    ticketsPath += "/Tickets";
+    var t = await FB().getJson(path: ticketsPath, silent: true);
+    if (t.isNotEmpty) {
+      for (var entry in t.entries) {
+        Ticket ticket =
+            Utils().convertRawToDatatype(entry.value, Ticket.fromJson);
+        String key = ticket.amount.toString();
+        int value = lastUsedTicketNumbers[key] ?? 1;
+        if (ticket.ticketNumber > value) {
+          lastUsedTicketNumbers[key] = ticket.ticketNumber;
+        }
+      }
+      await FB().setJson(path: ticketNumbersPath, json: lastUsedTicketNumbers);
+    }
 
     return sessionLock;
   }

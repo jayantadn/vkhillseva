@@ -15,7 +15,7 @@ class NSUtils {
     // init
   }
 
-  Future<String?> getLastActiveSessionPath() async {
+  Future<String?> getLastActiveNityaSeva() async {
     DateTime now = DateTime.now();
     DateTime startDate = DateTime(now.year, now.month - 1, 1);
     Map<String, dynamic> sessions = await FB().getValuesByDateRange(
@@ -48,11 +48,11 @@ class NSUtils {
 
           if (s is Map && s.isNotEmpty) {
             if (s['Tickets'] != null && s['Tickets'].isNotEmpty) {
-              // Return the path of the last active session
-              return "${Const().dbrootGaruda}/NityaSeva/$key/$k";
-            } else {
-              // If there are no tickets, continue to the next session
-              continue;
+              Session session =
+                  Utils().convertRawToDatatype(s['Settings'], Session.fromJson);
+              if (session.name == "Nitya Seva") {
+                return "${Const().dbrootGaruda}/NityaSeva/$key/$k";
+              }
             }
           }
         }
@@ -65,7 +65,7 @@ class NSUtils {
   Future<SessionLock?> lockSession(
       {required String sessionPath, String? username}) async {
     // get the session
-    var sessionJson = await FB().getJson(path: sessionPath);
+    var sessionJson = await FB().getJson(path: "$sessionPath/Settings");
     if (sessionJson.isEmpty) {
       Toaster().error("Unable to lock. Session not found");
       return null;
@@ -84,37 +84,33 @@ class NSUtils {
     sessionLock.lockedTime = DateTime.now();
 
     // push to fb
-    await FB()
-        .setJson(path: "$sessionPath/sessionLock", json: sessionLock.toJson());
+    await FB().setJson(
+        path: "$sessionPath/Settings/sessionLock", json: sessionLock.toJson());
 
     // store the last used ticket numbers
     if (session.name == "Nitya Seva") {
-      String? lastActiveSessionPath = await getLastActiveSessionPath();
-      print(lastActiveSessionPath);
+      String? lastActiveSessionPath = await getLastActiveNityaSeva();
+      if (sessionPath == lastActiveSessionPath) {
+        // locking only the last active session will update ticket numbers
+        String ticketNumbersPath =
+            "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
+        Map<String, dynamic> nextTicketNumbers =
+            await FB().getJson(path: ticketNumbersPath, silent: true);
+        String ticketsPath = "$sessionPath/Tickets";
 
-      String ticketNumbersPath =
-          "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
-      Map<String, dynamic> nextTicketNumbers =
-          await FB().getJson(path: ticketNumbersPath, silent: true);
-      List<String> pathSections = sessionPath.split('/');
-      if (pathSections.isNotEmpty) {
-        pathSections.removeLast();
-      }
-      String ticketsPath = pathSections.join('/');
-      ticketsPath += "/Tickets";
-
-      var t = await FB().getJson(path: ticketsPath, silent: true);
-      if (t.isNotEmpty) {
-        for (var entry in t.entries) {
-          Ticket ticket =
-              Utils().convertRawToDatatype(entry.value, Ticket.fromJson);
-          String key = ticket.amount.toString();
-          int value = nextTicketNumbers[key] ?? 1;
-          if (ticket.ticketNumber >= value) {
-            nextTicketNumbers[key] = ticket.ticketNumber + 1;
+        var t = await FB().getJson(path: ticketsPath, silent: true);
+        if (t.isNotEmpty) {
+          for (var entry in t.entries) {
+            Ticket ticket =
+                Utils().convertRawToDatatype(entry.value, Ticket.fromJson);
+            String key = ticket.amount.toString();
+            int value = nextTicketNumbers[key] ?? 1;
+            if (ticket.ticketNumber >= value) {
+              nextTicketNumbers[key] = ticket.ticketNumber + 1;
+            }
           }
+          await FB().setJson(path: ticketNumbersPath, json: nextTicketNumbers);
         }
-        await FB().setJson(path: ticketNumbersPath, json: nextTicketNumbers);
       }
     }
 
@@ -126,7 +122,7 @@ class NSUtils {
     required String sessionPath,
   }) async {
     // get the session
-    var sessionJson = await FB().getJson(path: sessionPath);
+    var sessionJson = await FB().getJson(path: "$sessionPath/Settings");
     if (sessionJson.isEmpty) {
       Toaster().error("Unable to lock. Session not found");
       return null;
@@ -175,7 +171,8 @@ class NSUtils {
       }
 
       await FB().setJson(
-          path: "$sessionPath/sessionLock", json: sessionLock!.toJson());
+          path: "$sessionPath/Settings/sessionLock",
+          json: sessionLock!.toJson());
     });
 
     return sessionLock;

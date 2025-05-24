@@ -777,8 +777,7 @@ class _TicketPageState extends State<TicketPage> {
             DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
         String key =
             widget.session.timestamp.toIso8601String().replaceAll(".", "^");
-        String sessionPath =
-            "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings";
+        String sessionPath = "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key";
         widget.session.sessionLock = await NSUtils()
             .lockSession(sessionPath: sessionPath, username: _username);
 
@@ -1101,7 +1100,7 @@ class _TicketPageState extends State<TicketPage> {
                           .toIso8601String()
                           .replaceAll(".", "^");
                       String sessionPath =
-                          "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings";
+                          "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key";
                       SessionLock? lockStatus = await NSUtils().unlockSession(
                           context: context, sessionPath: sessionPath);
                       if (lockStatus == null) {

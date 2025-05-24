@@ -546,7 +546,7 @@ class _NityaSevaState extends State<NityaSeva> {
             .subtract(Duration(hours: Const().sessionLockDuration)))) {
           String dbDate = DateFormat('yyyy-MM-dd').format(timestamp);
           String dbpathSession =
-              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$element/Settings";
+              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$element";
 
           await NSUtils().lockSession(sessionPath: dbpathSession);
 
@@ -602,7 +602,7 @@ class _NityaSevaState extends State<NityaSeva> {
                       await NSUtils().unlockSession(
                           context: context,
                           sessionPath:
-                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key/Settings");
+                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key");
                     },
                     icon: Icon(Icons.lock))
                 : Widgets().createContextMenu(["Edit", "Delete", "Lock"],
@@ -642,7 +642,7 @@ class _NityaSevaState extends State<NityaSeva> {
                           .replaceAll(".", "^");
                       NSUtils().lockSession(
                           sessionPath:
-                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key/Settings",
+                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key",
                           username: _username);
                     } else {
                       Toaster().error("Unknown action: $value");

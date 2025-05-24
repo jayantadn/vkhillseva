@@ -1015,7 +1015,7 @@ class _TicketPageState extends State<TicketPage> {
                               child: ListTile(
                                 leading: Icon(Icons.lock),
                                 title: Text(
-                                    "Session is locked. No further modifications are allowed. Please ask admin to unlock for changes."),
+                                    "Session is locked by ${widget.session.sessionLock!.lockedBy} at ${DateFormat('dd-MM-yy, hh:mm').format(widget.session.sessionLock!.lockedTime!)}. Please ask admin to unlock for any changes."),
                               )),
 
                         // list of tickets

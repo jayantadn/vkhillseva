@@ -243,7 +243,7 @@ class _NityaSevaState extends State<NityaSeva> {
                               "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key/Settings");
                     },
                     icon: Icon(Icons.lock))
-                : Widgets().createContextMenu(["Edit", "Delete"],
+                : Widgets().createContextMenu(["Edit", "Delete", "Lock"],
                     (String value) {
                     if (value == "Edit") {
                       _addEditSession(session: session);
@@ -272,6 +272,18 @@ class _NityaSevaState extends State<NityaSeva> {
                             // close the dialog
                             Navigator.of(context).pop();
                           }));
+                    } else if (value == "Lock") {
+                      String dbDate =
+                          DateFormat('yyyy-MM-dd').format(_selectedDate);
+                      String key = session.timestamp
+                          .toIso8601String()
+                          .replaceAll(".", "^");
+                      NSUtils().lockSession(
+                          sessionPath:
+                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key/Settings",
+                          username: _username);
+                    } else {
+                      Toaster().error("Unknown action: $value");
                     }
                   })));
   }

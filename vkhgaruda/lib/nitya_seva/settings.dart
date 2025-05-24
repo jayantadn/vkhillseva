@@ -102,8 +102,8 @@ class _SettingsState extends State<Settings> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const TicketSettingsPage(
-                                title: "Ticket settings")),
+                            builder: (context) =>
+                                const TicketSettings(title: "Ticket settings")),
                       );
                     }),
                   ),

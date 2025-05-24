@@ -1,21 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
-class TicketSettingsPage extends StatefulWidget {
+class TicketSettings extends StatefulWidget {
   final String title;
   final String? splashImage;
 
-  const TicketSettingsPage({super.key, required this.title, this.splashImage});
+  const TicketSettings({super.key, required this.title, this.splashImage});
 
   @override
   // ignore: library_private_types_in_public_api
-  _TicketSettingsPageState createState() => _TicketSettingsPageState();
+  _TicketSettingsState createState() => _TicketSettingsState();
 }
 
-class _TicketSettingsPageState extends State<TicketSettingsPage> {
+class _TicketSettingsState extends State<TicketSettings> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
@@ -23,6 +24,7 @@ class _TicketSettingsPageState extends State<TicketSettingsPage> {
 
   // lists
   final Map<String, TextEditingController> _controllerTicketNumbers = {};
+  List<Map<String, dynamic>> _ticketHistory = [];
 
   // controllers, listeners and focus nodes
 
@@ -36,6 +38,8 @@ class _TicketSettingsPageState extends State<TicketSettingsPage> {
   @override
   dispose() {
     // clear all lists
+    _ticketSettings.clear();
+    _ticketHistory.clear();
 
     // clear all controllers and focus nodes
     for (var controller in _controllerTicketNumbers.values) {
@@ -58,6 +62,28 @@ class _TicketSettingsPageState extends State<TicketSettingsPage> {
           "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
       _ticketSettings =
           await FB().getJson(path: ticketNumbersPath, silent: true);
+
+      // first time use
+      if (_ticketSettings.isEmpty) {
+        for (var amount in Const().nityaSeva['amounts']!) {
+          String key = amount.keys.first;
+          if (amount[key]?['obsolete'] == true)
+            continue; // skip obsolete amounts
+          _ticketSettings[key] = 1; // default value
+        }
+      }
+
+      // populate history
+      String historyPath =
+          "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbersAdminHistory";
+      List historyListRaw = await FB().getList(
+        path: historyPath,
+      );
+      _ticketHistory = historyListRaw
+          .map((entry) => Map<String, dynamic>.from(entry))
+          .toList()
+        ..sort((a, b) => DateTime.parse(b['timestamp'])
+            .compareTo(DateTime.parse(a['timestamp'])));
     });
 
     // refresh all child widgets
@@ -65,6 +91,28 @@ class _TicketSettingsPageState extends State<TicketSettingsPage> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Widget _createHistoryTile(int index) {
+    String datetimeFormatted = DateFormat("dd/MM/yyyy HH:mm")
+        .format(DateTime.parse(_ticketHistory[index]['timestamp']));
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListTile(
+          title: Text(
+            "${_ticketHistory[index]['user']} - $datetimeFormatted",
+          ),
+          subtitle:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              "Note: ${_ticketHistory[index]['note']}",
+            ),
+            Text(
+              "Ticket numbers: ${_ticketHistory[index]['ticketNumbers'].toString()}",
+            ),
+          ])),
+    );
   }
 
   Widget _createTicketSettingRow(int index) {
@@ -102,6 +150,58 @@ class _TicketSettingsPageState extends State<TicketSettingsPage> {
     );
   }
 
+  Future<void> _onSave() async {
+    String note = "";
+
+    await Widgets().showResponsiveDialog(
+      context: context,
+      child: TextField(
+        autofocus: true,
+        onChanged: (value) => note = value,
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () async {
+            // validate input
+            if (note.trim().isEmpty) {
+              Toaster().error("Please enter some remarks");
+              return;
+            }
+
+            // save the ticket numbers
+            Map<String, dynamic> ticketNumbers = {};
+            for (var entry in _controllerTicketNumbers.entries) {
+              String key = entry.key;
+              int value = int.parse(entry.value.text.trim());
+              ticketNumbers[key] = value;
+            }
+
+            // push to fb
+            String ticketNumbersPath =
+                "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
+            await FB().setJson(path: ticketNumbersPath, json: ticketNumbers);
+
+            // save history
+            String historyPath =
+                "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbersAdminHistory";
+            UserBasics? user = await Utils().fetchOrGetUserBasics();
+            await FB().addToList(listpath: historyPath, data: {
+              "user": user?.name ?? "Unknown User",
+              "timestamp": DateTime.now().toIso8601String(),
+              "ticketNumbers": ticketNumbers,
+              "note": note,
+            });
+
+            Navigator.of(context).pop(); // close the dialog
+            Toaster().info("Saved successfully");
+          },
+          child: Text("OK"),
+        )
+      ],
+      title: "Enter some remarks",
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -120,7 +220,7 @@ class _TicketSettingsPageState extends State<TicketSettingsPage> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      // your widgets here
+                      // main entry field
                       Widgets().createTopLevelCard(
                         context: context,
                         title: "Next ticket numbers",
@@ -134,30 +234,21 @@ class _TicketSettingsPageState extends State<TicketSettingsPage> {
                             Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: ElevatedButton(
-                                    child: Text("Save"),
-                                    onPressed: () async {
-                                      // save the ticket numbers
-                                      Map<String, dynamic> ticketNumbers = {};
-                                      for (var entry
-                                          in _controllerTicketNumbers.entries) {
-                                        String key = entry.key;
-                                        int value =
-                                            int.parse(entry.value.text.trim());
-                                        ticketNumbers[key] = value;
-                                      }
-
-                                      // push to fb
-                                      String ticketNumbersPath =
-                                          "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
-                                      await FB().setJson(
-                                          path: ticketNumbersPath,
-                                          json: ticketNumbers);
-
-                                      Toaster().info("Saved successfully");
-                                    })),
+                                    child: Text("Save"), onPressed: _onSave)),
                           ],
                         ),
                       ),
+
+                      // history
+                      Widgets().createTopLevelCard(
+                          context: context,
+                          title: "History",
+                          child: Column(
+                            children: [
+                              ...List.generate(_ticketHistory.length,
+                                  (index) => _createHistoryTile(index))
+                            ],
+                          )),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

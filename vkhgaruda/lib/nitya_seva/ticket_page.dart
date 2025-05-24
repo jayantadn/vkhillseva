@@ -1011,7 +1011,7 @@ class _TicketPageState extends State<TicketPage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          const TicketSettingsPage(title: "Ticket settings")),
+                          const TicketSettings(title: "Ticket settings")),
                 );
               },
               child: Text("Edit"),

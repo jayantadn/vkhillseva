@@ -15,6 +15,53 @@ class NSUtils {
     // init
   }
 
+  Future<String?> getLastActiveSessionPath() async {
+    DateTime now = DateTime.now();
+    DateTime startDate = DateTime(now.year, now.month - 1, 1);
+    Map<String, dynamic> sessions = await FB().getValuesByDateRange(
+        path: "${Const().dbrootGaruda}/NityaSeva", startDate: startDate);
+
+    if (sessions.isEmpty) {
+      Toaster().error("No sessions found in the last month");
+      return null;
+    }
+
+    List<String> sessionKeys = sessions.keys.toList();
+    sessionKeys.sort();
+
+    for (int i = sessionKeys.length - 1; i >= 0; i--) {
+      String key = sessionKeys[i];
+      if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(key)) {
+        continue;
+      }
+      var value = sessions[key];
+
+      // If value is a nested map, traverse deeper
+      if (value is Map && value.isNotEmpty) {
+        // Get the last key in the nested map
+        var nestedKeys = value.keys.toList();
+        nestedKeys.sort();
+
+        for (int i = nestedKeys.length - 1; i >= 0; i--) {
+          var k = nestedKeys[i];
+          var s = value[k];
+
+          if (s is Map && s.isNotEmpty) {
+            if (s['Tickets'] != null && s['Tickets'].isNotEmpty) {
+              // Return the path of the last active session
+              return "${Const().dbrootGaruda}/NityaSeva/$key/$k";
+            } else {
+              // If there are no tickets, continue to the next session
+              continue;
+            }
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
   Future<SessionLock?> lockSession(
       {required String sessionPath, String? username}) async {
     // get the session
@@ -42,6 +89,9 @@ class NSUtils {
 
     // store the last used ticket numbers
     if (session.name == "Nitya Seva") {
+      String? lastActiveSessionPath = await getLastActiveSessionPath();
+      print(lastActiveSessionPath);
+
       String ticketNumbersPath =
           "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
       Map<String, dynamic> nextTicketNumbers =

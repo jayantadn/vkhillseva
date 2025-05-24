@@ -67,8 +67,9 @@ class _TicketSettingsState extends State<TicketSettings> {
       if (_ticketSettings.isEmpty) {
         for (var amount in Const().nityaSeva['amounts']!) {
           String key = amount.keys.first;
-          if (amount[key]?['obsolete'] == true)
+          if (amount[key]?['obsolete'] == true) {
             continue; // skip obsolete amounts
+          }
           _ticketSettings[key] = 1; // default value
         }
       }
@@ -234,7 +235,8 @@ class _TicketSettingsState extends State<TicketSettings> {
                             Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: ElevatedButton(
-                                    child: Text("Save"), onPressed: _onSave)),
+                                    onPressed: _onSave,
+                                    child: Text("Save"))),
                           ],
                         ),
                       ),

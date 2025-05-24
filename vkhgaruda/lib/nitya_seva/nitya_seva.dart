@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/common/nsutils.dart';
 import 'package:vkhgaruda/nitya_seva/festival.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/laddu.dart';
@@ -11,7 +9,6 @@ import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
 import 'package:vkhgaruda/widgets/common_widgets.dart';
 import 'package:vkhgaruda/nitya_seva/day_summary.dart';
-import 'package:vkhgaruda/widgets/launcher_tile.dart';
 import 'package:vkhgaruda/nitya_seva/settings.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 

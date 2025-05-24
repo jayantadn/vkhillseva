@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart';
 import 'package:vkhgaruda/common/datatypes.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -76,7 +75,7 @@ class NSUtils {
       var sessionJson = await FB().getJson(path: "$sessionPath/Settings");
       if (sessionJson.isEmpty) {
         Toaster().error("Unable to lock. Session not found");
-        return null;
+        return;
       }
       Session session = Session.fromJson(sessionJson);
 

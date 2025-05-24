@@ -1,4 +1,3 @@
-import 'package:vkhpackages/vkhpackages.dart';
 
 class Session {
   final String name;

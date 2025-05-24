@@ -1102,17 +1102,18 @@ class _TicketPageState extends State<TicketPage> {
                           .replaceAll(".", "^");
                       String sessionPath =
                           "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings";
-                      widget.session.sessionLock = await NSUtils()
-                          .unlockSession(
-                              context: context, sessionPath: sessionPath);
+                      SessionLock? lockStatus = await NSUtils().unlockSession(
+                          context: context, sessionPath: sessionPath);
+                      if (lockStatus == null) {
+                        // if unlock failed, return
+                        return;
+                      } else {
+                        widget.session.sessionLock = lockStatus;
+                      }
+
                       // unlock the session
                       setState(() {
-                        if (widget.session.sessionLock != null &&
-                            widget.session.sessionLock!.isLocked == true) {
-                          _isSessionLocked = true;
-                        } else {
-                          _isSessionLocked = false;
-                        }
+                        _isSessionLocked = widget.session.sessionLock!.isLocked;
                       });
                     },
                   ),
@@ -1180,7 +1181,7 @@ class _TicketPageState extends State<TicketPage> {
                               child: ListTile(
                                 leading: Icon(Icons.lock),
                                 title: Text(
-                                    "Session is locked by ${widget.session.sessionLock!.lockedBy} at ${DateFormat('dd-MM-yy, hh:mm').format(widget.session.sessionLock!.lockedTime!)}. Please ask admin to unlock for any changes."),
+                                    "Session is locked by ${widget.session.sessionLock!.lockedBy} at ${DateFormat('dd-MM-yy, HH:mm').format(widget.session.sessionLock!.lockedTime!)}. Please ask admin to unlock for any changes."),
                               )),
 
                         // list of tickets

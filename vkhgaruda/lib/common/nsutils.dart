@@ -103,12 +103,14 @@ class NSUtils {
       return null;
     }
 
-    Widgets().showConfirmDialog(
+    SessionLock? sessionLock;
+
+    await Widgets().showConfirmDialog(
         context,
         "Are you sure to unlock this session? Tickets can be added or modified after this.",
         "Unlock", () async {
       // push to fb
-      SessionLock sessionLock;
+
       if (session.sessionLock == null) {
         sessionLock = SessionLock(
           isLocked: false,
@@ -117,13 +119,15 @@ class NSUtils {
         );
       } else {
         sessionLock = session.sessionLock!;
-        sessionLock.isLocked = false;
-        sessionLock.unlockedBy = user!.name;
-        sessionLock.unlockedTime = DateTime.now();
+        sessionLock!.isLocked = false;
+        sessionLock!.unlockedBy = user!.name;
+        sessionLock!.unlockedTime = DateTime.now();
       }
 
       await FB().setJson(
-          path: "$sessionPath/sessionLock", json: sessionLock.toJson());
+          path: "$sessionPath/sessionLock", json: sessionLock!.toJson());
     });
+
+    return sessionLock;
   }
 }

@@ -102,8 +102,6 @@ class _AdvisoryState extends State<Advisory> {
         _advisories.removeAt(index);
       });
 
-      Navigator.of(context).pop();
-
       await FB().setValue(
           path: "${Const().dbrootSangeetSeva}/Settings/Advisory",
           value: _advisories);

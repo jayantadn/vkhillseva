@@ -366,7 +366,15 @@ class Widgets {
                 Navigator.of(context).pop();
               },
             ),
-            TextButton(onPressed: action, child: Text(actionType ?? 'OK')),
+            TextButton(
+              onPressed: () {
+                if (action != null) {
+                  action();
+                }
+                Navigator.of(context).pop();
+              },
+              child: Text(actionType ?? 'OK'),
+            ),
           ],
         );
       },

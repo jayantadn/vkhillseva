@@ -52,7 +52,7 @@ class Const {
       },
       {
         "1000": {
-          'color': Colors.orangeAccent,
+          'color': Colors.deepOrange,
           "sevas": [
             {"name": "Naivedya Seva"},
             {"name": "Sadhu Seva"},

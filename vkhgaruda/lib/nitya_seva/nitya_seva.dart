@@ -30,7 +30,6 @@ class _NityaSevaState extends State<NityaSeva> {
   DateTime _selectedDate = DateTime.now();
   DateTime _lastCallbackInvoked = DateTime.now();
   String _username = "Guest";
-  final _lock = Lock();
 
   // lists
   final List<FestivalSettings> _sevaList = [];
@@ -202,6 +201,79 @@ class _NityaSevaState extends State<NityaSeva> {
         FB().deleteValue(path: dbpath);
       }
     }
+  }
+
+  Widget _createSessionTile(int index) {
+    Session session = _sessions[index];
+    return Widgets().createTopLevelCard(
+        context: context,
+        child: ListTile(
+            leading: session.icon.isNotEmpty
+                ? ClipOval(
+                    child: Image.asset(
+                      session.icon,
+                    ),
+                  )
+                : null,
+            title: Text(session.name),
+            subtitle: Text(
+                "${session.sevakarta}, ${session.timestamp.hour < 14 ? 'Morning' : 'Evening'} ${session.type}, ${DateFormat('HH:mm').format(session.timestamp)}"),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TicketPage(
+                    session: session,
+                  ),
+                ),
+              );
+            },
+            trailing: (session.sessionLock != null &&
+                    session.sessionLock!.isLocked)
+                ? IconButton(
+                    onPressed: () async {
+                      String dbDate =
+                          DateFormat('yyyy-MM-dd').format(_selectedDate);
+                      String key = session.timestamp
+                          .toIso8601String()
+                          .replaceAll(".", "^");
+                      await NSUtils().unlockSession(
+                          context: context,
+                          sessionPath:
+                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key/Settings");
+                    },
+                    icon: Icon(Icons.lock))
+                : Widgets().createContextMenu(["Edit", "Delete"],
+                    (String value) {
+                    if (value == "Edit") {
+                      _addEditSession(session: session);
+                    } else if (value == "Delete") {
+                      String dbDate =
+                          DateFormat('yyyy-MM-dd').format(_selectedDate);
+
+                      // confirmation dialog
+                      CommonWidgets().confirm(
+                          context: context,
+                          msg: 'Are you sure you want to delete this session?',
+                          callbacks: ConfirmationCallbacks(onConfirm: () {
+                            // delete locally
+                            setState(() {
+                              _sessions.remove(session);
+                            });
+
+                            // delete in server
+                            String dbTimestamp = session.timestamp
+                                .toIso8601String()
+                                .replaceAll(".", "^");
+                            FB().deleteValue(
+                                path:
+                                    "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbTimestamp");
+
+                            // close the dialog
+                            Navigator.of(context).pop();
+                          }));
+                    }
+                  })));
   }
 
   List<String> _preValidation(Session session) {
@@ -645,57 +717,6 @@ class _NityaSevaState extends State<NityaSeva> {
         });
   }
 
-  void _createContextMenu(Session session) {
-    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
-
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Wrap(
-          children: <Widget>[
-            ListTile(
-              leading: Icon(Icons.edit),
-              title: Text('Edit'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _addEditSession(session: session);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.delete),
-              title: Text('Delete'),
-              onTap: () {
-                // confirmation dialog
-                CommonWidgets().confirm(
-                    context: context,
-                    msg: 'Are you sure you want to delete this session?',
-                    callbacks: ConfirmationCallbacks(onConfirm: () {
-                      // TODO: pre validations e.g. for admin only
-
-                      // delete locally
-                      setState(() {
-                        _sessions.remove(session);
-                      });
-
-                      // delete in server
-                      String dbTimestamp = session.timestamp
-                          .toIso8601String()
-                          .replaceAll(".", "^");
-                      FB().deleteValue(
-                          path:
-                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbTimestamp");
-
-                      // close the dialog
-                      Navigator.of(context).pop();
-                    }));
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _onDateChange(DateTime date) {
     setState(() {
       _selectedDate = date;
@@ -789,32 +810,8 @@ class _NityaSevaState extends State<NityaSeva> {
                       ),
 
                     // Session tiles
-                    ..._sessions.map((Session session) {
-                      return GestureDetector(
-                        onLongPress: () {
-                          HapticFeedback.mediumImpact();
-                          _createContextMenu(session);
-                        },
-                        child: LauncherTile2(
-                          imageLeading: session.icon,
-                          imageTrailing: session.timestamp.hour < 14
-                              ? 'assets/images/Common/morning.png'
-                              : 'assets/images/Common/evening.png',
-                          title: session.name,
-                          text:
-                              "${session.sevakarta}, ${session.timestamp.hour < 14 ? 'Morning' : 'Evening'} ${session.type}, ${DateFormat('HH:mm').format(session.timestamp)}",
-                          callback: LauncherTileCallback(onClick: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TicketPage(
-                                  session: session,
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
-                      );
+                    ...List.generate(_sessions.length, (index) {
+                      return _createSessionTile(index);
                     }),
 
                     // summary

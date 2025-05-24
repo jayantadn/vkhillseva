@@ -18,7 +18,7 @@ class Session {
       required this.icon,
       required this.sevakarta,
       required this.timestamp,
-      SessionLock? sessionLock});
+      this.sessionLock});
 
   Map<String, dynamic> toJson() {
     return {
@@ -35,17 +35,17 @@ class Session {
 
   factory Session.fromJson(Map<String, dynamic> json) {
     Session session = Session(
-      name: json['name'],
-      type: json['type'],
-      defaultAmount: json['defaultAmount'],
-      defaultPaymentMode: json['defaultPaymentMode'],
-      icon: json['icon'],
-      sevakarta: json['sevakarta'],
-      timestamp: DateTime.parse(json['timestamp']),
-      sessionLock: json['sessionLock'] != null
-          ? Utils().convertRawToDatatype(json['sessionLock'], SessionLock.fromJson)
-          : null,
-    );
+        name: json['name'],
+        type: json['type'],
+        defaultAmount: json['defaultAmount'],
+        defaultPaymentMode: json['defaultPaymentMode'],
+        icon: json['icon'],
+        sevakarta: json['sevakarta'],
+        timestamp: DateTime.parse(json['timestamp']),
+        sessionLock: json['sessionLock'] == null
+            ? null
+            : SessionLock.fromJson(
+                Map<String, dynamic>.from(json['sessionLock'])));
 
     return session;
   }
@@ -79,9 +79,13 @@ class SessionLock {
     SessionLock sessionLock = SessionLock(
       isLocked: json['isLocked'],
       lockedBy: json['lockedBy'],
-      lockedTime: json['lockedTime'] == null ? null : DateTime.parse(json['lockedTime']),
+      lockedTime: json['lockedTime'] == null
+          ? null
+          : DateTime.parse(json['lockedTime']),
       unlockedBy: json['unlockedBy'],
-      unlockedTime: json['unlockedTime'] == null ? null : DateTime.parse(json['unlockedTime']),
+      unlockedTime: json['unlockedTime'] == null
+          ? null
+          : DateTime.parse(json['unlockedTime']),
     );
 
     return sessionLock;

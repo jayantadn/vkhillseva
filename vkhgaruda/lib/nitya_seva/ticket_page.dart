@@ -724,64 +724,6 @@ class _TicketPageState extends State<TicketPage> {
     return ret;
   }
 
-  Future<void> _onUnlockSession() async {
-    // check if user is admin
-    List adminsRaw = await FB()
-        .getList(path: "${Const().dbrootGaruda}/Settings/UserManagement/Admin");
-    List<String> admins = adminsRaw.map((e) => e.toString()).toList();
-    UserBasics? user = Utils().getUserBasics();
-    if (user == null || user.name.isEmpty) {
-      await Utils().fetchUserBasics();
-      user = Utils().getUserBasics();
-    }
-    if (user == null) {
-      Widgets().showMessage(context,
-          "You cannot unlock the session. Please contact admin to do it.");
-      return;
-    }
-    if (!admins.contains(user.mobile)) {
-      Widgets().showMessage(context,
-          "You cannot unlock the session. Please contact admin to do it.");
-      return;
-    }
-
-    CommonWidgets().confirm(
-      context: context,
-      msg:
-          "Are you sure to unlock this session? Tickets can be added or modified after this.",
-      callbacks: ConfirmationCallbacks(onConfirm: () async {
-        // push to fb
-        SessionLock sessionLock;
-        if (widget.session.sessionLock == null) {
-          sessionLock = SessionLock(
-            isLocked: false,
-            unlockedBy: _username,
-            unlockedTime: DateTime.now(),
-          );
-        } else {
-          sessionLock = widget.session.sessionLock!;
-          sessionLock.isLocked = false;
-          sessionLock.unlockedBy = _username;
-          sessionLock.unlockedTime = DateTime.now();
-        }
-        widget.session.sessionLock = sessionLock;
-        String dbdate =
-            DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
-        String key =
-            widget.session.timestamp.toIso8601String().replaceAll(".", "^");
-        await FB().setJson(
-            path:
-                "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings/sessionLock",
-            json: sessionLock.toJson());
-
-        // unlock the session
-        setState(() {
-          _isSessionLocked = false;
-        });
-      }),
-    );
-  }
-
   void _onLockSession() {
     CommonWidgets().confirm(
       context: context,
@@ -987,7 +929,27 @@ class _TicketPageState extends State<TicketPage> {
                 if (_isSessionLocked)
                   IconButton(
                     icon: Icon(Icons.lock, size: 32),
-                    onPressed: _onUnlockSession,
+                    onPressed: () async {
+                      String dbdate = DateFormat('yyyy-MM-dd')
+                          .format(widget.session.timestamp);
+                      String key = widget.session.timestamp
+                          .toIso8601String()
+                          .replaceAll(".", "^");
+                      String sessionPath =
+                          "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key/Settings";
+                      widget.session.sessionLock = await NSUtils()
+                          .unlockSession(
+                              context: context, sessionPath: sessionPath);
+                      // unlock the session
+                      setState(() {
+                        if (widget.session.sessionLock != null &&
+                            widget.session.sessionLock!.isLocked == true) {
+                          _isSessionLocked = true;
+                        } else {
+                          _isSessionLocked = false;
+                        }
+                      });
+                    },
                   ),
 
                 // menu button

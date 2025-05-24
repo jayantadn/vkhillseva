@@ -7,6 +7,7 @@ import 'package:vkhgaruda/common/datatypes.dart';
 import 'package:vkhgaruda/common/nsutils.dart';
 import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/session_summary.dart';
+import 'package:vkhgaruda/nitya_seva/settings/ticket_settings.dart';
 import 'package:vkhgaruda/nitya_seva/tally_cash.dart';
 import 'package:vkhgaruda/nitya_seva/tally_upi_card.dart';
 import 'package:vkhgaruda/widgets/common_widgets.dart';
@@ -39,6 +40,13 @@ class _TicketPageState extends State<TicketPage> {
   @override
   initState() {
     super.initState();
+
+    // check if user is admin
+    Utils().isAdmin().then((isAdmin) {
+      setState(() {
+        _isAdmin = isAdmin;
+      });
+    });
 
     // firebase listeners
     String dbDate = DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
@@ -936,6 +944,19 @@ class _TicketPageState extends State<TicketPage> {
           Text("If there is any mismatch, please contact admin.")
         ]),
         actions: [
+          if (_isAdmin)
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const TicketSettingsPage(title: "Ticket settings")),
+                );
+              },
+              child: Text("Edit"),
+            ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);

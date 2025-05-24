@@ -766,27 +766,19 @@ class _TicketPageState extends State<TicketPage> {
     return ticketNumber;
   }
 
-  void _onLockSession() {
-    NSWidgetsOld().confirm(
-      context: context,
-      msg:
-          "Are you sure to lock this session? Tickets cannot be added or modified after this.",
-      callbacks: ConfirmationCallbacks(onConfirm: () async {
-        // update session data
-        String dbdate =
-            DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
-        String key =
-            widget.session.timestamp.toIso8601String().replaceAll(".", "^");
-        String sessionPath = "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key";
-        widget.session.sessionLock = await NSUtils()
-            .lockSession(sessionPath: sessionPath, username: _username);
+  Future<void> _onLockSession() async {
+    // update session data
+    String dbdate = DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
+    String key =
+        widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+    String sessionPath = "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key";
+    widget.session.sessionLock = await NSUtils().lockSession(
+        context: context, sessionPath: sessionPath, username: _username);
 
-        // lock the UI
-        setState(() {
-          _isSessionLocked = true;
-        });
-      }),
-    );
+    // lock the UI
+    setState(() {
+      _isSessionLocked = true;
+    });
   }
 
   List<String> _prevalidateTicket(Ticket ticket) {
@@ -1179,8 +1171,9 @@ class _TicketPageState extends State<TicketPage> {
                               context: context,
                               child: ListTile(
                                 leading: Icon(Icons.lock),
-                                title: Text(
-                                    "Session is locked by ${widget.session.sessionLock!.lockedBy} at ${DateFormat('dd-MM-yy, HH:mm').format(widget.session.sessionLock!.lockedTime!)}. Please ask admin to unlock for any changes."),
+                                title: Text(widget.session.sessionLock == null
+                                    ? "Session is locked. Please ask admin to unlock for any changes."
+                                    : "Session is locked by ${widget.session.sessionLock!.lockedBy} at ${DateFormat('dd-MM-yy, HH:mm').format(widget.session.sessionLock!.lockedTime!)}. Please ask admin to unlock for any changes."),
                               )),
 
                         // list of tickets

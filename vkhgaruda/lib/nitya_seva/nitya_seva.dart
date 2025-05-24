@@ -548,7 +548,8 @@ class _NityaSevaState extends State<NityaSeva> {
           String dbpathSession =
               "${Const().dbrootGaruda}/NityaSeva/$dbDate/$element";
 
-          await NSUtils().lockSession(sessionPath: dbpathSession);
+          await NSUtils()
+              .lockSession(context: context, sessionPath: dbpathSession);
 
           Toaster().info(
             "Session Autolocked: ${element.toString()}",
@@ -641,6 +642,7 @@ class _NityaSevaState extends State<NityaSeva> {
                           .toIso8601String()
                           .replaceAll(".", "^");
                       NSUtils().lockSession(
+                          context: context,
                           sessionPath:
                               "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key",
                           username: _username);

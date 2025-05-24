@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vkhgaruda/home/festival_settings_page.dart';
+import 'package:vkhgaruda/nitya_seva/settings/festival_settings_page.dart';
+import 'package:vkhgaruda/nitya_seva/settings/ticket_settings.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Settings extends StatefulWidget {
@@ -29,7 +30,7 @@ class _SettingsState extends State<Settings> {
 
   Widget _createSettingsCard(
       {required String title,
-      required String icon,
+      required IconData icon,
       required SettingsCallback callback}) {
     return Card(
       child: Padding(
@@ -38,14 +39,24 @@ class _SettingsState extends State<Settings> {
           onTap: () {
             callback.onClick();
           },
-          child: ListTile(
-            title:
-                Text(title, style: Theme.of(context).textTheme.headlineMedium),
-            leading: ClipRRect(
-              borderRadius:
-                  BorderRadius.circular(8.0), // Adjust the radius as needed
-              child: Image.asset(
-                icon,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: ListTile(
+              title: Text(title,
+                  style: Theme.of(context).textTheme.headlineMedium),
+              leading: ClipRRect(
+                borderRadius:
+                    BorderRadius.circular(8.0), // Adjust the radius as needed
+                child: Container(
+                  color: Theme.of(context)
+                      .primaryColor, // Background color for the icon
+                  padding: const EdgeInsets.all(
+                      8.0), // Optional: add padding for better appearance
+                  child: Icon(
+                    icon,
+                    color: Colors.white, // Icon color as white
+                  ),
+                ),
               ),
             ),
           ),
@@ -70,14 +81,29 @@ class _SettingsState extends State<Settings> {
                 children: [
                   // Nitya Seva Festival settings
                   _createSettingsCard(
-                    title: 'Nitya seva list',
-                    icon: "assets/images/LauncherIcons/NityaSeva.png",
+                    title: 'Festival settings',
+                    icon: Icons.volunteer_activism,
                     callback: SettingsCallback(onClick: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const FestivalSettingsPage(
-                                title: "Nitya seva list")),
+                                title: "Festival settings")),
+                      );
+                    }),
+                  ),
+
+                  // Nitya Seva Ticket settings
+                  _createSettingsCard(
+                    title: 'Ticket settings',
+                    icon:
+                        Icons.confirmation_number, // Suggested icon for tickets
+                    callback: SettingsCallback(onClick: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const TicketSettingsPage(
+                                title: "Ticket settings")),
                       );
                     }),
                   ),

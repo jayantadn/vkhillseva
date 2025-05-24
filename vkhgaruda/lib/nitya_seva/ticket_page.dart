@@ -464,7 +464,7 @@ class _TicketPageState extends State<TicketPage> {
                                   if (ticket == null) {
                                     errors = _prevalidateTicket(t);
                                     if (errors.isNotEmpty) {
-                                      String? action = await CommonWidgets()
+                                      String? action = await NSWidgetsOld()
                                           .createErrorDialog(
                                               context: context, errors: errors);
                                       if (action == "Cancel") {
@@ -509,7 +509,7 @@ class _TicketPageState extends State<TicketPage> {
                                   // if (errors.isEmpty) {
                                   //   errors = await _postvalidateTicket();
                                   //   if (errors.isNotEmpty) {
-                                  //     String? action = await CommonWidgets()
+                                  //     String? action = await NSWidgetsOld()
                                   //         .createErrorDialog(
                                   //             context: context,
                                   //             errors: errors,
@@ -667,7 +667,7 @@ class _TicketPageState extends State<TicketPage> {
     List<String> errors = await _prevalidateDelete(ticket);
 
     if (errors.isNotEmpty) {
-      String? action = await CommonWidgets().createErrorDialog(
+      String? action = await NSWidgetsOld().createErrorDialog(
         context: context,
         errors: errors,
       );
@@ -677,7 +677,7 @@ class _TicketPageState extends State<TicketPage> {
       }
     }
 
-    CommonWidgets().confirm(
+    NSWidgetsOld().confirm(
         context: context,
         msg: "Are you sure you want to delete this ticket?",
         callbacks: ConfirmationCallbacks(onConfirm: () {
@@ -720,12 +720,12 @@ class _TicketPageState extends State<TicketPage> {
         _tickets.where((ticket) => ticket.amount == amount).toList();
     if (filteredTickets.isEmpty) {
       String lastTicketNumberPath =
-          "${Const().dbrootGaruda}/NityaSeva/LastUsedTicketNumbers/$amount";
-      int? lastTicketNumber = await FB().getValue(path: lastTicketNumberPath);
-      if (lastTicketNumber == null) {
+          "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers/$amount";
+      int? nextTicketNumber = await FB().getValue(path: lastTicketNumberPath);
+      if (nextTicketNumber == null) {
         ticketNumber = 1;
       } else {
-        ticketNumber = lastTicketNumber + 1;
+        ticketNumber = nextTicketNumber;
       }
     } else {
       ticketNumber = filteredTickets.first.ticketNumber + 1;
@@ -739,7 +739,7 @@ class _TicketPageState extends State<TicketPage> {
   }
 
   void _onLockSession() {
-    CommonWidgets().confirm(
+    NSWidgetsOld().confirm(
       context: context,
       msg:
           "Are you sure to lock this session? Tickets cannot be added or modified after this.",
@@ -967,7 +967,7 @@ class _TicketPageState extends State<TicketPage> {
                   ),
 
                 // menu button
-                CommonWidgets().createPopupMenu([
+                NSWidgetsOld().createPopupMenu([
                   // tally cash button
                   MyPopupMenuItem(
                       text: "Tally cash",

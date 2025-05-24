@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CommonWidgets {
-  static final CommonWidgets _instance = CommonWidgets._internal();
+class NSWidgetsOld {
+  static final NSWidgetsOld _instance = NSWidgetsOld._internal();
 
-  factory CommonWidgets() {
+  factory NSWidgetsOld() {
     return _instance;
   }
 
-  CommonWidgets._internal() {
+  NSWidgetsOld._internal() {
     // init
   }
 

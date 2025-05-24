@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CommonWidgets {
-  static final CommonWidgets _instance = CommonWidgets._internal();
+class NSWidgetsOld {
+  static final NSWidgetsOld _instance = NSWidgetsOld._internal();
 
-  factory CommonWidgets() {
+  factory NSWidgetsOld() {
     return _instance;
   }
 
-  CommonWidgets._internal() {
+  NSWidgetsOld._internal() {
     // init
   }
 
@@ -66,7 +66,8 @@ class CommonWidgets {
                   value: item.text,
                   child: Row(
                     children: <Widget>[
-                      Icon(item.icon, color: Theme.of(context).iconTheme.color),
+                      Icon(item.icon,
+                          size: 24, color: Theme.of(context).iconTheme.color),
                       const SizedBox(width: 8),
                       Text(item.text),
                     ],

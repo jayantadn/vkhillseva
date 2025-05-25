@@ -25,7 +25,7 @@ class _UserManagementState extends State<UserManagement> {
   // lists
   Map<String, dynamic> _userData = {};
   Map<String, dynamic> _userProfiles = {};
-  List<UserBasics> _userBasics = [];
+  final List<UserBasics> _userBasics = [];
 
   // controllers, listeners and focus nodes
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();

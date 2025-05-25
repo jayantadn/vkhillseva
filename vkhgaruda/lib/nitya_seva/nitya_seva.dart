@@ -2,10 +2,8 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/common/nsutils.dart';
 import 'package:vkhgaruda/nitya_seva/festival.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/laddu.dart';
-import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
 import 'package:vkhgaruda/widgets/common_widgets.dart';
 import 'package:vkhgaruda/nitya_seva/day_summary.dart';
@@ -545,7 +543,7 @@ class _NityaSevaState extends State<NityaSeva> {
           String dbpathSession =
               "${Const().dbrootGaruda}/NityaSeva/$dbDate/$element";
 
-          await NSUtils()
+          await Utils()
               .lockSession(context: context, sessionPath: dbpathSession);
 
           Toaster().info(
@@ -597,7 +595,7 @@ class _NityaSevaState extends State<NityaSeva> {
                       String key = session.timestamp
                           .toIso8601String()
                           .replaceAll(".", "^");
-                      await NSUtils().unlockSession(
+                      await Utils().unlockSession(
                           context: context,
                           sessionPath:
                               "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key");
@@ -638,7 +636,7 @@ class _NityaSevaState extends State<NityaSeva> {
                       String key = session.timestamp
                           .toIso8601String()
                           .replaceAll(".", "^");
-                      NSUtils().lockSession(
+                      Utils().lockSession(
                           context: context,
                           sessionPath:
                               "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key",

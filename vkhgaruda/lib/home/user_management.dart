@@ -19,8 +19,11 @@ class _UserManagementState extends State<UserManagement> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  String? _dropdownValue;
 
   // lists
+  Map<String, dynamic> _userData = {};
+  Map<String, dynamic> _userProfiles = {};
 
   // controllers, listeners and focus nodes
 
@@ -34,6 +37,8 @@ class _UserManagementState extends State<UserManagement> {
   @override
   dispose() {
     // clear all lists
+    _userData.clear();
+    _userProfiles.clear();
 
     // clear all controllers and focus nodes
 
@@ -48,7 +53,10 @@ class _UserManagementState extends State<UserManagement> {
     // access control
 
     await _lock.synchronized(() async {
-      // your code here
+      String dbpathUM = "${Const().dbrootGaruda}/Settings/UserManagement";
+      String dbpathUP = "${Const().dbrootGaruda}/Settings/UserProfileSettings";
+      _userData = await FB().getJson(path: dbpathUM);
+      _userProfiles = await FB().getJson(path: dbpathUP);
     });
 
     // refresh all child widgets
@@ -76,7 +84,7 @@ class _UserManagementState extends State<UserManagement> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      // your widgets here
+                      // input fields
                       Widgets().createTopLevelCard(
                         context: context,
                         child: Padding(
@@ -87,17 +95,19 @@ class _UserManagementState extends State<UserManagement> {
                               width: double.infinity,
                               child: Center(
                                 child: DropdownButton<String>(
-                                  onChanged: (value) {},
-                                  value: null,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _dropdownValue = value;
+                                    });
+                                  },
+                                  value: _dropdownValue,
                                   hint: const Text('Select an option',
                                       textAlign: TextAlign.center),
                                   isExpanded: true,
                                   alignment: Alignment.center,
-                                  items: <String>[
-                                    'Option 1',
-                                    'Option 2',
-                                    'Option 3'
-                                  ].map((String value) {
+                                  items: _userData.keys
+                                      .toList()
+                                      .map((String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Center(
@@ -148,6 +158,12 @@ class _UserManagementState extends State<UserManagement> {
                             )
                           ]),
                         ),
+                      ),
+
+                      // list of users
+                      Widgets().createTopLevelCard(
+                        context: context,
+                        child: Placeholder(),
                       ),
 
                       // leave some space at bottom

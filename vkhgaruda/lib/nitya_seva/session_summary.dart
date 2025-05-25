@@ -3,9 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhpackages/vkhpackages.dart';
-import 'package:vkhgaruda/common/datatypes.dart';
 
 class SessionSummary extends StatefulWidget {
   final String title;

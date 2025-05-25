@@ -3,9 +3,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/common/datatypes.dart';
-import 'package:vkhgaruda/common/nsutils.dart';
-import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/session_summary.dart';
 import 'package:vkhgaruda/nitya_seva/settings/ticket_settings.dart';
 import 'package:vkhgaruda/nitya_seva/tally_cash.dart';
@@ -773,7 +770,7 @@ class _TicketPageState extends State<TicketPage> {
     String key =
         widget.session.timestamp.toIso8601String().replaceAll(".", "^");
     String sessionPath = "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key";
-    widget.session.sessionLock = await NSUtils().lockSession(
+    widget.session.sessionLock = await Utils().lockSession(
         context: context, sessionPath: sessionPath, username: _username);
 
     // lock the UI
@@ -1094,7 +1091,7 @@ class _TicketPageState extends State<TicketPage> {
                           .replaceAll(".", "^");
                       String sessionPath =
                           "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key";
-                      SessionLock? lockStatus = await NSUtils().unlockSession(
+                      SessionLock? lockStatus = await Utils().unlockSession(
                           context: context, sessionPath: sessionPath);
                       if (lockStatus == null) {
                         // if unlock failed, return

@@ -29,6 +29,8 @@ class _HomePageState extends State<HomePage> {
   initState() {
     super.initState();
 
+    _uploadProfileSettings();
+
     refresh();
   }
 
@@ -59,6 +61,23 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _uploadProfileSettings() async {
+    String? uploaded = await LS().read("userbasicsUploaded");
+    if (uploaded != null && uploaded == "true") {
+      return; // already uploaded
+    }
+
+    UserBasics? user = await Utils().fetchOrGetUserBasics();
+    if (user != null) {
+      String dbpath =
+          "${Const().dbrootGaruda}/Settings/UserProfileSettings/${user.mobile}";
+      await FB().setJson(path: dbpath, json: {
+        'name': user.name,
+      });
+      await LS().write("userbasicsUploaded", "true");
+    }
   }
 
   @override

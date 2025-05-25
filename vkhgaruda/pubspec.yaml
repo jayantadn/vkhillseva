@@ -6,11 +6,11 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # followed by an optional build number separated by a +.
 # build by specifying --build-name and --build-number, respectively.
-# Read more about Android versioning at https: 7.5.1+1
+# Read more about Android versioning at https: 7.5.2+1
 # In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
-version: 7.5.1+1
+version: 7.5.2+1
 
 environment:
   sdk: ^3.6.0

@@ -20,6 +20,7 @@ class _UserManagementState extends State<UserManagement> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   String? _dropdownValue;
+  String _mobile = "";
 
   // lists
   Map<String, dynamic> _userData = {};
@@ -27,6 +28,7 @@ class _UserManagementState extends State<UserManagement> {
   List<UserBasics> _userBasics = [];
 
   // controllers, listeners and focus nodes
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   initState() {
@@ -75,8 +77,17 @@ class _UserManagementState extends State<UserManagement> {
       child: ListTile(
           title: Text(user.mobile),
           subtitle: Text(user.name),
-          trailing:
-              Widgets().createContextMenu(["Edit", "Delete"], (value) {})),
+          trailing: Widgets().createContextMenu(["Delete"], (value) {
+            if (value.isEmpty) {
+              return;
+            }
+
+            if (value == "Delete") {
+              _onDeleteUser(user.mobile);
+            } else {
+              Toaster().error("Unknown action: $value");
+            }
+          })),
     );
   }
 
@@ -95,6 +106,47 @@ class _UserManagementState extends State<UserManagement> {
       }
       _userBasics.add(basics);
     }
+  }
+
+  Future<void> _onAddUser() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (_userData[_dropdownValue].contains(_mobile)) {
+      Toaster().error("User already exists");
+      return;
+    }
+
+    // add user to the database
+    String dbpath =
+        "${Const().dbrootGaruda}/Settings/UserManagement/$_dropdownValue";
+    await FB().addToList(listpath: dbpath, data: _mobile);
+
+    // add to userbasics list
+    UserBasics newUser = UserBasics(name: "Unknown", mobile: _mobile);
+    setState(() {
+      _userBasics.add(newUser);
+    });
+
+    Toaster().info("User added");
+  }
+
+  Future<void> _onDeleteUser(String mobile) async {
+    await Widgets().showConfirmDialog(context, "Are you sure?", "Delete",
+        () async {
+      // remove user from the database
+      String dbpath =
+          "${Const().dbrootGaruda}/Settings/UserManagement/$_dropdownValue";
+      await FB().deleteFromListByValue(listpath: dbpath, value: mobile);
+
+      // remove from userbasics list
+      setState(() {
+        _userBasics.removeWhere((user) => user.mobile == mobile);
+      });
+
+      Toaster().info("User deleted");
+    });
   }
 
   @override
@@ -120,93 +172,133 @@ class _UserManagementState extends State<UserManagement> {
                         context: context,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Column(children: [
-                            // dropdown for category
-                            SizedBox(
-                              width: double.infinity,
-                              child: Center(
-                                child: DropdownButton<String>(
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _dropdownValue = value;
-                                      _setUserBasics();
-                                    });
-                                  },
-                                  value: _dropdownValue,
-                                  hint: const Text('Select an option',
-                                      textAlign: TextAlign.center),
-                                  isExpanded: true,
-                                  alignment: Alignment.center,
-                                  items: _userData.keys
-                                      .toList()
-                                      .map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Center(
-                                          child: Text(
-                                        value,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            color: value == "Admin"
-                                                ? Colors.red
-                                                : Colors.black),
-                                      )),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            ),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(children: [
+                              // dropdown for category
+                              SizedBox(
+                                width: double.infinity,
+                                child: Center(
+                                  child: DropdownButtonFormField<String>(
+                                    onChanged: (value) async {
+                                      await refresh();
+                                      setState(() {
+                                        _dropdownValue = value;
 
-                            Row(
-                              children: [
-                                // mobile number field
-                                Expanded(
-                                  flex: 8,
-                                  child: TextField(
-                                    decoration: const InputDecoration(
-                                      hintText: 'Enter mobile number',
-                                    ),
-                                    keyboardType: TextInputType.phone,
-                                    onChanged: (value) {},
+                                        _setUserBasics();
+                                      });
+                                    },
+                                    value: _dropdownValue,
+                                    hint: const Text('Select an option',
+                                        textAlign: TextAlign.center),
+                                    isExpanded: true,
+                                    alignment: Alignment.center,
+                                    items: _userData.keys
+                                        .toList()
+                                        .map((String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Center(
+                                            child: Text(
+                                          value,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              color: value == "Admin"
+                                                  ? Colors.red
+                                                  : Colors.black),
+                                        )),
+                                      );
+                                    }).toList(),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please select an option';
+                                      }
+                                      return null;
+                                    },
                                   ),
                                 ),
+                              ),
 
-                                // circular add button
-                                Expanded(
-                                  flex: 2,
-                                  child: Center(
-                                    child: Material(
-                                      color: _dropdownValue == "Admin"
-                                          ? Colors.red
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .primary, // dark background
-                                      shape: const CircleBorder(),
-                                      child: IconButton(
-                                        icon: Icon(Icons.add,
-                                            color: Theme.of(context)
+                              Row(
+                                children: [
+                                  // mobile number field
+                                  Expanded(
+                                    flex: 8,
+                                    child: TextFormField(
+                                      decoration: const InputDecoration(
+                                        hintText: 'Enter mobile number',
+                                      ),
+                                      keyboardType: TextInputType.phone,
+                                      onChanged: (value) {
+                                        _mobile = value;
+                                      },
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter a mobile number';
+                                        }
+
+                                        if (value.startsWith('+') &&
+                                            value.length != 13) {
+                                          return 'Invalid mobile number';
+                                        }
+
+                                        if (value.startsWith('91') &&
+                                            (value.length < 10 ||
+                                                value.length > 12 ||
+                                                value.length == 11)) {
+                                          return 'Invalid mobile number';
+                                        }
+
+                                        if (value.length < 10) {
+                                          return 'Mobile number must be 10 digits';
+                                        }
+
+                                        if (!RegExp(r'^[\d+]+$')
+                                            .hasMatch(value)) {
+                                          return 'Only numbers and + are allowed';
+                                        }
+
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+
+                                  // circular add button
+                                  Expanded(
+                                    flex: 2,
+                                    child: Center(
+                                      child: Material(
+                                        color: _dropdownValue == "Admin"
+                                            ? Colors.red
+                                            : Theme.of(context)
                                                 .colorScheme
-                                                .secondary), // white icon
-                                        onPressed: () {
-                                          // add user logic
-                                        },
+                                                .primary, // dark background
+                                        shape: const CircleBorder(),
+                                        child: IconButton(
+                                          icon: Icon(Icons.add,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .secondary), // white icon
+                                          onPressed: _onAddUser,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            )
-                          ]),
+                                ],
+                              )
+                            ]),
+                          ),
                         ),
                       ),
 
                       // list of users
-                      Widgets().createTopLevelCard(
-                        context: context,
-                        child: Column(
-                            children: List.generate(_userBasics.length,
-                                (index) => _createUserCard(index))),
-                      ),
+                      if (_userBasics.isNotEmpty)
+                        Widgets().createTopLevelCard(
+                          context: context,
+                          child: Column(
+                              children: List.generate(_userBasics.length,
+                                  (index) => _createUserCard(index))),
+                        ),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

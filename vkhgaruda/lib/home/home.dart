@@ -21,7 +21,8 @@ class _HomePageState extends State<HomePage> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  bool _isAdmin = false; // to check if user is admin
+  bool _isAdmin = false;
+  String _username = "";
 
   // lists
 
@@ -58,6 +59,12 @@ class _HomePageState extends State<HomePage> {
 
     await _lock.synchronized(() async {
       // perform async operations here
+      UserBasics? basic = await Utils().fetchOrGetUserBasics();
+      if (basic != null) {
+        setState(() {
+          _username = basic.name;
+        });
+      }
 
       // fetch form values
 
@@ -69,6 +76,17 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _logout() async {
+    await LS().delete("userbasics");
+    await refresh();
+
+    setState(() {
+      _username = "";
+    });
+
+    Navigator.pop(context);
   }
 
   Future<void> _uploadProfileSettings() async {
@@ -96,6 +114,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           Scaffold(
             appBar: AppBar(title: Text(widget.title), actions: [
+              // user management
               if (_isAdmin)
                 IconButton(
                   icon: const Icon(Icons.manage_accounts),
@@ -108,6 +127,32 @@ class _HomePageState extends State<HomePage> {
                     }));
                   },
                 ),
+
+              // logout button
+              if (_username.isNotEmpty)
+                IconButton(
+                  icon: Icon(Icons.logout),
+                  onPressed: () async {
+                    Widgets().showConfirmDialog(context,
+                        "Are you sure to log out?", "Log out", _logout);
+                  },
+                ),
+
+              // support
+              IconButton(
+                icon: Icon(Icons.help),
+                onPressed: () {
+                  Navigator.push(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Support(
+                        title: "Support",
+                      ),
+                    ),
+                  );
+                },
+              ),
             ]),
             body: RefreshIndicator(
               onRefresh: refresh,

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhgaruda/home/landing.dart';
+import 'package:vkhgaruda/home/user_management.dart';
 import 'package:vkhgaruda/nitya_seva/settings/ticket_settings.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const Landing(title: "Hare Krishna");
-  final Widget test = const TicketSettings(
+  final Widget test = const UserManagement(
     title: "Testing",
   );
 
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Garuda',
       theme: themeGaruda,
-      home: home,
+      home: test,
     );
   }
 }

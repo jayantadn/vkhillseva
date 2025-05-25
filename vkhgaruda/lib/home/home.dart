@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/home/user_management.dart';
 import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
 import 'package:vkhgaruda/widgets/launcher_tile.dart';
@@ -20,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  bool _isAdmin = false; // to check if user is admin
 
   // lists
 
@@ -28,6 +30,12 @@ class _HomePageState extends State<HomePage> {
   @override
   initState() {
     super.initState();
+
+    Utils().isAdmin().then((isAdmin) {
+      setState(() {
+        _isAdmin = isAdmin;
+      });
+    });
 
     _uploadProfileSettings();
 
@@ -87,7 +95,20 @@ class _HomePageState extends State<HomePage> {
       child: Stack(
         children: [
           Scaffold(
-            appBar: AppBar(title: Text(widget.title)),
+            appBar: AppBar(title: Text(widget.title), actions: [
+              if (_isAdmin)
+                IconButton(
+                  icon: const Icon(Icons.manage_accounts),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const UserManagement(
+                        title: "User Management",
+                      );
+                    }));
+                  },
+                ),
+            ]),
             body: RefreshIndicator(
               onRefresh: refresh,
               child: SingleChildScrollView(

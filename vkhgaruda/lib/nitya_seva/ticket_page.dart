@@ -236,7 +236,7 @@ class _TicketPageState extends State<TicketPage> {
                           decoration:
                               InputDecoration(labelText: "Ticket Number"),
                           keyboardType: TextInputType.number,
-                          readOnly: true,
+                          readOnly: _isAdmin ? false : true,
                         ),
 
                         // Seva amount label

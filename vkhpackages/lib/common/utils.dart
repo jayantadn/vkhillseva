@@ -47,6 +47,15 @@ class Utils {
     return fromJson(map);
   }
 
+  Map<String, dynamic> convertRawToJson(dynamic raw) {
+    if (raw is Map) {
+      Map<String, dynamic> map = Map<String, dynamic>.from(raw);
+      return map;
+    } else {
+      throw Exception("Raw data is not a Map");
+    }
+  }
+
   Future<void> fetchFestivalIcons() async {
     if (festivalIcons.isEmpty) {
       List sevaListRaw = await FB().getList(path: "Settings/NityaSevaList");
@@ -165,6 +174,10 @@ class Utils {
 
   UserBasics? getUserBasics() {
     return _userbasics;
+  }
+
+  void printType(dynamic value) {
+    print("${value.runtimeType}: $value");
   }
 
   Future<void> sendWhatsAppMessage(String phoneNumber, String message) async {

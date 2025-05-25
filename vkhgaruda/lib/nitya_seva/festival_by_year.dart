@@ -5,17 +5,18 @@ import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
-class FestivalRecord extends StatefulWidget {
+class FestivalRecordByYear extends StatefulWidget {
   final String title;
   final String icon;
 
-  const FestivalRecord({super.key, required this.title, required this.icon});
+  const FestivalRecordByYear(
+      {super.key, required this.title, required this.icon});
 
   @override
-  _FestivalRecordState createState() => _FestivalRecordState();
+  _FestivalRecordByYearState createState() => _FestivalRecordByYearState();
 }
 
-class _FestivalRecordState extends State<FestivalRecord> {
+class _FestivalRecordByYearState extends State<FestivalRecordByYear> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;

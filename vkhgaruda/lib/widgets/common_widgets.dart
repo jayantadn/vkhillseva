@@ -67,7 +67,7 @@ class NSWidgetsOld {
                   child: Row(
                     children: <Widget>[
                       Icon(item.icon,
-                          size: 24, color: Theme.of(context).iconTheme.color),
+                          size: 20, color: Theme.of(context).iconTheme.color),
                       const SizedBox(width: 8),
                       Text(item.text),
                     ],

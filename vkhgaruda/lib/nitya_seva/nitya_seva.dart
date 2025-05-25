@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/nitya_seva/festival.dart';
+import 'package:vkhgaruda/nitya_seva/festival_by_event.dart';
+import 'package:vkhgaruda/nitya_seva/festival_by_year.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/laddu.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
 import 'package:vkhgaruda/widgets/common_widgets.dart';
@@ -734,6 +735,43 @@ class _NityaSevaState extends State<NityaSeva> {
     refresh();
   }
 
+  Future<void> _onFestivalRecord() async {
+    await Widgets().showResponsiveDialog(
+        context: context,
+        child: Column(
+          children: [
+            // view by year
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FestivalRecordByYear(
+                            title: "Festival record",
+                            icon: 'assets/images/LauncherIcons/NityaSeva.png')),
+                  );
+                },
+                child: Text("View by year")),
+
+            // view by event
+            SizedBox(height: 8),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FestivalRecordByEvent(
+                            title: "Festival record",
+                            splashImage:
+                                'assets/images/LauncherIcons/NityaSeva.png')),
+                  );
+                },
+                child: Text("View by event")),
+          ],
+        ),
+        actions: []);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -771,16 +809,7 @@ class _NityaSevaState extends State<NityaSeva> {
                 MyPopupMenuItem(
                     text: "Festival Record",
                     icon: Icons.temple_hindu,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => FestivalRecord(
-                                title: "Festival record",
-                                icon:
-                                    'assets/images/LauncherIcons/NityaSeva.png')),
-                      );
-                    }),
+                    onPressed: _onFestivalRecord),
 
                 // settings
                 MyPopupMenuItem(

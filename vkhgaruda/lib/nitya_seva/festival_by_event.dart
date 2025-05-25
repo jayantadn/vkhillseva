@@ -79,8 +79,65 @@ class _FestivalRecordByEventState extends State<FestivalRecordByEvent> {
   }
 
   Widget _createDataTile(int index) {
-    int key = _ticketsSold.keys.toList()[index];
-    return ListTile(title: Text("${_ticketsSold[key]}"));
+    int year = _ticketsSold.keys.toList()[index];
+    int value = _ticketsSold[year] ?? 0;
+
+    // Find the max value for scaling
+    int maxValue = _ticketsSold.values.isNotEmpty
+        ? _ticketsSold.values.reduce((a, b) => a > b ? a : b)
+        : 1;
+
+    // Calculate bar width as a fraction of available width
+    double barFraction = maxValue > 0 ? value / maxValue : 0;
+
+    return ListTile(
+      leading: Text(year.toString(),
+          style: Theme.of(context).textTheme.headlineSmall),
+      title: LayoutBuilder(
+        builder: (context, constraints) {
+          double barWidth = constraints.maxWidth * barFraction;
+          return Stack(
+            children: [
+              Container(
+                height: 24,
+                width: constraints.maxWidth,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              Container(
+                height: 24,
+                width: barWidth,
+                decoration: BoxDecoration(
+                  color: Utils().getRandomDarkColor(),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              Positioned.fill(
+                child: Center(
+                  child: Text(
+                    value.toString(),
+                    style: TextStyle(
+                      color: barFraction > 0.5 ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 2,
+                          color: Colors.black26,
+                          offset: Offset(1, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+      trailing: SizedBox.shrink(),
+    );
   }
 
   Widget _createFestivalDropdown() {
@@ -110,35 +167,47 @@ class _FestivalRecordByEventState extends State<FestivalRecordByEvent> {
     // this year
     DateTime now = DateTime.now();
     DateTime startOfYear = DateTime(now.year, 1, 1);
-    var recordsThisYear = await FB().getValuesByDateRange(
-      path: "${Const().dbrootGaruda}/NityaSeva",
-      startDate: startOfYear,
-    );
-    List<String> recordsThisYearKeys = recordsThisYear.keys.toList();
-    for (var key in recordsThisYearKeys) {
-      var sessionsRaw = recordsThisYear[key];
-      var sessionsMap = Utils().convertRawToJson(sessionsRaw);
-      List<String> sessionsKeys = sessionsMap.keys.toList();
+    DateTime? end;
+    while (true) {
+      var recordsThisYear = await FB().getValuesByDateRange(
+          path: "${Const().dbrootGaruda}/NityaSeva",
+          startDate: startOfYear,
+          endDate: end ?? now);
+      if (recordsThisYear.isEmpty) {
+        // no records found for this year, break the loop
+        setState(() {});
+        break;
+      }
 
-      for (String sessionKey in sessionsKeys) {
-        var sessionMap = Utils().convertRawToJson(sessionsMap[sessionKey]);
-        Session sessionSettings = Utils()
-            .convertRawToDatatype(sessionMap['Settings'], Session.fromJson);
-        int year = int.parse(DateFormat("yyyy").format(now));
-        if (sessionSettings.name == festivalName) {
-          setState(() {
-            if (_ticketsSold[year] == null) {
-              _ticketsSold[year] = sessionMap['Tickets'].length;
-            } else {
-              _ticketsSold[year] =
-                  (_ticketsSold[year]! + sessionMap['Tickets'].length).toInt();
-            }
-          });
+      List<String> recordsThisYearKeys = recordsThisYear.keys.toList();
+      for (var key in recordsThisYearKeys) {
+        var sessionsRaw = recordsThisYear[key];
+        var sessionsMap = Utils().convertRawToJson(sessionsRaw);
+        List<String> sessionsKeys = sessionsMap.keys.toList();
+
+        for (String sessionKey in sessionsKeys) {
+          var sessionMap = Utils().convertRawToJson(sessionsMap[sessionKey]);
+          Session sessionSettings = Utils()
+              .convertRawToDatatype(sessionMap['Settings'], Session.fromJson);
+          int year = int.parse(DateFormat("yyyy").format(startOfYear));
+          if (sessionSettings.name == festivalName) {
+            setState(() {
+              if (_ticketsSold[year] == null) {
+                _ticketsSold[year] = sessionMap['Tickets'].length;
+              } else {
+                _ticketsSold[year] =
+                    (_ticketsSold[year]! + sessionMap['Tickets'].length)
+                        .toInt();
+              }
+            });
+          }
         }
       }
-    }
 
-    // previous years
+      // rewind 1 year
+      startOfYear = DateTime(startOfYear.year - 1, 1, 1);
+      end = DateTime(startOfYear.year, 12, 31);
+    }
   }
 
   @override

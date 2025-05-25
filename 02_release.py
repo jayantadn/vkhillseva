@@ -246,7 +246,7 @@ def main():
     set_parameters()
     release("vkhgaruda")
     release("vkhsangeetseva")
-    print("Test base features and delta changes. Press Enter to continue...") 
+    input("Test base features and delta changes. Press Enter to continue...") 
 
 if __name__ == '__main__':
     main()

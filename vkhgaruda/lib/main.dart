@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhgaruda/home/landing.dart';
-import 'package:vkhgaruda/home/user_management.dart';
 import 'package:vkhgaruda/nitya_seva/festival_by_event.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -37,7 +36,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Garuda',
       theme: themeGaruda,
-      home: test,
+      home: home,
     );
   }
 }

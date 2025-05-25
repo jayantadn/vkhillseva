@@ -424,7 +424,6 @@ class _ProfileState extends State<Profile> {
       UserBasics basics = UserBasics(
         name: details.name,
         mobile: details.mobile,
-        uid: Utils().getUserBasics()!.uid,
       );
       await LS().write("userbasics", jsonEncode(basics));
     }

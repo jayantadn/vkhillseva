@@ -24,6 +24,7 @@ class _UserManagementState extends State<UserManagement> {
   // lists
   Map<String, dynamic> _userData = {};
   Map<String, dynamic> _userProfiles = {};
+  List<UserBasics> _userBasics = [];
 
   // controllers, listeners and focus nodes
 
@@ -66,6 +67,36 @@ class _UserManagementState extends State<UserManagement> {
     });
   }
 
+  Widget _createUserCard(int index) {
+    UserBasics user = _userBasics[index];
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0),
+      child: ListTile(
+          title: Text(user.mobile),
+          subtitle: Text(user.name),
+          trailing:
+              Widgets().createContextMenu(["Edit", "Delete"], (value) {})),
+    );
+  }
+
+  Future<void> _setUserBasics() async {
+    if (_dropdownValue == null || _userData.isEmpty || _userProfiles.isEmpty) {
+      return;
+    }
+
+    _userBasics.clear();
+    for (String mobile in _userData[_dropdownValue]) {
+      UserBasics basics = UserBasics(name: "Unknown", mobile: mobile);
+
+      var profile = _userProfiles[mobile];
+      if (profile != null) {
+        basics.name = profile['name'];
+      }
+      _userBasics.add(basics);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -98,6 +129,7 @@ class _UserManagementState extends State<UserManagement> {
                                   onChanged: (value) {
                                     setState(() {
                                       _dropdownValue = value;
+                                      _setUserBasics();
                                     });
                                   },
                                   value: _dropdownValue,
@@ -111,8 +143,14 @@ class _UserManagementState extends State<UserManagement> {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Center(
-                                          child: Text(value,
-                                              textAlign: TextAlign.center)),
+                                          child: Text(
+                                        value,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: value == "Admin"
+                                                ? Colors.red
+                                                : Colors.black),
+                                      )),
                                     );
                                   }).toList(),
                                 ),
@@ -138,9 +176,11 @@ class _UserManagementState extends State<UserManagement> {
                                   flex: 2,
                                   child: Center(
                                     child: Material(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary, // dark background
+                                      color: _dropdownValue == "Admin"
+                                          ? Colors.red
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .primary, // dark background
                                       shape: const CircleBorder(),
                                       child: IconButton(
                                         icon: Icon(Icons.add,
@@ -163,7 +203,9 @@ class _UserManagementState extends State<UserManagement> {
                       // list of users
                       Widgets().createTopLevelCard(
                         context: context,
-                        child: Placeholder(),
+                        child: Column(
+                            children: List.generate(_userBasics.length,
+                                (index) => _createUserCard(index))),
                       ),
 
                       // leave some space at bottom

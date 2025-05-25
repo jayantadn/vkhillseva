@@ -68,7 +68,6 @@ class _AuthDialogState extends State<AuthDialog> {
       UserBasics userbasics = UserBasics(
         name: _nameController.text.trim(),
         mobile: _mobileNumberController.text,
-        uid: userCredential.user!.uid,
       );
       await LS().write("userbasics", jsonEncode(userbasics));
 

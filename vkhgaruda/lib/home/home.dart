@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/home/landing.dart';
 import 'package:vkhgaruda/home/user_management.dart';
 import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
@@ -80,11 +81,10 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _logout() async {
     await LS().delete("userbasics");
-    await refresh();
 
-    setState(() {
-      _username = "";
-    });
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return const Landing(title: "Login");
+    }));
   }
 
   Future<void> _uploadProfileSettings() async {

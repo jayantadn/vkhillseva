@@ -643,7 +643,9 @@ class _NityaSevaState extends State<NityaSeva> {
                               "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key",
                           username: _username);
                     } else {
-                      Toaster().error("Unknown action: $value");
+                      if (value.isNotEmpty) {
+                        Toaster().error("Unknown action: $value");
+                      }
                     }
                   })));
   }

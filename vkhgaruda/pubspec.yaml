@@ -6,11 +6,11 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # followed by an optional build number separated by a +.
 # build by specifying --build-name and --build-number, respectively.
-# Read more about Android versioning at https: 7.6.1+1
+# Read more about Android versioning at https: 7.7.0+1
 # In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
-version: 7.6.1+1
+version: 7.7.0+1
 
 environment:
   sdk: ^3.6.0
@@ -128,6 +128,12 @@ flutter:
     - assets/images/NityaSeva/JalaDana.png
     - assets/images/NityaSeva/laddu.png
     - assets/images/NityaSeva/sadhu_seva.png
+    - assets/images/Tutorials/01.png
+    - assets/images/Tutorials/02.png
+    - assets/images/Tutorials/03.png
+    - assets/images/Tutorials/04.png
+    - assets/images/Tutorials/05.png
+    - assets/images/Tutorials/06.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

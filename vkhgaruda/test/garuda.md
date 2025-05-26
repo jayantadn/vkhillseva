@@ -1,7 +1,5 @@
-# Sangeet Seva
-- set up profile
-- request for event
-- view requested event
+# General
+- signup
 
 # Garuda
 - create event slot

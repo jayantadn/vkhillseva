@@ -85,8 +85,6 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _username = "";
     });
-
-    Navigator.pop(context);
   }
 
   Future<void> _uploadProfileSettings() async {
@@ -129,14 +127,14 @@ class _HomePageState extends State<HomePage> {
                 ),
 
               // logout button
-              // if (_username.isNotEmpty)
-              //   IconButton(
-              //     icon: Icon(Icons.logout),
-              //     onPressed: () async {
-              //       Widgets().showConfirmDialog(context,
-              //           "Are you sure to log out?", "Log out", _logout);
-              //     },
-              //   ),
+              if (_username.isNotEmpty)
+                IconButton(
+                  icon: Icon(Icons.logout),
+                  onPressed: () async {
+                    Widgets().showConfirmDialog(context,
+                        "Are you sure to log out?", "Log out", _logout);
+                  },
+                ),
 
               // support
               IconButton(

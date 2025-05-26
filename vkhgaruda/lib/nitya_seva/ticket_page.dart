@@ -775,7 +775,10 @@ class _TicketPageState extends State<TicketPage> {
 
     // lock the UI
     setState(() {
-      _isSessionLocked = true;
+      if (widget.session.sessionLock != null &&
+          widget.session.sessionLock!.isLocked) {
+        _isSessionLocked = true;
+      }
     });
   }
 

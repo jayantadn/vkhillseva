@@ -284,71 +284,86 @@ class Utils {
     required String sessionPath,
     String? username,
   }) async {
-    SessionLock? sessionLock;
-
-    await Widgets().showConfirmDialog(
-      context,
-      "Are you sure to lock this session? Tickets cannot be added or modified after this.",
-      "Lock",
-      () async {
-        // get the session
-        var sessionJson = await FB().getJson(path: "$sessionPath/Settings");
-        if (sessionJson.isEmpty) {
-          Toaster().error("Unable to lock. Session not found");
-          return;
-        }
-        Session session = Session.fromJson(sessionJson);
-
-        sessionLock = session.sessionLock;
-        if (sessionLock == null) {
-          sessionLock = SessionLock(isLocked: true);
-        } else {
-          sessionLock!.isLocked = true;
-        }
-        sessionLock!.lockedBy = username ?? "Autolock";
-        sessionLock!.lockedTime = DateTime.now();
-
-        // push to fb
-        await FB().setJson(
-          path: "$sessionPath/Settings/sessionLock",
-          json: sessionLock!.toJson(),
+    bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Lock Session'),
+          content: const Text('Are you sure you want to lock this session?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+            ),
+          ],
         );
-
-        // store the last used ticket numbers
-        if (session.name == "Nitya Seva") {
-          String? lastActiveSessionPath = await getLastActiveNityaSeva();
-          if (sessionPath == lastActiveSessionPath) {
-            // locking only the last active session will update ticket numbers
-            String ticketNumbersPath =
-                "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
-            Map<String, dynamic> nextTicketNumbers = await FB().getJson(
-              path: ticketNumbersPath,
-              silent: true,
-            );
-            String ticketsPath = "$sessionPath/Tickets";
-
-            var t = await FB().getJson(path: ticketsPath, silent: true);
-            if (t.isNotEmpty) {
-              for (var entry in t.entries) {
-                Ticket ticket = Utils().convertRawToDatatype(
-                  entry.value,
-                  Ticket.fromJson,
-                );
-                String key = ticket.amount.toString();
-                int value = nextTicketNumbers[key] ?? 1;
-                if (ticket.ticketNumber >= value) {
-                  nextTicketNumbers[key] = ticket.ticketNumber + 1;
-                }
-              }
-              await FB().setJson(
-                path: ticketNumbersPath,
-                json: nextTicketNumbers,
-              );
-            }
-          }
-        }
       },
     );
+
+    if (confirm != true) {
+      return null;
+    }
+
+    SessionLock? sessionLock;
+
+    // get the session
+    var sessionJson = await FB().getJson(path: "$sessionPath/Settings");
+    if (sessionJson.isEmpty) {
+      Toaster().error("Unable to lock. Session not found");
+      return null;
+    }
+    Session session = Session.fromJson(sessionJson);
+
+    sessionLock = session.sessionLock;
+    if (sessionLock == null) {
+      sessionLock = SessionLock(isLocked: true);
+    } else {
+      sessionLock.isLocked = true;
+    }
+    sessionLock.lockedBy = username ?? "Autolock";
+    sessionLock.lockedTime = DateTime.now();
+
+    // push to fb
+    await FB().setJson(
+      path: "$sessionPath/Settings/sessionLock",
+      json: sessionLock!.toJson(),
+    );
+
+    // store the last used ticket numbers
+    if (session.name == "Nitya Seva") {
+      String? lastActiveSessionPath = await getLastActiveNityaSeva();
+      if (sessionPath == lastActiveSessionPath) {
+        // locking only the last active session will update ticket numbers
+        String ticketNumbersPath =
+            "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
+        Map<String, dynamic> nextTicketNumbers = await FB().getJson(
+          path: ticketNumbersPath,
+          silent: true,
+        );
+        String ticketsPath = "$sessionPath/Tickets";
+
+        var t = await FB().getJson(path: ticketsPath, silent: true);
+        if (t.isNotEmpty) {
+          for (var entry in t.entries) {
+            Ticket ticket = Utils().convertRawToDatatype(
+              entry.value,
+              Ticket.fromJson,
+            );
+            String key = ticket.amount.toString();
+            int value = nextTicketNumbers[key] ?? 1;
+            if (ticket.ticketNumber >= value) {
+              nextTicketNumbers[key] = ticket.ticketNumber + 1;
+            }
+          }
+          await FB().setJson(path: ticketNumbersPath, json: nextTicketNumbers);
+        }
+      }
+    }
+    ;
 
     return sessionLock;
   }

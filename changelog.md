@@ -23,6 +23,33 @@
 - fix: change print statement to input for user prompt in main function
 - feature: bar chart for festival
 - fix: removed logout
+- fix: lock session
+
+# 7.6.1
+## Effort for this release: 0 hrs
+- fix: approval
+- fix: notification deny
+- fix: dont merge test version to main
+- feature: session lock/unlock implemented
+- feature: auto lock session
+- feature: redesigned ticket
+- feature: session tile uneditable on lock
+- feature: save last ticket numbers upon session lock
+- feature: auto fetch next ticket number
+- feature: settings button to edit the next ticket numbers
+- feature: on empty session startup, display the next ticket numbers
+- feature: resume ticket number from previous session
+- fix: unlock cancel issue
+- feature: to record the last ticket numbers, check if its the last active Nitya Seva session
+- fix: confirm dialog for lock session
+- feature: note for admin entry in NextTicketNumbers
+- fix: ticket number made readonly
+- fix: enhance prompt message for testing features
+- feature: upload user info
+- feature: user management
+- fix: change print statement to input for user prompt in main function
+- feature: bar chart for festival
+- fix: removed logout
 
 # 7.6.1
 ## Effort for this release: 0 hrs

@@ -558,8 +558,8 @@ class _NityaSevaState extends State<NityaSeva> {
           String dbpathSession =
               "${Const().dbrootGaruda}/NityaSeva/$dbDate/$element";
 
-          await Utils()
-              .lockSession(context: context, sessionPath: dbpathSession);
+          await Utils().lockSession(
+              context: context, sessionPath: dbpathSession, silent: true);
 
           Toaster().info(
             "Session Autolocked: ${element.toString()}",

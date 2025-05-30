@@ -283,26 +283,33 @@ class Utils {
     required BuildContext context,
     required String sessionPath,
     String? username,
+    bool? silent,
   }) async {
-    bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Lock Session'),
-          content: const Text('Are you sure you want to lock this session?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('No'),
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-            ),
-            TextButton(
-              child: const Text('Yes'),
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-            ),
-          ],
-        );
-      },
-    );
+    bool? confirm;
+
+    if (silent == null || (silent != null && !silent)) {
+      confirm = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return AlertDialog(
+            title: const Text('Lock Session'),
+            content: const Text('Are you sure you want to lock this session?'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('No'),
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+              ),
+              TextButton(
+                child: const Text('Yes'),
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      confirm = true;
+    }
 
     if (confirm != true) {
       return null;

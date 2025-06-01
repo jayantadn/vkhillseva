@@ -50,7 +50,7 @@ class _TutorialState extends State<Tutorial> {
               await LS().write("lastTutorial", Const().version);
               Widgets().showConfirmDialog(
                 context,
-                "This is the end of the tutorial. Click OK to close and go to Nitya Seva.",
+                "This is the end of the tutorial. Click OK to go back to the app.",
                 "OK",
                 () {
                   Navigator.pop(context);

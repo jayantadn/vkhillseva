@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'package:vkhgaruda/nitya_seva/festival_by_event.dart';
-import 'package:vkhgaruda/nitya_seva/nstutorial.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -27,9 +26,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const Landing(title: "Hare Krishna");
-  final Widget test = const NSTutorial(
-    title: "Testing",
-  );
+  final Widget test = const Tutorial(title: "Testing", images: []);
 
   // This widget is the root of your application.
   @override

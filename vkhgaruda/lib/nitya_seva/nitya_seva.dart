@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:vkhgaruda/nitya_seva/festival_by_event.dart';
 import 'package:vkhgaruda/nitya_seva/festival_by_year.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/laddu.dart';
-import 'package:vkhgaruda/nitya_seva/nstutorial.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
 import 'package:vkhgaruda/widgets/common_widgets.dart';
 import 'package:vkhgaruda/nitya_seva/day_summary.dart';
@@ -144,9 +143,15 @@ class _NityaSevaState extends State<NityaSeva> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => NSTutorial(
-              title: "Nitya Seva Tutorial",
-              splashImage: 'assets/images/LauncherIcons/NityaSeva.png'),
+          builder: (context) => Tutorial(title: "Nitya Seva Tutorial", images: [
+            "assets/images/Tutorials/NityaSevaBasics/01.png",
+            "assets/images/Tutorials/NityaSevaBasics/02.png",
+            "assets/images/Tutorials/NityaSevaBasics/03.png",
+            "assets/images/Tutorials/NityaSevaBasics/04.png",
+            "assets/images/Tutorials/NityaSevaBasics/05.png",
+            "assets/images/Tutorials/NityaSevaBasics/06.png",
+            "assets/images/Tutorials/NityaSevaBasics/07.png",
+          ]),
         ),
       );
     }

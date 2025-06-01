@@ -22,12 +22,13 @@ class _NSTutorialState extends State<NSTutorial> {
   bool _isLoading = true;
   bool _lastPage = false;
   final List<String> _images = [
-    "assets/images/Tutorials/01.png",
-    "assets/images/Tutorials/02.png",
-    "assets/images/Tutorials/03.png",
-    "assets/images/Tutorials/04.png",
-    "assets/images/Tutorials/05.png",
-    "assets/images/Tutorials/06.png",
+    "assets/images/Tutorials/NityaSevaBasics/01.png",
+    "assets/images/Tutorials/NityaSevaBasics/02.png",
+    "assets/images/Tutorials/NityaSevaBasics/03.png",
+    "assets/images/Tutorials/NityaSevaBasics/04.png",
+    "assets/images/Tutorials/NityaSevaBasics/05.png",
+    "assets/images/Tutorials/NityaSevaBasics/06.png",
+    "assets/images/Tutorials/NityaSevaBasics/07.png",
   ];
 
   // lists
@@ -53,10 +54,15 @@ class _NSTutorialState extends State<NSTutorial> {
     return Stack(children: [
       PageView.builder(
         itemCount: _images.length,
-        onPageChanged: (index) {
+        onPageChanged: (index) async {
+          print(index);
           if (index == _images.length - 1) {
-            setState(() {
-              _lastPage = true;
+            await LS().write("lastTutorial", Const().version);
+            Widgets().showConfirmDialog(
+                context,
+                "This is the end of the tutorial. Click OK to close and go to Nitya Seva.",
+                "OK", () {
+              Navigator.pop(context);
             });
           }
         },
@@ -64,25 +70,6 @@ class _NSTutorialState extends State<NSTutorial> {
           return Image.asset(_images[index]);
         },
       ),
-      if (_lastPage)
-        Positioned(
-          bottom: 100,
-          left: 0,
-          right: 0,
-          child: Center(
-            child: IconButton(
-              icon: Icon(Icons.close, color: Colors.black, size: 60),
-              onPressed: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) {
-                  return NityaSeva(
-                    title: "Nitya Seva",
-                  );
-                }));
-              },
-            ),
-          ),
-        )
     ]);
   }
 }

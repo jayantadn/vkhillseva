@@ -141,7 +141,7 @@ class _NityaSevaState extends State<NityaSeva> {
     // show tutorials
     String? lastVersion = await LS().read("lastTutorial");
     if (lastVersion == null) {
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => NSTutorial(
@@ -177,9 +177,11 @@ class _NityaSevaState extends State<NityaSeva> {
     }
     _sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _addEditSession({Session? session}) async {
@@ -558,12 +560,14 @@ class _NityaSevaState extends State<NityaSeva> {
           String dbpathSession =
               "${Const().dbrootGaruda}/NityaSeva/$dbDate/$element";
 
-          await Utils().lockSession(
-              context: context, sessionPath: dbpathSession, silent: true);
+          if (mounted) {
+            await Utils().lockSession(
+                context: context, sessionPath: dbpathSession, silent: true);
 
-          Toaster().info(
-            "Session Autolocked: ${element.toString()}",
-          );
+            Toaster().info(
+              "Session Autolocked: ${element.toString()}",
+            );
+          }
         } else {
           openSessionsNew.add(element);
         }

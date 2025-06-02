@@ -667,7 +667,7 @@ class _NityaSevaState extends State<NityaSeva> {
                       NSWidgetsOld().confirm(
                           context: context,
                           msg: 'Are you sure you want to delete this session?',
-                          callbacks: ConfirmationCallbacks(onConfirm: () {
+                          callbacks: ConfirmationCallbacks(onConfirm: () async {
                             // delete locally
                             setState(() {
                               _sessions.remove(session);
@@ -677,9 +677,19 @@ class _NityaSevaState extends State<NityaSeva> {
                             String dbTimestamp = session.timestamp
                                 .toIso8601String()
                                 .replaceAll(".", "^");
-                            FB().deleteValue(
+                            await FB().deleteValue(
                                 path:
                                     "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbTimestamp");
+
+                            // delete from open sessions
+                            List openSessions = await FB().getList(
+                                path:
+                                    "${Const().dbrootGaruda}/NityaSeva/OpenSessions");
+                            openSessions.remove(dbTimestamp);
+                            await FB().setValue(
+                                path:
+                                    "${Const().dbrootGaruda}/NityaSeva/OpenSessions",
+                                value: openSessions);
 
                             // close the dialog
                             Navigator.of(context).pop();

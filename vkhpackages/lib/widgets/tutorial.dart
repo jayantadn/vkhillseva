@@ -47,7 +47,6 @@ class _TutorialState extends State<Tutorial> {
           itemCount: widget.images.length,
           onPageChanged: (index) async {
             if (index == widget.images.length - 1) {
-              await LS().write("lastTutorial", Const().version);
               Widgets().showConfirmDialog(
                 context,
                 "This is the end of the tutorial. Click OK to go back to the app.",

@@ -219,6 +219,7 @@ class _UserManagementState extends State<UserManagement> {
                                 ),
                               ),
 
+                              SizedBox(height: 10),
                               Row(
                                 children: [
                                   // mobile number field

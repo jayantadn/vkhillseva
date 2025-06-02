@@ -26,6 +26,7 @@ class _NityaSevaState extends State<NityaSeva> {
   DateTime _selectedDate = DateTime.now();
   DateTime _lastCallbackInvoked = DateTime.now();
   String _username = "Guest";
+  bool _isAdmin = false;
 
   // lists
   final List<FestivalSettings> _sevaList = [];
@@ -136,10 +137,12 @@ class _NityaSevaState extends State<NityaSeva> {
     }
 
     _username = Utils().getUsername();
+    _isAdmin = await Utils().isAdmin();
 
     // show tutorials
     String? lastVersion = await LS().read("lastTutorial");
-    if (lastVersion == null) {
+    if (lastVersion == null || lastVersion != Const().version) {
+      await LS().write("lastTutorial", Const().version);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -154,6 +157,32 @@ class _NityaSevaState extends State<NityaSeva> {
           ]),
         ),
       );
+    }
+
+    // admin tutorial
+    if (_isAdmin) {
+      String? lastAdminVersion = await LS().read("lastAdminTutorial");
+      if (lastAdminVersion == null || lastAdminVersion != Const().version) {
+        await Widgets().showMessage(
+            context, "Since you are admin, some more tutorials for you.");
+        await LS().write("lastAdminTutorial", Const().version);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                Tutorial(title: "Nitya Seva Tutorial", images: [
+              "assets/images/Tutorials/NityaSevaAdmin/01.png",
+              "assets/images/Tutorials/NityaSevaAdmin/02.png",
+              "assets/images/Tutorials/NityaSevaAdmin/03.png",
+              "assets/images/Tutorials/NityaSevaAdmin/04.png",
+              "assets/images/Tutorials/NityaSevaAdmin/05.png",
+              "assets/images/Tutorials/NityaSevaAdmin/06.png",
+              "assets/images/Tutorials/NityaSevaAdmin/07.png",
+              "assets/images/Tutorials/NityaSevaAdmin/08.png",
+            ]),
+          ),
+        );
+      }
     }
 
     // fetch festival sevas from db

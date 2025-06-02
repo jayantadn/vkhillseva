@@ -1004,6 +1004,7 @@ class _TicketPageState extends State<TicketPage> {
                 Text("If there is any mismatch, please contact admin.")
               ]),
         actions: [
+          // edit button for admin
           if (_isAdmin)
             ElevatedButton(
               onPressed: () {
@@ -1017,6 +1018,9 @@ class _TicketPageState extends State<TicketPage> {
               },
               child: Text("Edit"),
             ),
+
+          // ok button
+          SizedBox(width: 8),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);

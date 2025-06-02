@@ -154,6 +154,7 @@ class _NityaSevaState extends State<NityaSeva> {
             "assets/images/Tutorials/NityaSevaBasics/05.png",
             "assets/images/Tutorials/NityaSevaBasics/06.png",
             "assets/images/Tutorials/NityaSevaBasics/07.png",
+            "assets/images/Tutorials/NityaSevaBasics/08.png",
           ]),
         ),
       );

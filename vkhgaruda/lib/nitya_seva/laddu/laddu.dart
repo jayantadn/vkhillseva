@@ -112,7 +112,7 @@ class _LadduSevaState extends State<LadduMain> {
           child: Text(
             lr.count.toString(),
             style: TextStyle(
-                fontSize: 24.0,
+                fontSize: 18.0,
                 color: Color(0xFF8A0303)), // Increase the font size
           ),
         ),

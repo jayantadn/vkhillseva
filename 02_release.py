@@ -37,15 +37,15 @@ def update_changelog(version):
     log_messages.reverse()
 
     print("write changelog")
-    with open('changelog.md', 'r') as file:
-        existing_contents = file.read()
-    with open('changelog.md', 'w') as file:
-        file.write(f'# {version}\n')
-        file.write(f'## Effort for this release: {effort_hr} hrs\n')
-        for log_message in log_messages:
-            file.write(f'- {log_message}\n')
-        file.write('\n')  
-        file.write(existing_contents)
+    # with open('changelog.md', 'r') as file:
+    #     existing_contents = file.read()
+    # with open('changelog.md', 'w') as file:
+    #     file.write(f'# {version}\n')
+    #     file.write(f'## Effort for this release: {effort_hr} hrs\n')
+    #     for log_message in log_messages:
+    #         file.write(f'- {log_message}\n')
+    #     file.write('\n')  
+    #     file.write(existing_contents)
 
 def set_parameters():
     global rootdir

@@ -1,0 +1,734 @@
+[
+    {
+        "version": "7.7.0",
+        "effort": "2 hrs",
+        "features": [
+            "session lock/unlock implemented",
+            "auto lock session",
+            "redesigned ticket",
+            "session tile uneditable on lock",
+            "save last ticket numbers upon session lock",
+            "auto fetch next ticket number",
+            "settings button to edit the next ticket numbers",
+            "on empty session startup, display the next ticket numbers",
+            "resume ticket number from previous session",
+            "to record the last ticket numbers, check if its the last active Nitya Seva session",
+            "note for admin entry in NextTicketNumbers",
+            "upload user info",
+            "user management",
+            "bar chart for festival"
+        ],
+        "fixes": [
+            "approval",
+            "notification deny",
+            "dont merge test version to main",
+            "unlock cancel issue",
+            "confirm dialog for lock session",
+            "ticket number made readonly",
+            "enhance prompt message for testing features",
+            "change print statement to input for user prompt in main function",
+            "removed logout",
+            "lock session",
+            "laddu seva"
+        ]
+    },
+    {
+        "version": "7.6.1",
+        "effort": "0 hrs",
+        "features": [
+            "session lock/unlock implemented",
+            "auto lock session",
+            "redesigned ticket",
+            "session tile uneditable on lock",
+            "save last ticket numbers upon session lock",
+            "auto fetch next ticket number",
+            "settings button to edit the next ticket numbers",
+            "on empty session startup, display the next ticket numbers",
+            "resume ticket number from previous session",
+            "to record the last ticket numbers, check if its the last active Nitya Seva session",
+            "note for admin entry in NextTicketNumbers",
+            "upload user info",
+            "user management",
+            "bar chart for festival"
+        ],
+        "fixes": [
+            "approval",
+            "notification deny",
+            "dont merge test version to main",
+            "unlock cancel issue",
+            "confirm dialog for lock session",
+            "ticket number made readonly",
+            "enhance prompt message for testing features",
+            "change print statement to input for user prompt in main function",
+            "removed logout"
+        ]
+    },
+    {
+        "version": "7.1.0",
+        "effort": "1 hrs",
+        "features": [
+            "theme change",
+            "lock button"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "6.9.1",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "approval",
+            "notification deny",
+            "dont merge test version to main"
+        ]
+    },
+    {
+        "version": "6.7.0",
+        "effort": "0 hrs",
+        "features": [
+            "show supporter profile",
+            "referrals shown in profiles",
+            "standard advisory for client",
+            "edit advisory",
+            "add and delete advisory"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "6.6.1",
+        "effort": "0 hrs",
+        "features": [
+            "save list of supporters"
+        ],
+        "fixes": [
+            "seva slot duration made one hour"
+        ]
+    },
+    {
+        "version": "6.6.0",
+        "effort": "0 hrs",
+        "features": [
+            "responsive dialog",
+            "add multiple slots",
+            "guest count",
+            "UI changes for guest",
+            "Event requester as default performer",
+            "slot preference",
+            "notes from temple is pre-populated"
+        ],
+        "fixes": [
+            "add support team as top modal",
+            "add song dialog",
+            "sangeet sadhana details",
+            "modal for single slot creation dialog",
+            "youtube links redesigned",
+            "handle others while adding performers in event request",
+            "multiple main performer"
+        ]
+    },
+    {
+        "version": "6.5.0",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "max slots in a day"
+        ]
+    },
+    {
+        "version": "6.4.1",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "minor fixes"
+        ]
+    },
+    {
+        "version": "6.4.0",
+        "effort": "0 hrs",
+        "features": [
+            "welcome banner for sangeet seva",
+            "view registered events",
+            "notify admin for new event requests",
+            "reject approved request"
+        ],
+        "fixes": [
+            "selected skill in sangeet sadhana"
+        ]
+    },
+    {
+        "version": "6.3.0",
+        "effort": "0 hrs",
+        "features": [
+            "new theme generator"
+        ],
+        "fixes": [
+            "reset next available slot when no slots are found",
+            "improve slot availability logic and update UI messaging",
+            "fetch previous slot"
+        ]
+    },
+    {
+        "version": "6.2.1",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "6.2.0",
+        "effort": "0 hrs",
+        "features": [
+            "check for existing user before adding",
+            "warn user if same slot requested twice",
+            "booked slot is stored in db",
+            "clicking booked slot will show event details",
+            "deleting outdated requests"
+        ],
+        "fixes": [
+            "garuda launch issue",
+            "slot count in calendar",
+            "forbid booking slot in the past",
+            "await message display for request submission confirmation"
+        ]
+    },
+    {
+        "version": "6.0.0",
+        "effort": "0 hrs",
+        "features": [
+            "edit and delete event request"
+        ],
+        "fixes": [
+            "changelog centralized",
+            "remove auto update"
+        ]
+    },
+    {
+        "version": "5.0.4",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "ticket colors"
+        ]
+    },
+    {
+        "version": "5.0.3",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "new amount in tally upi"
+        ]
+    },
+    {
+        "version": "5.0.2",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "5.0.1",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "reduce list of nitya seva"
+        ]
+    },
+    {
+        "version": "5.0.0",
+        "effort": "0 hrs",
+        "features": [
+            "web app auto update",
+            "basic access control"
+        ],
+        "fixes": [
+            "toast compile error",
+            "version number display",
+            "Garuda android sms auth"
+        ]
+    },
+    {
+        "version": "4.4.1",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "4.4.0",
+        "effort": "0 hrs",
+        "features": [
+            "laddu carry forward",
+            "pin page"
+        ],
+        "fixes": [
+            "ticket icon"
+        ]
+    },
+    {
+        "version": "4.4.0",
+        "effort": "0 hrs",
+        "features": [
+            "laddu carry forward",
+            "pin page"
+        ],
+        "fixes": [
+            "ticket icon"
+        ]
+    },
+    {
+        "version": "4.4.0",
+        "effort": "0 hrs",
+        "features": [
+            "laddu carry forward",
+            "pin page"
+        ],
+        "fixes": [
+            "ticket icon"
+        ]
+    },
+    {
+        "version": "4.4.0",
+        "effort": "0 hrs",
+        "features": [
+            "laddu carry forward",
+            "pin page"
+        ],
+        "fixes": [
+            "ticket icon"
+        ]
+    },
+    {
+        "version": "4.1.0",
+        "effort": "0 hrs",
+        "features": [
+            "setup for notification",
+            "auto update sangeet seva",
+            "autoupdate Garuda",
+            "old day summary does not include new tickets",
+            "new session will skip obsolete denominations",
+            "skip obsolete seva amount in ticket issue dialog",
+            "old session session skip new seva amounts",
+            "add session cosmetic changes"
+        ],
+        "fixes": [
+            "multiple notification",
+            "app icon for web notifications",
+            "welcome key double definition",
+            "auto update of pending requests"
+        ]
+    },
+    {
+        "version": "4.1.0",
+        "effort": "0 hrs",
+        "features": [
+            "setup for notification",
+            "auto update sangeet seva",
+            "autoupdate Garuda",
+            "old day summary does not include new tickets",
+            "new session will skip obsolete denominations",
+            "skip obsolete seva amount in ticket issue dialog",
+            "old session session skip new seva amounts",
+            "add session cosmetic changes"
+        ],
+        "fixes": [
+            "multiple notification",
+            "app icon for web notifications",
+            "welcome key double definition",
+            "auto update of pending requests"
+        ]
+    },
+    {
+        "version": "4.1.0",
+        "effort": "0 hrs",
+        "features": [
+            "setup for notification",
+            "auto update sangeet seva",
+            "autoupdate Garuda",
+            "old day summary does not include new tickets",
+            "new session will skip obsolete denominations",
+            "skip obsolete seva amount in ticket issue dialog",
+            "old session session skip new seva amounts",
+            "add session cosmetic changes"
+        ],
+        "fixes": [
+            "multiple notification",
+            "app icon for web notifications",
+            "welcome key double definition",
+            "auto update of pending requests"
+        ]
+    },
+    {
+        "version": "4.1.0",
+        "effort": "0 hrs",
+        "features": [
+            "setup for notification",
+            "auto update sangeet seva",
+            "autoupdate Garuda",
+            "old day summary does not include new tickets",
+            "new session will skip obsolete denominations",
+            "skip obsolete seva amount in ticket issue dialog",
+            "old session session skip new seva amounts",
+            "add session cosmetic changes"
+        ],
+        "fixes": [
+            "multiple notification",
+            "app icon for web notifications",
+            "welcome key double definition",
+            "auto update of pending requests"
+        ]
+    },
+    {
+        "version": "3.3.0",
+        "effort": "0 hrs",
+        "features": [
+            "available slots"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "2.0.6",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "2.0.5",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "sms authentication for android"
+        ]
+    },
+    {
+        "version": "2.0.4",
+        "effort": "0 hrs",
+        "features": [
+            "android auth settings"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "2.0.2",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "2.0.1",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "2.0.0",
+        "effort": "0 hrs",
+        "features": [
+            "signup button",
+            "sms authentication"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "1.4.2",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "logo updated"
+        ]
+    },
+    {
+        "version": "1.1.2",
+        "effort": "0 hrs",
+        "features": [
+            "rename project to vkhgaruda"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "1.1.1",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "1.1.0",
+        "effort": "0 hrs",
+        "features": [
+            "festival record",
+            "new logo"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "1.0.0",
+        "effort": "0 hrs",
+        "features": [
+            "festival record"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "0.19.1",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "0.19.0",
+        "effort": "0 hrs",
+        "features": [
+            "settings for laddu packs",
+            "tally UPI",
+            "tally cash"
+        ],
+        "fixes": [
+            "adjust ticket tile layout and increase container size",
+            "removed image from ticket"
+        ]
+    },
+    {
+        "version": "0.18.18",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "auto refresh logic"
+        ]
+    },
+    {
+        "version": "0.18.17",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "multiple update"
+        ]
+    },
+    {
+        "version": "0.18.16",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "contiguous tickets"
+        ]
+    },
+    {
+        "version": "0.18.15",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "calling setState after all async work"
+        ]
+    },
+    {
+        "version": "0.18.14",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "ticket refresh issues"
+        ]
+    },
+    {
+        "version": "0.18.13",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "share message"
+        ]
+    },
+    {
+        "version": "0.18.12",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "large font for ticket numbers",
+            "update share message",
+            "outside click to cancel for dialog"
+        ]
+    },
+    {
+        "version": "0.18.11",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "0.18.0",
+        "effort": "0 hrs",
+        "features": [
+            "select pushpanjali or kumkum archana",
+            "new session tile",
+            "username made mandatory",
+            "change app name to Garuda",
+            "app icon changed"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "0.17.2",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "more validations"
+        ]
+    },
+    {
+        "version": "0.17.1",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "ticket validations"
+        ]
+    },
+    {
+        "version": "0.17.0",
+        "effort": "0 hrs",
+        "features": [
+            "tas"
+        ],
+        "fixes": [
+            "persistent pujari signature"
+        ]
+    },
+    {
+        "version": "0.16.2",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "text wrapping on grand total"
+        ]
+    },
+    {
+        "version": "0.16.1",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "contiguous ticket numbers",
+            "username",
+            "removed the oval from appbar title"
+        ]
+    },
+    {
+        "version": "0.16.0",
+        "effort": "0 hrs",
+        "features": [
+            "laddu is integrated",
+            "pin authentication"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "0.15.0",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "session without settings"
+        ]
+    },
+    {
+        "version": "0.14.6",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "pie setstate",
+            "pie no sessions",
+            "pie chart"
+        ]
+    },
+    {
+        "version": "0.14.5",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "pie chart"
+        ]
+    },
+    {
+        "version": "0.14.4",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "day summary updating on date scroll"
+        ]
+    },
+    {
+        "version": "0.14.3",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "update date scroller for day summary"
+        ]
+    },
+    {
+        "version": "0.14.2",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "0.12.0",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "0.11.0",
+        "effort": "0 hrs",
+        "features": [
+            "sesson summary",
+            "note field"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "0.10.0",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "0.9.0",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": []
+    },
+    {
+        "version": "0.8.0",
+        "effort": "0 hrs",
+        "features": [],
+        "fixes": [
+            "improve error handling and streamline git operations in release script"
+        ]
+    },
+    {
+        "version": "0.7.0",
+        "effort": "0 hrs",
+        "features": [
+            "add ticket"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "0.2.0",
+        "effort": "0 hrs",
+        "features": [
+            "edit session",
+            "delete session",
+            "date scroller",
+            "validation"
+        ],
+        "fixes": []
+    },
+    {
+        "version": "0.1.0",
+        "effort": "0 hrs",
+        "features": [
+            "add Session model and enhance Nitya Seva state management",
+            "add Nitya Seva configuration and improve festival settings management",
+            "integrate Nitya Seva page and refactor session creation method",
+            "delete festival",
+            "add ability to create new festivals in settings",
+            "festival name edit",
+            "nitya seva dropdown",
+            "pie chart"
+        ],
+        "fixes": [
+            "festival config loading"
+        ]
+    }
+]

@@ -1,16 +1,16 @@
 # General
-- signup
+-[] signup
 
 # Nitya Seva
-- create slot
-    - edit
-    - delete
-- add ticket
-    - edit
-    - delete
-- lock session
+-[] create slot
+    -[] edit
+    -[] delete
+-[] add ticket
+    -[] edit
+    -[] delete
+-[] lock session
 
 # Laddu seva
-- add stock
-- serve
-- return
+-[] add stock
+-[] serve
+-[] return

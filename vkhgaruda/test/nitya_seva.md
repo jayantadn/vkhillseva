@@ -1,5 +1,5 @@
 # General
--[] signup
+-[x] signup
 
 # Nitya Seva
 -[] create slot

@@ -142,6 +142,8 @@ class _NityaSevaState extends State<NityaSeva> {
     // show tutorials
     String? lastVersion = await LS().read("lastTutorial");
     if (lastVersion == null || lastVersion != Const().version) {
+      await Widgets()
+          .showMessage(context, "Some tutorials for you to get started.");
       await LS().write("lastTutorial", Const().version);
       Navigator.push(
         context,
@@ -164,8 +166,8 @@ class _NityaSevaState extends State<NityaSeva> {
     if (_isAdmin) {
       String? lastAdminVersion = await LS().read("lastAdminTutorial");
       if (lastAdminVersion == null || lastAdminVersion != Const().version) {
-        await Widgets().showMessage(
-            context, "Since you are admin, some more tutorials for you.");
+        await Widgets()
+            .showMessage(context, "Some admin related tutorials for you.");
         await LS().write("lastAdminTutorial", Const().version);
         Navigator.push(
           context,

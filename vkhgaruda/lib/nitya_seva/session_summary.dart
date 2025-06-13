@@ -245,7 +245,7 @@ class _SessionSummaryState extends State<SessionSummary> {
       }
     }
 
-    return Colors.grey[300] ?? Colors.grey;
+    return Colors.grey;
   }
 
   List<Widget> _getListOfRows(List<String> rows) {
@@ -323,6 +323,7 @@ class _SessionSummaryState extends State<SessionSummary> {
                             style: const TextStyle(
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
                         ),

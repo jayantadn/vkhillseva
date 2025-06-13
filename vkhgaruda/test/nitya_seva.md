@@ -5,10 +5,11 @@
 -[x] create slot
     -[x] edit
     -[x] delete
--[] add ticket
-    -[] edit
+-[x] add ticket
+    -[x] edit
     -[] delete
 -[] lock session
+-[] session summary
 
 # Laddu seva
 -[] add stock

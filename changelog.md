@@ -245,15 +245,6 @@
 # 1.4.2
 - fix: logo updated
 
-# 1.4.1
-
-# 1.4.0
-
-# 1.3.0
-
-# 0.20.0
-
-# 1.2.0
 
 # 1.1.2
 - feature: rename project to vkhgaruda
@@ -295,33 +286,12 @@
 - fix: share message
 
 # 0.18.12
-- fix: 1. large font for ticket numbers
-2. update share message
-3. disable outside click to cancel for dialog
+- fix: large font for ticket numbers
+- fix: update share message
+- fix: outside click to cancel for dialog
 
 # 0.18.11
 
-# main
-
-# 0.18.10
-
-# 0.18.9
-
-# 0.18.8
-
-# 0.18.7
-
-# 0.18.6
-
-# 0.18.5
-
-# 0.18.4
-
-# 0.18.3
-
-# 0.18.2
-
-# 0.18.1
 
 # 0.18.0
 - feature: select pushpanjali or kumkum archana
@@ -387,20 +357,11 @@
 # 0.8.0
 - fix: improve error handling and streamline git operations in release script
 
-# main
 
 # 0.7.0
 - feature: add ticket
 
-# 0.6.2
 
-# 0.6.1
-
-# 0.6.0
-
-# 0.4.0
-
-# 0.3.0
 
 # 0.2.0
 - feature: edit session

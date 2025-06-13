@@ -299,7 +299,14 @@ class _TicketPageState extends State<TicketPage> {
                                           seva.keys.first,
                                           style: Theme.of(context)
                                               .textTheme
-                                              .bodyLarge,
+                                              .bodyLarge!
+                                              .copyWith(
+                                                  color: amount.toString() ==
+                                                          seva.keys.first
+                                                      ? Colors.white
+                                                      : seva.values
+                                                              .first['color']
+                                                          as Color),
                                         ),
                                       ),
                                     ),

@@ -2,9 +2,9 @@
 -[x] signup
 
 # Nitya Seva
--[] create slot
-    -[] edit
-    -[] delete
+-[x] create slot
+    -[x] edit
+    -[x] delete
 -[] add ticket
     -[] edit
     -[] delete

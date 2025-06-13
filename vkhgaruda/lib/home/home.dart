@@ -127,14 +127,17 @@ class _HomePageState extends State<HomePage> {
                 ),
 
               // logout button
-              if (_username.isNotEmpty)
-                IconButton(
-                  icon: Icon(Icons.logout),
-                  onPressed: () async {
-                    Widgets().showConfirmDialog(context,
-                        "Are you sure to log out?", "Log out", _logout);
-                  },
-                ),
+              IconButton(
+                icon: Icon(Icons.logout),
+                onPressed: () async {
+                  if (_username.isEmpty) {
+                    return;
+                  }
+
+                  Widgets().showConfirmDialog(
+                      context, "Are you sure to log out?", "Log out", _logout);
+                },
+              ),
 
               // support
               IconButton(

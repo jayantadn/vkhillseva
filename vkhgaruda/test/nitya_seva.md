@@ -7,11 +7,10 @@
     -[x] delete
 -[x] add ticket
     -[x] edit
-    -[] delete
--[] lock session
--[] session summary
+    -[x] delete
+-[x] lock/unlock session
+-[x] session/day summary
 
 # Laddu seva
--[] add stock
--[] serve
--[] return
+-[x] add / serve / return
+-[x] settings

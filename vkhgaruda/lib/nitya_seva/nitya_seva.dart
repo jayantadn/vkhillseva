@@ -692,9 +692,6 @@ class _NityaSevaState extends State<NityaSeva> {
                                 path:
                                     "${Const().dbrootGaruda}/NityaSeva/OpenSessions",
                                 value: openSessions);
-
-                            // close the dialog
-                            Navigator.of(context).pop();
                           }));
                     } else if (value == "Lock") {
                       String dbDate =

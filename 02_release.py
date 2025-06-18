@@ -26,7 +26,7 @@ def update_changelog(version):
         with open('.timetracker', 'r') as f:
             timetracker_data = json.load(f)
             effort_sec = timetracker_data['total']
-            effort_hr = effort_sec // 3600
+            effort_hr = round(effort_sec / 3600, 2)
         os.unlink('.timetracker')
 
     print("generate the changelog from git log")
@@ -45,7 +45,19 @@ def update_changelog(version):
     with open('changelog.json', 'r') as file:
         changelog = json.load(file)
         if f"{version}" in changelog.keys():
-            pass
+            effort = changelog[f"{version}"]['effort']
+            effort = effort.replace('h', '')
+            effort = int(effort) + effort_hr
+            changelog[f"{version}"]['effort'] = f"{effort}h"
+            for msg in log_messages:
+                if msg.startswith("feature:"):
+                    msg = msg.replace("feature:", "").strip()
+                    if msg not in changelog[f"{version}"]['features']:
+                        changelog[f"{version}"]['features'].append(msg)
+                elif msg.startswith("fix:"):
+                    msg = msg.replace("fix:", "").strip()
+                    if msg not in changelog[f"{version}"]['fixes']:
+                        changelog[f"{version}"]['fixes'].append(msg)
         else:
             changelog[f"{version}"] = {
                 'effort': "",
@@ -64,7 +76,6 @@ def update_changelog(version):
         sorted(changelog.items(), key=lambda x: x[0], reverse=True))
     with open('changelog.json', 'w') as file:
         json.dump(changelog, file, indent=4)
-    # print(changelog)
     sys.exit(0)
 
 

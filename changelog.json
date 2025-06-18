@@ -2,7 +2,8 @@
     "7.7.1": {
         "effort": "0.42h",
         "features": [
-            "update version"
+            "update version",
+            "appending changelog"
         ],
         "fixes": []
     },

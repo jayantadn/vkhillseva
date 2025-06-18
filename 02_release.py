@@ -47,7 +47,7 @@ def update_changelog(version):
         if f"{version}" in changelog.keys():
             effort = changelog[f"{version}"]['effort']
             effort = effort.replace('h', '')
-            effort = int(effort) + effort_hr
+            effort = float(effort) + effort_hr
             changelog[f"{version}"]['effort'] = f"{effort}h"
             for msg in log_messages:
                 if msg.startswith("feature:"):

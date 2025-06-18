@@ -8,21 +8,26 @@ reltype = ""
 hostingsite = ""
 rootdir = ""
 
+
 def run_command(command):
     print(f"Running command: {command}")
-    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.run(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if result.returncode != 0:
         print(f"Command '{command}' failed with error:\n{result.stderr}")
         sys.exit(1)
     return result.stdout.strip()
 
+
 def update_changelog(version):
     print("updating effort")
-    with open('.timetracker', 'r') as f:
-        timetracker_data = json.load(f)
-        effort_sec = timetracker_data['total']
-        effort_hr = effort_sec // 3600
-    os.unlink('.timetracker')
+    effort_hr = 0
+    if os.path.exists('.timetracker'):
+        with open('.timetracker', 'r') as f:
+            timetracker_data = json.load(f)
+            effort_sec = timetracker_data['total']
+            effort_hr = effort_sec // 3600
+        os.unlink('.timetracker')
 
     print("generate the changelog from git log")
     base_branch = run_command('git merge-base origin/main HEAD')
@@ -37,22 +42,38 @@ def update_changelog(version):
     log_messages.reverse()
 
     print("write changelog")
-    # with open('changelog.md', 'r') as file:
-    #     existing_contents = file.read()
-    # with open('changelog.md', 'w') as file:
-    #     file.write(f'# {version}\n')
-    #     file.write(f'## Effort for this release: {effort_hr} hrs\n')
-    #     for log_message in log_messages:
-    #         file.write(f'- {log_message}\n')
-    #     file.write('\n')  
-    #     file.write(existing_contents)
+    with open('changelog.json', 'r') as file:
+        changelog = json.load(file)
+        if f"{version}" in changelog.keys():
+            pass
+        else:
+            changelog[f"{version}"] = {
+                'effort': "",
+                'features': [],
+                'fixes': []
+            }
+            changelog[f"{version}"]['effort'] = f"{effort_hr}h"
+            for msg in log_messages:
+                if msg.startswith("feature:"):
+                    msg = msg.replace("feature:", "").strip()
+                    changelog[f"{version}"]['features'].append(msg)
+                elif msg.startswith("fix:"):
+                    changelog[f"{version}"]['fixes'].append(msg)
+    # Sort the changelog dictionary by keys in descending order
+    changelog = dict(
+        sorted(changelog.items(), key=lambda x: x[0], reverse=True))
+    with open('changelog.json', 'w') as file:
+        json.dump(changelog, file, indent=4)
+    # print(changelog)
+    sys.exit(0)
+
 
 def set_parameters():
     global rootdir
     global reltype
 
     rootdir = run_command('git rev-parse --show-toplevel')
-    
+
     if len(sys.argv) == 2:
         reltype = sys.argv[1]
     else:
@@ -65,21 +86,23 @@ def set_parameters():
             print("Invalid release type")
             sys.exit(1)
     print(f"Release type: {reltype}")
-    
+
+
 def set_hosting_site(app):
     global hostingsite
-    if(app == 'vkhgaruda' and reltype == 'release'):
+    if (app == 'vkhgaruda' and reltype == 'release'):
         hostingsite = 'vkhillgaruda'
-    elif(app == 'vkhgaruda' and reltype == 'test'):
-        hostingsite = 'testgaruda'    
-    elif(app == 'vkhsangeetseva' and reltype == 'release'):
+    elif (app == 'vkhgaruda' and reltype == 'test'):
+        hostingsite = 'testgaruda'
+    elif (app == 'vkhsangeetseva' and reltype == 'release'):
         hostingsite = 'govindasangetseva'
-    elif(app == 'vkhsangeetseva' and reltype == 'test'):
+    elif (app == 'vkhsangeetseva' and reltype == 'test'):
         hostingsite = 'testsangeetseva'
     else:
         print("Hosting site could not be determined")
         sys.exit(1)
     print(f"Hosting site: {hostingsite}")
+
 
 def replace_string_in_file(file, search_string, replacement_string):
     curdir = os.getcwd()
@@ -91,8 +114,9 @@ def replace_string_in_file(file, search_string, replacement_string):
             if search_string in line:
                 file.write(replacement_string)
             else:
-                file.write(line)   
+                file.write(line)
     os.chdir(curdir)
+
 
 def set_value_in_file(filepath, search_string, value):
     curdir = os.getcwd()
@@ -109,8 +133,9 @@ def set_value_in_file(filepath, search_string, value):
                     key, _ = line.split(':', 1)
                     file.write(f'{key}: {value}\n')
             else:
-                file.write(line)   
+                file.write(line)
     os.chdir(curdir)
+
 
 def get_value_from_file(filepath, search_string):
     ret = ""
@@ -133,9 +158,10 @@ def get_value_from_file(filepath, search_string):
     return ret
     os.chdir(curdir)
 
+
 def release(app):
     os.chdir(rootdir)
-        
+
     print("get the branch name")
     branch_name = run_command('git rev-parse --abbrev-ref HEAD')
     branch_name = branch_name.lstrip()
@@ -170,7 +196,8 @@ def release(app):
         print("Applying dart fix")
         os.chdir(f"{rootdir}/{app}")
         try:
-            result = subprocess.run(["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
+            result = subprocess.run(
+                ["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
             print(result.stdout)
             if result.returncode != 0:
                 print(result.stderr)
@@ -183,10 +210,12 @@ def release(app):
 
         print("set database path")
         prefix = ""
-        if(reltype == 'test'):
+        if (reltype == 'test'):
             prefix = "TEST/"
-        set_value_in_file('vkhpackages/lib/common/const.dart', "final String dbrootGaruda", f" \"{prefix}GARUDA_01\";" )
-        set_value_in_file('vkhpackages/lib/common/const.dart', "final String dbrootSangeetSeva", f" \"{prefix}SANGEETSEVA_01\";" )
+        set_value_in_file('vkhpackages/lib/common/const.dart',
+                          "final String dbrootGaruda", f" \"{prefix}GARUDA_01\";")
+        set_value_in_file('vkhpackages/lib/common/const.dart',
+                          "final String dbrootSangeetSeva", f" \"{prefix}SANGEETSEVA_01\";")
 
         print("commit all changes and push to git")
         if run_command('git status --porcelain'):
@@ -227,16 +256,19 @@ def release(app):
         drive_path = "X:/GoogleDrive/PublicRO/Garuda"
         if os.path.exists(drive_path):
             shutil.copy(new_apk_path, drive_path)
-            shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{version}.apk'), os.path.join(drive_path, 'vkhgaruda_latest.apk'))
+            shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{version}.apk'), os.path.join(
+                drive_path, 'vkhgaruda_latest.apk'))
         else:
             print("ERROR: Google Drive not found in your local system")
 
     print("all operations completed")
 
+
 def main():
     set_parameters()
     release("vkhgaruda")
     release("vkhsangeetseva")
+
 
 if __name__ == '__main__':
     main()

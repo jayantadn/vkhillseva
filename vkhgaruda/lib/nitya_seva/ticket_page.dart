@@ -317,41 +317,6 @@ class _TicketPageState extends State<TicketPage> {
     return ret;
   }
 
-  List<String> _prevalidateTicket(Ticket ticket) {
-    List<String> errors = [];
-    List<Ticket> filteredTickets =
-        _tickets.where((t) => t.amount == ticket.amount).toList();
-
-    // check if ticket number is > 0
-    if (ticket.ticketNumber <= 0) {
-      errors.add("Ticket number should be greater than 0");
-    }
-
-    // check if ticket number is unique
-    if (filteredTickets
-        .where((t) => t.ticketNumber == ticket.ticketNumber)
-        .isNotEmpty) {
-      errors.add("Ticket number already exists");
-    }
-
-    // check if ticket number is contiguous
-    if (filteredTickets.isNotEmpty && filteredTickets.length > 1) {
-      if (ticket.ticketNumber - filteredTickets.first.ticketNumber != 1) {
-        errors.add("Ticket number should be contiguous");
-      }
-    }
-
-    // check if ticket is entered in another date
-    DateTime now = DateTime.now();
-    if (widget.session.timestamp.day != now.day ||
-        widget.session.timestamp.month != now.month ||
-        widget.session.timestamp.year != now.year) {
-      errors.add("Ticket from another date");
-    }
-
-    return errors;
-  }
-
   Future<List<String>> _prevalidateDelete(Ticket ticket) async {
     List<String> errors = [];
 
@@ -382,59 +347,6 @@ class _TicketPageState extends State<TicketPage> {
     }
 
     sessions.clear();
-    return errors;
-  }
-
-  Future<List<String>> _postvalidateTicket() async {
-    List<String> errors = [];
-
-    await refresh();
-
-    // create a map of tickets as per amount
-    Map<int, List<Ticket>> ticketsMap = {};
-    for (var ticket in _tickets) {
-      if (!ticketsMap.containsKey(ticket.amount)) {
-        ticketsMap[ticket.amount] = [];
-      }
-      ticketsMap[ticket.amount]!.add(ticket);
-    }
-
-    // check if ticket numbers are unique
-    if (_tickets.length != _tickets.toSet().length) {
-      errors.add("Duplicate ticket numbers found");
-    }
-
-    // check for each key, whether the list of tickets have contiguous numbers
-    ticketsMap.forEach((amount, tickets) {
-      tickets.sort((a, b) => a.ticketNumber.compareTo(b.ticketNumber));
-      for (int i = 0; i < tickets.length - 1; i++) {
-        if (tickets[i + 1].ticketNumber - tickets[i].ticketNumber != 1) {
-          errors.add("Ticket numbers for amount $amount are not contiguous");
-          break;
-        }
-      }
-    });
-
-    // check if ticket is created in the correct session
-    String dbDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-    var sessionsList =
-        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
-    if (sessionsList.isEmpty) {
-      errors.add("No sessions found for today");
-    } else {
-      List<Session> sessions = [];
-      for (var sessionRaw in sessionsList) {
-        Map<String, dynamic> sessionMap =
-            Map<String, dynamic>.from(sessionRaw['Settings']);
-        sessions.add(Session.fromJson(sessionMap));
-      }
-      sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-      if (sessions.last.timestamp != widget.session.timestamp) {
-        errors.add("Ticket created in old session");
-      }
-    }
-
     return errors;
   }
 
@@ -779,20 +691,6 @@ class _TicketPageState extends State<TicketPage> {
                                     seva: sevaName,
                                   );
 
-                                  // pre validations
-                                  List<String> errors = [];
-                                  if (ticket == null) {
-                                    errors = _prevalidateTicket(t);
-                                    if (errors.isNotEmpty) {
-                                      String? action = await CommonWidgets()
-                                          .createErrorDialog(
-                                              context: context, errors: errors);
-                                      if (action == "Cancel") {
-                                        return;
-                                      }
-                                    }
-                                  }
-
                                   // add ticket to list
                                   setState(() {
                                     if (ticket == null) {
@@ -825,33 +723,9 @@ class _TicketPageState extends State<TicketPage> {
                                           "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets",
                                       data: t.toJson());
 
-                                  // post validations
-                                  // if (errors.isEmpty) {
-                                  //   errors = await _postvalidateTicket();
-                                  //   if (errors.isNotEmpty) {
-                                  //     String? action = await CommonWidgets()
-                                  //         .createErrorDialog(
-                                  //             context: context,
-                                  //             errors: errors,
-                                  //             post: true);
-
-                                  //     if (action == "Delete") {
-                                  //       _deleteTicket(t);
-                                  //     } else if (action == "Edit") {
-                                  //       _addEditTicket(context, t);
-                                  //     }
-                                  //   }
-                                  // }
-
                                   // clear all lists
                                   sevaNames.clear();
                                   filteredTickets.clear();
-                                  errors.clear();
-
-                                  // dispose all controllers and focus nodes
-                                  // TODO: disposing controllers is causing an exception while editing ticket
-                                  // ticketNumberController.dispose();
-                                  // noteController.dispose();
                                 },
                               ),
                             ),

@@ -340,10 +340,14 @@ class _NityaSevaState extends State<NityaSeva> {
                                         decoration: BoxDecoration(
                                           color:
                                               selectedSevaType == "Pushpanjali"
-                                                  ? Theme.of(context).colorScheme.primary
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .primary
                                                   : Colors.transparent,
-                                          border:
-                                              Border.all(color: Theme.of(context).colorScheme.primary),
+                                          border: Border.all(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary),
                                           borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(8),
                                             bottomLeft: Radius.circular(8),
@@ -360,7 +364,9 @@ class _NityaSevaState extends State<NityaSeva> {
                                                 color: selectedSevaType ==
                                                         "Pushpanjali"
                                                     ? Colors.white
-                                                    : Theme.of(context).colorScheme.primary,
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .primary,
                                               ),
                                         ),
                                       ),
@@ -375,16 +381,26 @@ class _NityaSevaState extends State<NityaSeva> {
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: selectedSevaType ==
-                                                  "Kumkum Archana"
-                                              ? Theme.of(context).colorScheme.primary
-                                              : Colors.transparent,
+                                          color:
+                                              selectedSevaType ==
+                                                      "Kumkum Archana"
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .primary
+                                                  : Colors.transparent,
                                           border: Border(
-                                            top: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                            right:
-                                                BorderSide(color: Theme.of(context).colorScheme.primary),
-                                            bottom:
-                                                BorderSide(color: Theme.of(context).colorScheme.primary),
+                                            top: BorderSide(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary),
+                                            right: BorderSide(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary),
+                                            bottom: BorderSide(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary),
                                           ),
                                           borderRadius: BorderRadius.only(
                                             topRight: Radius.circular(8),
@@ -402,7 +418,9 @@ class _NityaSevaState extends State<NityaSeva> {
                                                 color: selectedSevaType ==
                                                         "Kumkum Archana"
                                                     ? Colors.white
-                                                    : Theme.of(context).colorScheme.primary,
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .primary,
                                               ),
                                         ),
                                       ),
@@ -635,6 +653,8 @@ class _NityaSevaState extends State<NityaSeva> {
 
   @override
   Widget build(BuildContext context) {
+    DateTime today = DateTime.now();
+
     return Theme(
       data: themeGaruda,
       child: Stack(
@@ -642,13 +662,16 @@ class _NityaSevaState extends State<NityaSeva> {
           Scaffold(
             appBar: AppBar(title: Text(widget.title), actions: [
               // add session button
-              IconButton(
-                icon: Icon(
-                  Icons.add,
-                  size: 32,
+              if (_selectedDate.day == today.day &&
+                  _selectedDate.month == today.month &&
+                  _selectedDate.year == today.year)
+                IconButton(
+                  icon: Icon(
+                    Icons.add,
+                    size: 32,
+                  ),
+                  onPressed: _addEditSession,
                 ),
-                onPressed: _addEditSession,
-              ),
 
               // menu button
               CommonWidgets().createPopupMenu([

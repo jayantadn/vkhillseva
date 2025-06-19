@@ -851,59 +851,6 @@ class _TicketPageState extends State<TicketPage> {
     return errors;
   }
 
-  Future<List<String>> _postvalidateTicket() async {
-    List<String> errors = [];
-
-    await refresh();
-
-    // create a map of tickets as per amount
-    Map<int, List<Ticket>> ticketsMap = {};
-    for (var ticket in _tickets) {
-      if (!ticketsMap.containsKey(ticket.amount)) {
-        ticketsMap[ticket.amount] = [];
-      }
-      ticketsMap[ticket.amount]!.add(ticket);
-    }
-
-    // check if ticket numbers are unique
-    if (_tickets.length != _tickets.toSet().length) {
-      errors.add("Duplicate ticket numbers found");
-    }
-
-    // check for each key, whether the list of tickets have contiguous numbers
-    ticketsMap.forEach((amount, tickets) {
-      tickets.sort((a, b) => a.ticketNumber.compareTo(b.ticketNumber));
-      for (int i = 0; i < tickets.length - 1; i++) {
-        if (tickets[i + 1].ticketNumber - tickets[i].ticketNumber != 1) {
-          errors.add("Ticket numbers for amount $amount are not contiguous");
-          break;
-        }
-      }
-    });
-
-    // check if ticket is created in the correct session
-    String dbDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-    var sessionsList =
-        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
-    if (sessionsList.isEmpty) {
-      errors.add("No sessions found for today");
-    } else {
-      List<Session> sessions = [];
-      for (var sessionRaw in sessionsList) {
-        Map<String, dynamic> sessionMap =
-            Map<String, dynamic>.from(sessionRaw['Settings']);
-        sessions.add(Session.fromJson(sessionMap));
-      }
-      sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-      if (sessions.last.timestamp != widget.session.timestamp) {
-        errors.add("Ticket created in old session");
-      }
-    }
-
-    return errors;
-  }
-
   Future<void> _showFestivalStartingTicketNumber(BuildContext context) async {
     bool isNewBook = false;
     TextEditingController ticketNumberController =

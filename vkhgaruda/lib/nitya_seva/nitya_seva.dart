@@ -160,6 +160,7 @@ class _NityaSevaState extends State<NityaSeva> {
           ]),
         ),
       );
+      return;
     }
 
     // admin tutorial

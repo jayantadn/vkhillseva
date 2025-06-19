@@ -68,7 +68,6 @@ class _AuthDialogState extends State<AuthDialog> {
       UserBasics userbasics = UserBasics(
         name: _nameController.text.trim(),
         mobile: _mobileNumberController.text,
-        uid: userCredential.user!.uid,
       );
       await LS().write("userbasics", jsonEncode(userbasics));
 
@@ -382,33 +381,6 @@ class TermsAndConditions extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class UserBasics {
-  final String uid;
-  final String name;
-  final String mobile;
-  String? fcmToken;
-
-  UserBasics({
-    required this.uid,
-    required this.name,
-    required this.mobile,
-    this.fcmToken,
-  });
-
-  factory UserBasics.fromJson(Map<String, dynamic> json) {
-    return UserBasics(
-      uid: json['uid'],
-      name: json['name'],
-      mobile: json['mobile'],
-      fcmToken: json['fcmToken'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'uid': uid, 'name': name, 'mobile': mobile, 'fcmToken': fcmToken};
   }
 }
 

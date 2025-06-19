@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/home/landing.dart';
+import 'package:vkhgaruda/home/user_management.dart';
 import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
 import 'package:vkhgaruda/widgets/launcher_tile.dart';
@@ -20,6 +22,8 @@ class _HomePageState extends State<HomePage> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  bool _isAdmin = false;
+  String _username = "";
 
   // lists
 
@@ -28,6 +32,14 @@ class _HomePageState extends State<HomePage> {
   @override
   initState() {
     super.initState();
+
+    Utils().isAdmin().then((isAdmin) {
+      setState(() {
+        _isAdmin = isAdmin;
+      });
+    });
+
+    _uploadProfileSettings();
 
     refresh();
   }
@@ -48,6 +60,12 @@ class _HomePageState extends State<HomePage> {
 
     await _lock.synchronized(() async {
       // perform async operations here
+      UserBasics? basic = await Utils().fetchOrGetUserBasics();
+      if (basic != null) {
+        setState(() {
+          _username = basic.name;
+        });
+      }
 
       // fetch form values
 
@@ -61,6 +79,31 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _logout() async {
+    await LS().delete("userbasics");
+
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return const Landing(title: "Login");
+    }));
+  }
+
+  Future<void> _uploadProfileSettings() async {
+    String? uploaded = await LS().read("userbasicsUploaded");
+    if (uploaded != null && uploaded == "true") {
+      return; // already uploaded
+    }
+
+    UserBasics? user = await Utils().fetchOrGetUserBasics();
+    if (user != null) {
+      String dbpath =
+          "${Const().dbrootGaruda}/Settings/UserProfileSettings/${user.mobile}";
+      await FB().setJson(path: dbpath, json: {
+        'name': user.name,
+      });
+      await LS().write("userbasicsUploaded", "true");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -68,7 +111,47 @@ class _HomePageState extends State<HomePage> {
       child: Stack(
         children: [
           Scaffold(
-            appBar: AppBar(title: Text(widget.title)),
+            appBar: AppBar(title: Text(widget.title), actions: [
+              // user management
+              if (_isAdmin)
+                IconButton(
+                  icon: const Icon(Icons.manage_accounts),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const UserManagement(
+                        title: "User Management",
+                      );
+                    }));
+                  },
+                ),
+
+              // logout button
+              if (_username.isNotEmpty)
+                IconButton(
+                  icon: Icon(Icons.exit_to_app),
+                  onPressed: () async {
+                    Widgets().showConfirmDialog(context,
+                        "Are you sure to log out?", "Log out", _logout);
+                  },
+                ),
+
+              // support
+              IconButton(
+                icon: Icon(Icons.help),
+                onPressed: () {
+                  Navigator.push(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Support(
+                        title: "Support",
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ]),
             body: RefreshIndicator(
               onRefresh: refresh,
               child: SingleChildScrollView(

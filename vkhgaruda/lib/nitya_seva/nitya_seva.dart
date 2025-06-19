@@ -1,16 +1,14 @@
 import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/nitya_seva/festival.dart';
+import 'package:vkhgaruda/nitya_seva/festival_by_event.dart';
+import 'package:vkhgaruda/nitya_seva/festival_by_year.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/laddu.dart';
-import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:vkhgaruda/nitya_seva/ticket_page.dart';
 import 'package:vkhgaruda/widgets/common_widgets.dart';
 import 'package:vkhgaruda/nitya_seva/day_summary.dart';
-import 'package:vkhgaruda/widgets/launcher_tile.dart';
-import 'package:vkhgaruda/home/settings.dart';
+import 'package:vkhgaruda/nitya_seva/settings.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class NityaSeva extends StatefulWidget {
@@ -28,6 +26,7 @@ class _NityaSevaState extends State<NityaSeva> {
   DateTime _selectedDate = DateTime.now();
   DateTime _lastCallbackInvoked = DateTime.now();
   String _username = "Guest";
+  bool _isAdmin = false;
 
   // lists
   final List<FestivalSettings> _sevaList = [];
@@ -40,7 +39,10 @@ class _NityaSevaState extends State<NityaSeva> {
   initState() {
     super.initState();
 
-    // listed to database events
+    // auto lock any old open session
+    _autoLockOldSessions();
+
+    // listen to database events
     String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
     FB().listenForChange(
         "${Const().dbrootGaruda}/NityaSeva/$dbDate",
@@ -135,6 +137,56 @@ class _NityaSevaState extends State<NityaSeva> {
     }
 
     _username = Utils().getUsername();
+    _isAdmin = await Utils().isAdmin();
+
+    // show tutorials
+    String? lastVersion = await LS().read("lastTutorial");
+    if (lastVersion == null || lastVersion != Const().version) {
+      await Widgets()
+          .showMessage(context, "Some tutorials for you to get started.");
+      await LS().write("lastTutorial", Const().version);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Tutorial(title: "Nitya Seva Tutorial", images: [
+            "assets/images/Tutorials/NityaSevaBasics/01.png",
+            "assets/images/Tutorials/NityaSevaBasics/02.png",
+            "assets/images/Tutorials/NityaSevaBasics/03.png",
+            "assets/images/Tutorials/NityaSevaBasics/04.png",
+            "assets/images/Tutorials/NityaSevaBasics/05.png",
+            "assets/images/Tutorials/NityaSevaBasics/06.png",
+            "assets/images/Tutorials/NityaSevaBasics/07.png",
+            "assets/images/Tutorials/NityaSevaBasics/08.png",
+          ]),
+        ),
+      );
+    }
+
+    // admin tutorial
+    if (_isAdmin) {
+      String? lastAdminVersion = await LS().read("lastAdminTutorial");
+      if (lastAdminVersion == null || lastAdminVersion != Const().version) {
+        await Widgets()
+            .showMessage(context, "Some admin related tutorials for you.");
+        await LS().write("lastAdminTutorial", Const().version);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                Tutorial(title: "Nitya Seva Tutorial", images: [
+              "assets/images/Tutorials/NityaSevaAdmin/01.png",
+              "assets/images/Tutorials/NityaSevaAdmin/02.png",
+              "assets/images/Tutorials/NityaSevaAdmin/03.png",
+              "assets/images/Tutorials/NityaSevaAdmin/04.png",
+              "assets/images/Tutorials/NityaSevaAdmin/05.png",
+              "assets/images/Tutorials/NityaSevaAdmin/06.png",
+              "assets/images/Tutorials/NityaSevaAdmin/07.png",
+              "assets/images/Tutorials/NityaSevaAdmin/08.png",
+            ]),
+          ),
+        );
+      }
+    }
 
     // fetch festival sevas from db
     _sevaList.clear();
@@ -162,89 +214,11 @@ class _NityaSevaState extends State<NityaSeva> {
     }
     _sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  List<String> _preValidation(Session session) {
-    List<String> errors = [];
-
-    // check if session is created during service time
-    DateTime now = DateTime.now();
-    if (now.hour < 10 || now.hour > 20) {
-      errors.add("Outside service hours");
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
     }
-
-    // check if last session was created recently
-    bool isRecent = false;
-    if (_sessions.isNotEmpty) {
-      Session lastSession = _sessions.last;
-      var diff = now.difference(lastSession.timestamp).inHours;
-      if (diff < 3) {
-        errors.add("Session created too recently");
-        isRecent = true;
-      }
-    }
-
-    // check if session is created for today
-    if (_selectedDate.day != now.day ||
-        _selectedDate.month != now.month ||
-        _selectedDate.year != now.year) {
-      errors.add("Session created in older date");
-    }
-
-    return errors;
-  }
-
-  void _postValidation(Session session) {
-    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
-    List<String> errors = [];
-
-    refresh(spinner: false).then((_) async {
-      Session lastSession = _sessions.last;
-
-      if (_sessions.length > 1) {
-        if (lastSession.name == session.name &&
-            lastSession.sevakarta == session.sevakarta) {
-          lastSession = _sessions[_sessions.length - 2];
-        }
-
-        // check if last session was created recently
-        bool isRecent = false;
-        if (session.timestamp.difference(lastSession.timestamp).inHours < 3) {
-          errors.add("Session created too recently");
-          isRecent = true;
-        }
-
-        // validate duplicate session name
-        if (session.name == lastSession.name &&
-            lastSession.type == session.type &&
-            isRecent) {
-          errors.add("Duplicate session name");
-        }
-      }
-
-      if (errors.isNotEmpty) {
-        String? ret = await CommonWidgets()
-            .createErrorDialog(context: context, errors: errors, post: true);
-        if (ret == 'Edit') {
-          _addEditSession(session: session);
-        } else if (ret == 'Delete') {
-          // delete locally
-          setState(() {
-            _sessions.remove(session);
-          });
-
-          // delete in server
-          FB().deleteValue(
-              path:
-                  "${Const().dbrootGaruda}/NityaSeva/$dbDate/${session.name}");
-
-          Toaster().info("Session deleted");
-        }
-      }
-    });
   }
 
   Future<void> _addEditSession({Session? session}) async {
@@ -451,6 +425,7 @@ class _NityaSevaState extends State<NityaSeva> {
                             },
                           ),
 
+                          // seva amount and payment mode
                           SizedBox(height: 16.0),
                           Row(
                             children: [
@@ -538,11 +513,12 @@ class _NityaSevaState extends State<NityaSeva> {
                                     );
 
                                     if (session == null) {
+                                      // edit mode
                                       List<String> errors =
                                           _preValidation(newSession);
                                       String? ret = 'Proceed';
                                       if (errors.isNotEmpty) {
-                                        ret = await CommonWidgets()
+                                        ret = await NSWidgetsOld()
                                             .createErrorDialog(
                                                 context: context,
                                                 errors: errors);
@@ -554,6 +530,20 @@ class _NityaSevaState extends State<NityaSeva> {
                                           child: "Settings",
                                           data: newSession.toJson(),
                                         );
+
+                                        // mark as open session
+                                        String path =
+                                            "${Const().dbrootGaruda}/NityaSeva/OpenSessions";
+                                        String data = newSession.timestamp
+                                            .toIso8601String()
+                                            .replaceAll(".", "^");
+                                        if (await FB().pathExists(path)) {
+                                          await FB().addToList(
+                                              listpath: path, data: data);
+                                        } else {
+                                          await FB().setValue(
+                                              path: path, value: [data]);
+                                        }
 
                                         setState(() {
                                           _sessions.add(newSession);
@@ -593,55 +583,213 @@ class _NityaSevaState extends State<NityaSeva> {
         });
   }
 
-  void _createContextMenu(Session session) {
-    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+  Future<void> _autoLockOldSessions() async {
+    String dbpath = "${Const().dbrootGaruda}/NityaSeva/OpenSessions";
+    List openSessions = await FB().getList(path: dbpath);
+    List openSessionsNew = [];
+    if (openSessions.isNotEmpty) {
+      for (var element in openSessions) {
+        String dbTimestamp = element.toString().replaceAll("^", ".");
+        DateTime timestamp = DateTime.parse(dbTimestamp);
+        if (timestamp.isBefore(DateTime.now()
+            .subtract(Duration(hours: Const().sessionLockDuration)))) {
+          String dbDate = DateFormat('yyyy-MM-dd').format(timestamp);
+          String dbpathSession =
+              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$element";
 
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Wrap(
-          children: <Widget>[
-            ListTile(
-              leading: Icon(Icons.edit),
-              title: Text('Edit'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _addEditSession(session: session);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.delete),
-              title: Text('Delete'),
-              onTap: () {
-                // confirmation dialog
-                CommonWidgets().confirm(
-                    context: context,
-                    msg: 'Are you sure you want to delete this session?',
-                    callbacks: ConfirmationCallbacks(onConfirm: () {
-                      // TODO: pre validations e.g. for admin only
+          if (mounted) {
+            await Utils().lockSession(
+                context: context, sessionPath: dbpathSession, silent: true);
 
-                      // delete locally
-                      setState(() {
-                        _sessions.remove(session);
-                      });
+            Toaster().info(
+              "Session Autolocked: ${element.toString()}",
+            );
+          }
+        } else {
+          openSessionsNew.add(element);
+        }
+      }
+      if (openSessionsNew.isNotEmpty) {
+        FB().setValue(path: dbpath, value: openSessionsNew);
+      } else {
+        FB().deleteValue(path: dbpath);
+      }
+    }
+  }
 
-                      // delete in server
-                      String dbTimestamp = session.timestamp
+  Widget _createSessionTile(int index) {
+    Session session = _sessions[index];
+    return Widgets().createTopLevelCard(
+        context: context,
+        child: ListTile(
+            leading: session.icon.isNotEmpty
+                ? ClipOval(
+                    child: Image.asset(
+                      session.icon,
+                    ),
+                  )
+                : null,
+            title: Text(session.name),
+            subtitle: Text(
+                "${session.sevakarta}, ${session.timestamp.hour < 14 ? 'Morning' : 'Evening'} ${session.type}, ${DateFormat('HH:mm').format(session.timestamp)}"),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TicketPage(
+                    session: session,
+                  ),
+                ),
+              );
+            },
+            trailing: (session.sessionLock != null &&
+                    session.sessionLock!.isLocked)
+                ? IconButton(
+                    onPressed: () async {
+                      String dbDate =
+                          DateFormat('yyyy-MM-dd').format(_selectedDate);
+                      String key = session.timestamp
                           .toIso8601String()
                           .replaceAll(".", "^");
-                      FB().deleteValue(
-                          path:
-                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbTimestamp");
+                      await Utils().unlockSession(
+                          context: context,
+                          sessionPath:
+                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key");
+                    },
+                    icon: Icon(Icons.lock))
+                : Widgets().createContextMenu(["Edit", "Delete", "Lock"],
+                    (String value) {
+                    if (value == "Edit") {
+                      _addEditSession(session: session);
+                    } else if (value == "Delete") {
+                      String dbDate =
+                          DateFormat('yyyy-MM-dd').format(_selectedDate);
 
-                      // close the dialog
-                      Navigator.of(context).pop();
-                    }));
-              },
-            ),
-          ],
-        );
-      },
-    );
+                      // confirmation dialog
+                      NSWidgetsOld().confirm(
+                          context: context,
+                          msg: 'Are you sure you want to delete this session?',
+                          callbacks: ConfirmationCallbacks(onConfirm: () async {
+                            // delete locally
+                            setState(() {
+                              _sessions.remove(session);
+                            });
+
+                            // delete in server
+                            String dbTimestamp = session.timestamp
+                                .toIso8601String()
+                                .replaceAll(".", "^");
+                            await FB().deleteValue(
+                                path:
+                                    "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbTimestamp");
+
+                            // delete from open sessions
+                            List openSessions = await FB().getList(
+                                path:
+                                    "${Const().dbrootGaruda}/NityaSeva/OpenSessions");
+                            openSessions.remove(dbTimestamp);
+                            await FB().setValue(
+                                path:
+                                    "${Const().dbrootGaruda}/NityaSeva/OpenSessions",
+                                value: openSessions);
+                          }));
+                    } else if (value == "Lock") {
+                      String dbDate =
+                          DateFormat('yyyy-MM-dd').format(_selectedDate);
+                      String key = session.timestamp
+                          .toIso8601String()
+                          .replaceAll(".", "^");
+                      Utils().lockSession(
+                          context: context,
+                          sessionPath:
+                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key",
+                          username: _username);
+                    } else {
+                      if (value.isNotEmpty) {
+                        Toaster().error("Unknown action: $value");
+                      }
+                    }
+                  })));
+  }
+
+  List<String> _preValidation(Session session) {
+    List<String> errors = [];
+
+    // check if session is created during service time
+    DateTime now = DateTime.now();
+    if (now.hour < 10 || now.hour > 20) {
+      errors.add("Outside service hours");
+    }
+
+    // check if last session was created recently
+    bool isRecent = false;
+    if (_sessions.isNotEmpty) {
+      Session lastSession = _sessions.last;
+      var diff = now.difference(lastSession.timestamp).inHours;
+      if (diff < 3) {
+        errors.add("Session created too recently");
+        isRecent = true;
+      }
+    }
+
+    // check if session is created for today
+    if (_selectedDate.day != now.day ||
+        _selectedDate.month != now.month ||
+        _selectedDate.year != now.year) {
+      errors.add("Session created in older date");
+    }
+
+    return errors;
+  }
+
+  void _postValidation(Session session) {
+    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+    List<String> errors = [];
+
+    refresh(spinner: false).then((_) async {
+      Session lastSession = _sessions.last;
+
+      if (_sessions.length > 1) {
+        if (lastSession.name == session.name &&
+            lastSession.sevakarta == session.sevakarta) {
+          lastSession = _sessions[_sessions.length - 2];
+        }
+
+        // check if last session was created recently
+        bool isRecent = false;
+        if (session.timestamp.difference(lastSession.timestamp).inHours < 3) {
+          errors.add("Session created too recently");
+          isRecent = true;
+        }
+
+        // validate duplicate session name
+        if (session.name == lastSession.name &&
+            lastSession.type == session.type &&
+            isRecent) {
+          errors.add("Duplicate session name");
+        }
+      }
+
+      if (errors.isNotEmpty) {
+        String? ret = await NSWidgetsOld()
+            .createErrorDialog(context: context, errors: errors, post: true);
+        if (ret == 'Edit') {
+          _addEditSession(session: session);
+        } else if (ret == 'Delete') {
+          // delete locally
+          setState(() {
+            _sessions.remove(session);
+          });
+
+          // delete in server
+          FB().deleteValue(
+              path:
+                  "${Const().dbrootGaruda}/NityaSeva/$dbDate/${session.name}");
+
+          Toaster().info("Session deleted");
+        }
+      }
+    });
   }
 
   void _onDateChange(DateTime date) {
@@ -649,6 +797,43 @@ class _NityaSevaState extends State<NityaSeva> {
       _selectedDate = date;
     });
     refresh();
+  }
+
+  Future<void> _onFestivalRecord() async {
+    await Widgets().showResponsiveDialog(
+        context: context,
+        child: Column(
+          children: [
+            // view by year
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FestivalRecordByYear(
+                            title: "Festival record",
+                            icon: 'assets/images/LauncherIcons/NityaSeva.png')),
+                  );
+                },
+                child: Text("View by year")),
+
+            // view by event
+            SizedBox(height: 8),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FestivalRecordByEvent(
+                            title: "Festival record",
+                            splashImage:
+                                'assets/images/LauncherIcons/NityaSeva.png')),
+                  );
+                },
+                child: Text("View by event")),
+          ],
+        ),
+        actions: []);
   }
 
   @override
@@ -674,7 +859,7 @@ class _NityaSevaState extends State<NityaSeva> {
                 ),
 
               // menu button
-              CommonWidgets().createPopupMenu([
+              NSWidgetsOld().createPopupMenu([
                 // laddu
                 MyPopupMenuItem(
                     text: "Laddu seva",
@@ -693,16 +878,7 @@ class _NityaSevaState extends State<NityaSeva> {
                 MyPopupMenuItem(
                     text: "Festival Record",
                     icon: Icons.temple_hindu,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => FestivalRecord(
-                                title: "Festival record",
-                                icon:
-                                    'assets/images/LauncherIcons/NityaSeva.png')),
-                      );
-                    }),
+                    onPressed: _onFestivalRecord),
 
                 // settings
                 MyPopupMenuItem(
@@ -742,32 +918,8 @@ class _NityaSevaState extends State<NityaSeva> {
                       ),
 
                     // Session tiles
-                    ..._sessions.map((Session session) {
-                      return GestureDetector(
-                        onLongPress: () {
-                          HapticFeedback.mediumImpact();
-                          _createContextMenu(session);
-                        },
-                        child: LauncherTile2(
-                          imageLeading: session.icon,
-                          imageTrailing: session.timestamp.hour < 14
-                              ? 'assets/images/Common/morning.png'
-                              : 'assets/images/Common/evening.png',
-                          title: session.name,
-                          text:
-                              "${session.sevakarta}, ${session.timestamp.hour < 14 ? 'Morning' : 'Evening'} ${session.type}, ${DateFormat('HH:mm').format(session.timestamp)}",
-                          callback: LauncherTileCallback(onClick: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TicketPage(
-                                  session: session,
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
-                      );
+                    ...List.generate(_sessions.length, (index) {
+                      return _createSessionTile(index);
                     }),
 
                     // summary

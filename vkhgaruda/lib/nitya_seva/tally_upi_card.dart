@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vkhgaruda/common/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class TallyUpiCardPage extends StatefulWidget {
@@ -232,7 +231,9 @@ class _TallyNotesPageState extends State<TallyUpiCardPage> {
             width: 60, // Adjust the width as needed to fit 3 digits
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary, // Set background color to brown
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary, // Set background color to brown
               border: Border.all(color: Colors.black),
               borderRadius: BorderRadius.circular(12.0),
             ),

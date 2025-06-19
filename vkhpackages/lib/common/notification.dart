@@ -22,7 +22,7 @@ class Notifications {
     // Explicitly enable FCM auto-init
     FirebaseMessaging.instance.setAutoInitEnabled(true);
 
-    await FirebaseMessaging.instance.requestPermission(
+    var status = await FirebaseMessaging.instance.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -31,6 +31,14 @@ class Notifications {
       provisional: false, // actively asks the user to enable notifications
       sound: true,
     );
+
+    if (status.authorizationStatus == AuthorizationStatus.authorized) {
+      // User granted permission
+    } else if (status.authorizationStatus == AuthorizationStatus.provisional) {
+      // User granted provisional permission
+    } else {
+      return null;
+    }
 
     // Get the FCM token
     String? fcmToken;

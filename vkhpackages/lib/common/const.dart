@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'datatypes.dart';
 
 class Const {
   static final Const _instance = Const._internal();
@@ -12,6 +11,8 @@ class Const {
     // init
   }
 
+  final version = "7.7.0";
+
   final String dbrootGaruda = "TEST/GARUDA_01";
   final String dbrootSangeetSeva = "TEST/SANGEETSEVA_01";
 
@@ -20,6 +21,7 @@ class Const {
   final int morningCutoff = 14;
   final int maxImageSize = 500; // kB
   final String delimiter = "~";
+  final int sessionLockDuration = 5; // hours
 
   final nityaSeva = {
     'amounts': [
@@ -34,7 +36,7 @@ class Const {
       },
       {
         "500": {
-          'color': Colors.blue[100],
+          'color': Colors.blue,
           "sevas": [
             {"name": "Pushpanjali Seva"},
           ],
@@ -43,7 +45,7 @@ class Const {
       },
       {
         "600": {
-          'color': Colors.green[100],
+          'color': Colors.green,
           "sevas": [
             {"name": "Tulasi Archana Seva"},
           ],
@@ -52,7 +54,7 @@ class Const {
       },
       {
         "1000": {
-          'color': Colors.yellow,
+          'color': Colors.deepOrange,
           "sevas": [
             {"name": "Naivedya Seva"},
             {"name": "Sadhu Seva"},
@@ -62,7 +64,7 @@ class Const {
       },
       {
         "2500": {
-          'color': Colors.pink[100],
+          'color': Colors.pink,
           "sevas": [
             {"name": "Pushpalankara Seva"},
             {"name": "Sadhu Bhojana Seva"},
@@ -74,10 +76,22 @@ class Const {
   };
 
   final paymentModes = {
-    'Cash': {'icon': "assets/images/PaymentModes/icon_cash.png"},
-    'UPI': {'icon': "assets/images/PaymentModes/icon_upi.png"},
-    'Card': {'icon': "assets/images/PaymentModes/icon_card.png"},
-    'Gift': {'icon': "assets/images/PaymentModes/icon_gift.png"},
+    'Cash': {
+      'icon': "assets/images/PaymentModes/icon_cash.png",
+      'color': Colors.green,
+    },
+    'UPI': {
+      'icon': "assets/images/PaymentModes/icon_upi.png",
+      'color': Colors.deepOrange,
+    },
+    'Card': {
+      'icon': "assets/images/PaymentModes/icon_card.png",
+      'color': Colors.blue,
+    },
+    'Gift': {
+      'icon': "assets/images/PaymentModes/icon_gift.png",
+      'color': Colors.purple,
+    },
   };
 
   final List<String> icons = [

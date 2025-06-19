@@ -128,6 +128,23 @@ flutter:
     - assets/images/NityaSeva/JalaDana.png
     - assets/images/NityaSeva/laddu.png
     - assets/images/NityaSeva/sadhu_seva.png
+    - assets/images/Tutorials/NityaSevaBasics/01.png
+    - assets/images/Tutorials/NityaSevaBasics/02.png
+    - assets/images/Tutorials/NityaSevaBasics/03.png
+    - assets/images/Tutorials/NityaSevaBasics/04.png
+    - assets/images/Tutorials/NityaSevaBasics/05.png
+    - assets/images/Tutorials/NityaSevaBasics/06.png
+    - assets/images/Tutorials/NityaSevaBasics/07.png
+    - assets/images/Tutorials/NityaSevaBasics/08.png
+    - assets/images/Tutorials/NityaSevaAdmin/01.png
+    - assets/images/Tutorials/NityaSevaAdmin/02.png
+    - assets/images/Tutorials/NityaSevaAdmin/03.png
+    - assets/images/Tutorials/NityaSevaAdmin/04.png
+    - assets/images/Tutorials/NityaSevaAdmin/05.png
+    - assets/images/Tutorials/NityaSevaAdmin/06.png
+    - assets/images/Tutorials/NityaSevaAdmin/07.png
+    - assets/images/Tutorials/NityaSevaAdmin/08.png
+    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

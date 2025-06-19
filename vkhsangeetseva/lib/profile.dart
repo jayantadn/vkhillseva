@@ -8,7 +8,6 @@ import 'package:synchronized/synchronized.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:vkhpackages/widgets/radio_row.dart';
 import 'package:file_picker/file_picker.dart';
 
 class Profile extends StatefulWidget {
@@ -40,7 +39,7 @@ class _ProfileState extends State<Profile> {
   String _profilePicUrl = '';
   late String _salutation;
   PerformerProfile? _userDetailsOld;
-  final double _imagesize = 150;
+  final double _imagesize = 200;
 
   // lists
 
@@ -425,7 +424,6 @@ class _ProfileState extends State<Profile> {
       UserBasics basics = UserBasics(
         name: details.name,
         mobile: details.mobile,
-        uid: Utils().getUserBasics()!.uid,
       );
       await LS().write("userbasics", jsonEncode(basics));
     }

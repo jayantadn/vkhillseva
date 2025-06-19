@@ -22,12 +22,16 @@ def run_command(command):
 def update_changelog(version):
     print("updating effort")
     effort_hr = 0
-    if os.path.exists('.timetracker'):
+    try:
         with open('.timetracker', 'r') as f:
             timetracker_data = json.load(f)
-            effort_sec = timetracker_data['total']
-            effort_hr = round(effort_sec / 3600, 2)
+            effort_sec = timetracker_data.get('total', 0)
+            effort_hr = effort_sec // 3600
         os.unlink('.timetracker')
+    except FileNotFoundError:
+        print(".timetracker file not found, skipping effort update.")
+    except Exception as e:
+        print(f"Error reading .timetracker: {e}")
 
     print("generate the changelog from git log")
     base_branch = run_command('git merge-base origin/main HEAD')
@@ -236,7 +240,7 @@ def release(app):
             else:
                 run_command(f'git commit -m "release {branch_name}"')
             run_command('git push origin')
-            if branch_name != "main":
+            if branch_name != "main" and reltype == 'release':
                 run_command('git checkout main')
                 run_command('git pull')
                 run_command(f'git merge {branch_name}')

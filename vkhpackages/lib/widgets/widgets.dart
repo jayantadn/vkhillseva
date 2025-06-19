@@ -200,6 +200,7 @@ class Widgets {
     required BuildContext context,
     required Widget child,
     String? title,
+    Color? color,
   }) {
     double maxWidth = maxCardWidth;
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -219,7 +220,7 @@ class Widgets {
                 Container(
                   width: double.infinity, // Stretch to full width
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
+                    color: color ?? Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(10.0),
                       topRight: Radius.circular(10.0),
@@ -365,7 +366,15 @@ class Widgets {
                 Navigator.of(context).pop();
               },
             ),
-            TextButton(onPressed: action, child: Text(actionType ?? 'OK')),
+            TextButton(
+              onPressed: () {
+                if (action != null) {
+                  action();
+                }
+                Navigator.of(context).pop();
+              },
+              child: Text(actionType ?? 'OK'),
+            ),
           ],
         );
       },

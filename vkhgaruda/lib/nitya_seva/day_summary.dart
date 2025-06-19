@@ -5,12 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:vkhgaruda/nitya_seva/session.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:vkhpackages/vkhpackages.dart';
-import 'package:vkhgaruda/common/datatypes.dart';
 
 class DaySummary extends StatefulWidget {
   final DateTime date;

@@ -6,8 +6,7 @@ import 'package:vkhgaruda/nitya_seva/laddu/serve.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/nitya_seva/session.dart';
-import 'package:vkhgaruda/common/datatypes.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class Log extends StatefulWidget {
   final DateTime? session;
@@ -100,7 +99,7 @@ class _LogState extends State<Log> {
               ),
               child: Text(
                 (stock.count + (stock.carry ?? 0)).toString(),
-                style: TextStyle(fontSize: 24.0), // Increase the font size
+                style: TextStyle(fontSize: 18.0), // Increase the font size
               ),
             ),
 
@@ -146,11 +145,10 @@ class _LogState extends State<Log> {
                     Text(
                       CalculateTotalLadduPacksServed(serve).toString(),
                       style: TextStyle(
-                        fontSize: 24.0, // Increase font size
+                        fontSize: 18.0, // Increase font size
                         fontWeight: FontWeight.bold, // Make text bold
                       ),
                     ),
-                    Text("Total"),
                   ],
                 ),
               ),

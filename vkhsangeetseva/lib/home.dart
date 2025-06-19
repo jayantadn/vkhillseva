@@ -72,6 +72,7 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(
               builder: (context) => Profile(
                 title: "Create Profile",
+                icon: widget.icon,
                 self: true,
               ),
             ),

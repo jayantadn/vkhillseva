@@ -93,11 +93,10 @@ class _WelcomeState extends State<Welcome> {
         'ISKCON Vaikuntha Hill',
         style: Theme.of(context).textTheme.headlineMedium,
       ),
-      if (_version.isNotEmpty)
-        Text('Garuda v$_version',
-            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  color: Colors.grey,
-                )),
+      Text('Garuda v${Const().version}',
+          style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: Colors.grey,
+              )),
     ]);
   }
 }

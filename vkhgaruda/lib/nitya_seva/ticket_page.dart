@@ -910,20 +910,27 @@ class _TicketPageState extends State<TicketPage> {
     ticketSettings = await FB().getJson(path: ticketNumbersPath, silent: true);
 
     List<Widget> rows = List.generate(ticketSettings.length, (index) {
-      String key = ticketSettings.keys.elementAt(index);
-      int value = ticketSettings[key] ?? 1;
+      String amount = ticketSettings.keys.elementAt(index);
 
-      int labelWidth = 4;
+      int bookNumber = 1;
+      int ticketNumber = 1;
+      if (ticketSettings[amount] != null) {
+        String str = ticketSettings[amount];
+        bookNumber = int.tryParse(str.split(":").first) ?? 1;
+        ticketNumber = int.tryParse(str.split(":").last) ?? 1;
+      }
+
+      int labelWidth = 2;
 
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
-            // label - occupies 30% of the available width
+            // label
             Expanded(
               flex: labelWidth,
               child: Text(
-                "              ₹$key: ",
+                "₹$amount: ",
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
@@ -931,10 +938,19 @@ class _TicketPageState extends State<TicketPage> {
             // input field
             Expanded(
               flex: 10 - labelWidth,
-              child: Text(
-                value.toString(),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
+              child: Widgets().createResponsiveRow(context, [
+                Text(
+                  "[Book - $bookNumber]",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Colors.blueGrey),
+                ),
+                Text(
+                  "  Ticket - $ticketNumber",
+                  style: Theme.of(context).textTheme.bodyLarge,
+                )
+              ]),
             ),
           ],
         ),

@@ -603,7 +603,7 @@ class _TicketPageState extends State<TicketPage> {
 
         // seva name
         title: Text(
-          "Ticket# ${ticket.ticketNumber},  Amount: ₹${ticket.amount}",
+          "Tkt# ${ticket.ticketNumber},  Amt: ₹${ticket.amount}",
           overflow: TextOverflow.ellipsis,
           style:
               Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16),
@@ -738,13 +738,16 @@ class _TicketPageState extends State<TicketPage> {
         _tickets.where((ticket) => ticket.amount == amount).toList();
     if (filteredTickets.isEmpty) {
       if (widget.session.name == "Nitya Seva") {
-        String lastTicketNumberPath =
+        String nextTicketNumberPath =
             "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers/$amount";
-        int? nextTicketNumber = await FB().getValue(path: lastTicketNumberPath);
-        if (nextTicketNumber == null) {
+        String? nextTicketNumberComb =
+            await FB().getValue(path: nextTicketNumberPath);
+        if (nextTicketNumberComb == null) {
           ticketNumber = 1;
         } else {
-          ticketNumber = nextTicketNumber;
+          ticketNumber = nextTicketNumberComb.split(":").last.isEmpty
+              ? 1
+              : int.tryParse(nextTicketNumberComb.split(":").last) ?? 1;
         }
       } else {
         if (_nextFestivalTicketNumber == 0) {

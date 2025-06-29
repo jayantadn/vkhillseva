@@ -337,7 +337,7 @@ class Utils {
     // push to fb
     await FB().setJson(
       path: "$sessionPath/Settings/sessionLock",
-      json: sessionLock!.toJson(),
+      json: sessionLock.toJson(),
     );
 
     // store the last used ticket numbers
@@ -361,9 +361,11 @@ class Utils {
               Ticket.fromJson,
             );
             String key = ticket.amount.toString();
-            int value = nextTicketNumbers[key] ?? 1;
+            int value =
+                int.tryParse(nextTicketNumbers[key].split(":").last) ?? 1;
             if (ticket.ticketNumber >= value) {
-              nextTicketNumbers[key] = ticket.ticketNumber + 1;
+              int bookNumber = nextTicketNumbers[key].split(":").first;
+              nextTicketNumbers[key] = "$bookNumber:${ticket.ticketNumber + 1}";
             }
           }
           await FB().setJson(path: ticketNumbersPath, json: nextTicketNumbers);

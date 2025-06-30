@@ -287,7 +287,7 @@ class Utils {
   }) async {
     bool? confirm;
 
-    if (silent == null || (silent != null && !silent)) {
+    if (silent == null || (!silent)) {
       confirm = await showDialog<bool>(
         context: context,
         builder: (BuildContext dialogContext) {
@@ -364,7 +364,7 @@ class Utils {
             int value =
                 int.tryParse(nextTicketNumbers[key].split(":").last) ?? 1;
             if (ticket.ticketNumber >= value) {
-              int bookNumber = nextTicketNumbers[key].split(":").first;
+              String bookNumber = nextTicketNumbers[key].split(":").first;
               nextTicketNumbers[key] = "$bookNumber:${ticket.ticketNumber + 1}";
             }
           }

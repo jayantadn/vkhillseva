@@ -10,6 +10,7 @@
     -[x] delete
 -[x] lock/unlock session
 -[x] session/day summary
+-[ ] restore ticket numbers
 
 # Laddu seva
 -[x] add / serve / return

@@ -23,6 +23,7 @@ class _TicketSettingsState extends State<TicketSettings> {
   Map<String, dynamic> _ticketSettings = {};
 
   // lists
+  final Map<String, TextEditingController> _controllerBookNumbers = {};
   final Map<String, TextEditingController> _controllerTicketNumbers = {};
   List<Map<String, dynamic>> _ticketHistory = [];
 
@@ -43,6 +44,9 @@ class _TicketSettingsState extends State<TicketSettings> {
 
     // clear all controllers and focus nodes
     for (var controller in _controllerTicketNumbers.values) {
+      controller.dispose();
+    }
+    for (var controller in _controllerBookNumbers.values) {
       controller.dispose();
     }
 
@@ -70,9 +74,15 @@ class _TicketSettingsState extends State<TicketSettings> {
           if (amount[key]?['obsolete'] == true) {
             continue; // skip obsolete amounts
           }
-          _ticketSettings[key] = 1; // default value
+          _ticketSettings[key] = "1:1"; // default value
         }
       }
+
+      // sort _ticketSettings by amount
+      _ticketSettings = Map.fromEntries(
+        _ticketSettings.entries.toList()
+          ..sort((a, b) => int.parse(a.key).compareTo(int.parse(b.key))),
+      );
 
       // populate history
       String historyPath =
@@ -118,30 +128,50 @@ class _TicketSettingsState extends State<TicketSettings> {
 
   Widget _createTicketSettingRow(int index) {
     String key = _ticketSettings.keys.elementAt(index);
-    int value = _ticketSettings[key] ?? 1;
+    String value = _ticketSettings[key] ?? "1:1";
 
     int labelWidth = 4;
+
+    _controllerBookNumbers[key] =
+        TextEditingController(text: value.split(":").first.trim());
     _controllerTicketNumbers[key] =
-        TextEditingController(text: value.toString());
+        TextEditingController(text: value.split(":").last.trim());
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
-          // label - occupies 30% of the available width
           Expanded(
             flex: labelWidth,
             child: Text(
               "Amount: ₹$key",
-              style: Theme.of(context).textTheme.bodyLarge,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
 
-          // input field
-          SizedBox(width: 10),
+          // book
+          SizedBox(width: 5),
           Expanded(
-            flex: 10 - labelWidth,
+            flex: ((10 - labelWidth) / 2).round(),
             child: TextField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: "Book",
+              ),
+              controller: _controllerBookNumbers[key],
+              keyboardType: TextInputType.number,
+            ),
+          ),
+
+          // ticket
+          SizedBox(width: 5),
+          Expanded(
+            flex: ((10 - labelWidth) / 2).round(),
+            child: TextField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: "Ticket",
+              ),
               controller: _controllerTicketNumbers[key],
               keyboardType: TextInputType.number,
             ),
@@ -235,8 +265,7 @@ class _TicketSettingsState extends State<TicketSettings> {
                             Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: ElevatedButton(
-                                    onPressed: _onSave,
-                                    child: Text("Save"))),
+                                    onPressed: _onSave, child: Text("Save"))),
                           ],
                         ),
                       ),

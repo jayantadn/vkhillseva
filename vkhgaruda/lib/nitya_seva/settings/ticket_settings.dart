@@ -160,6 +160,12 @@ class _TicketSettingsState extends State<TicketSettings> {
               ),
               controller: _controllerBookNumbers[key],
               keyboardType: TextInputType.number,
+              onChanged: (value) {
+                // hack: two variables are holding the same values - _ticketSettings and _controllerBookNumbers
+                // following hack is to update both at the same time
+                _ticketSettings[key] =
+                    "${value.trim()}:${_controllerTicketNumbers[key]!.text.trim()}";
+              },
             ),
           ),
 
@@ -168,13 +174,18 @@ class _TicketSettingsState extends State<TicketSettings> {
           Expanded(
             flex: ((10 - labelWidth) / 2).round(),
             child: TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: "Ticket",
-              ),
-              controller: _controllerTicketNumbers[key],
-              keyboardType: TextInputType.number,
-            ),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "Ticket",
+                ),
+                controller: _controllerTicketNumbers[key],
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  // hack: two variables are holding the same values - _ticketSettings and _controllerBookNumbers
+                  // following hack is to update both at the same time
+                  _ticketSettings[key] =
+                      "${_controllerBookNumbers[key]!.text.trim()}:$value";
+                }),
           ),
         ],
       ),
@@ -203,8 +214,9 @@ class _TicketSettingsState extends State<TicketSettings> {
             Map<String, dynamic> ticketNumbers = {};
             for (var entry in _controllerTicketNumbers.entries) {
               String key = entry.key;
-              int value = int.parse(entry.value.text.trim());
-              ticketNumbers[key] = value;
+              int book = int.parse(_controllerBookNumbers[key]!.text.trim());
+              int ticket = int.parse(entry.value.text.trim());
+              ticketNumbers[key] = "$book:$ticket";
             }
 
             // push to fb

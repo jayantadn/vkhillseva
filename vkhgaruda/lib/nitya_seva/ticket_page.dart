@@ -911,6 +911,10 @@ class _TicketPageState extends State<TicketPage> {
     String ticketNumbersPath =
         "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
     ticketSettings = await FB().getJson(path: ticketNumbersPath, silent: true);
+    ticketSettings = Map.fromEntries(
+      ticketSettings.entries.toList()
+        ..sort((a, b) => int.parse(a.key).compareTo(int.parse(b.key))),
+    );
 
     List<Widget> rows = List.generate(ticketSettings.length, (index) {
       String amount = ticketSettings.keys.elementAt(index);

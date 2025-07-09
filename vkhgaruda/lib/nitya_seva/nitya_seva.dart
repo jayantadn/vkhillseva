@@ -532,6 +532,10 @@ class _NityaSevaState extends State<NityaSeva> {
                                           data: newSession.toJson(),
                                         );
 
+                                        setState(() {
+                                          _sessions.add(newSession);
+                                        });
+
                                         // mark as open session
                                         String path =
                                             "${Const().dbrootGaruda}/NityaSeva/OpenSessions";
@@ -545,10 +549,6 @@ class _NityaSevaState extends State<NityaSeva> {
                                           await FB().setValue(
                                               path: path, value: [data]);
                                         }
-
-                                        setState(() {
-                                          _sessions.add(newSession);
-                                        });
                                       }
                                       if (errors.isEmpty) {
                                         _postValidation(newSession);

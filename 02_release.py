@@ -80,7 +80,6 @@ def update_changelog(version):
         sorted(changelog.items(), key=lambda x: x[0], reverse=True))
     with open('changelog.json', 'w') as file:
         json.dump(changelog, file, indent=4)
-    sys.exit(0)
 
 
 def set_parameters():
@@ -282,7 +281,7 @@ def release(app):
 def main():
     set_parameters()
     release("vkhgaruda")
-    release("vkhsangeetseva")
+    # release("vkhsangeetseva")
 
 
 if __name__ == '__main__':

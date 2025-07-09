@@ -1,11 +1,45 @@
 {
     "7.7.1": {
-        "effort": "0.42h",
+        "effort": "2.42h",
         "features": [
             "update version",
-            "appending changelog"
+            "appending changelog",
+            "session lock/unlock implemented",
+            "auto lock session",
+            "redesigned ticket",
+            "session tile uneditable on lock",
+            "save last ticket numbers upon session lock",
+            "auto fetch next ticket number",
+            "settings button to edit the next ticket numbers",
+            "on empty session startup, display the next ticket numbers",
+            "resume ticket number from previous session",
+            "to record the last ticket numbers, check if its the last active Nitya Seva session",
+            "note for admin entry in NextTicketNumbers",
+            "upload user info",
+            "user management",
+            "bar chart for festival",
+            "changelog converted to json",
+            "add session only possible if session is from today",
+            "edit starting ticket nos"
         ],
-        "fixes": []
+        "fixes": [
+            "approval",
+            "notification deny",
+            "dont merge test version to main",
+            "unlock cancel issue",
+            "confirm dialog for lock session",
+            "ticket number made readonly",
+            "enhance prompt message for testing features",
+            "change print statement to input for user prompt in main function",
+            "removed logout",
+            "lock session",
+            "laddu seva",
+            "github dependency issues",
+            "update babel version",
+            "store ticket numbers on session lock",
+            "sort starting ticket numbers",
+            "double session display"
+        ]
     },
     "7.7.0": {
         "effort": "2h",

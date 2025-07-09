@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'package:vkhgaruda/home/settings.dart';
-import 'package:vkhgaruda/home/user_management.dart';
 import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
 import 'package:vkhgaruda/widgets/launcher_tile.dart';

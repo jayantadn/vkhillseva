@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:vkhgaruda/nitya_seva/settings/festival_settings_page.dart';
-import 'package:vkhgaruda/nitya_seva/settings/ticket_settings.dart';
+import 'package:vkhgaruda/home/festival_settings_page.dart';
+import 'package:vkhgaruda/home/ticket_settings.dart';
+import 'package:vkhgaruda/home/user_management.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Settings extends StatefulWidget {
@@ -79,6 +80,20 @@ class _SettingsState extends State<Settings> {
               onRefresh: refresh,
               child: ListView(
                 children: [
+                  // User settings
+                  _createSettingsCard(
+                    title: 'User management',
+                    icon: Icons.person,
+                    callback: SettingsCallback(onClick: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const UserManagement(title: "User management")),
+                      );
+                    }),
+                  ),
+
                   // Nitya Seva Festival settings
                   _createSettingsCard(
                     title: 'Festival settings',

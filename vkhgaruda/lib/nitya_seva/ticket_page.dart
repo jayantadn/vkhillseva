@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/nitya_seva/session_summary.dart';
-import 'package:vkhgaruda/nitya_seva/settings/ticket_settings.dart';
+import 'package:vkhgaruda/home/ticket_settings.dart';
 import 'package:vkhgaruda/nitya_seva/tally_cash.dart';
 import 'package:vkhgaruda/nitya_seva/tally_upi_card.dart';
 import 'package:vkhgaruda/widgets/common_widgets.dart';

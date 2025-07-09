@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/home/landing.dart';
+import 'package:vkhgaruda/home/settings.dart';
 import 'package:vkhgaruda/home/user_management.dart';
 import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
@@ -112,15 +113,15 @@ class _HomePageState extends State<HomePage> {
         children: [
           Scaffold(
             appBar: AppBar(title: Text(widget.title), actions: [
-              // user management
+              // settings
               if (_isAdmin)
                 IconButton(
-                  icon: const Icon(Icons.manage_accounts),
+                  icon: const Icon(Icons.settings),
                   onPressed: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {
-                      return const UserManagement(
-                        title: "User Management",
+                      return const Settings(
+                        title: "Settings",
                       );
                     }));
                   },

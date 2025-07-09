@@ -1,17 +1,17 @@
 # General
--[x] signup
+-[] signup
 
 # Nitya Seva
--[x] create slot
-    -[x] edit
-    -[x] delete
--[x] add ticket
-    -[x] edit
-    -[x] delete
--[x] lock/unlock session
--[x] session/day summary
+-[] create slot
+    -[] edit
+    -[] delete
+-[] add ticket
+    -[] edit
+    -[] delete
+-[] lock/unlock session
+-[] session/day summary
 -[ ] restore ticket numbers
 
 # Laddu seva
--[x] add / serve / return
--[x] settings
+-[] add / serve / return
+-[] settings

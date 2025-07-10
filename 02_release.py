@@ -81,6 +81,33 @@ def update_changelog(version):
     with open('changelog.json', 'w') as file:
         json.dump(changelog, file, indent=4)
 
+    print("Testcases refreshing")
+    with open('vkhgaruda/test/nitya_seva.md', 'r+') as testspec:
+        content = testspec.read()
+        testspec.seek(0)
+        testspec.write(content.replace("-[x]", "-[]"))
+        testspec.truncate()
+        # Load the updated changelog
+        with open('changelog.json', 'r') as f:
+            changelog = json.load(f)
+
+        # Get the first (latest) version's features
+        first_version = next(iter(changelog))
+        features = changelog[first_version].get('features', [])
+
+        # Read the test spec again to update after "# new features"
+        testspec.seek(0)
+        content = testspec.read()
+        split_marker = "# new features"
+        if split_marker in content:
+            before, _ = content.split(split_marker, 1)
+            new_content = before + split_marker + "\n"
+            for feature in features:
+                new_content += f"-[] {feature}\n"
+            testspec.seek(0)
+            testspec.write(new_content)
+            testspec.truncate()
+
 
 def set_parameters():
     global rootdir
@@ -282,6 +309,7 @@ def main():
     set_parameters()
     release("vkhgaruda")
     # release("vkhsangeetseva")
+    input("Please test the app before release.")
 
 
 if __name__ == '__main__':

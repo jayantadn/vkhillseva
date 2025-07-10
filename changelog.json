@@ -38,7 +38,8 @@
             "update babel version",
             "store ticket numbers on session lock",
             "sort starting ticket numbers",
-            "double session display"
+            "double session display",
+            "tutorial hung"
         ]
     },
     "7.7.0": {

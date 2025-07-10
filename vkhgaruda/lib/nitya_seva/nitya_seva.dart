@@ -43,74 +43,7 @@ class _NityaSevaState extends State<NityaSeva> {
     _autoLockOldSessions();
 
     // listen to database events
-    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
-    FB().listenForChange(
-        "${Const().dbrootGaruda}/NityaSeva/$dbDate",
-        FBCallbacks(
-          // add
-          add: (data) {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
-                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
-
-              Map<String, dynamic> map = Map<String, dynamic>.from(data);
-              Map<String, dynamic> json =
-                  Map<String, dynamic>.from(map['Settings']);
-              Session session = Session.fromJson(json);
-              bool exists = false;
-              for (var element in _sessions) {
-                if (element.name == session.name) {
-                  exists = true;
-                  break;
-                }
-              }
-              if (!exists) {
-                setState(() {
-                  _sessions.add(session);
-                });
-              }
-            }
-          },
-
-          // edit
-          edit: () {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
-                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
-
-              refresh();
-            }
-          },
-
-          // delete
-          delete: (data) {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
-                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
-
-              // process the received data
-              Map<String, dynamic> map = Map<String, dynamic>.from(data);
-              if (map['Settings'] != null) {
-                Map<String, dynamic> json =
-                    Map<String, dynamic>.from(map['Settings']);
-                Session session = Session.fromJson(json);
-
-                setState(() {
-                  int index = _sessions
-                      .indexWhere((s) => s.timestamp == session.timestamp);
-                  if (index != -1) {
-                    _sessions.removeAt(index);
-                  }
-                });
-              }
-            }
-          },
-
-          // get listeners
-          getListeners: (listeners) {
-            _listeners = listeners;
-          },
-        ));
+    _addFBListeners();
 
     refresh();
   }
@@ -585,6 +518,77 @@ class _NityaSevaState extends State<NityaSeva> {
         });
   }
 
+  void _addFBListeners() {
+    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+    FB().listenForChange(
+        "${Const().dbrootGaruda}/NityaSeva/$dbDate",
+        FBCallbacks(
+          // add
+          add: (data) {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              Map<String, dynamic> map = Map<String, dynamic>.from(data);
+              Map<String, dynamic> json =
+                  Map<String, dynamic>.from(map['Settings']);
+              Session session = Session.fromJson(json);
+              bool exists = false;
+              for (var element in _sessions) {
+                if (element.name == session.name) {
+                  exists = true;
+                  break;
+                }
+              }
+              if (!exists) {
+                setState(() {
+                  _sessions.add(session);
+                });
+              }
+            }
+          },
+
+          // edit
+          edit: () {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              refresh();
+            }
+          },
+
+          // delete
+          delete: (data) {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              // process the received data
+              Map<String, dynamic> map = Map<String, dynamic>.from(data);
+              if (map['Settings'] != null) {
+                Map<String, dynamic> json =
+                    Map<String, dynamic>.from(map['Settings']);
+                Session session = Session.fromJson(json);
+
+                setState(() {
+                  int index = _sessions
+                      .indexWhere((s) => s.timestamp == session.timestamp);
+                  if (index != -1) {
+                    _sessions.removeAt(index);
+                  }
+                });
+              }
+            }
+          },
+
+          // get listeners
+          getListeners: (listeners) {
+            _listeners = listeners;
+          },
+        ));
+  }
+
   Future<void> _autoLockOldSessions() async {
     String dbpath = "${Const().dbrootGaruda}/NityaSeva/OpenSessions";
     List openSessions = await FB().getList(path: dbpath);
@@ -797,6 +801,7 @@ class _NityaSevaState extends State<NityaSeva> {
   void _onDateChange(DateTime date) {
     setState(() {
       _selectedDate = date;
+      _addFBListeners();
     });
     refresh();
   }

@@ -491,7 +491,8 @@ class _NityaSevaState extends State<NityaSeva> {
                               SizedBox(width: 8),
                               Expanded(
                                 child: ElevatedButton(
-                                  child: Text(session == null ? 'Add' : 'Edit'),
+                                  child:
+                                      Text(session == null ? 'Add' : 'Update'),
                                   onPressed: () async {
                                     String icon = '';
                                     for (var element in _sevaList) {

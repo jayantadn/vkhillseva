@@ -269,20 +269,33 @@ class _UserManagementState extends State<UserManagement> {
                                     flex: 2,
                                     child: Center(
                                       child: Material(
-                                        color: _dropdownValue == "Admin"
-                                            ? Colors.red
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .primary, // dark background
-                                        shape: const CircleBorder(),
-                                        child: IconButton(
-                                          icon: Icon(Icons.add,
-                                              color: Theme.of(context)
+                                          color: _dropdownValue == "Admin"
+                                              ? Colors.red
+                                              : Theme.of(context)
                                                   .colorScheme
-                                                  .secondary), // white icon
-                                          onPressed: _onAddUser,
-                                        ),
-                                      ),
+                                                  .primary, // dark background
+                                          shape: const CircleBorder(),
+                                          child: IconButton(
+                                            icon: Icon(Icons.add,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary),
+                                            onPressed: () async {
+                                              // Validate the form
+                                              if (_formKey.currentState!
+                                                  .validate()) {
+                                                await _onAddUser();
+                                                // Clear the field
+                                                setState(() {
+                                                  _mobile = "";
+                                                });
+                                                // Unfocus and clear the text field
+                                                FocusScope.of(context)
+                                                    .unfocus();
+                                                _formKey.currentState!.reset();
+                                              }
+                                            },
+                                          )),
                                     ),
                                   ),
                                 ],

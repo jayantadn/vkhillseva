@@ -234,6 +234,14 @@ class _TicketSettingsState extends State<TicketSettings> {
               "ticketNumbers": ticketNumbers,
               "note": note,
             });
+            setState(() {
+              _ticketHistory.insert(0, {
+                "user": user?.name ?? "Unknown User",
+                "timestamp": DateTime.now().toIso8601String(),
+                "ticketNumbers": ticketNumbers,
+                "note": note,
+              });
+            });
 
             Navigator.of(context).pop(); // close the dialog
             Toaster().info("Saved successfully");

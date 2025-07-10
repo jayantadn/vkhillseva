@@ -162,7 +162,10 @@ class _FestivalRecordByEventState extends State<FestivalRecordByEvent> {
   }
 
   Future<void> _onFestivalSelection(String festivalName) async {
-    _ticketsSold.clear();
+    setState(() {
+      _isLoading = true;
+      _ticketsSold.clear();
+    });
 
     // this year
     DateTime now = DateTime.now();
@@ -208,6 +211,10 @@ class _FestivalRecordByEventState extends State<FestivalRecordByEvent> {
       startOfYear = DateTime(startOfYear.year - 1, 1, 1);
       end = DateTime(startOfYear.year, 12, 31);
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override

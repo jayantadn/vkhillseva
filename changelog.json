@@ -1,6 +1,6 @@
 {
     "7.7.1": {
-        "effort": "2.42h",
+        "effort": "3.42h",
         "features": [
             "update version",
             "appending changelog",
@@ -39,7 +39,8 @@
             "store ticket numbers on session lock",
             "sort starting ticket numbers",
             "double session display",
-            "tutorial hung"
+            "tutorial hung",
+            "other day session lock"
         ]
     },
     "7.7.0": {

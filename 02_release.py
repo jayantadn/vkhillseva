@@ -309,7 +309,6 @@ def main():
     set_parameters()
     release("vkhgaruda")
     # release("vkhsangeetseva")
-    input("Please test the app before release.")
 
 
 if __name__ == '__main__':

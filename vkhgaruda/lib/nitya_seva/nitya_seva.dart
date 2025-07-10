@@ -159,7 +159,7 @@ class _NityaSevaState extends State<NityaSeva> {
             "assets/images/Tutorials/NityaSevaBasics/08.png",
           ]),
         ),
-      );
+      ).then((_) => refresh());
       return;
     }
 

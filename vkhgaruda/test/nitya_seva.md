@@ -13,8 +13,6 @@
 -[] settings
 
 # new features
--[] update version
--[] appending changelog
 -[] session lock/unlock implemented
 -[] auto lock session
 -[] redesigned ticket
@@ -29,6 +27,8 @@
 -[] upload user info
 -[] user management
 -[] bar chart for festival
+-[] update version
+-[] appending changelog
 -[] changelog converted to json
 -[] add session only possible if session is from today
 -[] edit starting ticket nos

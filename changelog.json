@@ -1,4 +1,50 @@
 {
+    "7.7.2": {
+        "effort": "0h",
+        "features": [
+            "session lock/unlock implemented",
+            "auto lock session",
+            "redesigned ticket",
+            "session tile uneditable on lock",
+            "save last ticket numbers upon session lock",
+            "auto fetch next ticket number",
+            "settings button to edit the next ticket numbers",
+            "on empty session startup, display the next ticket numbers",
+            "resume ticket number from previous session",
+            "to record the last ticket numbers, check if its the last active Nitya Seva session",
+            "note for admin entry in NextTicketNumbers",
+            "upload user info",
+            "user management",
+            "bar chart for festival",
+            "update version",
+            "appending changelog",
+            "changelog converted to json",
+            "add session only possible if session is from today",
+            "edit starting ticket nos"
+        ],
+        "fixes": [
+            "fix: approval",
+            "fix: notification deny",
+            "fix: dont merge test version to main",
+            "fix: unlock cancel issue",
+            "fix: confirm dialog for lock session",
+            "fix: ticket number made readonly",
+            "fix: enhance prompt message for testing features",
+            "fix: change print statement to input for user prompt in main function",
+            "fix: removed logout",
+            "fix: lock session",
+            "fix: laddu seva",
+            "fix: github dependency issues",
+            "fix: update babel version",
+            "fix: store ticket numbers on session lock",
+            "fix: sort starting ticket numbers",
+            "fix: double session display",
+            "fix: tutorial hung",
+            "fix: other day session lock",
+            "fix: toned down the yellow color",
+            "fix: ticket edit same amount increment"
+        ]
+    },
     "7.7.1": {
         "effort": "3.42h",
         "features": [

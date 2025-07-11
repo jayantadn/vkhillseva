@@ -11,7 +11,7 @@ class Const {
     // init
   }
 
-  final version = "7.7.1";
+  final version = "7.7.2";
 
   final String dbrootGaruda = "TEST/GARUDA_01";
   final String dbrootSangeetSeva = "TEST/SANGEETSEVA_01";
@@ -54,7 +54,7 @@ class Const {
       },
       {
         "1000": {
-          'color': Colors.deepOrange,
+          'color': Colors.yellow[800],
           "sevas": [
             {"name": "Naivedya Seva"},
             {"name": "Sadhu Seva"},

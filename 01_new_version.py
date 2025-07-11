@@ -131,7 +131,7 @@ def main():
         create_or_switch_branch(newversion, oldversion)
         set_value_in_file('vkhgaruda/pubspec.yaml', "version", f'{newversion}+1')
         set_value_in_file('vkhsangeetseva/pubspec.yaml', "version", f'{newversion}+1')
-        set_value_in_file('vkhpackages/lib/common/const.dart', "version", newversion)
+        set_value_in_file('vkhpackages/lib/common/const.dart', "version", f"\"{newversion}\";")
     except subprocess.CalledProcessError:
         print("ERROR: Failed to create new branch")
         sys.exit(1)

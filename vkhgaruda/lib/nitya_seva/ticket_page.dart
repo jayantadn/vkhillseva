@@ -270,9 +270,15 @@ class _TicketPageState extends State<TicketPage> {
                                   child: GestureDetector(
                                     onTap: () async {
                                       amount = int.parse(seva.keys.first);
-                                      ticketNumberController.text =
-                                          (await _getNextTicketNumber(amount))
-                                              .toString();
+                                      if (ticket != null &&
+                                          ticket.amount == amount) {
+                                        ticketNumberController.text =
+                                            ticket.ticketNumber.toString();
+                                      } else {
+                                        ticketNumberController.text =
+                                            (await _getNextTicketNumber(amount))
+                                                .toString();
+                                      }
                                       setDialogState(() {
                                         sevaNames = _getSevaNames(amount);
                                         sevaName = sevaNames.isNotEmpty

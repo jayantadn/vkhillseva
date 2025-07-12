@@ -30,29 +30,7 @@ class _HarinaamState extends State<Harinaam> {
   final GlobalKey<DashboardState> keyDashboard = GlobalKey<DashboardState>();
 
   // lists
-  List<ChantersEntry> chantersEntries = [
-    // dummy entry
-    ChantersEntry(
-      timestamp: DateTime.now(),
-      username: "dummy_user",
-      count: 900,
-    ),
-    ChantersEntry(
-      timestamp: DateTime.now(),
-      username: "dummy_user",
-      count: 10,
-    ),
-    ChantersEntry(
-      timestamp: DateTime.now(),
-      username: "dummy_user",
-      count: 10,
-    ),
-    ChantersEntry(
-      timestamp: DateTime.now(),
-      username: "dummy_user",
-      count: 10,
-    ),
-  ];
+  final List<ChantersEntry> _chantersEntries = [];
 
   // controllers, listeners and focus nodes
 
@@ -66,7 +44,7 @@ class _HarinaamState extends State<Harinaam> {
   @override
   dispose() {
     // clear all lists and maps
-    chantersEntries.clear();
+    _chantersEntries.clear();
 
     // clear all controllers and focus nodes
 
@@ -96,8 +74,22 @@ class _HarinaamState extends State<Harinaam> {
     });
   }
 
+  Future<void> _addChanters(int count) async {
+    // create a new entry
+    ChantersEntry entry = ChantersEntry(
+      count: count,
+      timestamp: DateTime.now(),
+      username: Utils().getUsername(),
+    );
+
+    // add to the list
+    setState(() {
+      _chantersEntries.insert(0, entry);
+    });
+  }
+
   Widget _createChantersTile(int index) {
-    ChantersEntry entry = chantersEntries[index];
+    ChantersEntry entry = _chantersEntries[index];
     return Align(
         alignment: Alignment.centerLeft,
         child: IntrinsicWidth(
@@ -122,7 +114,7 @@ class _HarinaamState extends State<Harinaam> {
                     if (action == "Delete") {
                       // delete entry
                       setState(() {
-                        chantersEntries.removeAt(index);
+                        _chantersEntries.removeAt(index);
                       });
                       Toaster().info("Entry deleted");
                     }
@@ -183,15 +175,19 @@ class _HarinaamState extends State<Harinaam> {
                         child: Column(
                           children: [
                             // HmiChanters widget
-                            HmiChanters(key: keyHmiChanters),
+                            HmiChanters(
+                                key: keyHmiChanters,
+                                onSubmit: (count) {
+                                  _addChanters(count);
+                                }),
 
                             // chanters entries list
-                            if (chantersEntries.isNotEmpty)
+                            if (_chantersEntries.isNotEmpty)
                               SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
                                   children: List.generate(
-                                    chantersEntries.length,
+                                    _chantersEntries.length,
                                     (index) => Padding(
                                       padding:
                                           const EdgeInsets.only(right: 4.0),

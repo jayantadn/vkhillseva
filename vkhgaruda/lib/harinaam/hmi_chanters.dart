@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class HmiChanters extends StatefulWidget {
-  const HmiChanters({super.key});
+  final void Function(int) onSubmit;
+  const HmiChanters({super.key, required this.onSubmit});
 
   @override
   State<HmiChanters> createState() => HmiChantersState();
@@ -45,7 +48,9 @@ class HmiChantersState extends State<HmiChanters> {
 
   void _decrement() {
     int currentValue = int.tryParse(_numberController.text) ?? 0;
-    _numberController.text = (currentValue - 1).toString();
+    if (currentValue > 0) {
+      _numberController.text = (currentValue - 1).toString();
+    }
   }
 
   void _increment() {
@@ -59,8 +64,13 @@ class HmiChantersState extends State<HmiChanters> {
   }
 
   void _submit() {
-    // Handle submit action
-    print('Submitted value: ${_numberController.text}');
+    int value = int.tryParse(_numberController.text) ?? 0;
+    if (value <= 0) {
+      Toaster().error('Please enter a valid number');
+      return;
+    }
+
+    widget.onSubmit(value);
   }
 
   @override
@@ -83,10 +93,31 @@ class HmiChantersState extends State<HmiChanters> {
               controller: _numberController,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(6),
+              ],
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 8),
               ),
+              onChanged: (value) {
+                // Additional validation on change
+                if (value.isEmpty) {
+                  _numberController.text = '1';
+                  _numberController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: _numberController.text.length),
+                  );
+                } else {
+                  int? intValue = int.tryParse(value);
+                  if (intValue == null || intValue < 1) {
+                    _numberController.text = '1';
+                    _numberController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: _numberController.text.length),
+                    );
+                  }
+                }
+              },
             ),
           ),
           // Increment button

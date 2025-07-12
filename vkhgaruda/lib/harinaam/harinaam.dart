@@ -74,21 +74,20 @@ class _HarinaamState extends State<Harinaam> {
     });
   }
 
-  Future<void> _addChanters(int count) async {
-    // create a new entry
-    ChantersEntry entry = ChantersEntry(
-      count: count,
-      timestamp: DateTime.now(),
-      username: Utils().getUsername(),
-    );
-
+  Future<void> _addChanters(ChantersEntry entry) async {
     // update counter
-    keyDashboard.currentState!.addChanters(count);
+    keyDashboard.currentState!.addChanters(entry.count);
 
     // add to the list
     setState(() {
       _chantersEntries.insert(0, entry);
     });
+
+    // update database asynchronously
+    String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
+    String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters/$dbtime";
+    FB().setJson(path: dbpath, json: entry.toJson());
   }
 
   Widget _createChantersTile(int index) {
@@ -181,7 +180,13 @@ class _HarinaamState extends State<Harinaam> {
                             HmiChanters(
                                 key: keyHmiChanters,
                                 onSubmit: (count) {
-                                  _addChanters(count);
+                                  // create a new entry
+                                  ChantersEntry entry = ChantersEntry(
+                                    count: count,
+                                    timestamp: DateTime.now(),
+                                    username: Utils().getUsername(),
+                                  );
+                                  _addChanters(entry);
                                 }),
 
                             // chanters entries list

@@ -11,7 +11,7 @@ class Const {
     // init
   }
 
-  final version = "7.7.2";
+  final version ="8.0.0";
 
   final String dbrootGaruda = "TEST/GARUDA_01";
   final String dbrootSangeetSeva = "TEST/SANGEETSEVA_01";

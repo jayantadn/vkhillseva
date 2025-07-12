@@ -148,7 +148,7 @@ def main():
         print("Failed to set remote for new branch")
    
     print("all operations completed")
-    input("Start time tracker")
+    input("Start time tracker and then press Enter to continue...")
 
 
 if __name__ == "__main__":

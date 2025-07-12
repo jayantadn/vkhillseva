@@ -100,6 +100,12 @@ class HmiSalesState extends State<HmiSales> {
               onPressed: _onSubmit,
               icon: const Icon(Icons.check),
             ),
+            IconButton(
+              onPressed: () {
+                // handle lock action
+              },
+              icon: const Icon(Icons.lock),
+            ),
           ],
         ),
       ],

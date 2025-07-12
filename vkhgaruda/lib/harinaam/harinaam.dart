@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/harinaam/counter_display.dart';
 import 'package:vkhgaruda/harinaam/hmi_chanters.dart';
 import 'package:vkhgaruda/harinaam/hmi_sales.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -21,9 +22,11 @@ class _HarinaamState extends State<Harinaam> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  final GlobalKey<HmiChantersState> hmiChantersKey =
+  final GlobalKey<HmiChantersState> keyHmiChanters =
       GlobalKey<HmiChantersState>();
-  final GlobalKey<HmiSalesState> hmiSalesKey = GlobalKey<HmiSalesState>();
+  final GlobalKey<HmiSalesState> keyHmiSales = GlobalKey<HmiSalesState>();
+  final GlobalKey<CounterDisplayState> keyCounterDisplay =
+      GlobalKey<CounterDisplayState>();
 
   // lists
 
@@ -98,6 +101,12 @@ class _HarinaamState extends State<Harinaam> {
                       // leave some space at top
                       SizedBox(height: 10),
 
+                      // counter display
+                      Widgets().createTopLevelCard(
+                        context: context,
+                        child: CounterDisplay(key: keyCounterDisplay),
+                      ),
+
                       // Chanters' club
                       Widgets().createTopLevelCard(
                         context: context,
@@ -106,7 +115,7 @@ class _HarinaamState extends State<Harinaam> {
                         child: Column(
                           children: [
                             // HmiChanters widget
-                            HmiChanters(key: hmiChantersKey),
+                            HmiChanters(key: keyHmiChanters),
 
                             // grey separator
                             Divider(color: Colors.grey[200]),
@@ -118,7 +127,14 @@ class _HarinaamState extends State<Harinaam> {
                       Widgets().createTopLevelCard(
                         context: context,
                         title: "Japamala sales",
-                        child: HmiSales(key: hmiSalesKey),
+                        child: Column(
+                          children: [
+                            HmiSales(key: keyHmiSales),
+
+                            // grey separator
+                            Divider(color: Colors.grey[200]),
+                          ],
+                        ),
                       ),
 
                       // leave some space at bottom

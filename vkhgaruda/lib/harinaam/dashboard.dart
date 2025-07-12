@@ -45,6 +45,14 @@ class DashboardState extends State<Dashboard> {
     });
   }
 
+  Future<void> addChanters(int value) async {
+    await counterChantersKey.currentState!.addCount(value);
+  }
+
+  Future<void> addSales(int value) async {
+    await counterSalesKey.currentState!.addCount(value);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(

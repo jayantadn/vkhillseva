@@ -82,6 +82,9 @@ class _HarinaamState extends State<Harinaam> {
       username: Utils().getUsername(),
     );
 
+    // update counter
+    keyDashboard.currentState!.addChanters(count);
+
     // add to the list
     setState(() {
       _chantersEntries.insert(0, entry);

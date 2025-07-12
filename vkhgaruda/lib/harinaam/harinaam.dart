@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/harinaam/hmi_chanters.dart';
+import 'package:vkhgaruda/harinaam/hmi_sales.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Harinaam extends StatefulWidget {
@@ -22,6 +23,7 @@ class _HarinaamState extends State<Harinaam> {
   bool _isLoading = true;
   final GlobalKey<HmiChantersState> hmiChantersKey =
       GlobalKey<HmiChantersState>();
+  final GlobalKey<HmiSalesState> hmiSalesKey = GlobalKey<HmiSalesState>();
 
   // lists
 
@@ -100,6 +102,7 @@ class _HarinaamState extends State<Harinaam> {
                       Widgets().createTopLevelCard(
                         context: context,
                         title: "Chanters' club",
+                        color: Colors.brown,
                         child: Column(
                           children: [
                             // HmiChanters widget
@@ -115,10 +118,7 @@ class _HarinaamState extends State<Harinaam> {
                       Widgets().createTopLevelCard(
                         context: context,
                         title: "Japamala sales",
-                        child: ListTile(
-                          title: Text("Hello World"),
-                          subtitle: Text("This is a sample card"),
-                        ),
+                        child: HmiSales(key: hmiSalesKey),
                       ),
 
                       // leave some space at bottom

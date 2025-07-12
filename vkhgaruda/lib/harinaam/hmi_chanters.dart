@@ -73,7 +73,7 @@ class HmiChantersState extends State<HmiChanters> {
           // Decrement button
           IconButton(
             onPressed: _decrement,
-            icon: const Icon(Icons.remove),
+            icon: const Icon(Icons.remove, color: Colors.brown),
             tooltip: 'Decrement',
           ),
           // Numeric input field
@@ -92,19 +92,19 @@ class HmiChantersState extends State<HmiChanters> {
           // Increment button
           IconButton(
             onPressed: _increment,
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, color: Colors.brown),
             tooltip: 'Increment',
           ),
           // 10x increment button
           IconButton(
             onPressed: _increment10x,
-            icon: const Icon(Icons.add_box_outlined),
+            icon: const Icon(Icons.add_box_outlined, color: Colors.brown),
             tooltip: 'Increment by 10',
           ),
           // Submit button
           IconButton(
             onPressed: _submit,
-            icon: const Icon(Icons.check),
+            icon: const Icon(Icons.check, color: Colors.brown),
             tooltip: 'Submit',
           ),
         ],

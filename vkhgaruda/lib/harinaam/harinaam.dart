@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/harinaam/hmi_chanters.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Harinaam extends StatefulWidget {
@@ -19,6 +20,8 @@ class _HarinaamState extends State<Harinaam> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  final GlobalKey<HmiChantersState> hmiChantersKey =
+      GlobalKey<HmiChantersState>();
 
   // lists
 
@@ -63,7 +66,24 @@ class _HarinaamState extends State<Harinaam> {
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(title: Text(widget.title)),
+          appBar: AppBar(
+            title: Text(widget.title),
+            actions: [
+              // stock japamala
+              IconButton(
+                icon: const Icon(Icons.playlist_add),
+                onPressed: () {},
+              ),
+
+              // more actions
+              Widgets().createContextMenu(
+                ["Settlement", "Reports"],
+                (action) {
+                  // handle context menu actions
+                },
+              ),
+            ],
+          ),
           body: RefreshIndicator(
             onRefresh: refresh,
             child: SingleChildScrollView(
@@ -76,9 +96,25 @@ class _HarinaamState extends State<Harinaam> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      // your widgets here
+                      // Chanters' club
                       Widgets().createTopLevelCard(
                         context: context,
+                        title: "Chanters' club",
+                        child: Column(
+                          children: [
+                            // HmiChanters widget
+                            HmiChanters(key: hmiChantersKey),
+
+                            // grey separator
+                            Divider(color: Colors.grey[200]),
+                          ],
+                        ),
+                      ),
+
+                      // Japamala sales
+                      Widgets().createTopLevelCard(
+                        context: context,
+                        title: "Japamala sales",
                         child: ListTile(
                           title: Text("Hello World"),
                           subtitle: Text("This is a sample card"),

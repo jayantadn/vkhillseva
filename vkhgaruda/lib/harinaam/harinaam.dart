@@ -24,10 +24,11 @@ class _HarinaamState extends State<Harinaam> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  final GlobalKey<HmiChantersState> keyHmiChanters =
+  DateTime _selectedDate = DateTime.now();
+  final GlobalKey<HmiChantersState> _keyHmiChanters =
       GlobalKey<HmiChantersState>();
-  final GlobalKey<HmiSalesState> keyHmiSales = GlobalKey<HmiSalesState>();
-  final GlobalKey<DashboardState> keyDashboard = GlobalKey<DashboardState>();
+  final GlobalKey<HmiSalesState> _keyHmiSales = GlobalKey<HmiSalesState>();
+  final GlobalKey<DashboardState> _keyDashboard = GlobalKey<DashboardState>();
 
   // lists
   final List<ChantersEntry> _chantersEntries = [];
@@ -64,7 +65,20 @@ class _HarinaamState extends State<Harinaam> {
     }
 
     await _lock.synchronized(() async {
-      // your code here
+      _chantersEntries.clear();
+
+      String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+      String dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters";
+      Map<String, dynamic> chantersJson = await FB().getJson(path: dbpath);
+      int countChanters = 0;
+      for (String key in chantersJson.keys) {
+        ChantersEntry entry = Utils()
+            .convertRawToDatatype(chantersJson[key], ChantersEntry.fromJson);
+        countChanters += entry.count;
+        _chantersEntries.add(entry);
+      }
+      _chantersEntries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      _keyDashboard.currentState!.setChanters(countChanters);
     });
 
     // refresh all child widgets
@@ -76,7 +90,7 @@ class _HarinaamState extends State<Harinaam> {
 
   Future<void> _addChanters(ChantersEntry entry) async {
     // update counter
-    keyDashboard.currentState!.addChanters(entry.count);
+    _keyDashboard.currentState!.addChanters(entry.count);
 
     // add to the list
     setState(() {
@@ -104,7 +118,7 @@ class _HarinaamState extends State<Harinaam> {
             child: Padding(
               padding: const EdgeInsets.only(left: 4.0),
               child: ListTile(
-                title: Text(DateFormat("HH:mm").format(entry.timestamp)),
+                title: Text(DateFormat("HH:mm:ss").format(entry.timestamp)),
                 leading: CircleAvatar(
                   backgroundColor: Colors.brown,
                   child: Text(entry.count.toString()),
@@ -166,7 +180,7 @@ class _HarinaamState extends State<Harinaam> {
                       // counter display
                       Widgets().createTopLevelCard(
                         context: context,
-                        child: Dashboard(key: keyDashboard),
+                        child: Dashboard(key: _keyDashboard),
                       ),
 
                       // Chanters' club
@@ -178,7 +192,7 @@ class _HarinaamState extends State<Harinaam> {
                           children: [
                             // HmiChanters widget
                             HmiChanters(
-                                key: keyHmiChanters,
+                                key: _keyHmiChanters,
                                 onSubmit: (count) {
                                   // create a new entry
                                   ChantersEntry entry = ChantersEntry(
@@ -209,15 +223,13 @@ class _HarinaamState extends State<Harinaam> {
                       ),
 
                       // Japamala sales
+                      SizedBox(height: 10),
                       Widgets().createTopLevelCard(
                         context: context,
                         title: "Japamala sales",
                         child: Column(
                           children: [
-                            HmiSales(key: keyHmiSales),
-
-                            // grey separator
-                            Divider(color: Colors.grey[200]),
+                            HmiSales(key: _keyHmiSales),
                           ],
                         ),
                       ),

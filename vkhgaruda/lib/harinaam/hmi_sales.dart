@@ -66,11 +66,15 @@ class HmiSalesState extends State<HmiSales> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        RadioRow(
-            items: Const().paymentModes.keys.where((k) => k != "Gift").toList(),
-            onChanged: (value) {
-              // handle radio selection
-            }),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+          child: RadioRow(
+              items:
+                  Const().paymentModes.keys.where((k) => k != "Gift").toList(),
+              onChanged: (value) {
+                // handle radio selection
+              }),
+        ),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

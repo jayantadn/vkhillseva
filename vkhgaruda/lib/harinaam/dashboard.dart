@@ -57,6 +57,7 @@ class DashboardState extends State<Dashboard> {
                   key: counterChantersKey,
                   fontSize: 48,
                   color: Colors.brown,
+                  maxValue: 9999,
                 ),
                 Text("Chanters count",
                     style: Theme.of(context)
@@ -74,6 +75,7 @@ class DashboardState extends State<Dashboard> {
                 CounterDisplay(
                     key: counterSalesKey,
                     fontSize: 48,
+                    maxValue: 999,
                     color: Theme.of(context).colorScheme.primary),
                 Text("Japamala sold",
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(

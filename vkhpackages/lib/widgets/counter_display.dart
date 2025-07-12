@@ -62,25 +62,6 @@ class CounterDisplayState extends State<CounterDisplay> {
     });
   }
 
-  // API method to get the current counter value
-  int getCurrentValue() {
-    return _currentValue;
-  }
-
-  // API method to increment the counter
-  Future<void> increment() async {
-    if (_currentValue < widget.maxValue) {
-      await setCounterValue(_currentValue + 1);
-    }
-  }
-
-  // API method to decrement the counter
-  Future<void> decrement() async {
-    if (_currentValue > widget.minValue) {
-      await setCounterValue(_currentValue - 1);
-    }
-  }
-
   Future<void> refresh() async {
     // perform async work here
 
@@ -88,6 +69,17 @@ class CounterDisplayState extends State<CounterDisplay> {
       // perform sync work here
       setState(() {});
     });
+  }
+
+  // API method to increment the counter by a given value
+  Future<void> addToCounter(int increment) async {
+    int newValue = _currentValue + increment;
+    if (newValue < widget.minValue) {
+      newValue = widget.minValue;
+    } else if (newValue > widget.maxValue) {
+      newValue = widget.maxValue;
+    }
+    await setCounterValue(newValue);
   }
 
   @override

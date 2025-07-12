@@ -112,7 +112,8 @@ class CounterDisplayState extends State<CounterDisplay> {
                   digitCount,
                   '0',
                 ), // Format based on maxValue digits
-                style: GoogleFonts.orbitron(
+                style: TextStyle(
+                  fontFamily: 'Digital-7',
                   fontSize: widget.fontSize,
                   letterSpacing: 2.0,
                   color: widget.color,

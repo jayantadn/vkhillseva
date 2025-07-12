@@ -16,6 +16,27 @@ def create_or_switch_branch(newversion, oldversion):
     subprocess.check_output(["git", "checkout", "-b", newversion, oldversion])
     print(f"Created and switched to new branch: {newversion}")
 
+def get_value_from_file(filepath, search_string):
+    ret = ""
+    curdir = os.getcwd()
+    os.chdir(rootdir)
+    with open(filepath, 'r') as file:
+        lines = file.readlines()
+    for line in lines:
+        if line.startswith("#"):
+            continue
+        if search_string in line:
+            if '=' in line:
+                _, value = line.split('=', 1)
+                ret = value.strip()
+                break
+            elif ':' in line:
+                key, value = line.split(':', 1)
+                ret = value.strip()
+                break
+    return ret
+    os.chdir(curdir)
+
 def run_command(command):
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if result.returncode != 0:
@@ -54,26 +75,7 @@ def set_value_in_file(filepath, search_string, value):
                 file.write(line)   
     os.chdir(curdir)
 
-def get_value_from_file(filepath, search_string):
-    ret = ""
-    curdir = os.getcwd()
-    os.chdir(rootdir)
-    with open(filepath, 'r') as file:
-        lines = file.readlines()
-    for line in lines:
-        if line.startswith("#"):
-            continue
-        if search_string in line:
-            if '=' in line:
-                _, value = line.split('=', 1)
-                ret = value.strip()
-                break
-            elif ':' in line:
-                key, value = line.split(':', 1)
-                ret = value.strip()
-                break
-    return ret
-    os.chdir(curdir)
+
 
 def main():
     global rootdir
@@ -90,8 +92,6 @@ def main():
     else:
         print("Invalid version type")
         sys.exit(1)
-
-
 
     print("Get the latest remote branch")
     if len(sys.argv) > 1:
@@ -146,8 +146,9 @@ def main():
         print("Remote set for new branch")
     except subprocess.CalledProcessError:
         print("Failed to set remote for new branch")
-
+   
     print("all operations completed")
+    input("Start time tracker")
 
 
 if __name__ == "__main__":

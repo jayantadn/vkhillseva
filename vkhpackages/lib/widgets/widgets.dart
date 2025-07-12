@@ -46,7 +46,10 @@ class Widgets {
                 items.length,
                 (index) => PopupMenuItem<String>(
                   value: items[index],
-                  child: Text(items[index]),
+                  child: Text(
+                    items[index],
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
                 ),
               ),
             );

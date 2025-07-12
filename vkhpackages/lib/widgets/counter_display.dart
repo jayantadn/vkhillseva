@@ -72,7 +72,7 @@ class CounterDisplayState extends State<CounterDisplay> {
   }
 
   // API method to increment the counter by a given value
-  Future<void> addToCounter(int increment) async {
+  Future<void> addCount(int increment) async {
     int newValue = _currentValue + increment;
     if (newValue < widget.minValue) {
       newValue = widget.minValue;

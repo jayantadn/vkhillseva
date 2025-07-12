@@ -92,25 +92,35 @@ class CounterDisplayState extends State<CounterDisplay> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate the number of digits needed based on maxValue
+    final int digitCount = widget.maxValue.toString().length;
+
     return SizedBox(
       height: widget.fontSize,
-      child: CupertinoPicker(
-        scrollController: _scrollController,
-        itemExtent: widget.fontSize * 1.5,
-        onSelectedItemChanged: null,
-        children: List.generate(widget.maxValue - widget.minValue + 1, (index) {
-          final value = widget.minValue + index;
-          return Center(
-            child: Text(
-              value.toString().padLeft(4, '0'), // Format as 4-digit number
-              style: GoogleFonts.orbitron(
-                fontSize: widget.fontSize,
-                letterSpacing: 2.0,
-                color: widget.color,
+      child: IgnorePointer(
+        child: CupertinoPicker(
+          scrollController: _scrollController,
+          itemExtent: widget.fontSize * 1.5,
+          onSelectedItemChanged: null,
+          children: List.generate(widget.maxValue - widget.minValue + 1, (
+            index,
+          ) {
+            final value = widget.minValue + index;
+            return Center(
+              child: Text(
+                value.toString().padLeft(
+                  digitCount,
+                  '0',
+                ), // Format based on maxValue digits
+                style: GoogleFonts.orbitron(
+                  fontSize: widget.fontSize,
+                  letterSpacing: 2.0,
+                  color: widget.color,
+                ),
               ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }

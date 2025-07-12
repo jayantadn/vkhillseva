@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 
-class CounterDisplay extends StatefulWidget {
-  const CounterDisplay({super.key});
+class Dashboard extends StatefulWidget {
+  const Dashboard({super.key});
 
   @override
-  State<CounterDisplay> createState() => CounterDisplayState();
+  State<Dashboard> createState() => DashboardState();
 }
 
 // hint: put the global key as a member of the calling class
 // instantiate this class with a global key
-// final GlobalKey<CounterDisplayState> summaryKey = GlobalKey<CounterDisplayState>();
+// final GlobalKey<DashboardState> summaryKey = GlobalKey<DashboardState>();
 
-class CounterDisplayState extends State<CounterDisplay> {
+class DashboardState extends State<Dashboard> {
   final Lock _lock = Lock();
 
   @override

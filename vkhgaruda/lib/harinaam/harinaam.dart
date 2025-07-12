@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/harinaam/counter_display.dart';
+import 'package:vkhgaruda/harinaam/dashboard.dart';
 import 'package:vkhgaruda/harinaam/hmi_chanters.dart';
 import 'package:vkhgaruda/harinaam/hmi_sales.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -25,8 +25,7 @@ class _HarinaamState extends State<Harinaam> {
   final GlobalKey<HmiChantersState> keyHmiChanters =
       GlobalKey<HmiChantersState>();
   final GlobalKey<HmiSalesState> keyHmiSales = GlobalKey<HmiSalesState>();
-  final GlobalKey<CounterDisplayState> keyCounterDisplay =
-      GlobalKey<CounterDisplayState>();
+  final GlobalKey<DashboardState> keyDashboard = GlobalKey<DashboardState>();
 
   // lists
 
@@ -104,7 +103,7 @@ class _HarinaamState extends State<Harinaam> {
                       // counter display
                       Widgets().createTopLevelCard(
                         context: context,
-                        child: CounterDisplay(key: keyCounterDisplay),
+                        child: Dashboard(key: keyDashboard),
                       ),
 
                       // Chanters' club

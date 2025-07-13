@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
@@ -29,15 +30,59 @@ class _HarinaamState extends State<Harinaam> {
       GlobalKey<HmiChantersState>();
   final GlobalKey<HmiSalesState> _keyHmiSales = GlobalKey<HmiSalesState>();
   final GlobalKey<DashboardState> _keyDashboard = GlobalKey<DashboardState>();
+  DateTime _lastCallbackInvoked = DateTime.now();
 
   // lists
   final List<ChantersEntry> _chantersEntries = [];
 
   // controllers, listeners and focus nodes
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {
     super.initState();
+
+    // listen to database events
+    String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters";
+    FB().listenForChange(
+        dbpath,
+        FBCallbacks(
+          // add
+          add: (data) {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+            }
+
+            // process the received data
+          },
+
+          // edit
+          edit: () {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              refresh();
+            }
+          },
+
+          // delete
+          delete: (data) async {
+            if (_lastCallbackInvoked.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvoked = DateTime.now();
+
+              // process the received data
+            }
+          },
+
+          // get listeners
+          getListeners: (listeners) {
+            _listeners = listeners;
+          },
+        ));
 
     refresh();
   }
@@ -48,6 +93,9 @@ class _HarinaamState extends State<Harinaam> {
     _chantersEntries.clear();
 
     // clear all controllers and focus nodes
+    for (var element in _listeners) {
+      element.cancel();
+    }
 
     super.dispose();
   }
@@ -69,7 +117,8 @@ class _HarinaamState extends State<Harinaam> {
 
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
       String dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters";
-      Map<String, dynamic> chantersJson = await FB().getJson(path: dbpath);
+      Map<String, dynamic> chantersJson =
+          await FB().getJson(path: dbpath, silent: true);
       int countChanters = 0;
       for (String key in chantersJson.keys) {
         ChantersEntry entry = Utils()
@@ -127,7 +176,9 @@ class _HarinaamState extends State<Harinaam> {
                 trailing: Widgets().createContextMenu(
                   ["Edit", "Delete"],
                   (action) {
-                    if (action == "Delete") {
+                    if (action == "Edit") {
+                      _editChanters(index);
+                    } else if (action == "Delete") {
                       // delete entry
                       setState(() {
                         _chantersEntries.removeAt(index);
@@ -140,6 +191,74 @@ class _HarinaamState extends State<Harinaam> {
             ),
           ),
         ));
+  }
+
+  Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {
+    final TextEditingController controller =
+        TextEditingController(text: entry.count.toString());
+
+    return await Widgets().showResponsiveDialog(
+        context: context,
+        child: TextFormField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            labelText: "Count",
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // close dialog without saving
+              Navigator.of(context).pop();
+            },
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // save changes - read from controller
+              int count = int.tryParse(controller.text) ?? entry.count;
+              ChantersEntry editedEntry = ChantersEntry(
+                count: count,
+                timestamp: entry.timestamp,
+                username: Utils().getUsername(),
+              );
+              Navigator.of(context).pop(editedEntry);
+            },
+            child: const Text("Save"),
+          ),
+        ]);
+  }
+
+  Future<void> _editChanters(int index) async {
+    // get the entry to edit
+    ChantersEntry entry = _chantersEntries[index];
+
+    // Show the edit dialog
+    ChantersEntry? editedEntry = await _showDialogEditChanters(entry);
+
+    // If user saved changes, update the entry
+    if (editedEntry != null) {
+      // Update the list
+      setState(() {
+        _chantersEntries[index] = editedEntry;
+      });
+
+      // Update database (since timestamp doesn't change, we can update in place)
+      String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
+      String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
+      String dbpath =
+          "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters/$dbtime";
+      FB().setJson(path: dbpath, json: editedEntry.toJson());
+
+      // Update dashboard counter
+      int totalCount = 0;
+      for (ChantersEntry chanterEntry in _chantersEntries) {
+        totalCount += chanterEntry.count;
+      }
+      _keyDashboard.currentState!.setChanters(totalCount);
+    }
   }
 
   @override

@@ -247,7 +247,7 @@ class Widgets {
     );
   }
 
-  Future<void> showResponsiveDialog({
+  Future<dynamic> showResponsiveDialog({
     required BuildContext context,
     String? title,
     required Widget child,

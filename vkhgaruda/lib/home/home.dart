@@ -34,12 +34,6 @@ class _HomePageState extends State<HomePage> {
   initState() {
     super.initState();
 
-    Utils().isAdmin().then((isAdmin) {
-      setState(() {
-        _isAdmin = isAdmin;
-      });
-    });
-
     _uploadProfileSettings();
 
     refresh();
@@ -60,6 +54,8 @@ class _HomePageState extends State<HomePage> {
     });
 
     await _lock.synchronized(() async {
+      _isAdmin = await Utils().isAdmin();
+
       // perform async operations here
       UserBasics? basic = await Utils().fetchOrGetUserBasics();
       if (basic != null) {

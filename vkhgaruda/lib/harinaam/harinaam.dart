@@ -149,6 +149,17 @@ class _HarinaamState extends State<Harinaam> {
   }
 
   Future<void> _addChanters(ChantersEntry entry) async {
+    // forbid changes for another day
+    bool isToday = DateTime.now().year == _selectedDate.year &&
+        DateTime.now().month == _selectedDate.month &&
+        DateTime.now().day == _selectedDate.day;
+    if (!isToday) {
+      Toaster().error(
+        "You cannot change data for another day.",
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -223,6 +234,19 @@ class _HarinaamState extends State<Harinaam> {
   }
 
   Future<void> _deleteChanters(int index, {bool skipConfirm = false}) async {
+    // forbid changes for another day
+    bool isToday = DateTime.now().year == _selectedDate.year &&
+        DateTime.now().month == _selectedDate.month &&
+        DateTime.now().day == _selectedDate.day;
+    if (!isToday) {
+      Toaster().error(
+        "You cannot change data for another day.",
+      );
+      return;
+    }
+
+    ChantersEntry entry = _chantersEntries[index];
+
     setState(() {
       _isLoading = true;
     });
@@ -239,11 +263,10 @@ class _HarinaamState extends State<Harinaam> {
 
     // update dashboard counter
     int count = _keyDashboard.currentState!.getChanters();
-    count -= _chantersEntries[index].count;
+    count -= entry.count;
     _keyDashboard.currentState!.setChanters(count);
 
     // update database
-    ChantersEntry entry = _chantersEntries[index];
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters/$dbtime";
@@ -322,6 +345,17 @@ class _HarinaamState extends State<Harinaam> {
   }
 
   Future<void> _editChanters(int index) async {
+    // forbid changes for another day
+    bool isToday = DateTime.now().year == _selectedDate.year &&
+        DateTime.now().month == _selectedDate.month &&
+        DateTime.now().day == _selectedDate.day;
+    if (!isToday) {
+      Toaster().error(
+        "You cannot change data for another day.",
+      );
+      return;
+    }
+
     // get the entry to edit
     ChantersEntry entry = _chantersEntries[index];
 

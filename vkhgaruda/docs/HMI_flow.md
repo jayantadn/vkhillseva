@@ -4,4 +4,4 @@
 -[x] Store / restore variable from database
 -[x] edit / delete entry
 -[x] database listeners
--[] lock / unlock session 
+-[x] lock / unlock session 

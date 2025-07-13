@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhpackages/common/const.dart';
-import 'package:vkhpackages/widgets/radio_row.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class HmiSales extends StatefulWidget {
   const HmiSales({super.key});
@@ -58,6 +57,22 @@ class HmiSalesState extends State<HmiSales> {
   }
 
   void _onSubmit() {
+    // validations
+    String value = _quantityController.text.trim();
+    if (value.isEmpty) {
+      Toaster().error('Please enter a quantity');
+      return;
+    }
+    final intValue = int.tryParse(value);
+    if (intValue == null || intValue <= 0) {
+      Toaster().error('Please enter a valid quantity');
+      return;
+    }
+    if (!RegExp(r'^\d+$').hasMatch(value)) {
+      Toaster().error('Only numbers are allowed');
+      return;
+    }
+
     // handle submit action
     print('Submitted with quantity: ${_quantityController.text}');
   }

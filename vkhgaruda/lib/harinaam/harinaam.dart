@@ -493,7 +493,7 @@ class _HarinaamState extends State<Harinaam> {
                       ),
 
                       // leave some space at bottom
-                      SizedBox(height: 100),
+                      SizedBox(height: 500),
                     ],
                   ),
                 ),

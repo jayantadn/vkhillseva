@@ -86,7 +86,7 @@ class _SangeetSevaState extends State<SangeetSeva> {
                       ),
 
                       // leave some space at bottom
-                      SizedBox(height: 100),
+                      SizedBox(height: 500),
                     ],
                   ),
                 ),

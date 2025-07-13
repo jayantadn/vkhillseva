@@ -2,6 +2,6 @@
 -[x] state variable to build  UI
 -[x] Update display UI upon HMI submit
 -[x] Store / restore variable from database
--[] edit / delete entry
+-[x] edit / delete entry
 -[] database listeners
 -[] lock / unlock session 

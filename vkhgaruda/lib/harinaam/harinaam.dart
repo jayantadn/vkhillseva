@@ -56,6 +56,11 @@ class _HarinaamState extends State<Harinaam> {
             }
 
             // process the received data
+            ChantersEntry entry =
+                Utils().convertRawToDatatype(data, ChantersEntry.fromJson);
+            if (!_chantersEntries.contains(entry)) {
+              _addChanters(entry);
+            }
           },
 
           // edit
@@ -75,6 +80,12 @@ class _HarinaamState extends State<Harinaam> {
               _lastCallbackInvoked = DateTime.now();
 
               // process the received data
+              ChantersEntry entry =
+                  Utils().convertRawToDatatype(data, ChantersEntry.fromJson);
+              int index = _chantersEntries.indexOf(entry);
+              if (index != -1) {
+                _deleteChanters(index, skipConfirm: true);
+              }
             }
           },
 
@@ -164,48 +175,65 @@ class _HarinaamState extends State<Harinaam> {
   Widget _createChantersTile(int index) {
     ChantersEntry entry = _chantersEntries[index];
     return Align(
-        alignment: Alignment.centerLeft,
-        child: IntrinsicWidth(
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.brown),
-              borderRadius: BorderRadius.circular(12.0),
-              color: Theme.of(context).cardColor,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 4.0),
-              child: ListTile(
-                title: Text(DateFormat("HH:mm:ss").format(entry.timestamp)),
-                leading: CircleAvatar(
-                  backgroundColor: Colors.brown,
-                  child: Text(entry.count.toString()),
+      alignment: Alignment.centerLeft,
+      child: SizedBox(
+        width: 180, // fixed width
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.brown),
+            borderRadius: BorderRadius.circular(12.0),
+            color: Theme.of(context).cardColor,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 4.0),
+            child: ListTile(
+              title: Text(
+                DateFormat("HH:mm:ss").format(entry.timestamp),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              leading: CircleAvatar(
+                backgroundColor: Colors.brown,
+                child: Text(
+                  entry.count.toString(),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
-                subtitle: Text(entry.username),
-                trailing: Widgets().createContextMenu(
-                  ["Edit", "Delete"],
-                  (action) {
-                    if (action == "Edit") {
-                      _editChanters(index);
-                    } else if (action == "Delete") {
-                      _deleteChanters(index);
-                    }
-                  },
-                ),
+              ),
+              subtitle: Text(
+                entry.username,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              trailing: Widgets().createContextMenu(
+                ["Edit", "Delete"],
+                (action) {
+                  if (action == "Edit") {
+                    _editChanters(index);
+                  } else if (action == "Delete") {
+                    _deleteChanters(index);
+                  }
+                },
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
-  Future<void> _deleteChanters(int index) async {
+  Future<void> _deleteChanters(int index, {bool skipConfirm = false}) async {
     setState(() {
       _isLoading = true;
     });
 
     // confirm delete
-    dynamic ret = await Widgets()
-        .showConfirmDialog(context, "Are you sure?", "Delete", null);
-    bool confirmed = ret == null ? false : true;
+    bool confirmed = true;
+    if (!skipConfirm) {
+      dynamic ret = await Widgets()
+          .showConfirmDialog(context, "Are you sure?", "Delete", null);
+      confirmed = ret == null ? false : true;
+    }
 
     if (!confirmed) return;
 

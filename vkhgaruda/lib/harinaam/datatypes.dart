@@ -26,4 +26,18 @@ class ChantersEntry {
       'count': count,
     };
   }
+
+  // Override == operator for value equality
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ChantersEntry) return false;
+    return timestamp == other.timestamp &&
+        username == other.username &&
+        count == other.count;
+  }
+
+  // Override hashCode (must be consistent with ==)
+  @override
+  int get hashCode => Object.hash(timestamp, username, count);
 }

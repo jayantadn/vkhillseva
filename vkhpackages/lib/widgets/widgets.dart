@@ -257,7 +257,7 @@ class Widgets {
 
     if (screenHeight > maxScreenHeight) {
       // show dialog for desktop
-      await showDialog(
+      return await showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -269,7 +269,7 @@ class Widgets {
       );
     } else {
       // show top modal for mobile
-      await showGeneralDialog(
+      return await showGeneralDialog(
         context: context,
         barrierDismissible: true,
         barrierLabel:

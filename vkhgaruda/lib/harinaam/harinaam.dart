@@ -391,6 +391,16 @@ class _HarinaamState extends State<Harinaam> {
                       // leave some space at top
                       SizedBox(height: 10),
 
+                      // date header
+                      DateHeader(
+                          callbacks: DateHeaderCallbacks(onChange: (date) {
+                        // update selected date
+                        _selectedDate = date;
+
+                        // refresh the data
+                        refresh();
+                      })),
+
                       // counter display
                       Widgets().createTopLevelCard(
                         context: context,

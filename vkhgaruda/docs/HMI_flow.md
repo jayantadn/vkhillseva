@@ -3,5 +3,5 @@
 -[x] Update display UI upon HMI submit
 -[x] Store / restore variable from database
 -[x] edit / delete entry
--[] database listeners
+-[x] database listeners
 -[] lock / unlock session 

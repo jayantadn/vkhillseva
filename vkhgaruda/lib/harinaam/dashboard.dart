@@ -83,7 +83,7 @@ class DashboardState extends State<Dashboard> {
                   color: Colors.brown,
                   maxValue: 9999,
                 ),
-                Text("Chanters' count",
+                Text("Chanters' club",
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall!

@@ -347,7 +347,7 @@ class Widgets {
     );
   }
 
-  Future<void> showConfirmDialog(
+  Future<dynamic> showConfirmDialog(
     BuildContext context,
     String msg,
     String? actionType,
@@ -357,7 +357,7 @@ class Widgets {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm'),
+          title: Text('Confirm $actionType'),
           content: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(msg),
@@ -374,7 +374,7 @@ class Widgets {
                 if (action != null) {
                   action();
                 }
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(actionType);
               },
               child: Text(actionType ?? 'OK'),
             ),

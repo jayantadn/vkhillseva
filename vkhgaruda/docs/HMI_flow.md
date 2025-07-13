@@ -1,7 +1,7 @@
--[] form validators
--[] state variable to build  UI
--[] Update display UI upon HMI submit
--[] Store / restore variable from database
+-[x] form validators
+-[x] state variable to build  UI
+-[x] Update display UI upon HMI submit
+-[x] Store / restore variable from database
 -[] edit / delete entry
 -[] database listeners
 -[] lock / unlock session 

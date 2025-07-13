@@ -82,6 +82,10 @@ class CounterDisplayState extends State<CounterDisplay> {
     await setCounterValue(newValue);
   }
 
+  int getCount() {
+    return _currentValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Calculate the number of digits needed based on maxValue

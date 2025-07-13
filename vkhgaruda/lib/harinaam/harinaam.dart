@@ -138,6 +138,10 @@ class _HarinaamState extends State<Harinaam> {
   }
 
   Future<void> _addChanters(ChantersEntry entry) async {
+    setState(() {
+      _isLoading = true;
+    });
+
     // update counter
     _keyDashboard.currentState!.addChanters(entry.count);
 
@@ -151,6 +155,10 @@ class _HarinaamState extends State<Harinaam> {
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters/$dbtime";
     FB().setJson(path: dbpath, json: entry.toJson());
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Widget _createChantersTile(int index) {
@@ -179,11 +187,7 @@ class _HarinaamState extends State<Harinaam> {
                     if (action == "Edit") {
                       _editChanters(index);
                     } else if (action == "Delete") {
-                      // delete entry
-                      setState(() {
-                        _chantersEntries.removeAt(index);
-                      });
-                      Toaster().info("Entry deleted");
+                      _deleteChanters(index);
                     }
                   },
                 ),
@@ -191,6 +195,37 @@ class _HarinaamState extends State<Harinaam> {
             ),
           ),
         ));
+  }
+
+  Future<void> _deleteChanters(int index) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // confirm delete
+    dynamic ret = await Widgets()
+        .showConfirmDialog(context, "Are you sure?", "Delete", null);
+    bool confirmed = ret == null ? false : true;
+
+    if (!confirmed) return;
+
+    // update dashboard counter
+    int count = _keyDashboard.currentState!.getChanters();
+    count -= _chantersEntries[index].count;
+    _keyDashboard.currentState!.setChanters(count);
+
+    // update database
+    ChantersEntry entry = _chantersEntries[index];
+    String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
+    String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters/$dbtime";
+    FB().deleteValue(path: dbpath);
+
+    // remove from the list
+    setState(() {
+      _chantersEntries.removeAt(index);
+      _isLoading = false;
+    });
   }
 
   Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {
@@ -269,6 +304,7 @@ class _HarinaamState extends State<Harinaam> {
     if (editedEntry != null) {
       // Update the list
       setState(() {
+        _isLoading = true;
         _chantersEntries[index] = editedEntry;
       });
 
@@ -285,6 +321,10 @@ class _HarinaamState extends State<Harinaam> {
         totalCount += chanterEntry.count;
       }
       _keyDashboard.currentState!.setChanters(totalCount);
+
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 

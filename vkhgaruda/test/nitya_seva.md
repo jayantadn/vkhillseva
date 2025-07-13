@@ -12,6 +12,13 @@
 -[] add / serve / return
 -[] settings
 
+# Harinaam
+-[] add / edit / delete chanters
+-[] add / edit / delete procurement
+-[] add / edit / delete sales
+-[] weekly settlement
+-[] reports
+
 # new features
 -[] session lock/unlock implemented
 -[] auto lock session

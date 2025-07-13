@@ -53,6 +53,14 @@ class DashboardState extends State<Dashboard> {
     await counterSalesKey.currentState!.addCount(value);
   }
 
+  int getChanters() {
+    return counterChantersKey.currentState!.getCount();
+  }
+
+  int getSales() {
+    return counterSalesKey.currentState!.getCount();
+  }
+
   Future<void> setChanters(int value) async {
     await counterChantersKey.currentState!.setCounterValue(value);
   }

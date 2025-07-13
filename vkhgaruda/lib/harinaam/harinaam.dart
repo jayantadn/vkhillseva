@@ -196,15 +196,39 @@ class _HarinaamState extends State<Harinaam> {
   Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {
     final TextEditingController controller =
         TextEditingController(text: entry.count.toString());
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     return await Widgets().showResponsiveDialog(
         context: context,
-        child: TextFormField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            labelText: "Count",
-            border: OutlineInputBorder(),
+        child: Form(
+          key: formKey,
+          child: TextFormField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: "Count",
+              border: OutlineInputBorder(),
+            ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Count cannot be empty';
+              }
+
+              final number = int.tryParse(value.trim());
+              if (number == null) {
+                return 'Please enter a valid number';
+              }
+
+              if (number <= 0) {
+                return 'Count must be greater than 0';
+              }
+
+              if (number > 10000) {
+                return 'Count cannot exceed 10,000';
+              }
+
+              return null;
+            },
           ),
         ),
         actions: [
@@ -217,14 +241,17 @@ class _HarinaamState extends State<Harinaam> {
           ),
           ElevatedButton(
             onPressed: () {
-              // save changes - read from controller
-              int count = int.tryParse(controller.text) ?? entry.count;
-              ChantersEntry editedEntry = ChantersEntry(
-                count: count,
-                timestamp: entry.timestamp,
-                username: Utils().getUsername(),
-              );
-              Navigator.of(context).pop(editedEntry);
+              // Validate form before saving
+              if (formKey.currentState!.validate()) {
+                // save changes - read from controller
+                int count = int.parse(controller.text.trim());
+                ChantersEntry editedEntry = ChantersEntry(
+                  count: count,
+                  timestamp: entry.timestamp,
+                  username: Utils().getUsername(),
+                );
+                Navigator.of(context).pop(editedEntry);
+              }
             },
             child: const Text("Save"),
           ),

@@ -1,6 +1,6 @@
 {
     "7.7.2": {
-        "effort": "0h",
+        "effort": "0.0h",
         "features": [
             "session lock/unlock implemented",
             "auto lock session",
@@ -42,7 +42,29 @@
             "fix: tutorial hung",
             "fix: other day session lock",
             "fix: toned down the yellow color",
-            "fix: ticket edit same amount increment"
+            "fix: ticket edit same amount increment",
+            "approval",
+            "notification deny",
+            "dont merge test version to main",
+            "unlock cancel issue",
+            "confirm dialog for lock session",
+            "ticket number made readonly",
+            "enhance prompt message for testing features",
+            "change print statement to input for user prompt in main function",
+            "removed logout",
+            "lock session",
+            "laddu seva",
+            "github dependency issues",
+            "update babel version",
+            "store ticket numbers on session lock",
+            "sort starting ticket numbers",
+            "double session display",
+            "tutorial hung",
+            "other day session lock",
+            "toned down the yellow color",
+            "ticket edit same amount increment",
+            "prompt user to stop the timetracker before release",
+            "implement get_value_from_file function and clean up code"
         ]
     },
     "7.7.1": {

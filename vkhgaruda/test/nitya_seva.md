@@ -1,16 +1,15 @@
 # General
--[] signup
+-[x] signup
 
 # Nitya Seva
--[] session create / edit / delete 
--[] ticket add / edit / delete
--[] lock/unlock session
--[] session/day summary
--[] restore ticket numbers
+-[x] session create / edit / delete 
+-[x] ticket add / edit / delete
+-[x] lock/unlock session
+-[x] session/day summary
 
 # Laddu seva
--[] add / serve / return
--[] settings
+-[x] add / serve / return
+-[x] settings
 
 # Harinaam
 -[] add / edit / delete chanters

@@ -31,6 +31,7 @@ class _HarinaamState extends State<Harinaam> {
   final GlobalKey<HmiSalesState> _keyHmiSales = GlobalKey<HmiSalesState>();
   final GlobalKey<DashboardState> _keyDashboard = GlobalKey<DashboardState>();
   DateTime _lastCallbackInvoked = DateTime.now();
+  late String _session;
 
   // lists
   final List<ChantersEntry> _chantersEntries = [];
@@ -42,9 +43,17 @@ class _HarinaamState extends State<Harinaam> {
   initState() {
     super.initState();
 
+    // set session
+    if (DateTime.now().hour > Const().morningCutoff) {
+      _session = "Evening";
+    } else {
+      _session = "Morning";
+    }
+
     // listen to database events
     String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
-    String dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters";
+    String dbpath =
+        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters";
     FB().listenForChange(
         dbpath,
         FBCallbacks(
@@ -124,10 +133,11 @@ class _HarinaamState extends State<Harinaam> {
     }
 
     await _lock.synchronized(() async {
+      // add records from database
       _chantersEntries.clear();
-
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
-      String dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters";
+      String dbpath =
+          "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters";
       Map<String, dynamic> chantersJson =
           await FB().getJson(path: dbpath, silent: true);
       int countChanters = 0;
@@ -175,7 +185,8 @@ class _HarinaamState extends State<Harinaam> {
     // update database asynchronously
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
-    String dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters/$dbtime";
+    String dbpath =
+        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters/$dbtime";
     FB().setJson(path: dbpath, json: entry.toJson());
 
     setState(() {
@@ -269,7 +280,8 @@ class _HarinaamState extends State<Harinaam> {
     // update database
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
-    String dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters/$dbtime";
+    String dbpath =
+        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters/$dbtime";
     FB().deleteValue(path: dbpath);
 
     // remove from the list
@@ -374,7 +386,7 @@ class _HarinaamState extends State<Harinaam> {
       String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
       String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
       String dbpath =
-          "${Const().dbrootGaruda}/Harinaam/$dbdate/Chanters/$dbtime";
+          "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters/$dbtime";
       FB().setJson(path: dbpath, json: editedEntry.toJson());
 
       // Update dashboard counter
@@ -435,7 +447,17 @@ class _HarinaamState extends State<Harinaam> {
                         refresh();
                       })),
 
+                      // session
+                      RadioRow(
+                          items: ["Morning", "Evening"],
+                          selectedIndex: _session == "Morning" ? 0 : 1,
+                          onChanged: (String session) {
+                            _session = session;
+                            refresh();
+                          }),
+
                       // counter display
+                      SizedBox(height: 4),
                       Widgets().createTopLevelCard(
                         context: context,
                         child: Dashboard(key: _keyDashboard),

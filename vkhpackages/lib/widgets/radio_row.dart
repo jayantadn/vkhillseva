@@ -3,8 +3,14 @@ import 'package:vkhpackages/vkhpackages.dart';
 
 class RadioRow extends StatefulWidget {
   final List<String> items;
+  final int? selectedIndex;
   final void Function(String) onChanged;
-  const RadioRow({super.key, required this.items, required this.onChanged});
+  const RadioRow({
+    super.key,
+    required this.items,
+    this.selectedIndex,
+    required this.onChanged,
+  });
 
   @override
   State<RadioRow> createState() => _RadioRowState();
@@ -17,7 +23,13 @@ class _RadioRowState extends State<RadioRow> {
   void initState() {
     super.initState();
 
-    _selectedItem = widget.items.first;
+    if (widget.selectedIndex != null &&
+        widget.selectedIndex! >= 0 &&
+        widget.selectedIndex! < widget.items.length) {
+      _selectedItem = widget.items[widget.selectedIndex!];
+    } else if (widget.items.isNotEmpty) {
+      _selectedItem = widget.items.first;
+    }
   }
 
   @override

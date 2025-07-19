@@ -504,58 +504,62 @@ class _TicketPageState extends State<TicketPage> {
                                   }
 
                                   // add ticket to list
+                                  bool isTicketNumberModified = false;
                                   setState(() {
                                     if (ticket == null) {
                                       _tickets.insert(0, t);
                                     } else {
-                                      _tickets[_tickets.indexWhere((element) =>
-                                          element.timestamp ==
-                                          ticket.timestamp)] = t;
+                                      int index = _tickets.indexWhere(
+                                          (element) =>
+                                              element.timestamp ==
+                                              ticket.timestamp);
+
+                                      if (_tickets[index].ticketNumber !=
+                                          t.ticketNumber) {
+                                        isTicketNumberModified = true;
+                                      }
+
+                                      _tickets[index] = t;
+
+                                      // add ticket to database
+                                      String dbDate = DateFormat("yyyy-MM-dd")
+                                          .format(widget.session.timestamp)
+                                          .toString();
+                                      String dbSession = widget
+                                          .session.timestamp
+                                          .toIso8601String()
+                                          .replaceAll(".", "^");
+                                      String key = ticket.timestamp
+                                          .toIso8601String()
+                                          .replaceAll(".", "^");
+                                      FB().deleteValue(
+                                          path:
+                                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key");
+                                      FB().addMapToList(
+                                          path:
+                                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets",
+                                          data: t.toJson());
                                     }
                                   });
-                                  _lastCallbackInvoked = DateTime.now();
 
-                                  // add ticket to database
-                                  String dbDate = DateFormat("yyyy-MM-dd")
-                                      .format(widget.session.timestamp)
-                                      .toString();
-                                  String dbSession = widget.session.timestamp
-                                      .toIso8601String()
-                                      .replaceAll(".", "^");
-                                  if (ticket != null) {
-                                    String key = ticket.timestamp
-                                        .toIso8601String()
-                                        .replaceAll(".", "^");
-                                    FB().deleteValue(
-                                        path:
-                                            "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key");
+                                  // if ticket number is modified, update next ticket numbers
+                                  if (isTicketNumberModified) {
+                                    int index = _tickets.indexWhere((element) =>
+                                        element.timestamp == ticket!.timestamp);
+                                    int sourceAmount = ticket!.amount;
+                                    for (int i = 0; i < index; i++) {
+                                      if (_tickets[i].amount == sourceAmount) {
+                                        _tickets[i].ticketNumber--;
+                                      }
+                                    }
                                   }
-                                  FB().addMapToList(
-                                      path:
-                                          "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets",
-                                      data: t.toJson());
 
-                                  // post validations
-                                  // if (errors.isEmpty) {
-                                  //   errors = await _postvalidateTicket();
-                                  //   if (errors.isNotEmpty) {
-                                  //     String? action = await CommonWidgets()
-                                  //         .createErrorDialog(
-                                  //             context: context,
-                                  //             errors: errors,
-                                  //             post: true);
-
-                                  //     if (action == "Delete") {
-                                  //       _deleteTicket(t);
-                                  //     } else if (action == "Edit") {
-                                  //       _addEditTicket(context, t);
-                                  //     }
-                                  //   }
-                                  // }
-
+                                  _lastCallbackInvoked = DateTime.now();
                                   // clear all lists
                                   sevaNames.clear();
                                   filteredTickets.clear();
+
+                                  setState(() {});
                                 },
                               ),
                             ),

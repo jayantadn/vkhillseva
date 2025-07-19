@@ -91,6 +91,11 @@ class _UserManagementState extends State<UserManagement> {
     );
   }
 
+  String _getUsername(String mobile) {
+    var profile = _userProfiles[mobile];
+    return profile != null ? profile['name'] : "Unknown";
+  }
+
   Future<void> _setUserBasics() async {
     if (_dropdownValue == null || _userData.isEmpty || _userProfiles.isEmpty) {
       return;
@@ -133,7 +138,13 @@ class _UserManagementState extends State<UserManagement> {
   }
 
   Future<void> _onDeleteUser(String mobile) async {
-    await Widgets().showConfirmDialog(context, "Are you sure?", "Delete",
+    String username = _getUsername(mobile);
+    if (username == "Unknown") {
+      username = "";
+    }
+
+    await Widgets().showConfirmDialog(
+        context, "Are you sure to delete:\n$mobile\n$username", "Delete",
         () async {
       // remove user from the database
       String dbpath =

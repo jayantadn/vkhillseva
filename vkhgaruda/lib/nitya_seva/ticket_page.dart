@@ -504,6 +504,7 @@ class _TicketPageState extends State<TicketPage> {
                                   }
 
                                   // add ticket to list
+                                  bool isTicketAmountModified = false;
                                   bool isTicketNumberModified = false;
                                   setState(() {
                                     if (ticket == null) {
@@ -514,6 +515,9 @@ class _TicketPageState extends State<TicketPage> {
                                               element.timestamp ==
                                               ticket.timestamp);
 
+                                      if (_tickets[index].amount != t.amount) {
+                                        isTicketAmountModified = true;
+                                      }
                                       if (_tickets[index].ticketNumber !=
                                           t.ticketNumber) {
                                         isTicketNumberModified = true;
@@ -542,16 +546,34 @@ class _TicketPageState extends State<TicketPage> {
                                     }
                                   });
 
-                                  // if ticket number is modified, update next ticket numbers
-                                  if (isTicketNumberModified) {
-                                    int index = _tickets.indexWhere((element) =>
-                                        element.timestamp == ticket!.timestamp);
+                                  // if ticket amount is modified, update next ticket numbers
+                                  int index = _tickets.indexWhere((element) =>
+                                      element.timestamp == ticket!.timestamp);
+                                  if (isTicketAmountModified) {
                                     int sourceAmount = ticket!.amount;
                                     for (int i = 0; i < index; i++) {
                                       if (_tickets[i].amount == sourceAmount) {
                                         _tickets[i].ticketNumber--;
                                       }
                                     }
+                                  }
+
+                                  // if ticket number is modified, update next ticket numbers
+                                  if (isTicketNumberModified) {
+                                    int sourceAmount = ticket!.amount;
+                                    int ticketNumber = ticket.ticketNumber + 1;
+                                    for (int i = index - 1; i > 0; i--) {
+                                      if (_tickets[i].amount == sourceAmount) {
+                                        _tickets[i].ticketNumber = ticketNumber;
+                                        ticketNumber++;
+                                      }
+                                    }
+                                  }
+
+                                  // write all tickets to database
+                                  if (isTicketNumberModified ||
+                                      isTicketAmountModified) {
+                                    // TODO
                                   }
 
                                   _lastCallbackInvoked = DateTime.now();

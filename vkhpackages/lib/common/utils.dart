@@ -342,30 +342,42 @@ class Utils {
 
     // store the last used ticket numbers
     if (session.name == "Nitya Seva") {
+      // locking only the last active session will update ticket numbers
       String? lastActiveSessionPath = await getLastActiveNityaSeva();
       if (sessionPath == lastActiveSessionPath) {
-        // locking only the last active session will update ticket numbers
         String ticketNumbersPath =
             "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
         Map<String, dynamic> nextTicketNumbers = await FB().getJson(
           path: ticketNumbersPath,
           silent: true,
         );
-        String ticketsPath = "$sessionPath/Tickets";
 
+        String ticketsPath = "$sessionPath/Tickets";
         var t = await FB().getJson(path: ticketsPath, silent: true);
         if (t.isNotEmpty) {
-          for (var entry in t.entries) {
-            Ticket ticket = Utils().convertRawToDatatype(
-              entry.value,
-              Ticket.fromJson,
-            );
-            String key = ticket.amount.toString();
-            int value =
-                int.tryParse(nextTicketNumbers[key].split(":").last) ?? 1;
-            if (ticket.ticketNumber >= value) {
-              String bookNumber = nextTicketNumbers[key].split(":").first;
-              nextTicketNumbers[key] = "$bookNumber:${ticket.ticketNumber + 1}";
+          List<Ticket> tickets =
+              t.entries
+                  .map(
+                    (entry) => Utils().convertRawToDatatype(
+                      entry.value,
+                      Ticket.fromJson,
+                    ),
+                  )
+                  .toList();
+          tickets.sort((a, b) => a.ticketNumber.compareTo(b.ticketNumber));
+          for (Ticket ticket in tickets) {
+            String amount = ticket.amount.toString();
+            int storedTicketNumber =
+                int.tryParse(nextTicketNumbers[amount].split(":").last) ?? 1;
+            if (ticket.ticketNumber >= storedTicketNumber) {
+              String storedBookNumber =
+                  nextTicketNumbers[amount].split(":").first;
+              int nextBookNumber = int.tryParse(storedBookNumber) ?? 1;
+              if (ticket.ticketNumber % 100 == 0) {
+                nextBookNumber++;
+              }
+              nextTicketNumbers[amount] =
+                  "$nextBookNumber:${ticket.ticketNumber + 1}";
             }
           }
           await FB().setJson(path: ticketNumbersPath, json: nextTicketNumbers);

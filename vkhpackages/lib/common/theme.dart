@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class ThemeCreator {
   Color primaryColor;
-  Color secondaryColor = Colors.white;
+  Color surfaceColor = Colors.white;
   Color textColor = Colors.black;
 
   ThemeCreator({required this.primaryColor});
@@ -22,10 +22,10 @@ class ThemeCreator {
       scaffoldBackgroundColor: Colors.grey[100],
       colorScheme: ColorScheme.light(
         primary: primaryColor,
-        secondary: secondaryColor,
-        surface: secondaryColor,
-        onPrimary: secondaryColor,
-        onSecondary: secondaryColor,
+        secondary: Color.lerp(primaryColor, Colors.white, 0.95)!,
+        surface: surfaceColor,
+        onPrimary: surfaceColor,
+        onSecondary: surfaceColor,
         onSurface: Colors.black,
       ),
 
@@ -50,8 +50,8 @@ class ThemeCreator {
       // appbar theme
       appBarTheme: AppBarTheme(
         backgroundColor: primaryColor,
-        foregroundColor: secondaryColor,
-        iconTheme: IconThemeData(color: secondaryColor, size: 32.0),
+        foregroundColor: surfaceColor,
+        iconTheme: IconThemeData(color: surfaceColor, size: 32.0),
         elevation: 2.0,
         shadowColor: primaryColor,
       ),
@@ -121,7 +121,7 @@ class ThemeCreator {
       // Buttons
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          foregroundColor: secondaryColor,
+          foregroundColor: surfaceColor,
           backgroundColor: primaryColor,
         ),
       ),

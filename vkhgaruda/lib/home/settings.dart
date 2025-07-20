@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vkhgaruda/home/festival_settings_page.dart';
+import 'package:vkhgaruda/home/harinaam_settings.dart';
 import 'package:vkhgaruda/home/ticket_settings.dart';
 import 'package:vkhgaruda/home/user_management.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -110,7 +111,7 @@ class _SettingsState extends State<Settings> {
 
                   // Nitya Seva Ticket settings
                   _createSettingsCard(
-                    title: 'Ticket settings',
+                    title: 'Nitya Seva ticket settings',
                     icon:
                         Icons.confirmation_number, // Suggested icon for tickets
                     callback: SettingsCallback(onClick: () {
@@ -119,6 +120,20 @@ class _SettingsState extends State<Settings> {
                         MaterialPageRoute(
                             builder: (context) =>
                                 const TicketSettings(title: "Ticket settings")),
+                      );
+                    }),
+                  ),
+
+                  // Harinaam settings
+                  _createSettingsCard(
+                    title: 'Harinaam Mantapa',
+                    icon: Icons.brightness_low,
+                    callback: SettingsCallback(onClick: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HarinaamSettings(
+                                title: "Harinaam settings")),
                       );
                     }),
                   ),

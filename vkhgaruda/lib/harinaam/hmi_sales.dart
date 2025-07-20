@@ -122,7 +122,7 @@ class HmiSalesState extends State<HmiSales> {
               onPressed: () {
                 // handle lock action
               },
-              icon: const Icon(Icons.lock),
+              icon: const Icon(Icons.lock_open),
             ),
           ],
         ),

@@ -41,3 +41,45 @@ class ChantersEntry {
   @override
   int get hashCode => Object.hash(timestamp, username, count);
 }
+
+class Japamala {
+  String name;
+  int saleValue;
+  String colorHex;
+
+  Japamala({
+    required this.name,
+    required this.saleValue,
+    required this.colorHex,
+  });
+
+  // Convert from JSON
+  factory Japamala.fromJson(Map<String, dynamic> json) {
+    return Japamala(
+      name: json['name'],
+      saleValue: json['saleValue'],
+      colorHex: json['colorHex'],
+    );
+  }
+
+  // Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'saleValue': saleValue,
+      'colorHex': colorHex,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! Japamala) return false;
+    return name == other.name &&
+        saleValue == other.saleValue &&
+        colorHex == other.colorHex;
+  }
+
+  @override
+  int get hashCode => Object.hash(name, saleValue, colorHex);
+}

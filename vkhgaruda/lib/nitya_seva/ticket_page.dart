@@ -476,7 +476,7 @@ class _TicketPageState extends State<TicketPage> {
                                   Navigator.pop(context);
 
                                   // create ticket
-                                  Ticket t = Ticket(
+                                  Ticket ticketNew = Ticket(
                                     timestamp: ticket == null
                                         ? DateTime.now()
                                         : ticket.timestamp,
@@ -492,7 +492,7 @@ class _TicketPageState extends State<TicketPage> {
                                   // pre validations
                                   List<String> errors = [];
                                   if (ticket == null) {
-                                    errors = _prevalidateTicket(t);
+                                    errors = _prevalidateTicket(ticketNew);
                                     if (errors.isNotEmpty) {
                                       String? action = await NSWidgetsOld()
                                           .createErrorDialog(
@@ -508,47 +508,53 @@ class _TicketPageState extends State<TicketPage> {
                                   bool isTicketNumberModified = false;
                                   setState(() {
                                     if (ticket == null) {
-                                      _tickets.insert(0, t);
+                                      _tickets.insert(0, ticketNew);
                                     } else {
                                       int index = _tickets.indexWhere(
                                           (element) =>
                                               element.timestamp ==
                                               ticket.timestamp);
 
-                                      if (_tickets[index].amount != t.amount) {
+                                      if (_tickets[index].amount !=
+                                          ticketNew.amount) {
                                         isTicketAmountModified = true;
                                       }
-                                      if (_tickets[index].ticketNumber !=
-                                          t.ticketNumber) {
-                                        isTicketNumberModified = true;
+                                      if (!isTicketAmountModified) {
+                                        if (_tickets[index].ticketNumber !=
+                                            ticketNew.ticketNumber) {
+                                          isTicketNumberModified = true;
+                                        }
                                       }
 
-                                      _tickets[index] = t;
-
-                                      // add ticket to database
-                                      String dbDate = DateFormat("yyyy-MM-dd")
-                                          .format(widget.session.timestamp)
-                                          .toString();
-                                      String dbSession = widget
-                                          .session.timestamp
-                                          .toIso8601String()
-                                          .replaceAll(".", "^");
-                                      String key = ticket.timestamp
-                                          .toIso8601String()
-                                          .replaceAll(".", "^");
-                                      FB().deleteValue(
-                                          path:
-                                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key");
-                                      FB().addMapToList(
-                                          path:
-                                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets",
-                                          data: t.toJson());
+                                      _tickets[index] = ticketNew;
                                     }
                                   });
 
+                                  // add ticket to database
+                                  String dbDate = DateFormat("yyyy-MM-dd")
+                                      .format(widget.session.timestamp)
+                                      .toString();
+                                  String dbSession = widget.session.timestamp
+                                      .toIso8601String()
+                                      .replaceAll(".", "^");
+                                  String key = ticketNew.timestamp
+                                      .toIso8601String()
+                                      .replaceAll(".", "^");
+                                  FB().deleteValue(
+                                      path:
+                                          "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key");
+                                  FB().addMapToList(
+                                      path:
+                                          "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets",
+                                      data: ticketNew.toJson());
+
                                   // if ticket amount is modified, update next ticket numbers
-                                  int index = _tickets.indexWhere((element) =>
-                                      element.timestamp == ticket!.timestamp);
+                                  int index = 0;
+                                  if (ticket != null) {
+                                    // edit mode
+                                    index = _tickets.indexWhere((element) =>
+                                        element.timestamp == ticket.timestamp);
+                                  }
                                   if (isTicketAmountModified) {
                                     int sourceAmount = ticket!.amount;
                                     for (int i = 0; i < index; i++) {
@@ -561,8 +567,9 @@ class _TicketPageState extends State<TicketPage> {
                                   // if ticket number is modified, update next ticket numbers
                                   if (isTicketNumberModified) {
                                     int sourceAmount = ticket!.amount;
-                                    int ticketNumber = ticket.ticketNumber + 1;
-                                    for (int i = index - 1; i > 0; i--) {
+                                    int ticketNumber =
+                                        ticketNew.ticketNumber + 1;
+                                    for (int i = index - 1; i >= 0; i--) {
                                       if (_tickets[i].amount == sourceAmount) {
                                         _tickets[i].ticketNumber = ticketNumber;
                                         ticketNumber++;
@@ -573,7 +580,18 @@ class _TicketPageState extends State<TicketPage> {
                                   // write all tickets to database
                                   if (isTicketNumberModified ||
                                       isTicketAmountModified) {
-                                    // TODO
+                                    String dbDate = DateFormat("yyyy-MM-dd")
+                                        .format(widget.session.timestamp);
+                                    String dbSession = widget.session.timestamp
+                                        .toIso8601String()
+                                        .replaceAll(".", "^");
+                                    for (int i = 0; i <= index; i++) {
+                                      var ticketNew = _tickets[i];
+                                      FB().addMapToList(
+                                          path:
+                                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets",
+                                          data: ticketNew.toJson());
+                                    }
                                   }
 
                                   _lastCallbackInvoked = DateTime.now();

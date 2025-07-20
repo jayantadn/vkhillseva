@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -23,10 +22,7 @@ class _HarinaamSettingsState extends State<HarinaamSettings> {
   bool _isLoading = true;
 
   // lists
-  final List<Japamala> _japamalas = [
-    Japamala(name: "Neem mala", saleValue: 20, colorHex: "0000FF"),
-    Japamala(name: "Tulsi mala", saleValue: 25, colorHex: "FF0000"),
-  ];
+  final List<Japamala> _japamalas = [];
 
   // controllers, listeners and focus nodes
 
@@ -56,6 +52,15 @@ class _HarinaamSettingsState extends State<HarinaamSettings> {
 
     await _lock.synchronized(() async {
       // your code here
+      _japamalas.clear();
+      String dbpath = "${Const().dbrootGaruda}/Settings/Harinaam/Japamalas";
+      List japamalasRaw = await FB().getList(path: dbpath);
+      for (var japamalaRaw in japamalasRaw) {
+        Japamala japamala =
+            Utils().convertRawToDatatype(japamalaRaw, Japamala.fromJson);
+        _japamalas.add(japamala);
+      }
+      _japamalas.sort((a, b) => b.saleValue.compareTo(a.saleValue));
     });
 
     // refresh all child widgets
@@ -63,6 +68,25 @@ class _HarinaamSettingsState extends State<HarinaamSettings> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _addNewJapamala(Japamala japamala) async {
+    // Add the new japamala to the list
+    _japamalas.add(japamala);
+
+    // Sort the list by sale value in descending order
+    _japamalas.sort((a, b) => b.saleValue.compareTo(a.saleValue));
+
+    // store to database
+    String dbpath = "${Const().dbrootGaruda}/Settings/Harinaam/Japamalas";
+    await FB().setList(
+      path: dbpath,
+      list: _japamalas,
+      toJson: (p0) => p0.toJson(),
+    );
+
+    // Refresh the UI
+    setState(() {});
   }
 
   Widget _createJapamalaCard(int index) {
@@ -104,6 +128,102 @@ class _HarinaamSettingsState extends State<HarinaamSettings> {
     );
   }
 
+  Future<void> _showNewJapamalaDialog() async {
+    TextEditingController japamalaNameController = TextEditingController();
+    TextEditingController saleValueController = TextEditingController();
+
+    String selectedColorHex =
+        Utils().getRandomDarkColor().value.toRadixString(16).padLeft(8, '0');
+
+    final formKey = GlobalKey<FormState>();
+
+    Widgets().showResponsiveDialog(
+        context: context,
+        child: Widgets().createTopLevelCard(
+            context: context,
+            title: "Add new japamala",
+            child: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  // japamala name
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: "Japamala name",
+                      hintText: "e.g. Basic neem mala",
+                    ),
+                    controller: japamalaNameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter a japamala name";
+                      }
+                      return null;
+                    },
+                  ),
+
+                  Row(
+                    children: [
+                      // sale value
+                      Expanded(
+                        child: TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: "Sale value in Rupees",
+                            hintText: "e.g. 20",
+                          ),
+                          controller: saleValueController,
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Please enter a sale value";
+                            }
+                            final intValue = int.tryParse(value);
+                            if (intValue == null || intValue <= 0) {
+                              return "Please enter a valid positive number";
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+
+                      // color picker
+                      Widgets().showColorpicker(
+                          context: context,
+                          initialColorHex: selectedColorHex,
+                          onColorSelected: (String colorHex) {
+                            selectedColorHex = colorHex;
+                          }),
+                    ],
+                  )
+                ],
+              ),
+            )),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (formKey.currentState?.validate() ?? false) {
+                Japamala newJapamala = Japamala(
+                  name: japamalaNameController.text,
+                  saleValue: int.parse(saleValueController.text),
+                  colorHex: selectedColorHex,
+                );
+
+                _addNewJapamala(newJapamala);
+
+                // Close the dialog
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text("Add"),
+          ),
+        ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -129,8 +249,18 @@ class _HarinaamSettingsState extends State<HarinaamSettings> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
-                              children: List.generate(_japamalas.length,
-                                  (index) => _createJapamalaCard(index))),
+                            children: [
+                              // add new japamala button
+                              IconButton(
+                                icon: const Icon(Icons.add_circle_outline),
+                                onPressed: _showNewJapamalaDialog,
+                              ),
+
+                              // card for each japamala
+                              ...List.generate(_japamalas.length,
+                                  (index) => _createJapamalaCard(index)),
+                            ],
+                          ),
                         ),
                       ),
 

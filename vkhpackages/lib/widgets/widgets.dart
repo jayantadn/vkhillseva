@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class Widgets {
   static final Widgets _instance = Widgets._internal();
@@ -247,6 +248,105 @@ class Widgets {
     );
   }
 
+  Widget showColorpicker({
+    required BuildContext context,
+    required void Function(String) onColorSelected,
+    String? initialColorHex,
+  }) {
+    Color tempColor = Utils().getRandomDarkColor();
+
+    if (initialColorHex != null) {
+      tempColor = Color(int.parse("0xff$initialColorHex"));
+    }
+
+    return GestureDetector(
+      onTap: () async {
+        Color? pickedColor = await showDialog<Color>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text("Pick a color"),
+              content: SingleChildScrollView(
+                child: ColorPicker(
+                  pickerColor: tempColor,
+                  onColorChanged: (color) {
+                    tempColor = color;
+                  },
+                  showLabel: true,
+                  pickerAreaHeightPercent: 0.8,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: const Text("Cancel"),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                ElevatedButton(
+                  child: const Text("Select"),
+                  onPressed: () {
+                    onColorSelected(
+                      tempColor.value.toRadixString(16).substring(2),
+                    );
+                    Navigator.of(context).pop(tempColor);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        if (pickedColor != null) {
+          // Handle the picked color, e.g. setState or assign to a variable
+        }
+      },
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: tempColor, // Replace with selected color variable
+          border: Border.all(color: Colors.black26),
+        ),
+      ),
+    );
+  }
+
+  Future<dynamic> showConfirmDialog(
+    BuildContext context,
+    String msg,
+    String? actionType,
+    void Function()? action,
+  ) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm $actionType'),
+          content: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(msg),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                if (action != null) {
+                  action();
+                }
+                Navigator.of(context).pop(actionType);
+              },
+              child: Text(actionType ?? 'OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<dynamic> showResponsiveDialog({
     required BuildContext context,
     String? title,
@@ -268,6 +368,15 @@ class Widgets {
         },
       );
     } else {
+      // insert some padding between actions
+      List<Widget> paddedActions = [];
+      if (actions.isNotEmpty) {
+        for (var action in actions) {
+          paddedActions.add(action);
+          paddedActions.add(SizedBox(width: 10));
+        }
+      }
+
       // show top modal for mobile
       return await showGeneralDialog(
         context: context,
@@ -302,8 +411,8 @@ class Widgets {
                           children: [
                             child,
                             SizedBox(height: 10),
-                            if (actions.isNotEmpty)
-                              createResponsiveRow(context, actions),
+                            if (paddedActions.isNotEmpty)
+                              createResponsiveRow(context, paddedActions),
                           ],
                         ),
                       ),
@@ -340,43 +449,6 @@ class Widgets {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<dynamic> showConfirmDialog(
-    BuildContext context,
-    String msg,
-    String? actionType,
-    void Function()? action,
-  ) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Confirm $actionType'),
-          content: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(msg),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              onPressed: () {
-                if (action != null) {
-                  action();
-                }
-                Navigator.of(context).pop(actionType);
-              },
-              child: Text(actionType ?? 'OK'),
             ),
           ],
         );

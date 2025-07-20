@@ -1,11 +1,14 @@
 {
     "7.7.3": {
-        "effort": "1h",
+        "effort": "1.0h",
         "features": [],
         "fixes": [
             "fix: delete user display details",
             "fix: increment book number",
-            "fix: serialize ticket numbers on amount change"
+            "fix: serialize ticket numbers on amount change",
+            "delete user display details",
+            "increment book number",
+            "serialize ticket numbers on amount change"
         ]
     },
     "7.7.2": {

@@ -170,6 +170,20 @@ class _HarinaamState extends State<Harinaam> {
       return;
     }
 
+    // forbid changes for wrong session
+    if (_session == "Morning" && DateTime.now().hour >= Const().morningCutoff) {
+      Toaster().error(
+        "You cannot add entries to the Morning session after the cutoff time.",
+      );
+      return;
+    }
+    if (_session == "Evening" && DateTime.now().hour < Const().morningCutoff) {
+      Toaster().error(
+        "You cannot add entries to the Evening session before the cutoff time.",
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });

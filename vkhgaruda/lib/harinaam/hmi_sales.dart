@@ -84,8 +84,7 @@ class HmiSalesState extends State<HmiSales> {
         Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
           child: RadioRow(
-              items:
-                  Const().paymentModes.keys.where((k) => k != "Gift").toList(),
+              items: Const().paymentModes.keys.toList(growable: false),
               onChanged: (value) {
                 // handle radio selection
               }),

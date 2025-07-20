@@ -37,7 +37,7 @@ class Ticket {
   final DateTime timestamp;
   final int amount;
   final String mode;
-  final int ticketNumber;
+  int ticketNumber;
   final String user;
   final String note;
   final String seva;

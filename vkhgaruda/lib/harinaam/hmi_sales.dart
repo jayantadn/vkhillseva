@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class HmiSales extends StatefulWidget {
-  const HmiSales({super.key});
+  final void Function(SalesEntry) onSubmit;
+  const HmiSales({super.key, required this.onSubmit});
 
   @override
   State<HmiSales> createState() => HmiSalesState();
@@ -17,6 +19,7 @@ class HmiSalesState extends State<HmiSales> {
   final Lock _lock = Lock();
   final TextEditingController _quantityController =
       TextEditingController(text: '1');
+  String _selectedPaymentMode = Const().paymentModes.keys.first;
 
   @override
   void initState() {
@@ -56,7 +59,7 @@ class HmiSalesState extends State<HmiSales> {
     }
   }
 
-  void _onSubmit() {
+  Future<void> _onSubmit() async {
     // validations
     String value = _quantityController.text.trim();
     if (value.isEmpty) {
@@ -73,8 +76,22 @@ class HmiSalesState extends State<HmiSales> {
       return;
     }
 
+    // read ticket from db
+    String dbpath = "${Const().dbrootGaruda}/Settings/Harinaam/Japamalas";
+    List japamalasRaw = await FB().getList(path: dbpath);
+    Japamala japamala =
+        Utils().convertRawToDatatype(japamalasRaw.first, Japamala.fromJson);
+
+    SalesEntry newEntry = SalesEntry(
+      count: intValue,
+      japamala: japamala,
+      timestamp: DateTime.now(),
+      paymentMode: _selectedPaymentMode,
+      sevakarta: Utils().getUsername(),
+    );
+
     // handle submit action
-    print('Submitted with quantity: ${_quantityController.text}');
+    widget.onSubmit(newEntry);
   }
 
   @override
@@ -86,7 +103,7 @@ class HmiSalesState extends State<HmiSales> {
           child: RadioRow(
               items: Const().paymentModes.keys.toList(growable: false),
               onChanged: (value) {
-                // handle radio selection
+                _selectedPaymentMode = value;
               }),
         ),
         const SizedBox(height: 16),

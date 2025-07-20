@@ -35,6 +35,7 @@ class _HarinaamState extends State<Harinaam> {
 
   // lists
   final List<ChantersEntry> _chantersEntries = [];
+  final List<SalesEntry> _salesEntries = [];
 
   // controllers, listeners and focus nodes
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
@@ -111,6 +112,7 @@ class _HarinaamState extends State<Harinaam> {
   dispose() {
     // clear all lists and maps
     _chantersEntries.clear();
+    _salesEntries.clear();
 
     // clear all controllers and focus nodes
     for (var element in _listeners) {
@@ -208,6 +210,56 @@ class _HarinaamState extends State<Harinaam> {
     });
   }
 
+  Future<void> _addSalesEntry(SalesEntry entry) async {
+    // forbid changes for another day
+    bool isToday = DateTime.now().year == _selectedDate.year &&
+        DateTime.now().month == _selectedDate.month &&
+        DateTime.now().day == _selectedDate.day;
+    if (!isToday) {
+      Toaster().error(
+        "You cannot change data for another day.",
+      );
+      return;
+    }
+
+    // forbid changes for wrong session
+    if (_session == "Morning" && DateTime.now().hour >= Const().morningCutoff) {
+      Toaster().error(
+        "You cannot add entries to the Morning session after the cutoff time.",
+      );
+      return;
+    }
+    if (_session == "Evening" && DateTime.now().hour < Const().morningCutoff) {
+      Toaster().error(
+        "You cannot add entries to the Evening session before the cutoff time.",
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // update counter
+    _keyDashboard.currentState!.addSales(entry.count);
+
+    // add to the list
+    setState(() {
+      _salesEntries.insert(0, entry);
+    });
+
+    // update database asynchronously
+    String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
+    String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
+    String dbpath =
+        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales/$dbtime";
+    FB().setJson(path: dbpath, json: entry.toJson());
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   Widget _createChantersTile(int index) {
     ChantersEntry entry = _chantersEntries[index];
     return Align(
@@ -251,6 +303,52 @@ class _HarinaamState extends State<Harinaam> {
                   }
                 },
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _createSalesTile(int index) {
+    SalesEntry entry = _salesEntries[index];
+    String time = DateFormat("HH:mm:ss").format(entry.timestamp);
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: SizedBox(
+        width: 220,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Theme.of(context).primaryColor),
+            borderRadius: BorderRadius.circular(12.0),
+            color: Theme.of(context).cardColor,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: ListTile(
+              title: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 5,
+                    backgroundColor:
+                        Color(int.parse("0xff${entry.japamala.colorHex}")),
+                  ),
+                  SizedBox(width: 8),
+                  Text("$time, Count: ${entry.count}"),
+                ],
+              ),
+              subtitle: Widgets().createResponsiveRow(context, [
+                Text(
+                  "Recv ₹${entry.japamala.saleValue * entry.count} in ${entry.paymentMode}",
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                Text(
+                  entry.sevakarta,
+                ),
+              ]),
+              trailing: Widgets()
+                  .createContextMenu(["Edit", "Delete"], (String action) {}),
             ),
           ),
         ),
@@ -523,7 +621,25 @@ class _HarinaamState extends State<Harinaam> {
                         title: "Japamala sales",
                         child: Column(
                           children: [
-                            HmiSales(key: _keyHmiSales),
+                            // HMI
+                            HmiSales(
+                                key: _keyHmiSales,
+                                onSubmit: (sales) {
+                                  _addSalesEntry(sales);
+                                }),
+
+                            // sales entries list
+                            SizedBox(height: 10),
+                            if (_salesEntries.isNotEmpty)
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: List.generate(
+                                    _salesEntries.length,
+                                    (index) => _createSalesTile(index),
+                                  ),
+                                ),
+                              )
                           ],
                         ),
                       ),

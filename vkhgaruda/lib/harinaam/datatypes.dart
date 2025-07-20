@@ -83,3 +83,56 @@ class Japamala {
   @override
   int get hashCode => Object.hash(name, saleValue, colorHex);
 }
+
+class SalesEntry {
+  int count;
+  Japamala japamala;
+  final DateTime timestamp;
+  String paymentMode;
+  String sevakarta;
+
+  SalesEntry({
+    required this.count,
+    required this.japamala,
+    required this.timestamp,
+    required this.paymentMode,
+    required this.sevakarta,
+  });
+
+  // Convert from JSON
+  factory SalesEntry.fromJson(Map<String, dynamic> json) {
+    return SalesEntry(
+      count: json['count'],
+      japamala: Japamala.fromJson(json['japamala']),
+      timestamp: DateTime.parse(json['timestamp']),
+      paymentMode: json['paymentMode'] ?? 'Unknown',
+      sevakarta: json['sevakarta'] ?? 'Unknown',
+    );
+  }
+
+  // Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'count': count,
+      'japamala': japamala.toJson(),
+      'timestamp': timestamp.toIso8601String(),
+      'paymentMode': paymentMode,
+      'sevakarta': sevakarta,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! SalesEntry) return false;
+    return count == other.count &&
+        japamala == other.japamala &&
+        timestamp == other.timestamp &&
+        paymentMode == other.paymentMode &&
+        sevakarta == other.sevakarta;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(count, japamala, timestamp, paymentMode, sevakarta);
+}

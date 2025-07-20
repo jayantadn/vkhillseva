@@ -98,7 +98,7 @@ class _SettingsState extends State<Settings> {
                   // Nitya Seva Festival settings
                   _createSettingsCard(
                     title: 'Festival settings',
-                    icon: Icons.volunteer_activism,
+                    icon: Icons.temple_hindu,
                     callback: SettingsCallback(onClick: () {
                       Navigator.push(
                         context,

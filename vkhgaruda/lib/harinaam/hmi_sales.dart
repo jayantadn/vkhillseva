@@ -18,7 +18,7 @@ class HmiSales extends StatefulWidget {
 class HmiSalesState extends State<HmiSales> {
   final Lock _lock = Lock();
   final TextEditingController _quantityController =
-      TextEditingController(text: '1');
+      TextEditingController(text: '0');
   String _selectedPaymentMode = Const().paymentModes.keys.first;
 
   @override
@@ -75,6 +75,9 @@ class HmiSalesState extends State<HmiSales> {
       Toaster().error('Only numbers are allowed');
       return;
     }
+
+    // clear the text field
+    _quantityController.text = '0';
 
     // read ticket from db
     String dbpath = "${Const().dbrootGaruda}/Settings/Harinaam/Japamalas";

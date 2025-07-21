@@ -1,3 +1,5 @@
+import 'package:vkhpackages/vkhpackages.dart';
+
 class ChantersEntry {
   DateTime timestamp;
   String username;
@@ -103,7 +105,8 @@ class SalesEntry {
   factory SalesEntry.fromJson(Map<String, dynamic> json) {
     return SalesEntry(
       count: json['count'],
-      japamala: Japamala.fromJson(json['japamala']),
+      japamala:
+          Utils().convertRawToDatatype(json['japamala'], Japamala.fromJson),
       timestamp: DateTime.parse(json['timestamp']),
       paymentMode: json['paymentMode'] ?? 'Unknown',
       sevakarta: json['sevakarta'] ?? 'Unknown',

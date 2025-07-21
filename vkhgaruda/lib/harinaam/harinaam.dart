@@ -135,7 +135,7 @@ class _HarinaamState extends State<Harinaam> {
     }
 
     await _lock.synchronized(() async {
-      // add records from database
+      // add chanters records from database
       _chantersEntries.clear();
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
       String dbpath =
@@ -151,6 +151,22 @@ class _HarinaamState extends State<Harinaam> {
       }
       _chantersEntries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       _keyDashboard.currentState!.setChanters(countChanters);
+
+      // add sales records from database
+      _salesEntries.clear();
+      dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+      dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales";
+      Map<String, dynamic> salesJson =
+          await FB().getJson(path: dbpath, silent: true);
+      int countSales = 0;
+      for (String key in salesJson.keys) {
+        SalesEntry entry =
+            Utils().convertRawToDatatype(salesJson[key], SalesEntry.fromJson);
+        countSales += entry.count;
+        _salesEntries.add(entry);
+      }
+      _salesEntries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      _keyDashboard.currentState!.setSales(countSales);
     });
 
     // refresh all child widgets
@@ -636,7 +652,11 @@ class _HarinaamState extends State<Harinaam> {
                                 child: Row(
                                   children: List.generate(
                                     _salesEntries.length,
-                                    (index) => _createSalesTile(index),
+                                    (index) => Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 4.0),
+                                      child: _createSalesTile(index),
+                                    ),
                                   ),
                                 ),
                               )

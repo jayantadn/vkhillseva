@@ -18,7 +18,7 @@ class HmiChanters extends StatefulWidget {
 class HmiChantersState extends State<HmiChanters> {
   final Lock _lock = Lock();
   final TextEditingController _numberController =
-      TextEditingController(text: '1');
+      TextEditingController(text: '0');
 
   @override
   void initState() {
@@ -69,6 +69,9 @@ class HmiChantersState extends State<HmiChanters> {
       Toaster().error('Please enter a valid number');
       return;
     }
+
+    // clear the text field
+    _numberController.text = '0';
 
     widget.onSubmit(value);
   }

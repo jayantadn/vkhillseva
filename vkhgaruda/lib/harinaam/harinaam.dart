@@ -326,6 +326,65 @@ class _HarinaamState extends State<Harinaam> {
     );
   }
 
+  Widget _createSalePair(SalesEntry entry) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: IntrinsicWidth(
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Theme.of(context).primaryColor),
+            borderRadius: BorderRadius.circular(6),
+            color: Colors.grey.shade100,
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Left partition
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  decoration: BoxDecoration(
+                    color: Color(int.parse("0xff${entry.japamala.colorHex}")),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(6),
+                      bottomLeft: Radius.circular(6),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      entry.count.toString(),
+                      style:
+                          Theme.of(context).textTheme.headlineMedium!.copyWith(
+                                color: Colors.white,
+                              ),
+                    ),
+                  ),
+                ),
+                // Right partition
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(6),
+                      bottomRight: Radius.circular(6),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "₹${entry.japamala.saleValue * entry.count}",
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _createSalesTile(int index) {
     SalesEntry entry = _salesEntries[index];
     String time = DateFormat("HH:mm:ss").format(entry.timestamp);
@@ -343,26 +402,27 @@ class _HarinaamState extends State<Harinaam> {
           child: Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: ListTile(
-              title: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 5,
-                    backgroundColor:
-                        Color(int.parse("0xff${entry.japamala.colorHex}")),
-                  ),
-                  SizedBox(width: 8),
-                  Text("$time, Count: ${entry.count}"),
-                ],
-              ),
-              subtitle: Widgets().createResponsiveRow(context, [
-                Text(
-                  "Recv ₹${entry.japamala.saleValue * entry.count} in ${entry.paymentMode}",
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                Text(
-                  entry.sevakarta,
-                ),
-              ]),
+              leading: _createSalePair(entry),
+              // title: Row(
+              //   children: [
+              //     CircleAvatar(
+              //       radius: 5,
+              //       backgroundColor:
+              //           Color(int.parse("0xff${entry.japamala.colorHex}")),
+              //     ),
+              //     SizedBox(width: 8),
+              //     Text("$time, Count: ${entry.count}"),
+              //   ],
+              // ),
+              // subtitle: Widgets().createResponsiveRow(context, [
+              //   Text(
+              //     "Recv ₹${entry.japamala.saleValue * entry.count} in ${entry.paymentMode}",
+              //     style: Theme.of(context).textTheme.bodyLarge,
+              //   ),
+              //   Text(
+              //     entry.sevakarta,
+              //   ),
+              // ]),
               trailing: Widgets()
                   .createContextMenu(["Edit", "Delete"], (String action) {}),
             ),

@@ -17,9 +17,9 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
   DateTime _lastDataModification = DateTime.now();
 
   // lists
-  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   // controllers, listeners and focus nodes
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {

@@ -30,7 +30,8 @@ class _HarinaamState extends State<Harinaam> {
       GlobalKey<HmiChantersState>();
   final GlobalKey<HmiSalesState> _keyHmiSales = GlobalKey<HmiSalesState>();
   final GlobalKey<DashboardState> _keyDashboard = GlobalKey<DashboardState>();
-  DateTime _lastCallbackInvoked = DateTime.now();
+  DateTime _lastCallbackInvokedChanters = DateTime.now();
+  DateTime _lastCallbackInvokedSales = DateTime.now();
   late String _session;
 
   // lists
@@ -38,7 +39,8 @@ class _HarinaamState extends State<Harinaam> {
   final List<SalesEntry> _salesEntries = [];
 
   // controllers, listeners and focus nodes
-  List<StreamSubscription<DatabaseEvent>> _listeners = [];
+  List<StreamSubscription<DatabaseEvent>> _listenersChanters = [];
+  List<StreamSubscription<DatabaseEvent>> _listenersSales = [];
 
   @override
   initState() {
@@ -51,18 +53,18 @@ class _HarinaamState extends State<Harinaam> {
       _session = "Morning";
     }
 
-    // listen to database events
+    // listen to database events for chanters
     String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
-    String dbpath =
+    String dbpathChanters =
         "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters";
     FB().listenForChange(
-        dbpath,
+        dbpathChanters,
         FBCallbacks(
           // add
           add: (data) {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
+            if (_lastCallbackInvokedChanters.isBefore(DateTime.now()
                 .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
+              _lastCallbackInvokedChanters = DateTime.now();
             }
 
             // process the received data
@@ -75,9 +77,9 @@ class _HarinaamState extends State<Harinaam> {
 
           // edit
           edit: () {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
+            if (_lastCallbackInvokedChanters.isBefore(DateTime.now()
                 .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
+              _lastCallbackInvokedChanters = DateTime.now();
 
               refresh();
             }
@@ -85,9 +87,9 @@ class _HarinaamState extends State<Harinaam> {
 
           // delete
           delete: (data) async {
-            if (_lastCallbackInvoked.isBefore(DateTime.now()
+            if (_lastCallbackInvokedChanters.isBefore(DateTime.now()
                 .subtract(Duration(seconds: Const().fbListenerDelay)))) {
-              _lastCallbackInvoked = DateTime.now();
+              _lastCallbackInvokedChanters = DateTime.now();
 
               // process the received data
               ChantersEntry entry =
@@ -101,7 +103,60 @@ class _HarinaamState extends State<Harinaam> {
 
           // get listeners
           getListeners: (listeners) {
-            _listeners = listeners;
+            _listenersChanters = listeners;
+          },
+        ));
+
+    // listen to database events for sales
+    String dbpathSales =
+        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales";
+    FB().listenForChange(
+        dbpathSales,
+        FBCallbacks(
+          // add
+          add: (data) {
+            if (_lastCallbackInvokedSales.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvokedSales = DateTime.now();
+            }
+
+            // process the received data
+            SalesEntry entry =
+                Utils().convertRawToDatatype(data, SalesEntry.fromJson);
+            if (!_salesEntries.contains(entry)) {
+              _addSales(entry);
+            }
+          },
+
+          // edit
+          edit: () {
+            if (_lastCallbackInvokedSales.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvokedSales = DateTime.now();
+
+              refresh();
+            }
+          },
+
+          // delete
+          delete: (data) async {
+            if (_lastCallbackInvokedSales.isBefore(DateTime.now()
+                .subtract(Duration(seconds: Const().fbListenerDelay)))) {
+              _lastCallbackInvokedSales = DateTime.now();
+
+              // process the received data
+              SalesEntry entry =
+                  Utils().convertRawToDatatype(data, SalesEntry.fromJson);
+              int index = _salesEntries.indexOf(entry);
+              if (index != -1) {
+                _deleteSales(index, skipConfirm: true);
+              }
+            }
+          },
+
+          // get listeners
+          getListeners: (listeners) {
+            _listenersSales = listeners;
           },
         ));
 
@@ -115,9 +170,14 @@ class _HarinaamState extends State<Harinaam> {
     _salesEntries.clear();
 
     // clear all controllers and focus nodes
-    for (var element in _listeners) {
+    for (var element in _listenersChanters) {
       element.cancel();
     }
+    for (var element in _listenersSales) {
+      element.cancel();
+    }
+    _listenersChanters.clear();
+    _listenersSales.clear();
 
     super.dispose();
   }
@@ -226,7 +286,7 @@ class _HarinaamState extends State<Harinaam> {
     });
   }
 
-  Future<void> _addSalesEntry(SalesEntry entry) async {
+  Future<void> _addSales(SalesEntry entry) async {
     // forbid changes for another day
     bool isToday = DateTime.now().year == _selectedDate.year &&
         DateTime.now().month == _selectedDate.month &&
@@ -742,7 +802,7 @@ class _HarinaamState extends State<Harinaam> {
                             HmiSales(
                                 key: _keyHmiSales,
                                 onSubmit: (sales) {
-                                  _addSalesEntry(sales);
+                                  _addSales(sales);
                                 }),
 
                             // sales entries list

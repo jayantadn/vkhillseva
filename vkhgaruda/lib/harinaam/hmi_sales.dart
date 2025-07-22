@@ -90,7 +90,7 @@ class HmiSalesState extends State<HmiSales> {
       japamala: japamala,
       timestamp: DateTime.now(),
       paymentMode: _selectedPaymentMode,
-      sevakarta: Utils().getUsername(),
+      username: Utils().getUsername(),
     );
 
     // handle submit action

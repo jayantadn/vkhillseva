@@ -91,14 +91,14 @@ class SalesEntry {
   Japamala japamala;
   final DateTime timestamp;
   String paymentMode;
-  String sevakarta;
+  String username;
 
   SalesEntry({
     required this.count,
     required this.japamala,
     required this.timestamp,
     required this.paymentMode,
-    required this.sevakarta,
+    required this.username,
   });
 
   // Convert from JSON
@@ -109,7 +109,7 @@ class SalesEntry {
           Utils().convertRawToDatatype(json['japamala'], Japamala.fromJson),
       timestamp: DateTime.parse(json['timestamp']),
       paymentMode: json['paymentMode'] ?? 'Unknown',
-      sevakarta: json['sevakarta'] ?? 'Unknown',
+      username: json['username'] ?? 'Unknown',
     );
   }
 
@@ -120,7 +120,7 @@ class SalesEntry {
       'japamala': japamala.toJson(),
       'timestamp': timestamp.toIso8601String(),
       'paymentMode': paymentMode,
-      'sevakarta': sevakarta,
+      'username': username,
     };
   }
 
@@ -132,10 +132,10 @@ class SalesEntry {
         japamala == other.japamala &&
         timestamp == other.timestamp &&
         paymentMode == other.paymentMode &&
-        sevakarta == other.sevakarta;
+        username == other.username;
   }
 
   @override
   int get hashCode =>
-      Object.hash(count, japamala, timestamp, paymentMode, sevakarta);
+      Object.hash(count, japamala, timestamp, paymentMode, username);
 }

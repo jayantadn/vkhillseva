@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -275,6 +276,7 @@ class _HarinaamState extends State<Harinaam> {
     });
 
     // update database asynchronously
+    _lastCallbackInvokedChanters = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
@@ -325,6 +327,7 @@ class _HarinaamState extends State<Harinaam> {
     });
 
     // update database asynchronously
+    _lastCallbackInvokedSales = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
@@ -461,7 +464,7 @@ class _HarinaamState extends State<Harinaam> {
               leading: _createSalePair(entry),
               title: Text(time),
               subtitle: Text(
-                entry.sevakarta,
+                entry.username,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
@@ -516,6 +519,7 @@ class _HarinaamState extends State<Harinaam> {
     _keyDashboard.currentState!.setChanters(count);
 
     // update database
+    _lastCallbackInvokedChanters = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
@@ -563,6 +567,7 @@ class _HarinaamState extends State<Harinaam> {
     _keyDashboard.currentState!.setSales(count);
 
     // update database
+    _lastCallbackInvokedSales = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
@@ -603,6 +608,7 @@ class _HarinaamState extends State<Harinaam> {
       });
 
       // Update database (since timestamp doesn't change, we can update in place)
+      _lastCallbackInvokedChanters = DateTime.now();
       String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
       String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
       String dbpath =
@@ -622,7 +628,52 @@ class _HarinaamState extends State<Harinaam> {
     }
   }
 
-  Future<void> _editSales(int index) async {}
+  Future<void> _editSales(int index) async {
+    // forbid changes for another day
+    bool isToday = DateTime.now().year == _selectedDate.year &&
+        DateTime.now().month == _selectedDate.month &&
+        DateTime.now().day == _selectedDate.day;
+    if (!isToday) {
+      Toaster().error(
+        "You cannot change data for another day.",
+      );
+      return;
+    }
+
+    // get the entry to edit
+    SalesEntry entry = _salesEntries[index];
+
+    // Show the edit dialog
+    SalesEntry? editedEntry = await _showDialogEditSales(entry);
+
+    // If user saved changes, update the entry
+    if (editedEntry != null) {
+      // Update the list
+      setState(() {
+        _isLoading = true;
+        _salesEntries[index] = editedEntry;
+      });
+
+      // Update database (since timestamp doesn't change, we can update in place)
+      _lastCallbackInvokedSales = DateTime.now();
+      String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
+      String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
+      String dbpath =
+          "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales/$dbtime";
+      FB().setJson(path: dbpath, json: editedEntry.toJson());
+
+      // Update dashboard counter
+      int totalCount = 0;
+      for (SalesEntry salesEntry in _salesEntries) {
+        totalCount += salesEntry.count;
+      }
+      _keyDashboard.currentState!.setSales(totalCount);
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {
     final TextEditingController controller =
@@ -689,7 +740,105 @@ class _HarinaamState extends State<Harinaam> {
         ]);
   }
 
-  Future<void> _showDialogEditSales(SalesEntry entry) async {}
+  Future<SalesEntry?> _showDialogEditSales(SalesEntry entry) async {
+    final TextEditingController controller =
+        TextEditingController(text: entry.count.toString());
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    final Map<String, dynamic> paymentModes = Const().paymentModes;
+    final List<String> paymentModeKeys = paymentModes.keys.toList();
+    String selectedPaymentMode = entry.paymentMode;
+
+    return await Widgets().showResponsiveDialog(
+        context: context,
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedPaymentMode,
+                decoration: const InputDecoration(
+                  labelText: "Payment Mode",
+                  border: OutlineInputBorder(),
+                ),
+                items: paymentModeKeys
+                    .map((mode) => DropdownMenuItem<String>(
+                          value: mode,
+                          child: Text(mode),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    selectedPaymentMode = value;
+                  }
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a payment mode';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Count",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Count cannot be empty';
+                  }
+
+                  final number = int.tryParse(value.trim());
+                  if (number == null) {
+                    return 'Please enter a valid number';
+                  }
+
+                  if (number <= 0) {
+                    return 'Count must be greater than 0';
+                  }
+
+                  if (number > 10000) {
+                    return 'Count cannot exceed 10,000';
+                  }
+
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // close dialog without saving
+              Navigator.of(context).pop();
+            },
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Validate form before saving
+              if (formKey.currentState!.validate()) {
+                // save changes - read from controller
+                int count = int.parse(controller.text.trim());
+                Japamala japamala = entry.japamala;
+                SalesEntry editedEntry = SalesEntry(
+                  paymentMode: selectedPaymentMode,
+                  japamala: japamala,
+                  count: count,
+                  timestamp: entry.timestamp,
+                  username: Utils().getUsername(),
+                );
+                Navigator.of(context).pop(editedEntry);
+              }
+            },
+            child: const Text("Save"),
+          ),
+        ]);
+  }
 
   @override
   Widget build(BuildContext context) {

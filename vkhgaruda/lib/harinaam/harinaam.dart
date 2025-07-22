@@ -327,58 +327,54 @@ class _HarinaamState extends State<Harinaam> {
   }
 
   Widget _createSalePair(SalesEntry entry) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: IntrinsicWidth(
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).primaryColor),
-            borderRadius: BorderRadius.circular(6),
-            color: Colors.grey.shade100,
-          ),
-          child: IntrinsicHeight(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Left partition
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  decoration: BoxDecoration(
-                    color: Color(int.parse("0xff${entry.japamala.colorHex}")),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(6),
-                      bottomLeft: Radius.circular(6),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      entry.count.toString(),
-                      style:
-                          Theme.of(context).textTheme.headlineMedium!.copyWith(
-                                color: Colors.white,
-                              ),
-                    ),
+    return IntrinsicWidth(
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).primaryColor),
+          borderRadius: BorderRadius.circular(6),
+          color: Colors.grey.shade100,
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Left partition
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                decoration: BoxDecoration(
+                  color: Color(int.parse("0xff${entry.japamala.colorHex}")),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(6),
+                    bottomLeft: Radius.circular(6),
                   ),
                 ),
-                // Right partition
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(6),
-                      bottomRight: Radius.circular(6),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "₹${entry.japamala.saleValue * entry.count}",
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
+                child: Center(
+                  child: Text(
+                    entry.count.toString(),
+                    style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                          color: Colors.white,
+                        ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              // Right partition
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(6),
+                    bottomRight: Radius.circular(6),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    "₹${entry.japamala.saleValue * entry.count}",
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -403,28 +399,22 @@ class _HarinaamState extends State<Harinaam> {
             padding: const EdgeInsets.only(left: 8.0),
             child: ListTile(
               leading: _createSalePair(entry),
-              // title: Row(
-              //   children: [
-              //     CircleAvatar(
-              //       radius: 5,
-              //       backgroundColor:
-              //           Color(int.parse("0xff${entry.japamala.colorHex}")),
-              //     ),
-              //     SizedBox(width: 8),
-              //     Text("$time, Count: ${entry.count}"),
-              //   ],
-              // ),
-              // subtitle: Widgets().createResponsiveRow(context, [
-              //   Text(
-              //     "Recv ₹${entry.japamala.saleValue * entry.count} in ${entry.paymentMode}",
-              //     style: Theme.of(context).textTheme.bodyLarge,
-              //   ),
-              //   Text(
-              //     entry.sevakarta,
-              //   ),
-              // ]),
-              trailing: Widgets()
-                  .createContextMenu(["Edit", "Delete"], (String action) {}),
+              title: Text(time),
+              subtitle: Text(
+                entry.sevakarta,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              trailing: Widgets().createContextMenu(
+                ["Edit", "Delete"],
+                (String action) {
+                  if (action == "Edit") {
+                    _editSales(index);
+                  } else if (action == "Delete") {
+                    _deleteSales(index);
+                  }
+                },
+              ),
             ),
           ),
         ),
@@ -478,6 +468,101 @@ class _HarinaamState extends State<Harinaam> {
       _isLoading = false;
     });
   }
+
+  Future<void> _deleteSales(int index, {bool skipConfirm = false}) async {
+    // forbid changes for another day
+    bool isToday = DateTime.now().year == _selectedDate.year &&
+        DateTime.now().month == _selectedDate.month &&
+        DateTime.now().day == _selectedDate.day;
+    if (!isToday) {
+      Toaster().error(
+        "You cannot change data for another day.",
+      );
+      return;
+    }
+
+    SalesEntry entry = _salesEntries[index];
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // confirm delete
+    bool confirmed = true;
+    if (!skipConfirm) {
+      dynamic ret = await Widgets()
+          .showConfirmDialog(context, "Are you sure?", "Delete", null);
+      confirmed = ret == null ? false : true;
+    }
+
+    if (!confirmed) return;
+
+    // update dashboard counter
+    int count = _keyDashboard.currentState!.getSales();
+    count -= entry.count;
+    _keyDashboard.currentState!.setSales(count);
+
+    // update database
+    String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
+    String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
+    String dbpath =
+        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales/$dbtime";
+    FB().deleteValue(path: dbpath);
+
+    // remove from the list
+    setState(() {
+      _salesEntries.removeAt(index);
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _editChanters(int index) async {
+    // forbid changes for another day
+    bool isToday = DateTime.now().year == _selectedDate.year &&
+        DateTime.now().month == _selectedDate.month &&
+        DateTime.now().day == _selectedDate.day;
+    if (!isToday) {
+      Toaster().error(
+        "You cannot change data for another day.",
+      );
+      return;
+    }
+
+    // get the entry to edit
+    ChantersEntry entry = _chantersEntries[index];
+
+    // Show the edit dialog
+    ChantersEntry? editedEntry = await _showDialogEditChanters(entry);
+
+    // If user saved changes, update the entry
+    if (editedEntry != null) {
+      // Update the list
+      setState(() {
+        _isLoading = true;
+        _chantersEntries[index] = editedEntry;
+      });
+
+      // Update database (since timestamp doesn't change, we can update in place)
+      String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
+      String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
+      String dbpath =
+          "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters/$dbtime";
+      FB().setJson(path: dbpath, json: editedEntry.toJson());
+
+      // Update dashboard counter
+      int totalCount = 0;
+      for (ChantersEntry chanterEntry in _chantersEntries) {
+        totalCount += chanterEntry.count;
+      }
+      _keyDashboard.currentState!.setChanters(totalCount);
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _editSales(int index) async {}
 
   Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {
     final TextEditingController controller =
@@ -544,51 +629,7 @@ class _HarinaamState extends State<Harinaam> {
         ]);
   }
 
-  Future<void> _editChanters(int index) async {
-    // forbid changes for another day
-    bool isToday = DateTime.now().year == _selectedDate.year &&
-        DateTime.now().month == _selectedDate.month &&
-        DateTime.now().day == _selectedDate.day;
-    if (!isToday) {
-      Toaster().error(
-        "You cannot change data for another day.",
-      );
-      return;
-    }
-
-    // get the entry to edit
-    ChantersEntry entry = _chantersEntries[index];
-
-    // Show the edit dialog
-    ChantersEntry? editedEntry = await _showDialogEditChanters(entry);
-
-    // If user saved changes, update the entry
-    if (editedEntry != null) {
-      // Update the list
-      setState(() {
-        _isLoading = true;
-        _chantersEntries[index] = editedEntry;
-      });
-
-      // Update database (since timestamp doesn't change, we can update in place)
-      String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
-      String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
-      String dbpath =
-          "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters/$dbtime";
-      FB().setJson(path: dbpath, json: editedEntry.toJson());
-
-      // Update dashboard counter
-      int totalCount = 0;
-      for (ChantersEntry chanterEntry in _chantersEntries) {
-        totalCount += chanterEntry.count;
-      }
-      _keyDashboard.currentState!.setChanters(totalCount);
-
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
+  Future<void> _showDialogEditSales(SalesEntry entry) async {}
 
   @override
   Widget build(BuildContext context) {

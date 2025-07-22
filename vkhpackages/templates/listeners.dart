@@ -14,7 +14,7 @@ class RegisteredEvents extends StatefulWidget {
 
 class _RegisteredEventsState extends State<RegisteredEvents> {
   // scalars
-  DateTime _lastCallbackInvoked = DateTime.now();
+  DateTime _lastDataModification = DateTime.now();
 
   // lists
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
@@ -30,10 +30,10 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
       FBCallbacks(
         // add
         add: (data) {
-          if (_lastCallbackInvoked.isBefore(
+          if (_lastDataModification.isBefore(
             DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
           )) {
-            _lastCallbackInvoked = DateTime.now();
+            _lastDataModification = DateTime.now();
           }
 
           // process the received data
@@ -42,19 +42,19 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
 
         // edit
         edit: () {
-          if (_lastCallbackInvoked.isBefore(
+          if (_lastDataModification.isBefore(
             DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
           )) {
-            _lastCallbackInvoked = DateTime.now();
+            _lastDataModification = DateTime.now();
           }
         },
 
         // delete
         delete: (data) async {
-          if (_lastCallbackInvoked.isBefore(
+          if (_lastDataModification.isBefore(
             DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
           )) {
-            _lastCallbackInvoked = DateTime.now();
+            _lastDataModification = DateTime.now();
 
             // process the received data
             print(data);

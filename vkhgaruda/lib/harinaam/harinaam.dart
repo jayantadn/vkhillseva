@@ -702,35 +702,39 @@ class _HarinaamState extends State<Harinaam> {
 
     return await Widgets().showResponsiveDialog(
         context: context,
+        title: "Edit Chanters Entry",
         child: Form(
           key: formKey,
-          child: TextFormField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: "Count",
-              border: OutlineInputBorder(),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: TextFormField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "Count",
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Count cannot be empty';
+                }
+
+                final number = int.tryParse(value.trim());
+                if (number == null) {
+                  return 'Please enter a valid number';
+                }
+
+                if (number <= 0) {
+                  return 'Count must be greater than 0';
+                }
+
+                if (number > 10000) {
+                  return 'Count cannot exceed 10,000';
+                }
+
+                return null;
+              },
             ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Count cannot be empty';
-              }
-
-              final number = int.tryParse(value.trim());
-              if (number == null) {
-                return 'Please enter a valid number';
-              }
-
-              if (number <= 0) {
-                return 'Count must be greater than 0';
-              }
-
-              if (number > 10000) {
-                return 'Count cannot exceed 10,000';
-              }
-
-              return null;
-            },
           ),
         ),
         actions: [
@@ -770,10 +774,12 @@ class _HarinaamState extends State<Harinaam> {
 
     return await Widgets().showResponsiveDialog(
         context: context,
+        title: "Edit Sales Entry",
         child: Form(
           key: formKey,
           child: Column(
             children: [
+              SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: selectedPaymentMode,
                 decoration: const InputDecoration(

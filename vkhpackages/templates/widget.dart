@@ -32,10 +32,8 @@ class SummaryState extends State<Summary> {
   }
 
   Future<void> refresh() async {
-    // perform async work here
-
     await _lock.synchronized(() async {
-      // perform sync work here
+      // perform your work here
       setState(() {});
     });
   }

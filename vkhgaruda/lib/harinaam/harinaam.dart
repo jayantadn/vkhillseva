@@ -196,6 +196,24 @@ class _HarinaamState extends State<Harinaam> {
     }
 
     await _lock.synchronized(() async {
+      // lock session if not today
+      bool isToday = DateTime.now().year == _selectedDate.year &&
+          DateTime.now().month == _selectedDate.month &&
+          DateTime.now().day == _selectedDate.day;
+      if (!isToday) {
+        _keyHmiSales.currentState!.setLockState(true);
+      }
+
+      // lock if cutoff is passed
+      if (_session == "Morning" &&
+          DateTime.now().hour > Const().morningCutoff) {
+        _keyHmiSales.currentState!.setLockState(true);
+      }
+      if (_session == "Evening" &&
+          DateTime.now().hour > Const().eveningCutoff) {
+        _keyHmiSales.currentState!.setLockState(true);
+      }
+
       // add chanters records from database
       _chantersEntries.clear();
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
@@ -407,7 +425,7 @@ class _HarinaamState extends State<Harinaam> {
     return Align(
       alignment: Alignment.centerLeft,
       child: SizedBox(
-        width: 220,
+        width: 200,
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(color: Theme.of(context).primaryColor),
@@ -1003,15 +1021,18 @@ class _HarinaamState extends State<Harinaam> {
                             // sales entries list
                             SizedBox(height: 10),
                             if (_salesEntries.isNotEmpty)
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: List.generate(
-                                    _salesEntries.length,
-                                    (index) => Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 4.0),
-                                      child: _createSalesTile(index),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4.0),
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: List.generate(
+                                      _salesEntries.length,
+                                      (index) => Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 4.0),
+                                        child: _createSalesTile(index),
+                                      ),
                                     ),
                                   ),
                                 ),

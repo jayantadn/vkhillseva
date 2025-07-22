@@ -20,6 +20,8 @@ class HmiSalesState extends State<HmiSales> {
   final TextEditingController _quantityController =
       TextEditingController(text: '0');
   String _selectedPaymentMode = Const().paymentModes.keys.first;
+  bool _isAdmin = false;
+  bool _isLocked = false;
 
   @override
   void initState() {
@@ -39,10 +41,10 @@ class HmiSalesState extends State<HmiSales> {
   }
 
   Future<void> refresh() async {
-    // perform async work here
-
     await _lock.synchronized(() async {
-      // perform sync work here
+      // perform your work here
+      _isAdmin = await Utils().isAdmin();
+
       setState(() {});
     });
   }
@@ -97,6 +99,12 @@ class HmiSalesState extends State<HmiSales> {
     widget.onSubmit(newEntry);
   }
 
+  void setLockState(bool isLocked) {
+    setState(() {
+      _isLocked = isLocked;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -134,16 +142,43 @@ class HmiSalesState extends State<HmiSales> {
               onPressed: _incrementQuantity,
               icon: const Icon(Icons.add),
             ),
+
+            // submit button
             IconButton(
-              onPressed: _onSubmit,
-              icon: const Icon(Icons.check),
+              onPressed: _isLocked ? null : _onSubmit,
+              icon: Icon(
+                Icons.check,
+              ),
             ),
-            IconButton(
-              onPressed: () {
-                // handle lock action
-              },
-              icon: const Icon(Icons.lock_open),
-            ),
+
+            // lock button
+            if (!_isLocked)
+              IconButton(
+                onPressed: () {
+                  // handle lock action
+                  setState(() {
+                    _isLocked = true;
+                  });
+                },
+                icon: const Icon(Icons.lock_open),
+              ),
+
+            // unlock button
+            if (_isLocked)
+              IconButton(
+                onPressed: () {
+                  if (!_isAdmin) {
+                    Toaster().error('You are not authorized to unlock');
+                    return;
+                  }
+
+                  // handle unlock action
+                  setState(() {
+                    _isLocked = false;
+                  });
+                },
+                icon: const Icon(Icons.lock),
+              ),
           ],
         ),
       ],

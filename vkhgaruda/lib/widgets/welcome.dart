@@ -16,6 +16,7 @@ GlobalKey<_WelcomeState> summaryKey = GlobalKey<_WelcomeState>();
 class _WelcomeState extends State<Welcome> {
   final Lock _lock = Lock();
   String _username = '';
+  String? _mobile;
   String _version = "";
 
   @override
@@ -46,7 +47,12 @@ class _WelcomeState extends State<Welcome> {
     // perform sync work here
     await _lock.synchronized(() async {
       setState(() {
-        _username = Utils().getUsername();
+        UserBasics? basics = Utils().getUserBasics();
+
+        if (basics != null) {
+          _username = basics.name;
+          _mobile = basics.mobile;
+        }
       });
     });
   }
@@ -86,6 +92,15 @@ class _WelcomeState extends State<Welcome> {
         _username.isEmpty ? 'Guest' : _username,
         style: Theme.of(context).textTheme.headlineLarge,
       ),
+
+      // mobile number
+      if (_mobile != null && _mobile!.isNotEmpty)
+        Text(
+          _mobile ?? "",
+          style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: Colors.grey,
+              ),
+        ),
       SizedBox(
         height: 8,
       ),
@@ -93,9 +108,11 @@ class _WelcomeState extends State<Welcome> {
         'ISKCON Vaikuntha Hill',
         style: Theme.of(context).textTheme.headlineMedium,
       ),
+
+      // version
       Text('Garuda v${Const().version}',
           style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.primary,
               )),
     ]);
   }

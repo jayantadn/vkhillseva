@@ -21,42 +21,56 @@ class Widgets {
     // init
   }
 
-  Widget createContextMenu(List<String> items, Function(String) onPressed) {
+  Widget createContextMenu({
+    required List<String> items,
+    required Function(String) onPressed,
+    Color? color,
+  }) {
     return Builder(
       builder: (context) {
-        final GlobalKey iconButtonKey = GlobalKey();
-        return IconButton(
-          key: iconButtonKey,
-          icon: Icon(Icons.more_vert),
-          onPressed: () async {
-            final RenderBox renderBox =
-                iconButtonKey.currentContext!.findRenderObject() as RenderBox;
-            final Offset position = renderBox.localToGlobal(
-              renderBox.size.bottomCenter(Offset.zero),
-            );
+        final GlobalKey iconKey = GlobalKey();
+        return SizedBox(
+          width: 24, // Smaller width for just the icon
+          height: 24, // Smaller height for just the icon
+          child: GestureDetector(
+            key: iconKey,
+            onTap: () async {
+              final RenderBox renderBox =
+                  iconKey.currentContext!.findRenderObject() as RenderBox;
+              final Offset position = renderBox.localToGlobal(
+                renderBox.size.bottomCenter(Offset.zero),
+              );
 
-            final selectedValue = await showMenu<String>(
-              context: context,
-              position: RelativeRect.fromLTRB(
-                position.dx,
-                position.dy,
-                position.dx + 1,
-                position.dy + 1,
-              ),
-              items: List.generate(
-                items.length,
-                (index) => PopupMenuItem<String>(
-                  value: items[index],
-                  child: Text(
-                    items[index],
-                    style: Theme.of(context).textTheme.bodyLarge,
+              final selectedValue = await showMenu<String>(
+                context: context,
+                position: RelativeRect.fromLTRB(
+                  position.dx,
+                  position.dy,
+                  MediaQuery.of(context).size.width - position.dx,
+                  MediaQuery.of(context).size.height - position.dy,
+                ),
+                items: List.generate(
+                  items.length,
+                  (index) => PopupMenuItem<String>(
+                    value: items[index],
+                    child: Text(
+                      items[index],
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
                   ),
                 ),
-              ),
-            );
+              );
 
-            onPressed(selectedValue ?? "");
-          },
+              if (selectedValue != null) {
+                onPressed(selectedValue);
+              }
+            },
+            child: Icon(
+              Icons.more_vert,
+              size: 24,
+              color: color ?? Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
         );
       },
     );

@@ -115,14 +115,15 @@ class _HarinaamSettingsState extends State<HarinaamSettings> {
               ),
 
               // context menu
-              trailing: Widgets().createContextMenu(["Edit", "Delete"],
-                  (actionString) {
-                if (actionString == "Edit") {
-                  // Handle edit action
-                } else if (actionString == "Delete") {
-                  // Handle delete action
-                }
-              })),
+              trailing: Widgets().createContextMenu(
+                  items: ["Edit", "Delete"],
+                  onPressed: (actionString) {
+                    if (actionString == "Edit") {
+                      // Handle edit action
+                    } else if (actionString == "Delete") {
+                      // Handle delete action
+                    }
+                  })),
         ),
       ),
     );

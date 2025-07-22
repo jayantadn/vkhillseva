@@ -718,8 +718,8 @@ class _TicketPageState extends State<TicketPage> {
         trailing: _isSessionLocked
             ? null
             : Widgets().createContextMenu(
-                ["Edit", "Delete"],
-                (value) {
+                items: ["Edit", "Delete"],
+                onPressed: (value) {
                   if (value == "Edit") {
                     _addEditTicket(context, ticket);
                   } else if (value == "Delete") {

@@ -648,74 +648,77 @@ class _NityaSevaState extends State<NityaSeva> {
                 ),
               );
             },
-            trailing: (session.sessionLock != null &&
-                    session.sessionLock!.isLocked)
-                ? IconButton(
-                    onPressed: () async {
-                      String dbDate =
-                          DateFormat('yyyy-MM-dd').format(_selectedDate);
-                      String key = session.timestamp
-                          .toIso8601String()
-                          .replaceAll(".", "^");
-                      await Utils().unlockSession(
-                          context: context,
-                          sessionPath:
-                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key");
-                    },
-                    icon: Icon(Icons.lock))
-                : Widgets().createContextMenu(["Edit", "Delete", "Lock"],
-                    (String value) {
-                    if (value == "Edit") {
-                      _addEditSession(session: session);
-                    } else if (value == "Delete") {
-                      String dbDate =
-                          DateFormat('yyyy-MM-dd').format(_selectedDate);
+            trailing:
+                (session.sessionLock != null && session.sessionLock!.isLocked)
+                    ? IconButton(
+                        onPressed: () async {
+                          String dbDate =
+                              DateFormat('yyyy-MM-dd').format(_selectedDate);
+                          String key = session.timestamp
+                              .toIso8601String()
+                              .replaceAll(".", "^");
+                          await Utils().unlockSession(
+                              context: context,
+                              sessionPath:
+                                  "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key");
+                        },
+                        icon: Icon(Icons.lock))
+                    : Widgets().createContextMenu(
+                        items: ["Edit", "Delete", "Lock"],
+                        onPressed: (String value) {
+                          if (value == "Edit") {
+                            _addEditSession(session: session);
+                          } else if (value == "Delete") {
+                            String dbDate =
+                                DateFormat('yyyy-MM-dd').format(_selectedDate);
 
-                      // confirmation dialog
-                      NSWidgetsOld().confirm(
-                          context: context,
-                          msg: 'Are you sure you want to delete this session?',
-                          callbacks: ConfirmationCallbacks(onConfirm: () async {
-                            // delete locally
-                            setState(() {
-                              _sessions.remove(session);
-                            });
+                            // confirmation dialog
+                            NSWidgetsOld().confirm(
+                                context: context,
+                                msg:
+                                    'Are you sure you want to delete this session?',
+                                callbacks:
+                                    ConfirmationCallbacks(onConfirm: () async {
+                                  // delete locally
+                                  setState(() {
+                                    _sessions.remove(session);
+                                  });
 
-                            // delete in server
-                            String dbTimestamp = session.timestamp
+                                  // delete in server
+                                  String dbTimestamp = session.timestamp
+                                      .toIso8601String()
+                                      .replaceAll(".", "^");
+                                  await FB().deleteValue(
+                                      path:
+                                          "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbTimestamp");
+
+                                  // delete from open sessions
+                                  List openSessions = await FB().getList(
+                                      path:
+                                          "${Const().dbrootGaruda}/NityaSeva/OpenSessions");
+                                  openSessions.remove(dbTimestamp);
+                                  await FB().setValue(
+                                      path:
+                                          "${Const().dbrootGaruda}/NityaSeva/OpenSessions",
+                                      value: openSessions);
+                                }));
+                          } else if (value == "Lock") {
+                            String dbDate =
+                                DateFormat('yyyy-MM-dd').format(_selectedDate);
+                            String key = session.timestamp
                                 .toIso8601String()
                                 .replaceAll(".", "^");
-                            await FB().deleteValue(
-                                path:
-                                    "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbTimestamp");
-
-                            // delete from open sessions
-                            List openSessions = await FB().getList(
-                                path:
-                                    "${Const().dbrootGaruda}/NityaSeva/OpenSessions");
-                            openSessions.remove(dbTimestamp);
-                            await FB().setValue(
-                                path:
-                                    "${Const().dbrootGaruda}/NityaSeva/OpenSessions",
-                                value: openSessions);
-                          }));
-                    } else if (value == "Lock") {
-                      String dbDate =
-                          DateFormat('yyyy-MM-dd').format(_selectedDate);
-                      String key = session.timestamp
-                          .toIso8601String()
-                          .replaceAll(".", "^");
-                      Utils().lockSession(
-                          context: context,
-                          sessionPath:
-                              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key",
-                          username: _username);
-                    } else {
-                      if (value.isNotEmpty) {
-                        Toaster().error("Unknown action: $value");
-                      }
-                    }
-                  })));
+                            Utils().lockSession(
+                                context: context,
+                                sessionPath:
+                                    "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key",
+                                username: _username);
+                          } else {
+                            if (value.isNotEmpty) {
+                              Toaster().error("Unknown action: $value");
+                            }
+                          }
+                        })));
   }
 
   List<String> _preValidation(Session session) {

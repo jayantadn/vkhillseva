@@ -21,6 +21,7 @@ export 'widgets/date_header.dart';
 export 'widgets/radio_row.dart';
 export 'widgets/tutorial.dart';
 export 'widgets/counter_display.dart';
+export 'widgets/list_tile_compact.dart';
 
 export 'sangeet_seva/ssdatatypes.dart';
 export 'sangeet_seva/ssconst.dart';

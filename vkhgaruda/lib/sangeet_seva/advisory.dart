@@ -182,13 +182,14 @@ class _AdvisoryState extends State<Advisory> {
                                       .textTheme
                                       .headlineMedium),
                               trailing: Widgets().createContextMenu(
-                                  ["Edit", "Delete"], (String command) {
-                                if (command == "Edit") {
-                                  _onEdit(index);
-                                } else if (command == "Delete") {
-                                  _onDelete(index);
-                                }
-                              }),
+                                  items: ["Edit", "Delete"],
+                                  onPressed: (String command) {
+                                    if (command == "Edit") {
+                                      _onEdit(index);
+                                    } else if (command == "Delete") {
+                                      _onDelete(index);
+                                    }
+                                  }),
                             ),
                           ),
                         ),

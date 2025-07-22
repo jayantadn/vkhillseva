@@ -341,6 +341,7 @@ class _HarinaamState extends State<Harinaam> {
 
   Widget _createChantersTile(int index) {
     ChantersEntry entry = _chantersEntries[index];
+    final borderRadius = BorderRadius.circular(12.0);
     return Align(
       alignment: Alignment.centerLeft,
       child: SizedBox(
@@ -348,37 +349,116 @@ class _HarinaamState extends State<Harinaam> {
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(color: Colors.brown),
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: borderRadius,
             color: Theme.of(context).cardColor,
           ),
           child: Padding(
             padding: const EdgeInsets.only(left: 4.0),
-            child: ListTile(
+            child: ListTileCompact(
               title: Text(
                 DateFormat("HH:mm:ss").format(entry.timestamp),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
-              leading: CircleAvatar(
-                backgroundColor: Colors.brown,
-                child: Text(
-                  entry.count.toString(),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+
+              // count
+              leading: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: CircleAvatar(
+                  backgroundColor: Colors.brown,
+                  child: Text(
+                    entry.count.toString(),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ),
               ),
+
               subtitle: Text(
                 entry.username,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
+
+              // context menu
               trailing: Widgets().createContextMenu(
-                ["Edit", "Delete"],
-                (action) {
+                color: Colors.brown,
+                items: ["Edit", "Delete"],
+                onPressed: (action) {
                   if (action == "Edit") {
                     _editChanters(index);
                   } else if (action == "Delete") {
                     _deleteChanters(index);
+                  }
+                },
+              ),
+              borderRadius: borderRadius,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _createSalesTile(int index) {
+    SalesEntry entry = _salesEntries[index];
+    String time = DateFormat("HH:mm:ss").format(entry.timestamp);
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: SizedBox(
+        width: 220,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Theme.of(context).primaryColor),
+            borderRadius: BorderRadius.circular(12.0),
+            color: Theme.of(context).cardColor,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: ListTileCompact(
+              borderRadius: BorderRadius.circular(12.0),
+              // sale count and amount
+              leading: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: _createSalePair(entry),
+                  ),
+                  Text(
+                    entry.paymentMode,
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                          color: (Const().paymentModes[entry.paymentMode]
+                                  ?['color'] as Color?) ??
+                              Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              ),
+
+              // timestamp
+              title: Text(
+                time,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+
+              // username
+              subtitle: Text(
+                entry.username,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+
+              // context menu
+              trailing: Widgets().createContextMenu(
+                items: ["Edit", "Delete"],
+                onPressed: (String action) {
+                  if (action == "Edit") {
+                    _editSales(index);
+                  } else if (action == "Delete") {
+                    _deleteSales(index);
                   }
                 },
               ),
@@ -438,67 +518,6 @@ class _HarinaamState extends State<Harinaam> {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _createSalesTile(int index) {
-    SalesEntry entry = _salesEntries[index];
-    String time = DateFormat("HH:mm:ss").format(entry.timestamp);
-
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: SizedBox(
-        width: 220,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).primaryColor),
-            borderRadius: BorderRadius.circular(12.0),
-            color: Theme.of(context).cardColor,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: ListTile(
-              // sale count and amount
-              leading: Column(
-                children: [
-                  _createSalePair(entry),
-                  Text(
-                    entry.paymentMode,
-                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                          color: (Const().paymentModes[entry.paymentMode]
-                                  ?['color'] as Color?) ??
-                              Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
-              ),
-
-              // timestamp
-              title: Text(time),
-
-              // username
-              subtitle: Text(
-                entry.username,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-
-              // context menu
-              trailing: Widgets().createContextMenu(
-                ["Edit", "Delete"],
-                (String action) {
-                  if (action == "Edit") {
-                    _editSales(index);
-                  } else if (action == "Delete") {
-                    _deleteSales(index);
-                  }
-                },
-              ),
-            ),
           ),
         ),
       ),
@@ -882,8 +901,9 @@ class _HarinaamState extends State<Harinaam> {
 
               // more actions
               Widgets().createContextMenu(
-                ["Settlement", "Reports"],
-                (action) {
+                color: Colors.white,
+                items: ["Settlement", "Reports"],
+                onPressed: (action) {
                   // handle context menu actions
                 },
               ),

@@ -77,17 +77,19 @@ class _UserManagementState extends State<UserManagement> {
       child: ListTile(
           title: Text(user.mobile),
           subtitle: Text(user.name),
-          trailing: Widgets().createContextMenu(["Delete"], (value) {
-            if (value.isEmpty) {
-              return;
-            }
+          trailing: Widgets().createContextMenu(
+              items: ["Delete"],
+              onPressed: (value) {
+                if (value.isEmpty) {
+                  return;
+                }
 
-            if (value == "Delete") {
-              _onDeleteUser(user.mobile);
-            } else {
-              Toaster().error("Unknown action: $value");
-            }
-          })),
+                if (value == "Delete") {
+                  _onDeleteUser(user.mobile);
+                } else {
+                  Toaster().error("Unknown action: $value");
+                }
+              })),
     );
   }
 

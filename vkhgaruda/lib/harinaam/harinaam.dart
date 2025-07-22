@@ -461,13 +461,33 @@ class _HarinaamState extends State<Harinaam> {
           child: Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: ListTile(
-              leading: _createSalePair(entry),
+              // sale count and amount
+              leading: Column(
+                children: [
+                  _createSalePair(entry),
+                  Text(
+                    entry.paymentMode,
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                          color: (Const().paymentModes[entry.paymentMode]
+                                  ?['color'] as Color?) ??
+                              Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              ),
+
+              // timestamp
               title: Text(time),
+
+              // username
               subtitle: Text(
                 entry.username,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
+
+              // context menu
               trailing: Widgets().createContextMenu(
                 ["Edit", "Delete"],
                 (String action) {

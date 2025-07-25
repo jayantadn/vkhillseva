@@ -9,6 +9,7 @@ import 'package:vkhgaruda/harinaam/dashboard.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhgaruda/harinaam/hmi_chanters.dart';
 import 'package:vkhgaruda/harinaam/hmi_sales.dart';
+import 'package:vkhgaruda/harinaam/procurement.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Harinaam extends StatefulWidget {
@@ -914,7 +915,14 @@ class _HarinaamState extends State<Harinaam> {
               // stock japamala
               IconButton(
                 icon: const Icon(Icons.playlist_add),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Procurement(
+                              title: "Procurement",
+                              splashImage: widget.splashImage)));
+                },
               ),
 
               // more actions

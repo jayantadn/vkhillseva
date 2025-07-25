@@ -128,6 +128,13 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold>
       return null;
     }
 
+    final canPop = ModalRoute.of(context)?.canPop ?? false;
+    if (canPop && widget.sidePanel != null && !isDesktop) {
+      throw FlutterError(
+        'Side panel (hamburger menu) is only allowed on the main page. Do not request a side panel on child pages.',
+      );
+    }
+
     return AppBar(
       title: widget.title != null ? Text(widget.title!) : null,
       elevation: widget.elevation,
@@ -135,7 +142,8 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold>
           widget.leading ??
           (widget.automaticallyImplyLeading &&
                   widget.sidePanel != null &&
-                  !isDesktop
+                  !isDesktop &&
+                  !canPop
               ? IconButton(
                 icon: const Icon(Icons.menu, color: Colors.white),
                 onPressed: () => _scaffoldKey.currentState?.openDrawer(),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CounterDisplay extends StatefulWidget {
   final double fontSize;

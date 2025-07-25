@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
-class SangeetSeva extends StatefulWidget {
+class Procurement extends StatefulWidget {
   final String title;
   final String? splashImage;
 
-  const SangeetSeva({super.key, required this.title, this.splashImage});
+  const Procurement({super.key, required this.title, this.splashImage});
 
   @override
   // ignore: library_private_types_in_public_api
-  _SangeetSevaState createState() => _SangeetSevaState();
+  _ProcurementState createState() => _ProcurementState();
 }
 
-class _SangeetSevaState extends State<SangeetSeva> {
+class _ProcurementState extends State<Procurement> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
@@ -62,8 +62,18 @@ class _SangeetSevaState extends State<SangeetSeva> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Scaffold(
-          appBar: AppBar(title: Text(widget.title)),
+        ResponsiveScaffold(
+          // title
+          title: widget.title,
+
+          // toolbar icons
+          toolbarActions: [
+            // ResponsiveToolbarAction(
+            //   icon: Icon(Icons.refresh),
+            // ),
+          ],
+
+          // body
           body: RefreshIndicator(
             onRefresh: refresh,
             child: SingleChildScrollView(

@@ -73,13 +73,6 @@ class _ProcurementState extends State<Procurement> {
             // ),
           ],
 
-          // side panel
-          sidePanel: Column(
-            children: [
-              TextButton(onPressed: () {}, child: Text("data")),
-            ],
-          ),
-
           // body
           body: RefreshIndicator(
             onRefresh: refresh,

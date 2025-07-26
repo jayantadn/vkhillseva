@@ -139,3 +139,61 @@ class SalesEntry {
   int get hashCode =>
       Object.hash(count, japamala, timestamp, paymentMode, username);
 }
+
+class InventoryEntry {
+  int count;
+  String note;
+  final DateTime timestamp;
+  String username;
+  String malaType; // 'sale' or 'chanter'
+  String addOrRemove;
+
+  InventoryEntry({
+    required this.count,
+    required this.timestamp,
+    required this.note,
+    required this.username,
+    required this.malaType,
+    required this.addOrRemove,
+  });
+
+  // Convert from JSON
+  factory InventoryEntry.fromJson(Map<String, dynamic> json) {
+    return InventoryEntry(
+      count: json['count'],
+      note: json['note'],
+      timestamp: DateTime.parse(json['timestamp']),
+      username: json['username'] ?? 'Unknown',
+      malaType: json['malaType'] ?? 'Unknown',
+      addOrRemove: json['addOrRemove'] ?? 'Unknown',
+    );
+  }
+
+  // Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'count': count,
+      'timestamp': timestamp.toIso8601String(),
+      'note': note,
+      'username': username,
+      'malaType': malaType,
+      'addOrRemove': addOrRemove,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! InventoryEntry) return false;
+    return count == other.count &&
+        note == other.note &&
+        timestamp == other.timestamp &&
+        malaType == other.malaType &&
+        addOrRemove == other.addOrRemove &&
+        username == other.username;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(count, note, timestamp, malaType, addOrRemove, username);
+}

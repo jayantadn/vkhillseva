@@ -46,6 +46,8 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
             DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
           )) {
             _lastDataModification = DateTime.now();
+
+            refresh();
           }
         },
 
@@ -85,4 +87,6 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
   Widget build(BuildContext context) {
     return Placeholder();
   }
+
+  Future<void> refresh() async {}
 }

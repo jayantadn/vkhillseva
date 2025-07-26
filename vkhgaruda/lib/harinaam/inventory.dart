@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Inventory extends StatefulWidget {
@@ -19,14 +22,69 @@ class _InventoryState extends State<Inventory> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  String _selectedYear = DateTime.now().year.toString();
+  DateTime _lastDataModification = DateTime.now();
 
   // lists
+  final List<InventoryEntry> _inventoryEntries = [];
 
   // controllers, listeners and focus nodes
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {
     super.initState();
+
+    FB().listenForChange(
+      "${Const().dbrootGaruda}/HarinaamInventory",
+      FBCallbacks(
+        // add
+        add: (data) {
+          if (_lastDataModification.isBefore(
+            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
+          )) {
+            _lastDataModification = DateTime.now();
+          }
+
+          // process the received data
+          Map rawMap = data as Map;
+          List entriesRaw = rawMap.values.first;
+          for (var entryRaw in entriesRaw) {
+            InventoryEntry entry =
+                Utils().convertRawToDatatype(entryRaw, InventoryEntry.fromJson);
+            _inventoryEntries.insert(0, entry);
+          }
+        },
+
+        // edit
+        edit: () {
+          if (_lastDataModification.isBefore(
+            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
+          )) {
+            _lastDataModification = DateTime.now();
+
+            refresh();
+          }
+        },
+
+        // delete
+        delete: (data) async {
+          if (_lastDataModification.isBefore(
+            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
+          )) {
+            _lastDataModification = DateTime.now();
+
+            // process the received data
+            refresh(); // directly refreshing because the deleted data is deeply nested
+          }
+        },
+
+        // get listeners
+        getListeners: (listeners) {
+          _listeners = listeners;
+        },
+      ),
+    );
 
     refresh();
   }
@@ -34,8 +92,15 @@ class _InventoryState extends State<Inventory> {
   @override
   dispose() {
     // clear all lists and maps
+    _inventoryEntries.clear();
 
-    // clear all controllers and focus nodes
+    // dispose all controllers and focus nodes
+    _inventoryEntries.clear();
+
+    // listeners
+    for (var element in _listeners) {
+      element.cancel();
+    }
 
     super.dispose();
   }
@@ -46,9 +111,32 @@ class _InventoryState extends State<Inventory> {
     });
 
     // access control
+    bool allowed = await Utils().checkPermission("Harinaam");
+    if (!allowed) {
+      Toaster().error("Access denied");
+
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    }
 
     await _lock.synchronized(() async {
       // your code here
+
+      String dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+      List rawList =
+          await FB().getListByYear(path: dbpath, year: _selectedYear);
+      for (var rawItem in rawList) {
+        Map rawMap = rawItem as Map;
+        List entriesRaw = rawMap.values.first;
+        for (var entryRaw in entriesRaw) {
+          InventoryEntry entry =
+              Utils().convertRawToDatatype(entryRaw, InventoryEntry.fromJson);
+          _inventoryEntries.add(entry);
+
+          // hint: sorting may not be necessary
+        }
+      }
     });
 
     // refresh all child widgets
@@ -58,34 +146,114 @@ class _InventoryState extends State<Inventory> {
     });
   }
 
+  Future<void> _addInventory(InventoryEntry entry) async {
+    setState(() {
+      _inventoryEntries.insert(0, entry);
+    });
+
+    // store to database
+    String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
+    String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+    await FB().addToList(listpath: dbpath, data: entry.toJson());
+
+    _lastDataModification = DateTime.now();
+  }
+
+  Future<void> _deleteInventory(InventoryEntry entry) async {
+    setState(() {
+      _inventoryEntries.remove(entry);
+    });
+
+    // delete from database
+    String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
+    String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+    await FB().deleteFromListByValue(listpath: dbpath, value: entry.toJson());
+
+    _lastDataModification = DateTime.now();
+  }
+
   Future<void> _showDialogInventory(String addOrRemove) async {
+    final formKey = GlobalKey<FormState>();
+
+    TextEditingController noteController = TextEditingController();
+    TextEditingController countController = TextEditingController();
+    String malaType = "Chanters";
+
     Widgets().showResponsiveDialog(
         context: context,
-        child: Column(
-          children: [
-            // select chanter or sale
-            RadioRow(items: ["Chanters", "Sale"], onChanged: (String value) {}),
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              // select chanter or sale
+              RadioRow(
+                  items: ["Chanters", "Sale"],
+                  selectedIndex: malaType == "Chanters" ? 0 : 1,
+                  onChanged: (String value) {
+                    setState(() {
+                      malaType = value;
+                    });
+                  }),
 
-            // count
-            SizedBox(height: 10),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: "Count",
-                border: OutlineInputBorder(),
+              // count
+              SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Count",
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a count';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if (int.parse(value) <= 0) {
+                    return 'Count must be greater than 0';
+                  }
+                  return null;
+                },
               ),
-            ),
 
-            // note
-            SizedBox(height: 10),
-            TextField(
-              decoration: InputDecoration(
-                labelText: "Note",
-                border: OutlineInputBorder(),
+              // note
+              SizedBox(height: 10),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: "Note",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        actions: [ElevatedButton(onPressed: () {}, child: Text(addOrRemove))]);
+        actions: [
+          ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState?.validate() ?? false) {
+                  Navigator.of(context).pop();
+
+                  UserBasics? userBasics = await Utils().fetchOrGetUserBasics();
+
+                  // create the inventory entry
+                  InventoryEntry entry = InventoryEntry(
+                    count: int.parse(countController.text),
+                    timestamp: DateTime.now(),
+                    note: noteController.text,
+                    username: userBasics?.name ?? "Unknown",
+                    malaType: malaType,
+                    addOrRemove: addOrRemove,
+                  );
+
+                  _addInventory(entry);
+
+                  noteController.dispose();
+                  countController.dispose();
+                }
+              },
+              child: Text(addOrRemove))
+        ]);
   }
 
   @override

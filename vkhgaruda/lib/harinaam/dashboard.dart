@@ -3,7 +3,9 @@ import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+  final String? chantersLabel;
+  final String? salesLabel;
+  const Dashboard({super.key, this.chantersLabel, this.salesLabel});
 
   @override
   State<Dashboard> createState() => DashboardState();
@@ -83,7 +85,7 @@ class DashboardState extends State<Dashboard> {
                   color: Colors.brown,
                   maxValue: 9999,
                 ),
-                Text("Chanters' club",
+                Text(widget.chantersLabel ?? "Chanters' club",
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall!
@@ -101,7 +103,7 @@ class DashboardState extends State<Dashboard> {
                     fontSize: 48,
                     maxValue: 999,
                     color: Theme.of(context).colorScheme.primary),
-                Text("Japamala sold",
+                Text(widget.salesLabel ?? "Japamala sold",
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         color: Theme.of(context).colorScheme.primary)),
               ],

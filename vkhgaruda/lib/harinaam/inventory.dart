@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/harinaam/dashboard.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -30,6 +31,7 @@ class _InventoryState extends State<Inventory> {
 
   // controllers, listeners and focus nodes
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
+  final GlobalKey<DashboardState> keyDashboard = GlobalKey<DashboardState>();
 
   @override
   initState() {
@@ -111,13 +113,15 @@ class _InventoryState extends State<Inventory> {
     });
 
     // access control
-    bool allowed = await Utils().checkPermission("Harinaam");
+    bool allowed = await Utils().checkPermission("Harinaam Mantapa");
     if (!allowed) {
       Toaster().error("Access denied");
 
       if (mounted) {
         Navigator.of(context).pop();
       }
+
+      return;
     }
 
     await _lock.synchronized(() async {
@@ -157,6 +161,29 @@ class _InventoryState extends State<Inventory> {
     await FB().addToList(listpath: dbpath, data: entry.toJson());
 
     _lastDataModification = DateTime.now();
+  }
+
+  Widget _createYearSelector() {
+    return DropdownButton<String>(
+      value: _selectedYear,
+      items: List.generate(
+        5,
+        (index) => DateTime.now().year - index,
+      ).map((year) {
+        return DropdownMenuItem<String>(
+          value: year.toString(),
+          child: Text(year.toString()),
+        );
+      }).toList(),
+      onChanged: (String? newValue) {
+        if (newValue != null) {
+          setState(() {
+            _selectedYear = newValue;
+            refresh();
+          });
+        }
+      },
+    );
   }
 
   Future<void> _deleteInventory(InventoryEntry entry) async {
@@ -295,14 +322,15 @@ class _InventoryState extends State<Inventory> {
                       // leave some space at top
                       SizedBox(height: 10),
 
-                      // your widgets here
-                      Widgets().createTopLevelCard(
-                        context: context,
-                        child: ListTile(
-                          title: Text("Hello World"),
-                          subtitle: Text("This is a sample card"),
+                      // dashboard
+                      Widgets().createResponsiveRow(context, [
+                        _createYearSelector(),
+                        Dashboard(
+                          key: keyDashboard,
+                          chantersLabel: "Chanters mala stock",
+                          salesLabel: "Sales mala stock",
                         ),
-                      ),
+                      ]),
 
                       // leave some space at bottom
                       SizedBox(height: 500),

@@ -12,10 +12,10 @@ class Inventory extends StatefulWidget {
 
   @override
   // ignore: library_private_types_in_public_api
-  _ProcurementState createState() => _ProcurementState();
+  _InventoryState createState() => _InventoryState();
 }
 
-class _ProcurementState extends State<Inventory> {
+class _InventoryState extends State<Inventory> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
@@ -66,11 +66,16 @@ class _ProcurementState extends State<Inventory> {
           // title
           title: widget.title,
 
-          // toolbar icons
           toolbarActions: [
-            // ResponsiveToolbarAction(
-            //   icon: Icon(Icons.refresh),
-            // ),
+            // add
+            ResponsiveToolbarAction(
+              icon: Icon(Icons.add_circle_outline),
+            ),
+
+            // remove
+            ResponsiveToolbarAction(
+              icon: Icon(Icons.remove_circle_outline),
+            ),
           ],
 
           // body
@@ -108,8 +113,7 @@ class _ProcurementState extends State<Inventory> {
         // circular progress indicator
         if (_isLoading)
           LoadingOverlay(
-            image:
-                widget.splashImage ??
+            image: widget.splashImage ??
                 "assets/images/Logo/KrishnaLilaPark_circle.png",
           ),
       ],

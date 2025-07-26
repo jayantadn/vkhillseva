@@ -9,7 +9,8 @@ import 'package:vkhgaruda/harinaam/dashboard.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhgaruda/harinaam/hmi_chanters.dart';
 import 'package:vkhgaruda/harinaam/hmi_sales.dart';
-import 'package:vkhgaruda/harinaam/procurement.dart';
+import 'package:vkhgaruda/harinaam/inventory.dart';
+import 'package:vkhgaruda/harinaam/summary.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Harinaam extends StatefulWidget {
@@ -908,33 +909,35 @@ class _HarinaamState extends State<Harinaam> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Scaffold(
-          appBar: AppBar(
-            title: Text(widget.title),
-            actions: [
-              // stock japamala
-              IconButton(
-                icon: const Icon(Icons.playlist_add),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Procurement(
-                              title: "Procurement",
-                              splashImage: widget.splashImage)));
-                },
-              ),
+        ResponsiveScaffold(
+          title: widget.title,
+          toolbarActions: [
+            // inventory management
+            ResponsiveToolbarAction(
+              icon: const Icon(Icons.playlist_add),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Inventory(
+                            title: "Inventory",
+                            splashImage: widget.splashImage)));
+              },
+            ),
 
-              // more actions
-              Widgets().createContextMenu(
-                color: Colors.white,
-                items: ["Settlement", "Reports"],
-                onPressed: (action) {
-                  // handle context menu actions
-                },
-              ),
-            ],
-          ),
+            // summary
+            ResponsiveToolbarAction(
+              icon: const Icon(Icons.article),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Summary(
+                            title: "Summary",
+                            splashImage: widget.splashImage)));
+              },
+            ),
+          ],
           body: RefreshIndicator(
             onRefresh: refresh,
             child: SingleChildScrollView(

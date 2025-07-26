@@ -5,6 +5,9 @@ class ResponsiveScaffold extends StatefulWidget {
   /// The title of the screen
   final String? title;
 
+  /// The subtitle of the screen (shown below the title)
+  final String? subtitle;
+
   /// List of toolbar actions (will automatically overflow to context menu)
   final List<ResponsiveToolbarAction>? toolbarActions;
 
@@ -47,6 +50,7 @@ class ResponsiveScaffold extends StatefulWidget {
   const ResponsiveScaffold({
     super.key,
     this.title,
+    this.subtitle,
     this.toolbarActions,
     this.sidePanel,
     this.bottomNavItems,
@@ -136,7 +140,27 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold>
     }
 
     return AppBar(
-      title: widget.title != null ? Text(widget.title!) : null,
+      title:
+          (widget.title != null || widget.subtitle != null)
+              ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.title != null)
+                    Text(
+                      widget.title!,
+                      style: Theme.of(context).appBarTheme.titleTextStyle,
+                    ),
+                  if (widget.subtitle != null)
+                    Text(
+                      widget.subtitle!,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.white70),
+                    ),
+                ],
+              )
+              : null,
       elevation: widget.elevation,
       leading:
           widget.leading ??
@@ -181,7 +205,14 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold>
           widget.toolbarActions!.length == maxVisibleActions) {
         // Show as regular action
         if (action.expandedWidget != null && isDesktop) {
-          actions.add(action.expandedWidget!);
+          actions.add(
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 4,
+              ), // reduced padding
+              child: action.expandedWidget!,
+            ),
+          );
         } else {
           actions.add(
             IconButton(

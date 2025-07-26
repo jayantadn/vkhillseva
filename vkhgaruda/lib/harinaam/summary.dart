@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
-class Procurement extends StatefulWidget {
+class Summary extends StatefulWidget {
   final String title;
   final String? splashImage;
 
-  const Procurement({super.key, required this.title, this.splashImage});
+  const Summary({super.key, required this.title, this.splashImage});
 
   @override
   // ignore: library_private_types_in_public_api
-  _ProcurementState createState() => _ProcurementState();
+  _SummaryState createState() => _SummaryState();
 }
 
-class _ProcurementState extends State<Procurement> {
+class _SummaryState extends State<Summary> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;

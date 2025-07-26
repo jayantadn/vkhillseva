@@ -58,6 +58,11 @@ class _InventoryState extends State<Inventory> {
     });
   }
 
+  Future<void> _showDialogInventory(String addOrRemove) async {
+    Widgets().showResponsiveDialog(
+        context: context, child: Placeholder(), actions: []);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(

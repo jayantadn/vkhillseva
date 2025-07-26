@@ -777,13 +777,6 @@ class _HarinaamState extends State<Harinaam> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              // close dialog without saving
-              Navigator.of(context).pop();
-            },
-            child: const Text("Cancel"),
-          ),
           ElevatedButton(
             onPressed: () {
               // Validate form before saving
@@ -876,13 +869,6 @@ class _HarinaamState extends State<Harinaam> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              // close dialog without saving
-              Navigator.of(context).pop();
-            },
-            child: const Text("Cancel"),
-          ),
           ElevatedButton(
             onPressed: () {
               // Validate form before saving

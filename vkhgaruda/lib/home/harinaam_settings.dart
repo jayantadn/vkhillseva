@@ -199,12 +199,6 @@ class _HarinaamSettingsState extends State<HarinaamSettings> {
               ),
             )),
         actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text("Cancel"),
-          ),
           ElevatedButton(
             onPressed: () {
               if (formKey.currentState?.validate() ?? false) {

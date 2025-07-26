@@ -369,6 +369,18 @@ class Widgets {
   }) async {
     final double screenHeight = MediaQuery.of(context).size.height;
 
+    // add cancel button to actions
+    actions.insert(
+      0,
+      TextButton(
+        onPressed: () {
+          // close dialog without saving
+          Navigator.of(context).pop();
+        },
+        child: const Text("Cancel"),
+      ),
+    );
+
     if (screenHeight > maxScreenHeight) {
       // show dialog for desktop
       return await showDialog(

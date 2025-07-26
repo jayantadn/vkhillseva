@@ -60,7 +60,32 @@ class _InventoryState extends State<Inventory> {
 
   Future<void> _showDialogInventory(String addOrRemove) async {
     Widgets().showResponsiveDialog(
-        context: context, child: Placeholder(), actions: []);
+        context: context,
+        child: Column(
+          children: [
+            // select chanter or sale
+            RadioRow(items: ["Chanters", "Sale"], onChanged: (String value) {}),
+
+            // count
+            SizedBox(height: 10),
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: "Count",
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            // note
+            SizedBox(height: 10),
+            TextField(
+              decoration: InputDecoration(
+                labelText: "Note",
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [ElevatedButton(onPressed: () {}, child: Text(addOrRemove))]);
   }
 
   @override
@@ -75,11 +100,17 @@ class _InventoryState extends State<Inventory> {
             // add
             ResponsiveToolbarAction(
               icon: Icon(Icons.add_circle_outline),
+              onPressed: () async {
+                await _showDialogInventory("Add");
+              },
             ),
 
-            // remove
+            // discard
             ResponsiveToolbarAction(
               icon: Icon(Icons.remove_circle_outline),
+              onPressed: () async {
+                await _showDialogInventory("Discard");
+              },
             ),
           ],
 

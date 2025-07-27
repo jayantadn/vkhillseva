@@ -1051,8 +1051,7 @@ class _HarinaamState extends State<Harinaam> {
         // circular progress indicator
         if (_isLoading)
           LoadingOverlay(
-            image: widget.splashImage ??
-                "assets/images/Logo/KrishnaLilaPark_circle.png",
+            image: widget.splashImage,
           ),
       ],
     );

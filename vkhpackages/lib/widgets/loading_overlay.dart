@@ -11,10 +11,7 @@ class LoadingOverlay extends StatelessWidget {
 
     return Stack(
       children: [
-        ModalBarrier(
-          color: Colors.black.withOpacity(0.5),
-          dismissible: false,
-        ),
+        ModalBarrier(color: Colors.black.withOpacity(0.5), dismissible: false),
         Center(
           child: Stack(
             alignment: Alignment.center,
@@ -31,7 +28,7 @@ class LoadingOverlay extends StatelessWidget {
                 height: size,
                 child: ClipOval(
                   child: Image.asset(
-                    image ?? 'assets/images/Logo/KrishnaLilaPark_circle.png',
+                    image ?? 'assets/images/VKHillDieties/Garuda-circular.png',
                     fit: BoxFit.cover,
                   ),
                 ),

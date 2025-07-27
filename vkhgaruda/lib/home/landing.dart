@@ -132,7 +132,7 @@ class _LandingState extends State<Landing> {
           // circular progress indicator
           if (_isLoading)
             LoadingOverlay(
-              image: "assets/images/Logo/KrishnaLilaPark_circle.png",
+              image: "assets/images/VKHillDieties/Garuda-circular.png",
             ),
         ],
       ),

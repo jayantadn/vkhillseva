@@ -314,8 +314,7 @@ class _TicketSettingsState extends State<TicketSettings> {
         // circular progress indicator
         if (_isLoading)
           LoadingOverlay(
-            image: widget.splashImage ??
-                "assets/images/Logo/KrishnaLilaPark_circle.png",
+            image: widget.splashImage,
           ),
       ],
     );

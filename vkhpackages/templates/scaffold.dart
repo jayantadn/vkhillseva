@@ -108,12 +108,7 @@ class _ProcurementState extends State<Inventory> {
         ),
 
         // circular progress indicator
-        if (_isLoading)
-          LoadingOverlay(
-            image:
-                widget.splashImage ??
-                "assets/images/Logo/KrishnaLilaPark_circle.png",
-          ),
+        if (_isLoading) LoadingOverlay(image: widget.splashImage),
       ],
     );
   }

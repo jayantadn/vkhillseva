@@ -375,6 +375,82 @@ class _InventoryState extends State<Inventory> {
     await FB().deleteFromListByValue(listpath: dbpath, value: entry.toJson());
   }
 
+  Future<void> _updateInventoryEntry(
+      InventoryEntry oldEntry, InventoryEntry newEntry) async {
+    // update the entry in the list
+    int index = _inventoryEntries.indexOf(oldEntry);
+    if (index != -1) {
+      setState(() {
+        _inventoryEntries[index] = newEntry;
+      });
+    }
+
+    // update the dashboard counters
+    if (oldEntry.malaType == "Chanters") {
+      if (oldEntry.addOrRemove == "Add") {
+        await keyDashboard.currentState?.setChanters(
+            keyDashboard.currentState!.getChanters() -
+                oldEntry.count +
+                newEntry.count);
+      } else {
+        int count = keyDashboard.currentState!.getChanters();
+        int diff = newEntry.count - oldEntry.count;
+        count -= diff;
+
+        if (count < 0) {
+          count = 0;
+          Toaster().error("Chanters mala count cannot be negative.");
+        }
+        await keyDashboard.currentState?.setChanters(count);
+      }
+    } else if (oldEntry.malaType == "Sales") {
+      if (oldEntry.addOrRemove == "Add") {
+        await keyDashboard.currentState?.setSales(
+            keyDashboard.currentState!.getSales() -
+                oldEntry.count +
+                newEntry.count);
+      } else {
+        int count = keyDashboard.currentState!.getSales();
+        int diff = newEntry.count - oldEntry.count;
+        count -= diff;
+
+        if (count < 0) {
+          count = 0;
+          Toaster().error("Sales mala count cannot be negative.");
+        }
+        await keyDashboard.currentState?.setSales(count);
+      }
+    }
+
+    // update in the database
+    _lastDataModification = DateTime.now();
+    String dbdate = DateFormat("yyyy-MM-dd").format(newEntry.timestamp);
+    String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+    List<dynamic> inventoryListRaw = await FB().getList(path: dbpath);
+    if (inventoryListRaw.isEmpty) {
+      Toaster().error("No inventory entries found for the date");
+      return;
+    } else {
+      List newInventoryListRaw = [];
+      for (var inventoryItem in inventoryListRaw) {
+        InventoryEntry entry = Utils()
+            .convertRawToDatatype(inventoryItem, InventoryEntry.fromJson);
+        if (entry.timestamp == oldEntry.timestamp &&
+            entry.malaType == oldEntry.malaType &&
+            entry.addOrRemove == oldEntry.addOrRemove) {
+          // found the entry to update
+          newInventoryListRaw.add(newEntry.toJson());
+        } else {
+          // keep the old entry
+          newInventoryListRaw.add(inventoryItem);
+        }
+      }
+
+      _lastDataModification = DateTime.now();
+      await FB().setValue(path: dbpath, value: newInventoryListRaw);
+    }
+  }
+
   Future<void> _showDialogInventory(String addOrRemove,
       {InventoryEntry? oldEntry}) async {
     final formKey = GlobalKey<FormState>();
@@ -455,7 +531,11 @@ class _InventoryState extends State<Inventory> {
                     addOrRemove: addOrRemove,
                   );
 
-                  _addInventoryEntry(entry);
+                  if (oldEntry == null) {
+                    await _addInventoryEntry(entry);
+                  } else {
+                    await _updateInventoryEntry(oldEntry, entry);
+                  }
                 }
               },
               child:

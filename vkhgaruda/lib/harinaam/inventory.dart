@@ -221,8 +221,24 @@ class _InventoryState extends State<Inventory> {
           ),
 
           // mala type and timestamp
-          title: Text(
-            "[${entry.malaType} mala] ${DateFormat("dd MMM, yyyy").format(entry.timestamp)}",
+          title: Widgets().createResponsiveRow(
+            context,
+            [
+              Text(
+                "[${entry.malaType} mala]",
+                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                      color: entry.malaType == "Chanters"
+                          ? Colors.brown
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+              Text(DateFormat("dd MMM, yyyy").format(entry.timestamp),
+                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                        color: entry.malaType == "Chanters"
+                            ? Colors.brown
+                            : Theme.of(context).colorScheme.primary,
+                      )),
+            ],
           ),
 
           // username

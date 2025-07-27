@@ -179,7 +179,7 @@ class Widgets {
 
     return Wrap(
       alignment: WrapAlignment.start,
-      spacing: 0,
+      spacing: 2,
       runSpacing: 0,
       children: [
         for (var child in children)

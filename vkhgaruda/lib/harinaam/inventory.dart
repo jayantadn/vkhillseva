@@ -164,25 +164,60 @@ class _InventoryState extends State<Inventory> {
   }
 
   Widget _createYearSelector() {
-    return DropdownButton<String>(
-      value: _selectedYear,
-      items: List.generate(
-        5,
-        (index) => DateTime.now().year - index,
-      ).map((year) {
-        return DropdownMenuItem<String>(
-          value: year.toString(),
-          child: Text(year.toString()),
-        );
-      }).toList(),
-      onChanged: (String? newValue) {
-        if (newValue != null) {
-          setState(() {
-            _selectedYear = newValue;
-            refresh();
-          });
-        }
-      },
+    List<int> years = List.generate(5, (index) => DateTime.now().year - index);
+
+    double containerWidth = MediaQuery.of(context).size.width - 32;
+    double itemWidth = 80;
+
+    return Container(
+      height: 50,
+      width: containerWidth,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(25),
+      ),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(
+            horizontal: 8), // Add padding to center content
+        itemCount: years.length,
+        itemBuilder: (context, index) {
+          int year = years[index];
+          bool isSelected = year.toString() == _selectedYear;
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedYear = year.toString();
+                refresh();
+              });
+            },
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 300),
+              margin: EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+              width: itemWidth,
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: Text(
+                  year.toString(),
+                  style: TextStyle(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -319,18 +354,20 @@ class _InventoryState extends State<Inventory> {
                 child: Center(
                   child: Column(
                     children: [
-                      // leave some space at top
-                      SizedBox(height: 10),
-
                       // dashboard
-                      Widgets().createResponsiveRow(context, [
-                        _createYearSelector(),
-                        Dashboard(
-                          key: keyDashboard,
-                          chantersLabel: "Chanters mala stock",
-                          salesLabel: "Sales mala stock",
-                        ),
-                      ]),
+                      Widgets().createTopLevelCard(
+                          context: context,
+                          child: Column(
+                            children: [
+                              _createYearSelector(),
+                              SizedBox(height: 4),
+                              Dashboard(
+                                key: keyDashboard,
+                                chantersLabel: "Chanters mala stock",
+                                salesLabel: "Sales mala stock",
+                              )
+                            ],
+                          )),
 
                       // leave some space at bottom
                       SizedBox(height: 500),

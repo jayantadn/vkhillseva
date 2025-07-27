@@ -37,56 +37,50 @@ class _InventoryState extends State<Inventory> {
   initState() {
     super.initState();
 
-    // FB().listenForChange(
-    //   "${Const().dbrootGaruda}/HarinaamInventory",
-    //   FBCallbacks(
-    //     // add
-    //     add: (data) {
-    //       if (_lastDataModification.isBefore(
-    //         DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
-    //       )) {
-    //         _lastDataModification = DateTime.now();
-    //       }
+    FB().listenForChange(
+      "${Const().dbrootGaruda}/HarinaamInventory",
+      FBCallbacks(
+        // add
+        add: (data) {
+          if (_lastDataModification.isBefore(
+            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
+          )) {
+            _lastDataModification = DateTime.now();
+          }
 
-    //       // process the received data
-    //       Map rawMap = data as Map;
-    //       List entriesRaw = rawMap.values.first;
-    //       for (var entryRaw in entriesRaw) {
-    //         InventoryEntry entry =
-    //             Utils().convertRawToDatatype(entryRaw, InventoryEntry.fromJson);
-    //         _inventoryEntries.insert(0, entry);
-    //       }
-    //     },
+          // process the received data
+          refresh();
+        },
 
-    //     // edit
-    //     edit: () {
-    //       if (_lastDataModification.isBefore(
-    //         DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
-    //       )) {
-    //         _lastDataModification = DateTime.now();
+        // edit
+        edit: () {
+          if (_lastDataModification.isBefore(
+            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
+          )) {
+            _lastDataModification = DateTime.now();
 
-    //         refresh();
-    //       }
-    //     },
+            refresh();
+          }
+        },
 
-    //     // delete
-    //     delete: (data) async {
-    //       if (_lastDataModification.isBefore(
-    //         DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
-    //       )) {
-    //         _lastDataModification = DateTime.now();
+        // delete
+        delete: (data) async {
+          if (_lastDataModification.isBefore(
+            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
+          )) {
+            _lastDataModification = DateTime.now();
 
-    //         // process the received data
-    //         refresh(); // directly refreshing because the deleted data is deeply nested
-    //       }
-    //     },
+            // process the received data
+            refresh(); // directly refreshing because the deleted data is deeply nested
+          }
+        },
 
-    //     // get listeners
-    //     getListeners: (listeners) {
-    //       _listeners = listeners;
-    //     },
-    //   ),
-    // );
+        // get listeners
+        getListeners: (listeners) {
+          _listeners = listeners;
+        },
+      ),
+    );
 
     refresh();
   }
@@ -125,22 +119,39 @@ class _InventoryState extends State<Inventory> {
     }
 
     await _lock.synchronized(() async {
-      // your code here
+      // refill inventory entries
+      _inventoryEntries.clear();
+      String dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+      List rawList =
+          await FB().getListByYear(path: dbpath, year: _selectedYear);
+      for (var rawItem in rawList[0]) {
+        // rawList[0]: dont know why a double list is returned
+        Map rawMap = rawItem as Map;
+        InventoryEntry entry =
+            Utils().convertRawToDatatype(rawMap, InventoryEntry.fromJson);
+        _inventoryEntries.insert(0, entry);
+      }
 
-      // String dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
-      // List rawList =
-      //     await FB().getListByYear(path: dbpath, year: _selectedYear);
-      // for (var rawItem in rawList) {
-      //   Map rawMap = rawItem as Map;
-      //   List entriesRaw = rawMap.values.first;
-      //   for (var entryRaw in entriesRaw) {
-      //     InventoryEntry entry =
-      //         Utils().convertRawToDatatype(entryRaw, InventoryEntry.fromJson);
-      //     _inventoryEntries.add(entry);
-
-      //     // hint: sorting may not be necessary
-      //   }
-      // }
+      // dashboard counters
+      int chantersCount = 0;
+      int salesCount = 0;
+      for (InventoryEntry entry in _inventoryEntries) {
+        if (entry.malaType == "Chanters") {
+          if (entry.addOrRemove == "Add") {
+            chantersCount += entry.count;
+          } else {
+            chantersCount -= entry.count;
+          }
+        } else if (entry.malaType == "Sales") {
+          if (entry.addOrRemove == "Add") {
+            salesCount += entry.count;
+          } else {
+            salesCount -= entry.count;
+          }
+        }
+      }
+      await keyDashboard.currentState?.setChanters(chantersCount);
+      await keyDashboard.currentState?.setSales(salesCount);
     });
 
     // refresh all child widgets
@@ -150,7 +161,28 @@ class _InventoryState extends State<Inventory> {
     });
   }
 
-  Future<void> _addInventory(InventoryEntry entry) async {
+  Future<void> _addInventoryEntry(InventoryEntry entry) async {
+    // dashboard update
+    if (entry.malaType == "Chanters") {
+      if (entry.addOrRemove == "Add") {
+        await keyDashboard.currentState?.addChanters(entry.count);
+      } else {
+        int? count = keyDashboard.currentState?.getChanters();
+        if (count != null && count > 0) {
+          await keyDashboard.currentState?.setChanters(count - entry.count);
+        }
+      }
+    } else if (entry.malaType == "Sales") {
+      if (entry.addOrRemove == "Add") {
+        await keyDashboard.currentState?.addSales(entry.count);
+      } else {
+        int? count = keyDashboard.currentState?.getSales();
+        if (count != null && count > 0) {
+          await keyDashboard.currentState?.setSales(count - entry.count);
+        }
+      }
+    }
+
     setState(() {
       _inventoryEntries.insert(0, entry);
     });
@@ -175,13 +207,13 @@ class _InventoryState extends State<Inventory> {
               children: [
                 Icon(
                   Icons.add_circle,
-                  color: entry.malaType == "chanters"
+                  color: entry.malaType == "Chanters"
                       ? Colors.brown
                       : Theme.of(context).colorScheme.primary,
                 ),
                 Text(entry.count.toString(),
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: entry.malaType == "chanters"
+                        color: entry.malaType == "Chanters"
                             ? Colors.brown
                             : Theme.of(context).colorScheme.primary)),
               ],
@@ -210,7 +242,7 @@ class _InventoryState extends State<Inventory> {
                 } else if (action == "Delete") {
                   Widgets().showConfirmDialog(
                       context, "Delete this inventory item?", "Delete", () {
-                    _deleteInventory(entry);
+                    _deleteInventoryEntry(entry);
                   });
                 }
               }),
@@ -290,17 +322,37 @@ class _InventoryState extends State<Inventory> {
     );
   }
 
-  Future<void> _deleteInventory(InventoryEntry entry) async {
+  Future<void> _deleteInventoryEntry(InventoryEntry entry) async {
+    // dashboard update
+    if (entry.malaType == "Chanters") {
+      if (entry.addOrRemove == "Add") {
+        int? count = keyDashboard.currentState?.getChanters();
+        if (count != null && count > 0) {
+          await keyDashboard.currentState?.setChanters(count - entry.count);
+        }
+      } else {
+        await keyDashboard.currentState?.addChanters(entry.count);
+      }
+    } else if (entry.malaType == "Sales") {
+      if (entry.addOrRemove == "Add") {
+        int? count = keyDashboard.currentState?.getSales();
+        if (count != null && count > 0) {
+          await keyDashboard.currentState?.setSales(count - entry.count);
+        }
+      } else {
+        await keyDashboard.currentState?.addSales(entry.count);
+      }
+    }
+
     setState(() {
       _inventoryEntries.remove(entry);
     });
 
     // delete from database
+    _lastDataModification = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
     await FB().deleteFromListByValue(listpath: dbpath, value: entry.toJson());
-
-    _lastDataModification = DateTime.now();
   }
 
   Future<void> _showDialogInventory(String addOrRemove) async {
@@ -319,7 +371,7 @@ class _InventoryState extends State<Inventory> {
             children: [
               // select chanter or sale
               RadioRow(
-                  items: ["Chanters", "Sale"],
+                  items: ["Chanters", "Sales"],
                   selectedIndex: malaType == "Chanters" ? 0 : 1,
                   onChanged: (String value) {
                     setState(() {
@@ -380,7 +432,7 @@ class _InventoryState extends State<Inventory> {
                     addOrRemove: addOrRemove,
                   );
 
-                  _addInventory(entry);
+                  _addInventoryEntry(entry);
 
                   // noteController.dispose();
                   // countController.dispose();

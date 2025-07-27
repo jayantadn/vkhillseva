@@ -27,22 +27,7 @@ class _InventoryState extends State<Inventory> {
   DateTime _lastDataModification = DateTime.now();
 
   // lists
-  final List<InventoryEntry> _inventoryEntries = [
-    InventoryEntry(
-        count: 300,
-        timestamp: DateTime.now(),
-        note: "Test Note",
-        username: "Test User",
-        malaType: "chanters",
-        addOrRemove: "Add"),
-    InventoryEntry(
-        count: 300,
-        timestamp: DateTime.now(),
-        note: "Test Note",
-        username: "Test User",
-        malaType: "chanters",
-        addOrRemove: "Add")
-  ];
+  final List<InventoryEntry> _inventoryEntries = [];
 
   // controllers, listeners and focus nodes
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
@@ -52,56 +37,56 @@ class _InventoryState extends State<Inventory> {
   initState() {
     super.initState();
 
-    FB().listenForChange(
-      "${Const().dbrootGaruda}/HarinaamInventory",
-      FBCallbacks(
-        // add
-        add: (data) {
-          if (_lastDataModification.isBefore(
-            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
-          )) {
-            _lastDataModification = DateTime.now();
-          }
+    // FB().listenForChange(
+    //   "${Const().dbrootGaruda}/HarinaamInventory",
+    //   FBCallbacks(
+    //     // add
+    //     add: (data) {
+    //       if (_lastDataModification.isBefore(
+    //         DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
+    //       )) {
+    //         _lastDataModification = DateTime.now();
+    //       }
 
-          // process the received data
-          Map rawMap = data as Map;
-          List entriesRaw = rawMap.values.first;
-          for (var entryRaw in entriesRaw) {
-            InventoryEntry entry =
-                Utils().convertRawToDatatype(entryRaw, InventoryEntry.fromJson);
-            _inventoryEntries.insert(0, entry);
-          }
-        },
+    //       // process the received data
+    //       Map rawMap = data as Map;
+    //       List entriesRaw = rawMap.values.first;
+    //       for (var entryRaw in entriesRaw) {
+    //         InventoryEntry entry =
+    //             Utils().convertRawToDatatype(entryRaw, InventoryEntry.fromJson);
+    //         _inventoryEntries.insert(0, entry);
+    //       }
+    //     },
 
-        // edit
-        edit: () {
-          if (_lastDataModification.isBefore(
-            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
-          )) {
-            _lastDataModification = DateTime.now();
+    //     // edit
+    //     edit: () {
+    //       if (_lastDataModification.isBefore(
+    //         DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
+    //       )) {
+    //         _lastDataModification = DateTime.now();
 
-            refresh();
-          }
-        },
+    //         refresh();
+    //       }
+    //     },
 
-        // delete
-        delete: (data) async {
-          if (_lastDataModification.isBefore(
-            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
-          )) {
-            _lastDataModification = DateTime.now();
+    //     // delete
+    //     delete: (data) async {
+    //       if (_lastDataModification.isBefore(
+    //         DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
+    //       )) {
+    //         _lastDataModification = DateTime.now();
 
-            // process the received data
-            refresh(); // directly refreshing because the deleted data is deeply nested
-          }
-        },
+    //         // process the received data
+    //         refresh(); // directly refreshing because the deleted data is deeply nested
+    //       }
+    //     },
 
-        // get listeners
-        getListeners: (listeners) {
-          _listeners = listeners;
-        },
-      ),
-    );
+    //     // get listeners
+    //     getListeners: (listeners) {
+    //       _listeners = listeners;
+    //     },
+    //   ),
+    // );
 
     refresh();
   }
@@ -142,20 +127,20 @@ class _InventoryState extends State<Inventory> {
     await _lock.synchronized(() async {
       // your code here
 
-      String dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
-      List rawList =
-          await FB().getListByYear(path: dbpath, year: _selectedYear);
-      for (var rawItem in rawList) {
-        Map rawMap = rawItem as Map;
-        List entriesRaw = rawMap.values.first;
-        for (var entryRaw in entriesRaw) {
-          InventoryEntry entry =
-              Utils().convertRawToDatatype(entryRaw, InventoryEntry.fromJson);
-          _inventoryEntries.add(entry);
+      // String dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+      // List rawList =
+      //     await FB().getListByYear(path: dbpath, year: _selectedYear);
+      // for (var rawItem in rawList) {
+      //   Map rawMap = rawItem as Map;
+      //   List entriesRaw = rawMap.values.first;
+      //   for (var entryRaw in entriesRaw) {
+      //     InventoryEntry entry =
+      //         Utils().convertRawToDatatype(entryRaw, InventoryEntry.fromJson);
+      //     _inventoryEntries.add(entry);
 
-          // hint: sorting may not be necessary
-        }
-      }
+      //     // hint: sorting may not be necessary
+      //   }
+      // }
     });
 
     // refresh all child widgets
@@ -171,11 +156,10 @@ class _InventoryState extends State<Inventory> {
     });
 
     // store to database
+    _lastDataModification = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
     await FB().addToList(listpath: dbpath, data: entry.toJson());
-
-    _lastDataModification = DateTime.now();
   }
 
   Widget _createInventoryTile(int index) {
@@ -233,7 +217,7 @@ class _InventoryState extends State<Inventory> {
         ),
 
         // divider
-        SizedBox(height: 8),
+        if (_inventoryEntries.length > 1) SizedBox(height: 8),
         if (_inventoryEntries.length > 1 &&
             index < _inventoryEntries.length - 1)
           Divider(
@@ -243,7 +227,7 @@ class _InventoryState extends State<Inventory> {
             indent: 16,
             endIndent: 16,
           ),
-        SizedBox(height: 8),
+        if (_inventoryEntries.length > 1) SizedBox(height: 8),
       ],
     );
   }
@@ -398,8 +382,8 @@ class _InventoryState extends State<Inventory> {
 
                   _addInventory(entry);
 
-                  noteController.dispose();
-                  countController.dispose();
+                  // noteController.dispose();
+                  // countController.dispose();
                 }
               },
               child: Text(addOrRemove))

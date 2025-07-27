@@ -77,7 +77,8 @@ class ListTileCompact extends StatelessWidget {
                       if (infotext is Text)
                         Text(
                           (infotext as Text).data ?? '',
-                          style: Theme.of(context).textTheme.bodySmall,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(fontStyle: FontStyle.italic),
                         )
                       else if (infotext != null)
                         infotext!,

@@ -146,7 +146,7 @@ class InventoryEntry {
   final DateTime timestamp;
   String username;
   String malaType; // 'sale' or 'chanter'
-  String addOrRemove;
+  String addOrRemove; // 'Add' or 'Remove'
 
   InventoryEntry({
     required this.count,

@@ -59,61 +59,66 @@ class _WelcomeState extends State<Welcome> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Container(
-          height: 200,
-          width: 200,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: Offset(0, 3),
+    return Widgets().createTopLevelCard(
+      context: context,
+      child: Column(children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Container(
+            height: 200,
+            width: 200,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/images/VKHillDieties/Garuda.png',
+                fit: BoxFit.cover,
               ),
-            ],
-          ),
-          child: ClipOval(
-            child: Image.asset(
-              'assets/images/VKHillDieties/Garuda.png',
-              fit: BoxFit.cover,
             ),
           ),
         ),
-      ),
-      Text(
-        'Welcome',
-        style: Theme.of(context).textTheme.headlineLarge,
-      ),
-      Text(
-        _username.isEmpty ? 'Guest' : _username,
-        style: Theme.of(context).textTheme.headlineLarge,
-      ),
-
-      // mobile number
-      if (_mobile != null && _mobile!.isNotEmpty)
         Text(
-          _mobile ?? "",
-          style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                color: Colors.grey,
+          'Welcome',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        Text(
+          _username.isEmpty ? 'Guest' : _username,
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+
+        // mobile number
+        if (_mobile != null && _mobile!.isNotEmpty)
+          Text(
+            _mobile ?? "",
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  color: Colors.grey,
+                ),
+          ),
+        SizedBox(
+          height: 8,
+        ),
+        Text(
+          'ISKCON Vaikuntha Hill',
+          style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                color: Theme.of(context).colorScheme.primary,
               ),
         ),
-      SizedBox(
-        height: 8,
-      ),
-      Text(
-        'ISKCON Vaikuntha Hill',
-        style: Theme.of(context).textTheme.headlineMedium,
-      ),
 
-      // version
-      Text('Garuda v${Const().version}',
-          style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-              )),
-    ]);
+        // version
+        Text('Garuda v${Const().version}',
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                )),
+      ]),
+    );
   }
 }

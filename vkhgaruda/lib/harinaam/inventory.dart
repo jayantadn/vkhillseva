@@ -27,7 +27,22 @@ class _InventoryState extends State<Inventory> {
   DateTime _lastDataModification = DateTime.now();
 
   // lists
-  final List<InventoryEntry> _inventoryEntries = [];
+  final List<InventoryEntry> _inventoryEntries = [
+    InventoryEntry(
+        count: 300,
+        timestamp: DateTime.now(),
+        note: "Test Note",
+        username: "Test User",
+        malaType: "chanters",
+        addOrRemove: "Add"),
+    InventoryEntry(
+        count: 300,
+        timestamp: DateTime.now(),
+        note: "Test Note",
+        username: "Test User",
+        malaType: "chanters",
+        addOrRemove: "Add")
+  ];
 
   // controllers, listeners and focus nodes
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
@@ -163,6 +178,76 @@ class _InventoryState extends State<Inventory> {
     _lastDataModification = DateTime.now();
   }
 
+  Widget _createInventoryTile(int index) {
+    InventoryEntry entry = _inventoryEntries[index];
+
+    return Column(
+      children: [
+        ListTileCompact(
+          // count
+          leading: Container(
+            padding: EdgeInsets.all(8),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.add_circle,
+                  color: entry.malaType == "chanters"
+                      ? Colors.brown
+                      : Theme.of(context).colorScheme.primary,
+                ),
+                Text(entry.count.toString(),
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: entry.malaType == "chanters"
+                            ? Colors.brown
+                            : Theme.of(context).colorScheme.primary)),
+              ],
+            ),
+          ),
+
+          // mala type and timestamp
+          title: Text(
+            "[${entry.malaType} mala] ${DateFormat("dd MMM, yyyy").format(entry.timestamp)}",
+          ),
+
+          // username
+          subtitle: Text(
+            entry.username,
+          ),
+
+          // note
+          infotext: Text("Note: ${entry.note} "),
+
+          // context menu
+          trailing: Widgets().createContextMenu(
+              items: ["Edit", "Delete"],
+              onPressed: (String action) {
+                if (action == "Edit") {
+                  _showDialogInventory(entry.addOrRemove);
+                } else if (action == "Delete") {
+                  Widgets().showConfirmDialog(
+                      context, "Delete this inventory item?", "Delete", () {
+                    _deleteInventory(entry);
+                  });
+                }
+              }),
+        ),
+
+        // divider
+        SizedBox(height: 8),
+        if (_inventoryEntries.length > 1 &&
+            index < _inventoryEntries.length - 1)
+          Divider(
+            color: Colors.grey.shade300,
+            height: 1,
+            thickness: 1,
+            indent: 16,
+            endIndent: 16,
+          ),
+        SizedBox(height: 8),
+      ],
+    );
+  }
+
   Widget _createYearSelector() {
     List<int> years = List.generate(5, (index) => DateTime.now().year - index);
 
@@ -243,6 +328,7 @@ class _InventoryState extends State<Inventory> {
 
     Widgets().showResponsiveDialog(
         context: context,
+        title: "$addOrRemove Inventory",
         child: Form(
           key: formKey,
           child: Column(
@@ -264,6 +350,7 @@ class _InventoryState extends State<Inventory> {
                   labelText: "Count",
                   border: OutlineInputBorder(),
                 ),
+                controller: countController,
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -286,6 +373,7 @@ class _InventoryState extends State<Inventory> {
                   labelText: "Note",
                   border: OutlineInputBorder(),
                 ),
+                controller: noteController,
               ),
             ],
           ),
@@ -366,6 +454,18 @@ class _InventoryState extends State<Inventory> {
                                 chantersLabel: "Chanters mala stock",
                                 salesLabel: "Sales mala stock",
                               )
+                            ],
+                          )),
+
+                      // inventory entries
+                      Widgets().createTopLevelCard(
+                          context: context,
+                          child: Column(
+                            children: [
+                              ...List.generate(_inventoryEntries.length,
+                                  (index) => _createInventoryTile(index)),
+                              if (_inventoryEntries.isEmpty)
+                                Text("No inventory entries found")
                             ],
                           )),
 

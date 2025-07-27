@@ -164,35 +164,32 @@ class _HomePageState extends State<HomePage> {
                         //welcome message
                         Welcome(),
 
-                        SizedBox(height: 50),
+                        // SizedBox(height: 50),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
                               // Nitya Seva
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: LauncherTile(
-                                    image:
-                                        'assets/images/LauncherIcons/NityaSeva.png',
-                                    title: "Nitya\nSeva",
-                                    callback:
-                                        LauncherTileCallback(onClick: () async {
-                                      bool perm = await Utils()
-                                          .checkPermission("Nitya Seva");
-                                      if (perm) {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const NityaSeva(
-                                                      title: "Nitya Seva")),
-                                        );
-                                      } else {
-                                        Toaster().error("Access Denied");
-                                      }
-                                    })),
-                              ),
+                              LauncherTile(
+                                  image:
+                                      'assets/images/LauncherIcons/NityaSeva.png',
+                                  title: "Nitya\nSeva",
+                                  callback:
+                                      LauncherTileCallback(onClick: () async {
+                                    bool perm = await Utils()
+                                        .checkPermission("Nitya Seva");
+                                    if (perm) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const NityaSeva(
+                                                    title: "Nitya Seva")),
+                                      );
+                                    } else {
+                                      Toaster().error("Access Denied");
+                                    }
+                                  })),
 
                               // Harinaam Mantapa
                               LauncherTile(

@@ -134,7 +134,7 @@ class _InventoryState extends State<Inventory> {
         }
       }
 
-      // dashboard counters
+      // calculate dashboard counters
       int chantersCount = 0;
       int salesCount = 0;
       for (InventoryEntry entry in _inventoryEntries) {
@@ -152,6 +152,29 @@ class _InventoryState extends State<Inventory> {
           }
         }
       }
+
+      // offset by the sales count
+      int salesOffset = 0;
+      dbpath = "${Const().dbrootGaruda}/Harinaam";
+      rawList = await FB().getListByYear(path: dbpath, year: _selectedYear);
+      if (rawList.isNotEmpty) {
+        for (var rawItem in rawList) {
+          Map rawMap = rawItem as Map;
+          var entryRaw = rawMap.values.first as Map;
+          var salesRaw = entryRaw["Sales"];
+          if (salesRaw != null) {
+            Map salesMap = salesRaw as Map;
+            for (var entry in salesMap.entries) {
+              SalesEntry salesEntry = Utils()
+                  .convertRawToDatatype(entry.value, SalesEntry.fromJson);
+              salesOffset += salesEntry.count;
+            }
+          }
+        }
+      }
+      salesCount -= salesOffset;
+
+      // display the dashboard counters
       await keyDashboard.currentState?.setChanters(chantersCount);
       await keyDashboard.currentState?.setSales(salesCount);
     });

@@ -372,7 +372,19 @@ class _InventoryState extends State<Inventory> {
     _lastDataModification = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
-    await FB().deleteFromListByValue(listpath: dbpath, value: entry.toJson());
+    List inventoryEntriesRaw = await FB().getList(path: dbpath);
+    List<InventoryEntry> inventoryEntries = inventoryEntriesRaw
+        .map((e) => Utils().convertRawToDatatype(e, InventoryEntry.fromJson))
+        .toList();
+    if (inventoryEntries.isEmpty) {
+      Toaster().error("No inventory entries found for the date");
+    } else {
+      inventoryEntries.remove(entry);
+      inventoryEntriesRaw = inventoryEntries
+          .map((e) => e.toJson())
+          .toList(); // convert back to raw format
+      await FB().setValue(path: dbpath, value: inventoryEntriesRaw);
+    }
   }
 
   Future<void> _updateInventoryEntry(

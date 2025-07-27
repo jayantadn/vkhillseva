@@ -124,12 +124,14 @@ class _InventoryState extends State<Inventory> {
       String dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
       List rawList =
           await FB().getListByYear(path: dbpath, year: _selectedYear);
-      for (var rawItem in rawList[0]) {
-        // rawList[0]: dont know why a double list is returned
-        Map rawMap = rawItem as Map;
-        InventoryEntry entry =
-            Utils().convertRawToDatatype(rawMap, InventoryEntry.fromJson);
-        _inventoryEntries.insert(0, entry);
+      if (rawList.isNotEmpty) {
+        for (var rawItem in rawList[0]) {
+          // rawList[0]: dont know why a double list is returned
+          Map rawMap = rawItem as Map;
+          InventoryEntry entry =
+              Utils().convertRawToDatatype(rawMap, InventoryEntry.fromJson);
+          _inventoryEntries.insert(0, entry);
+        }
       }
 
       // dashboard counters
@@ -206,7 +208,9 @@ class _InventoryState extends State<Inventory> {
             child: Column(
               children: [
                 Icon(
-                  Icons.add_circle,
+                  entry.addOrRemove == "Add"
+                      ? Icons.add_circle
+                      : Icons.remove_circle,
                   color: entry.malaType == "Chanters"
                       ? Colors.brown
                       : Theme.of(context).colorScheme.primary,
@@ -247,14 +251,14 @@ class _InventoryState extends State<Inventory> {
           ),
 
           // note
-          infotext: Text("Note: ${entry.note} "),
+          infotext: entry.note.isNotEmpty ? Text("Note: ${entry.note}") : null,
 
           // context menu
           trailing: Widgets().createContextMenu(
               items: ["Edit", "Delete"],
               onPressed: (String action) {
                 if (action == "Edit") {
-                  _showDialogInventory(entry.addOrRemove);
+                  _showDialogInventory(entry.addOrRemove, oldEntry: entry);
                 } else if (action == "Delete") {
                   Widgets().showConfirmDialog(
                       context, "Delete this inventory item?", "Delete", () {
@@ -371,16 +375,19 @@ class _InventoryState extends State<Inventory> {
     await FB().deleteFromListByValue(listpath: dbpath, value: entry.toJson());
   }
 
-  Future<void> _showDialogInventory(String addOrRemove) async {
+  Future<void> _showDialogInventory(String addOrRemove,
+      {InventoryEntry? oldEntry}) async {
     final formKey = GlobalKey<FormState>();
 
-    TextEditingController noteController = TextEditingController();
-    TextEditingController countController = TextEditingController();
-    String malaType = "Chanters";
+    TextEditingController noteController =
+        TextEditingController(text: oldEntry?.note ?? "");
+    TextEditingController countController =
+        TextEditingController(text: oldEntry?.count.toString() ?? "");
+    String malaType = oldEntry?.malaType ?? "Chanters";
 
     Widgets().showResponsiveDialog(
         context: context,
-        title: "$addOrRemove Inventory",
+        title: "${oldEntry == null ? addOrRemove : 'Edit'} Inventory",
         child: Form(
           key: formKey,
           child: Column(
@@ -449,12 +456,10 @@ class _InventoryState extends State<Inventory> {
                   );
 
                   _addInventoryEntry(entry);
-
-                  // noteController.dispose();
-                  // countController.dispose();
                 }
               },
-              child: Text(addOrRemove))
+              child:
+                  Text("$addOrRemove${oldEntry == null ? '' : ' (Update)'}")),
         ]);
   }
 

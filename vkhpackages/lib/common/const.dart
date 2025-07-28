@@ -24,6 +24,9 @@ class Const {
   final String delimiter = "~";
   final int sessionLockDuration = 5; // hours
 
+  // harinaam
+  String weeklyHarinaamSettlementDay = "Monday";
+
   final nityaSeva = {
     'amounts': [
       {

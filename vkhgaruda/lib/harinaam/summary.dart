@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -19,6 +20,8 @@ class _SummaryState extends State<Summary> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  String _period = "daily";
+  String _periodDetails = DateFormat("dd MMM, yyyy").format(DateTime.now());
 
   // lists
 
@@ -58,6 +61,109 @@ class _SummaryState extends State<Summary> {
     });
   }
 
+  Widget _createHMI() {
+    return Widgets().createTopLevelCard(
+      context: context,
+      child: ListTile(
+          // previous button
+          leading: IconButton(
+            icon: Transform.rotate(
+              angle: 3.14, // Rotate 180 degrees to point left
+              child: Icon(
+                Icons.play_arrow,
+                color: Theme.of(context).iconTheme.color,
+              ),
+            ),
+            onPressed: () {},
+          ),
+
+          // dropdown
+          title: Center(
+            child: DropdownButton<String>(
+              value: _period,
+              items: const [
+                DropdownMenuItem(value: "daily", child: Text("Daily")),
+                DropdownMenuItem(value: "weekly", child: Text("Weekly")),
+                DropdownMenuItem(value: "monthly", child: Text("Monthly")),
+                DropdownMenuItem(value: "yearly", child: Text("Yearly")),
+              ],
+              onChanged: (String? newValue) {
+                setState(() {
+                  _period = newValue ?? _period;
+
+                  switch (_period) {
+                    case "daily":
+                      _periodDetails =
+                          DateFormat("dd MMM, yyyy").format(DateTime.now());
+                      break;
+                    case "weekly":
+                      String cutoffDate = _getLastCutoffDate(DateTime.now());
+
+                      String today =
+                          DateFormat("dd MMM, yyyy").format(DateTime.now());
+
+                      _periodDetails = "$cutoffDate - $today";
+                      break;
+                    case "monthly":
+                      _periodDetails =
+                          DateFormat("MMMM yyyy").format(DateTime.now());
+                      break;
+                    case "yearly":
+                      _periodDetails =
+                          DateFormat("yyyy").format(DateTime.now());
+                      break;
+                  }
+                });
+              },
+            ),
+          ),
+
+          // selection label
+          subtitle: Center(
+              child: Text(
+            _periodDetails,
+            style: Theme.of(context).textTheme.bodyMedium,
+          )),
+
+          // next button
+          trailing: IconButton(
+            icon: Icon(
+              Icons.play_arrow,
+              color: Theme.of(context).iconTheme.color,
+            ), // Default points right
+            onPressed: () {},
+          )),
+    );
+  }
+
+  String _getLastCutoffDate(DateTime date) {
+    // Find the last occurrence of the settlement day and return the day after
+    DateTime current = date;
+    String targetDay = Const().weeklyHarinaamSettlementDay;
+
+    // Convert day names to weekday numbers (Monday = 1, Sunday = 7)
+    Map<String, int> dayToWeekday = {
+      'Monday': 1,
+      'Tuesday': 2,
+      'Wednesday': 3,
+      'Thursday': 4,
+      'Friday': 5,
+      'Saturday': 6,
+      'Sunday': 7,
+    };
+
+    int targetWeekday = dayToWeekday[targetDay] ?? 1;
+
+    // Scroll backwards to find the last occurrence of the target day
+    do {
+      current = current.subtract(Duration(days: 1));
+    } while (current.weekday != targetWeekday);
+
+    // Return the date 1 day after the settlement day
+    DateTime cutoffDate = current.add(Duration(days: 1));
+    return DateFormat("dd MMM, yyyy").format(cutoffDate);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -87,13 +193,7 @@ class _SummaryState extends State<Summary> {
                       SizedBox(height: 10),
 
                       // your widgets here
-                      Widgets().createTopLevelCard(
-                        context: context,
-                        child: ListTile(
-                          title: Text("Hello World"),
-                          subtitle: Text("This is a sample card"),
-                        ),
-                      ),
+                      _createHMI(),
 
                       // leave some space at bottom
                       SizedBox(height: 500),

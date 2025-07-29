@@ -64,76 +64,257 @@ class _SummaryState extends State<Summary> {
   Widget _createHMI() {
     return Widgets().createTopLevelCard(
       context: context,
-      child: ListTile(
-          // previous button
-          leading: IconButton(
-            icon: Transform.rotate(
-              angle: 3.14, // Rotate 180 degrees to point left
-              child: Icon(
-                Icons.play_arrow,
-                color: Theme.of(context).iconTheme.color,
+      child: Container(
+        padding: const EdgeInsets.all(12.0), // Reduced from 16
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Theme.of(context).primaryColor.withOpacity(0.1),
+              Theme.of(context).colorScheme.surface,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            // Period selector row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Previous button with animation (more compact)
+                Container(
+                  width: 40, // Fixed width
+                  height: 40, // Fixed height
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    padding: EdgeInsets.zero, // Remove default padding
+                    icon: AnimatedRotation(
+                      turns: 0.5,
+                      duration: const Duration(milliseconds: 300),
+                      child: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Theme.of(context).primaryColor,
+                        size: 18, // Slightly smaller
+                      ),
+                    ),
+                    onPressed: _prev,
+                  ),
+                ),
+
+                // Dropdown with enhanced styling (more compact)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 6), // Reduced padding
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Theme.of(context).primaryColor.withOpacity(0.3),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).primaryColor.withOpacity(0.1),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: DropdownButton<String>(
+                    value: _period,
+                    underline: Container(),
+                    icon: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Theme.of(context).primaryColor,
+                      size: 20, // Slightly smaller
+                    ),
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14, // Reduced font size
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: "daily",
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.today, size: 16), // Smaller icons
+                            SizedBox(width: 6), // Reduced spacing
+                            Text("Daily"),
+                          ],
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: "weekly",
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.view_week, size: 16),
+                            SizedBox(width: 6),
+                            Text("Weekly"),
+                          ],
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: "monthly",
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.calendar_month, size: 16),
+                            SizedBox(width: 6),
+                            Text("Monthly"),
+                          ],
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: "yearly",
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.calendar_today, size: 16),
+                            SizedBox(width: 6),
+                            Text("Yearly"),
+                          ],
+                        ),
+                      ),
+                    ],
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _period = newValue ?? _period;
+
+                        // Update period details based on selection
+                        switch (_period) {
+                          case "daily":
+                            _periodDetails = DateFormat("dd MMM, yyyy")
+                                .format(DateTime.now());
+                            break;
+                          case "weekly":
+                            DateTime now = DateTime.now();
+                            DateTime startOfWeek =
+                                now.subtract(Duration(days: now.weekday - 1));
+                            DateTime endOfWeek =
+                                startOfWeek.add(Duration(days: 6));
+                            _periodDetails =
+                                "${DateFormat("dd MMM, yyyy").format(startOfWeek)} - ${DateFormat("dd MMM, yyyy").format(endOfWeek)}";
+                            break;
+                          case "monthly":
+                            DateTime now = DateTime.now();
+                            _periodDetails = DateFormat("MMM yyyy").format(now);
+                            break;
+                          case "yearly":
+                            DateTime now = DateTime.now();
+                            _periodDetails = DateFormat("yyyy").format(now);
+                            break;
+                        }
+                      });
+                    },
+                  ),
+                ),
+
+                // Next button with animation (more compact)
+                Container(
+                  width: 40, // Fixed width
+                  height: 40, // Fixed height
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    padding: EdgeInsets.zero, // Remove default padding
+                    icon: Icon(
+                      Icons.arrow_forward_ios,
+                      color: Theme.of(context).primaryColor,
+                      size: 18, // Slightly smaller
+                    ),
+                    onPressed: _next,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 8), // Reduced from 16
+
+            // Period details with enhanced styling (more compact)
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Container(
+                key: ValueKey(_periodDetails),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 8), // Reduced padding
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).primaryColor.withOpacity(0.2),
+                      Theme.of(context).primaryColor.withOpacity(0.1),
+                    ],
+                  ),
+                  borderRadius:
+                      BorderRadius.circular(20), // Slightly smaller radius
+                  border: Border.all(
+                    color: Theme.of(context).primaryColor.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _getPeriodIcon(),
+                      color: Theme.of(context).primaryColor,
+                      size: 16, // Smaller icon
+                    ),
+                    const SizedBox(width: 6), // Reduced spacing
+                    Text(
+                      _periodDetails,
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14, // Reduced font size
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            onPressed: _prev,
-          ),
-
-          // dropdown
-          title: Center(
-            child: DropdownButton<String>(
-              value: _period,
-              items: const [
-                DropdownMenuItem(value: "daily", child: Text("Daily")),
-                DropdownMenuItem(value: "weekly", child: Text("Weekly")),
-                DropdownMenuItem(value: "monthly", child: Text("Monthly")),
-                DropdownMenuItem(value: "yearly", child: Text("Yearly")),
-              ],
-              onChanged: (String? newValue) {
-                setState(() {
-                  _period = newValue ?? _period;
-
-                  switch (_period) {
-                    case "daily":
-                      _periodDetails =
-                          DateFormat("dd MMM, yyyy").format(DateTime.now());
-                      break;
-                    case "weekly":
-                      String cutoffDate = _getLastCutoffDate(DateTime.now());
-
-                      String today =
-                          DateFormat("dd MMM, yyyy").format(DateTime.now());
-
-                      _periodDetails = "$cutoffDate - $today";
-                      break;
-                    case "monthly":
-                      _periodDetails =
-                          DateFormat("MMMM yyyy").format(DateTime.now());
-                      break;
-                    case "yearly":
-                      _periodDetails =
-                          DateFormat("yyyy").format(DateTime.now());
-                      break;
-                  }
-                });
-              },
-            ),
-          ),
-
-          // selection label
-          subtitle: Center(
-              child: Text(
-            _periodDetails,
-            style: Theme.of(context).textTheme.bodyMedium,
-          )),
-
-          // next button
-          trailing: IconButton(
-            icon: Icon(
-              Icons.play_arrow,
-              color: Theme.of(context).iconTheme.color,
-            ), // Default points right
-            onPressed: _next,
-          )),
+          ],
+        ),
+      ),
     );
+  }
+
+  // Add this helper method
+  IconData _getPeriodIcon() {
+    switch (_period) {
+      case "daily":
+        return Icons.today;
+      case "weekly":
+        return Icons.view_week;
+      case "monthly":
+        return Icons.calendar_month;
+      case "yearly":
+        return Icons.calendar_today;
+      default:
+        return Icons.calendar_today;
+    }
   }
 
   String _getLastCutoffDate(DateTime date) {
@@ -173,8 +354,8 @@ class _SummaryState extends State<Summary> {
         setState(() {
           _periodDetails = DateFormat("dd MMM, yyyy").format(previousDate);
         });
-
         break;
+
       case "weekly":
         String startOfWeek = _periodDetails.split('-')[0].trim();
         DateTime currentStartDate =
@@ -187,21 +368,36 @@ class _SummaryState extends State<Summary> {
           _periodDetails =
               "${DateFormat("dd MMM, yyyy").format(previousStartDate)} - ${DateFormat("dd MMM, yyyy").format(previousEndDate)}";
         });
+        break;
 
-        break;
       case "monthly":
+        DateTime currentDate = DateFormat("MMM yyyy").parse(_periodDetails);
+        DateTime previousMonth =
+            DateTime(currentDate.year, currentDate.month - 1, 1);
+
+        setState(() {
+          _periodDetails = DateFormat("MMM yyyy").format(previousMonth);
+        });
         break;
+
       case "yearly":
+        DateTime currentDate = DateFormat("yyyy").parse(_periodDetails);
+        DateTime previousYear = DateTime(currentDate.year - 1, 1, 1);
+
+        setState(() {
+          _periodDetails = DateFormat("yyyy").format(previousYear);
+        });
         break;
     }
   }
 
   Future<void> _next() async {
+    DateTime today = DateTime.now();
+
     switch (_period) {
       case "daily":
         DateTime currentDate = DateFormat("dd MMM, yyyy").parse(_periodDetails);
 
-        DateTime today = DateTime.now();
         if (currentDate.year == today.year &&
             currentDate.month == today.month &&
             currentDate.day == today.day) {
@@ -213,13 +409,58 @@ class _SummaryState extends State<Summary> {
         setState(() {
           _periodDetails = DateFormat("dd MMM, yyyy").format(nextDate);
         });
+        break;
 
-        break;
       case "weekly":
+        String startOfWeek = _periodDetails.split('-')[0].trim();
+        DateTime currentStartDate =
+            DateFormat("dd MMM, yyyy").parse(startOfWeek);
+        DateTime nextStartDate = currentStartDate.add(Duration(days: 7));
+
+        // Don't go beyond current week
+        if (nextStartDate
+            .isAfter(today.subtract(Duration(days: today.weekday - 1)))) {
+          return;
+        }
+
+        DateTime nextEndDate = nextStartDate.add(Duration(days: 6));
+
+        setState(() {
+          _periodDetails =
+              "${DateFormat("dd MMM, yyyy").format(nextStartDate)} - ${DateFormat("dd MMM, yyyy").format(nextEndDate)}";
+        });
         break;
+
       case "monthly":
+        DateTime currentDate = DateFormat("MMM yyyy").parse(_periodDetails);
+
+        // Don't go beyond current month
+        if (currentDate.year == today.year &&
+            currentDate.month == today.month) {
+          return;
+        }
+
+        DateTime nextMonth =
+            DateTime(currentDate.year, currentDate.month + 1, 1);
+
+        setState(() {
+          _periodDetails = DateFormat("MMM yyyy").format(nextMonth);
+        });
         break;
+
       case "yearly":
+        DateTime currentDate = DateFormat("yyyy").parse(_periodDetails);
+
+        // Don't go beyond current year
+        if (currentDate.year == today.year) {
+          return;
+        }
+
+        DateTime nextYear = DateTime(currentDate.year + 1, 1, 1);
+
+        setState(() {
+          _periodDetails = DateFormat("yyyy").format(nextYear);
+        });
         break;
     }
   }

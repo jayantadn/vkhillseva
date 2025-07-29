@@ -116,7 +116,7 @@ class _SummaryState extends State<Summary> {
                 // Dropdown with enhanced styling (more compact)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 6), // Reduced padding
+                      horizontal: 12, vertical: 0), // Minimal vertical padding
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
@@ -259,39 +259,23 @@ class _SummaryState extends State<Summary> {
               duration: const Duration(milliseconds: 300),
               child: Container(
                 key: ValueKey(_periodDetails),
+                width: double.infinity, // Full width
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 8), // Reduced padding
+                    horizontal: 16, vertical: 6), // Reduced vertical padding
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).primaryColor.withOpacity(0.2),
-                      Theme.of(context).primaryColor.withOpacity(0.1),
-                    ],
-                  ),
-                  borderRadius:
-                      BorderRadius.circular(20), // Slightly smaller radius
-                  border: Border.all(
-                    color: Theme.of(context).primaryColor.withOpacity(0.3),
-                  ),
+                  color: Theme.of(context)
+                      .primaryColor
+                      .withOpacity(0.9), // Dark background
+                  borderRadius: BorderRadius.circular(4), // Sharp edges
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _getPeriodIcon(),
-                      color: Theme.of(context).primaryColor,
-                      size: 16, // Smaller icon
-                    ),
-                    const SizedBox(width: 6), // Reduced spacing
-                    Text(
-                      _periodDetails,
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14, // Reduced font size
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  _periodDetails,
+                  textAlign: TextAlign.center, // Center the text
+                  style: TextStyle(
+                    color: Colors.white, // White text
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14, // Reduced font size
+                  ),
                 ),
               ),
             ),

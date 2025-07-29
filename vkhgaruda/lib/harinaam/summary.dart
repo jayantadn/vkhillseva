@@ -289,50 +289,6 @@ class _SummaryState extends State<Summary> {
     );
   }
 
-  // Add this helper method
-  IconData _getPeriodIcon() {
-    switch (_period) {
-      case "daily":
-        return Icons.today;
-      case "weekly":
-        return Icons.view_week;
-      case "monthly":
-        return Icons.calendar_month;
-      case "yearly":
-        return Icons.calendar_today;
-      default:
-        return Icons.calendar_today;
-    }
-  }
-
-  String _getLastCutoffDate(DateTime date) {
-    // Find the last occurrence of the settlement day and return the day after
-    DateTime current = date;
-    String targetDay = Const().weeklyHarinaamSettlementDay;
-
-    // Convert day names to weekday numbers (Monday = 1, Sunday = 7)
-    Map<String, int> dayToWeekday = {
-      'Monday': 1,
-      'Tuesday': 2,
-      'Wednesday': 3,
-      'Thursday': 4,
-      'Friday': 5,
-      'Saturday': 6,
-      'Sunday': 7,
-    };
-
-    int targetWeekday = dayToWeekday[targetDay] ?? 1;
-
-    // Scroll backwards to find the last occurrence of the target day
-    do {
-      current = current.subtract(Duration(days: 1));
-    } while (current.weekday != targetWeekday);
-
-    // Return the date 1 day after the settlement day
-    DateTime cutoffDate = current.add(Duration(days: 1));
-    return DateFormat("dd MMM, yyyy").format(cutoffDate);
-  }
-
   Future<void> _prev() async {
     switch (_period) {
       case "daily":

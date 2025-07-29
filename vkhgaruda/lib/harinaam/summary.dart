@@ -74,7 +74,7 @@ class _SummaryState extends State<Summary> {
                 color: Theme.of(context).iconTheme.color,
               ),
             ),
-            onPressed: () {},
+            onPressed: _prev,
           ),
 
           // dropdown
@@ -131,7 +131,7 @@ class _SummaryState extends State<Summary> {
               Icons.play_arrow,
               color: Theme.of(context).iconTheme.color,
             ), // Default points right
-            onPressed: () {},
+            onPressed: _next,
           )),
     );
   }
@@ -162,6 +162,66 @@ class _SummaryState extends State<Summary> {
     // Return the date 1 day after the settlement day
     DateTime cutoffDate = current.add(Duration(days: 1));
     return DateFormat("dd MMM, yyyy").format(cutoffDate);
+  }
+
+  Future<void> _prev() async {
+    switch (_period) {
+      case "daily":
+        DateTime currentDate = DateFormat("dd MMM, yyyy").parse(_periodDetails);
+        DateTime previousDate = currentDate.subtract(Duration(days: 1));
+
+        setState(() {
+          _periodDetails = DateFormat("dd MMM, yyyy").format(previousDate);
+        });
+
+        break;
+      case "weekly":
+        String startOfWeek = _periodDetails.split('-')[0].trim();
+        DateTime currentStartDate =
+            DateFormat("dd MMM, yyyy").parse(startOfWeek);
+        DateTime previousStartDate =
+            currentStartDate.subtract(Duration(days: 7));
+        DateTime previousEndDate = previousStartDate.add(Duration(days: 6));
+
+        setState(() {
+          _periodDetails =
+              "${DateFormat("dd MMM, yyyy").format(previousStartDate)} - ${DateFormat("dd MMM, yyyy").format(previousEndDate)}";
+        });
+
+        break;
+      case "monthly":
+        break;
+      case "yearly":
+        break;
+    }
+  }
+
+  Future<void> _next() async {
+    switch (_period) {
+      case "daily":
+        DateTime currentDate = DateFormat("dd MMM, yyyy").parse(_periodDetails);
+
+        DateTime today = DateTime.now();
+        if (currentDate.year == today.year &&
+            currentDate.month == today.month &&
+            currentDate.day == today.day) {
+          return;
+        }
+
+        DateTime nextDate = currentDate.add(Duration(days: 1));
+
+        setState(() {
+          _periodDetails = DateFormat("dd MMM, yyyy").format(nextDate);
+        });
+
+        break;
+      case "weekly":
+        break;
+      case "monthly":
+        break;
+      case "yearly":
+        break;
+    }
   }
 
   @override

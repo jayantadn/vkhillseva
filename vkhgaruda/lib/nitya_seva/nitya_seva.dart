@@ -886,18 +886,6 @@ class _NityaSevaState extends State<NityaSeva> {
                     text: "Festival Record",
                     icon: Icons.temple_hindu,
                     onPressed: _onFestivalRecord),
-
-                // settings
-                MyPopupMenuItem(
-                    text: "Settings",
-                    icon: Icons.settings,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Settings(title: 'Settings')),
-                      );
-                    }),
               ]),
             ]),
             body: Padding(

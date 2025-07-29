@@ -88,7 +88,9 @@ class _SummaryState extends State<Summary> {
                   width: 40, // Fixed width
                   height: 40, // Fixed height
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    color: Theme.of(context)
+                        .primaryColor
+                        .withOpacity(0.9), // Dark background
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -105,7 +107,7 @@ class _SummaryState extends State<Summary> {
                       duration: const Duration(milliseconds: 300),
                       child: Icon(
                         Icons.arrow_forward_ios,
-                        color: Theme.of(context).primaryColor,
+                        color: Colors.white, // White icon
                         size: 18, // Slightly smaller
                       ),
                     ),
@@ -229,7 +231,9 @@ class _SummaryState extends State<Summary> {
                   width: 40, // Fixed width
                   height: 40, // Fixed height
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    color: Theme.of(context)
+                        .primaryColor
+                        .withOpacity(0.9), // Dark background
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -243,7 +247,7 @@ class _SummaryState extends State<Summary> {
                     padding: EdgeInsets.zero, // Remove default padding
                     icon: Icon(
                       Icons.arrow_forward_ios,
-                      color: Theme.of(context).primaryColor,
+                      color: Colors.white, // White icon
                       size: 18, // Slightly smaller
                     ),
                     onPressed: _next,

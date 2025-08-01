@@ -1,13 +1,16 @@
 {
     "7.8.0": {
-        "effort": "0h",
+        "effort": "0.0h",
         "features": [
             "festival seva custom amount"
         ],
         "fixes": [
             "fix: double add session",
             "fix: dashboard display custom amount",
-            "fix: audio clip upload issue"
+            "fix: audio clip upload issue",
+            "double add session",
+            "dashboard display custom amount",
+            "audio clip upload issue"
         ]
     },
     "7.7.4": {

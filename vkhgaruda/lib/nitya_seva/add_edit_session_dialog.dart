@@ -43,9 +43,20 @@ class _AddEditSessionDialogState extends State<AddEditSessionDialog> {
     _selectedSevaType = widget.session?.type ?? "Pushpanjali";
     _selectedSeva = widget.session?.name ?? "Nitya Seva";
     _sevaAmounts = List<String>.from(widget.sevaAmounts);
-    _sevaAmount = widget.session?.defaultAmount.toString() ?? _sevaAmounts.first;
     _paymentModes = List<String>.from(widget.paymentModes);
     _paymentMode = widget.session?.defaultPaymentMode ?? _paymentModes.first;
+
+    if (_selectedSeva == "Nitya Seva") {
+      if (widget.session?.defaultAmount != null &&
+          _sevaAmounts.contains(widget.session!.defaultAmount.toString())) {
+        _sevaAmount = widget.session!.defaultAmount.toString();
+      } else {
+        _sevaAmount = _sevaAmounts.first;
+      }
+    } else {
+      _sevaAmount =
+          widget.session?.defaultAmount.toString() ?? _sevaAmounts.first;
+    }
 
     _festivalSevaAmountController.text = _sevaAmount;
   }
@@ -167,6 +178,12 @@ class _AddEditSessionDialogState extends State<AddEditSessionDialog> {
                   onChanged: (newValue) {
                     setState(() {
                       if (newValue != null) {
+                        if (_selectedSeva != "Nitya Seva" &&
+                            newValue == "Nitya Seva") {
+                          _sevaAmount = widget.sevaAmounts.first;
+                          _festivalSevaAmountController.text = _sevaAmount;
+                        }
+
                         _selectedSeva = newValue;
                       }
                     });

@@ -173,7 +173,7 @@ class _TicketPageState extends State<TicketPage> {
     if (_tickets.isEmpty) {
       if (widget.session.name == "Nitya Seva") {
         _showNextTicketNumbers(context);
-      } 
+      }
     }
   }
 
@@ -203,7 +203,7 @@ class _TicketPageState extends State<TicketPage> {
     sevaNames = _getSevaNames(amount);
     if (ticket == null) {
       if (widget.session.name == "Nitya Seva") {
-      sevaName = sevaNames.isNotEmpty ? sevaNames[0] : "";
+        sevaName = sevaNames.isNotEmpty ? sevaNames[0] : "";
       } else {
         sevaName = widget.session.name;
       }
@@ -244,88 +244,90 @@ class _TicketPageState extends State<TicketPage> {
                         // Seva amount label
                         SizedBox(height: 8),
                         if (widget.session.name == "Nitya Seva")
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Seva Amount",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Seva Amount",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                            ),
                           ),
-                        ),
 
                         // buttons for seva amounts
                         if (widget.session.name == "Nitya Seva")
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              ...Const().nityaSeva['amounts']!.map((seva) {
-                                // skip obsolete seva amounts
-                                if (seva.values.first['obsolete'] == true) {
-                                  return Container();
-                                }
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                ...Const().nityaSeva['amounts']!.map((seva) {
+                                  // skip obsolete seva amounts
+                                  if (seva.values.first['obsolete'] == true) {
+                                    return Container();
+                                  }
 
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      amount = int.parse(seva.keys.first);
-                                      if (ticket != null &&
-                                          ticket.amount == amount) {
-                                        ticketNumberController.text =
-                                            ticket.ticketNumber.toString();
-                                      } else {
-                                        ticketNumberController.text =
-                                            (await _getNextTicketNumber(amount))
-                                                .toString();
-                                      }
-                                      setDialogState(() {
-                                        sevaNames = _getSevaNames(amount);
-                                        sevaName = sevaNames.isNotEmpty
-                                            ? sevaNames[0]
-                                            : "";
-                                      });
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color:
-                                            amount.toString() == seva.keys.first
-                                                ? seva.values.first['color']!
-                                                    as Color
-                                                : Colors.transparent,
-                                        border: Border.all(
-                                            color: seva.values.first['color']!
-                                                as Color),
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          seva.keys.first,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge!
-                                              .copyWith(
-                                                  color: amount.toString() ==
-                                                          seva.keys.first
-                                                      ? Colors.white
-                                                      : seva.values
-                                                              .first['color']
-                                                          as Color),
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        amount = int.parse(seva.keys.first);
+                                        if (ticket != null &&
+                                            ticket.amount == amount) {
+                                          ticketNumberController.text =
+                                              ticket.ticketNumber.toString();
+                                        } else {
+                                          ticketNumberController.text =
+                                              (await _getNextTicketNumber(
+                                                      amount))
+                                                  .toString();
+                                        }
+                                        setDialogState(() {
+                                          sevaNames = _getSevaNames(amount);
+                                          sevaName = sevaNames.isNotEmpty
+                                              ? sevaNames[0]
+                                              : "";
+                                        });
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: amount.toString() ==
+                                                  seva.keys.first
+                                              ? seva.values.first['color']!
+                                                  as Color
+                                              : Colors.transparent,
+                                          border: Border.all(
+                                              color: seva.values.first['color']!
+                                                  as Color),
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            seva.keys.first,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge!
+                                                .copyWith(
+                                                    color: amount.toString() ==
+                                                            seva.keys.first
+                                                        ? Colors.white
+                                                        : seva.values
+                                                                .first['color']
+                                                            as Color),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              }),
-                            ],
+                                  );
+                                }),
+                              ],
+                            ),
                           ),
-                        ),
 
                         // Payment mode label
                         SizedBox(height: 8),
@@ -409,40 +411,41 @@ class _TicketPageState extends State<TicketPage> {
                         // seva name label
                         SizedBox(height: 8),
                         if (widget.session.name == "Nitya Seva")
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Seva Name",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Seva Name",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                            ),
                           ),
-                        ),
 
                         // seva name dropdown
                         if (widget.session.name == "Nitya Seva")
-                        DropdownButton<String>(
-                          isExpanded: true,
-                          value: sevaName,
-                          items: sevaNames.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setDialogState(() {
-                              sevaName = newValue!;
-                            });
-                          },
-                          hint: Text(
-                            "Select Seva",
-                            style: Theme.of(context).textTheme.bodySmall,
+                          DropdownButton<String>(
+                            isExpanded: true,
+                            value: sevaName,
+                            items: sevaNames.map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setDialogState(() {
+                                sevaName = newValue!;
+                              });
+                            },
+                            hint: Text(
+                              "Select Seva",
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ),
-                        ),
 
                         // note field
                         SizedBox(height: 8),
@@ -636,10 +639,16 @@ class _TicketPageState extends State<TicketPage> {
     String time = DateFormat("HH:mm:ss").format(ticket.timestamp);
 
     Color color = Const()
-        .nityaSeva['amounts']!
-        .firstWhere((element) => element.keys.first == ticket.amount.toString())
-        .values
-        .first['color']! as Color;
+            .nityaSeva['amounts']!
+            .where((element) => element.keys.first == ticket.amount.toString())
+            .isNotEmpty
+        ? Const()
+            .nityaSeva['amounts']!
+            .firstWhere(
+                (element) => element.keys.first == ticket.amount.toString())
+            .values
+            .first['color']! as Color
+        : Colors.black;
 
     return Widgets().createTopLevelCard(
       context: context,

@@ -4,6 +4,7 @@ import 'package:vkhgaruda/harinaam/harinaam.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'package:vkhgaruda/home/settings.dart';
 import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
+import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
 import 'package:vkhgaruda/widgets/launcher_tile.dart';
 import 'package:vkhgaruda/widgets/welcome.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -224,31 +225,31 @@ class _HomePageState extends State<HomePage> {
                               ),
 
                               // Sangeet Seva
-                              // Padding(
-                              //   padding: const EdgeInsets.only(right: 8.0),
-                              //   child: LauncherTile(
-                              //       image: 'assets/images/Logo/SangeetSeva.png',
-                              //       title: "Sangeet\nSeva",
-                              //       callback:
-                              //           LauncherTileCallback(onClick: () async {
-                              //         bool perm = await Utils()
-                              //             .checkPermission("Sangeet Seva");
-                              //         if (perm) {
-                              //           Navigator.push(
-                              //             context,
-                              //             MaterialPageRoute(
-                              //                 builder: (context) =>
-                              //                     const SangeetSeva(
-                              //                       title: "Sangeet Seva",
-                              //                       splashImage:
-                              //                           'assets/images/Logo/SangeetSeva.png',
-                              //                     )),
-                              //           );
-                              //         } else {
-                              //           Toaster().error("Access Denied");
-                              //         }
-                              //       })),
-                              // ),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: LauncherTile(
+                                    image: 'assets/images/Logo/SangeetSeva.png',
+                                    title: "Sangeet\nSeva",
+                                    callback:
+                                        LauncherTileCallback(onClick: () async {
+                                      bool perm = await Utils()
+                                          .checkPermission("Sangeet Seva");
+                                      if (perm) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const SangeetSeva(
+                                                    title: "Sangeet Seva",
+                                                    splashImage:
+                                                        'assets/images/Logo/SangeetSeva.png',
+                                                  )),
+                                        );
+                                      } else {
+                                        Toaster().error("Access Denied");
+                                      }
+                                    })),
+                              ),
                             ],
                           ),
                         ),

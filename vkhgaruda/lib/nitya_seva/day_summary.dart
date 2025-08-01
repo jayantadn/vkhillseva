@@ -215,10 +215,12 @@ class _DaySummaryState extends State<DaySummary> {
                   .indexWhere((row) => row[0] == ticketTyped.amount.toString());
 
               // add count to the index
-              _amountTableTicketRow[index][indexSession + 1] =
-                  (int.parse(_amountTableTicketRow[index][indexSession + 1]) +
-                          1)
-                      .toString();
+              if (index >= 0) {
+                _amountTableTicketRow[index][indexSession + 1] =
+                    (int.parse(_amountTableTicketRow[index][indexSession + 1]) +
+                            1)
+                        .toString();
+              }
 
               // add count to the total row
               _amountTableTotalRow[0][indexSession + 1] =

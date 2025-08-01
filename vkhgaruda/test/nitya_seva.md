@@ -6,6 +6,8 @@
 -[x] ticket add / edit / delete
 -[x] lock/unlock session
 -[x] session/day summary
+-[x] restore ticket numbers
+-[x] festival seva custom amount
 
 # Laddu seva
 -[x] add / serve / return
@@ -19,4 +21,4 @@
 -[] reports
 
 # new features
--[] festival seva custom amount
+

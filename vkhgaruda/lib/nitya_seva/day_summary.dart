@@ -220,6 +220,14 @@ class _DaySummaryState extends State<DaySummary> {
                     (int.parse(_amountTableTicketRow[index][indexSession + 1]) +
                             1)
                         .toString();
+              } else {
+                // no entry found for the amount, so add a new row
+                List<String> newRow = List.filled(
+                    _amountTableHeaderRow.length, "0",
+                    growable: false);
+                newRow[0] = ticketTyped.amount.toString();
+                newRow[indexSession + 1] = "1";
+                _amountTableTicketRow.add(newRow);
               }
 
               // add count to the total row

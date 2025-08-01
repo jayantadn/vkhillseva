@@ -1,0 +1,75 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "garuda-1ba07",
+          "appId": "1:683499127522:android:ce092310e0b9ed01c014bb",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "garuda-1ba07",
+          "configurations": {
+            "android": "1:683499127522:android:ce092310e0b9ed01c014bb",
+            "web": "1:683499127522:web:97e1618cef14c36dc014bb"
+          }
+        }
+      }
+    }
+  },
+  "hosting": [
+    {
+      "public": "build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "target": "govindasangeetseva",
+      "public": "build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+      {
+        "source": "/version.json",
+        "destination": "/version.json"
+      }
+    ]      
+    },
+    {
+      "target": "testsangeetseva",
+      "public": "build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+      {
+        "source": "/version.json",
+        "destination": "/version.json"
+      }
+    ]      
+    }
+  ],
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
+}

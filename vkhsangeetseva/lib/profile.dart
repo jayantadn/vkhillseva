@@ -356,7 +356,8 @@ class _ProfileState extends State<Profile> {
 
     // validation of performance links
     if (widget.self != null && widget.self == true) {
-      if (_youtubeLinks[0].isEmpty && _audioClips[0].isEmpty) {
+      if ((_youtubeLinks.isEmpty || _youtubeLinks[0].isEmpty) &&
+          (_audioClips.isEmpty || _audioClips[0].isEmpty)) {
         Toaster().error(
             'Please enter at least one youtube link or upload one audio clip');
         return;
@@ -888,6 +889,7 @@ class _ProfileState extends State<Profile> {
                                                   await FilePicker.platform
                                                       .pickFiles(
                                                 type: FileType.audio,
+                                                withData: true,
                                               );
 
                                               if (result == null) return;

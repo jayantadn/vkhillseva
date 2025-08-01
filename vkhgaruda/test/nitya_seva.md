@@ -13,3 +13,4 @@
 -[] settings
 
 # new features
+-[] festival seva custom amount

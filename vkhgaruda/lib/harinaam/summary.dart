@@ -105,17 +105,36 @@ class _SummaryState extends State<Summary> {
           DateTime endDate = DateFormat("dd MMM, yyyy")
               .parse(_periodDetails.split('-')[1].trim());
 
+          // number of chanters
           String dbpath = "${Const().dbrootGaruda}/Harinaam";
           var dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
-          print(dataRaw);
+          _totalChanters = _getChantersCount(dataRaw);
 
           break;
         case "monthly":
-          _periodDetails = DateFormat("MMM yyyy").format(DateTime.now());
+          DateTime month = DateFormat("MMM yyyy").parse(_periodDetails);
+          DateTime startDate = DateTime(month.year, month.month, 1);
+          DateTime endDate = DateTime(month.year, month.month + 1, 0);
+
+          // number of chanters
+          String dbpath = "${Const().dbrootGaruda}/Harinaam";
+          var dataRaw = await FB().getValuesByDateRange(
+              path: dbpath, startDate: startDate, endDate: endDate);
+          _totalChanters = _getChantersCount(dataRaw);
+
           break;
         case "yearly":
-          _periodDetails = DateFormat("yyyy").format(DateTime.now());
+          DateTime year = DateFormat("yyyy").parse(_periodDetails);
+          DateTime startDate = DateTime(year.year, 1, 1);
+          DateTime endDate = DateTime(year.year, 12, 31);
+
+          // number of chanters
+          String dbpath = "${Const().dbrootGaruda}/Harinaam";
+          var dataRaw = await FB().getValuesByDateRange(
+              path: dbpath, startDate: startDate, endDate: endDate);
+          _totalChanters = _getChantersCount(dataRaw);
+
           break;
       }
     });
@@ -292,34 +311,32 @@ class _SummaryState extends State<Summary> {
                       ),
                     ],
                     onChanged: (String? newValue) {
-                      setState(() {
-                        _period = newValue ?? _period;
+                      _period = newValue ?? _period;
 
-                        // Update period details based on selection
-                        switch (_period) {
-                          case "daily":
-                            _periodDetails = DateFormat("dd MMM, yyyy")
-                                .format(DateTime.now());
-                            break;
-                          case "weekly":
-                            DateTime now = DateTime.now();
-                            DateTime startOfWeek =
-                                now.subtract(Duration(days: now.weekday - 1));
-                            DateTime endOfWeek =
-                                startOfWeek.add(Duration(days: 6));
-                            _periodDetails =
-                                "${DateFormat("dd MMM, yyyy").format(startOfWeek)} - ${DateFormat("dd MMM, yyyy").format(endOfWeek)}";
-                            break;
-                          case "monthly":
-                            DateTime now = DateTime.now();
-                            _periodDetails = DateFormat("MMM yyyy").format(now);
-                            break;
-                          case "yearly":
-                            DateTime now = DateTime.now();
-                            _periodDetails = DateFormat("yyyy").format(now);
-                            break;
-                        }
-                      });
+                      // Update period details based on selection
+                      switch (_period) {
+                        case "daily":
+                          _periodDetails =
+                              DateFormat("dd MMM, yyyy").format(DateTime.now());
+                          break;
+                        case "weekly":
+                          DateTime now = DateTime.now();
+                          DateTime startOfWeek =
+                              now.subtract(Duration(days: now.weekday - 1));
+                          DateTime endOfWeek =
+                              startOfWeek.add(Duration(days: 6));
+                          _periodDetails =
+                              "${DateFormat("dd MMM, yyyy").format(startOfWeek)} - ${DateFormat("dd MMM, yyyy").format(endOfWeek)}";
+                          break;
+                        case "monthly":
+                          DateTime now = DateTime.now();
+                          _periodDetails = DateFormat("MMM yyyy").format(now);
+                          break;
+                        case "yearly":
+                          DateTime now = DateTime.now();
+                          _periodDetails = DateFormat("yyyy").format(now);
+                          break;
+                      }
 
                       refresh();
                     },
@@ -410,15 +427,42 @@ class _SummaryState extends State<Summary> {
     ]);
   }
 
+  int _getChantersCount(Map dataRaw) {
+    int count = 0;
+    for (var entry in dataRaw.entries) {
+      // morning chanters
+      if (entry.value.containsKey('Morning') &&
+          entry.value['Morning'].containsKey('Chanters')) {
+        Map morningData = entry.value['Morning']['Chanters'];
+        for (var morningEntry in morningData.entries) {
+          ChantersEntry chanter = Utils()
+              .convertRawToDatatype(morningEntry.value, ChantersEntry.fromJson);
+          count += chanter.count;
+        }
+      }
+
+      // evening chanters
+      if (entry.value.containsKey('Evening') &&
+          entry.value['Evening'].containsKey('Chanters')) {
+        Map eveningData = entry.value['Evening']['Chanters'];
+        for (var eveningEntry in eveningData.entries) {
+          ChantersEntry chanter = Utils()
+              .convertRawToDatatype(eveningEntry.value, ChantersEntry.fromJson);
+          count += chanter.count;
+        }
+      }
+    }
+
+    return count;
+  }
+
   Future<void> _prev() async {
     switch (_period) {
       case "daily":
         DateTime currentDate = DateFormat("dd MMM, yyyy").parse(_periodDetails);
         DateTime previousDate = currentDate.subtract(Duration(days: 1));
 
-        setState(() {
-          _periodDetails = DateFormat("dd MMM, yyyy").format(previousDate);
-        });
+        _periodDetails = DateFormat("dd MMM, yyyy").format(previousDate);
         break;
 
       case "weekly":
@@ -429,10 +473,8 @@ class _SummaryState extends State<Summary> {
             currentStartDate.subtract(Duration(days: 7));
         DateTime previousEndDate = previousStartDate.add(Duration(days: 6));
 
-        setState(() {
-          _periodDetails =
-              "${DateFormat("dd MMM, yyyy").format(previousStartDate)} - ${DateFormat("dd MMM, yyyy").format(previousEndDate)}";
-        });
+        _periodDetails =
+            "${DateFormat("dd MMM, yyyy").format(previousStartDate)} - ${DateFormat("dd MMM, yyyy").format(previousEndDate)}";
         break;
 
       case "monthly":
@@ -440,20 +482,18 @@ class _SummaryState extends State<Summary> {
         DateTime previousMonth =
             DateTime(currentDate.year, currentDate.month - 1, 1);
 
-        setState(() {
-          _periodDetails = DateFormat("MMM yyyy").format(previousMonth);
-        });
+        _periodDetails = DateFormat("MMM yyyy").format(previousMonth);
         break;
 
       case "yearly":
         DateTime currentDate = DateFormat("yyyy").parse(_periodDetails);
         DateTime previousYear = DateTime(currentDate.year - 1, 1, 1);
 
-        setState(() {
-          _periodDetails = DateFormat("yyyy").format(previousYear);
-        });
+        _periodDetails = DateFormat("yyyy").format(previousYear);
         break;
     }
+
+    refresh();
   }
 
   Future<void> _next() async {
@@ -471,9 +511,7 @@ class _SummaryState extends State<Summary> {
 
         DateTime nextDate = currentDate.add(Duration(days: 1));
 
-        setState(() {
-          _periodDetails = DateFormat("dd MMM, yyyy").format(nextDate);
-        });
+        _periodDetails = DateFormat("dd MMM, yyyy").format(nextDate);
         break;
 
       case "weekly":
@@ -490,10 +528,8 @@ class _SummaryState extends State<Summary> {
 
         DateTime nextEndDate = nextStartDate.add(Duration(days: 6));
 
-        setState(() {
-          _periodDetails =
-              "${DateFormat("dd MMM, yyyy").format(nextStartDate)} - ${DateFormat("dd MMM, yyyy").format(nextEndDate)}";
-        });
+        _periodDetails =
+            "${DateFormat("dd MMM, yyyy").format(nextStartDate)} - ${DateFormat("dd MMM, yyyy").format(nextEndDate)}";
         break;
 
       case "monthly":
@@ -508,9 +544,7 @@ class _SummaryState extends State<Summary> {
         DateTime nextMonth =
             DateTime(currentDate.year, currentDate.month + 1, 1);
 
-        setState(() {
-          _periodDetails = DateFormat("MMM yyyy").format(nextMonth);
-        });
+        _periodDetails = DateFormat("MMM yyyy").format(nextMonth);
         break;
 
       case "yearly":
@@ -523,11 +557,11 @@ class _SummaryState extends State<Summary> {
 
         DateTime nextYear = DateTime(currentDate.year + 1, 1, 1);
 
-        setState(() {
-          _periodDetails = DateFormat("yyyy").format(nextYear);
-        });
+        _periodDetails = DateFormat("yyyy").format(nextYear);
         break;
     }
+
+    refresh();
   }
 
   @override

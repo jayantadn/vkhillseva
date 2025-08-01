@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Summary extends StatefulWidget {
@@ -22,6 +23,17 @@ class _SummaryState extends State<Summary> {
   bool _isLoading = true;
   String _period = "daily";
   String _periodDetails = DateFormat("dd MMM, yyyy").format(DateTime.now());
+
+  // variables for chanters summary
+  int _totalChanters = 0;
+  int _newChanterMalasProcured = 0;
+  int _discardedChanterMalas = 0;
+
+  // variables for sales summary
+  int _totalMalasSold = 0;
+  int _totalAmountCollected = 0;
+  int _newSaleMalasProcured = 0;
+  int _discardedSaleMalas = 0;
 
   // lists
 
@@ -49,9 +61,63 @@ class _SummaryState extends State<Summary> {
     });
 
     // access control
+    bool allowed = await Utils().checkPermission("Harinaam Mantapa");
+    if (!allowed) {
+      Toaster().error("Access denied");
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    }
 
     await _lock.synchronized(() async {
       // your code here
+      switch (_period) {
+        case "daily":
+          DateTime date = DateFormat("dd MMM, yyyy").parse(_periodDetails);
+          String dbdate = DateFormat("yyyy-MM-dd").format(date);
+
+          // collect morning chaters data
+          _totalChanters = 0;
+          String dbpath =
+              "${Const().dbrootGaruda}/Harinaam/$dbdate/Morning/Chanters";
+          Map<String, dynamic> data =
+              await FB().getJson(path: dbpath, silent: true);
+          for (var entry in data.entries) {
+            ChantersEntry chanter = Utils()
+                .convertRawToDatatype(entry.value, ChantersEntry.fromJson);
+            _totalChanters += chanter.count;
+          }
+
+          // collect evening chaters data
+          dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Evening/Chanters";
+          data = await FB().getJson(path: dbpath, silent: true);
+          for (var entry in data.entries) {
+            ChantersEntry chanter = Utils()
+                .convertRawToDatatype(entry.value, ChantersEntry.fromJson);
+            _totalChanters += chanter.count;
+          }
+
+          break;
+
+        case "weekly":
+          DateTime startDate = DateFormat("dd MMM, yyyy")
+              .parse(_periodDetails.split('-')[0].trim());
+          DateTime endDate = DateFormat("dd MMM, yyyy")
+              .parse(_periodDetails.split('-')[1].trim());
+
+          String dbpath = "${Const().dbrootGaruda}/Harinaam";
+          var dataRaw = await FB().getValuesByDateRange(
+              path: dbpath, startDate: startDate, endDate: endDate);
+          print(dataRaw);
+
+          break;
+        case "monthly":
+          _periodDetails = DateFormat("MMM yyyy").format(DateTime.now());
+          break;
+        case "yearly":
+          _periodDetails = DateFormat("yyyy").format(DateTime.now());
+          break;
+      }
     });
 
     // refresh all child widgets
@@ -59,6 +125,38 @@ class _SummaryState extends State<Summary> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Widget _createChantersSummary() {
+    return Widgets().createTopLevelCard(
+        context: context,
+        title: "Chanters' Summary",
+        color: Colors.brown,
+        child: Column(
+          children: [
+            _createTableEntry("Total Chanters", "$_totalChanters"),
+            _createTableEntry(
+                "New malas procured", "$_newChanterMalasProcured"),
+            _createTableEntry("Discarded malas", "$_discardedChanterMalas",
+                divider: false),
+          ],
+        ));
+  }
+
+  Widget _createSalesSummary() {
+    return Widgets().createTopLevelCard(
+        context: context,
+        title: "Japamala Sales",
+        child: Column(
+          children: [
+            _createTableEntry("Total malas sold", "$_totalMalasSold"),
+            _createTableEntry(
+                "Total amount collected", "₹$_totalAmountCollected"),
+            _createTableEntry("New malas procured", "$_newSaleMalasProcured"),
+            _createTableEntry("Discarded malas", "$_discardedSaleMalas",
+                divider: false),
+          ],
+        ));
   }
 
   Widget _createHMI() {
@@ -222,6 +320,8 @@ class _SummaryState extends State<Summary> {
                             break;
                         }
                       });
+
+                      refresh();
                     },
                   ),
                 ),
@@ -287,6 +387,27 @@ class _SummaryState extends State<Summary> {
         ),
       ),
     );
+  }
+
+  Widget _createTableEntry(String label, String value, {bool divider = true}) {
+    return Column(children: [
+      Table(
+        columnWidths: const {
+          0: FlexColumnWidth(3), // Label
+          1: FlexColumnWidth(1), // Number
+        },
+        children: [
+          TableRow(
+            children: [
+              Text(label),
+              Text(value),
+            ],
+          ),
+        ],
+      ),
+      if (divider)
+        Divider(height: 1, thickness: 0.5, color: Colors.grey.withOpacity(0.3))
+    ]);
   }
 
   Future<void> _prev() async {
@@ -439,6 +560,12 @@ class _SummaryState extends State<Summary> {
 
                       // your widgets here
                       _createHMI(),
+
+                      SizedBox(height: 10),
+                      _createChantersSummary(),
+
+                      SizedBox(height: 10),
+                      _createSalesSummary(),
 
                       // leave some space at bottom
                       SizedBox(height: 500),

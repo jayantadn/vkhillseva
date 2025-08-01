@@ -154,13 +154,18 @@ class _NityaSevaState extends State<NityaSeva> {
           dbDate: dbDate,
           onAddOrUpdate: (Session newSession) async {
             if (session == null) {
+              // add new session
               List<String> errors = _preValidation(newSession);
               String? ret = 'Proceed';
               if (errors.isNotEmpty) {
                 ret = await NSWidgetsOld()
                     .createErrorDialog(context: context, errors: errors);
               }
+
+              
               if (errors.isEmpty || ret == 'Proceed') {
+                _lastCallbackInvoked = DateTime.now();
+
                 await FB().addMapToList(
                   path: "${Const().dbrootGaruda}/NityaSeva/$dbDate",
                   child: "Settings",
@@ -182,6 +187,7 @@ class _NityaSevaState extends State<NityaSeva> {
                 _postValidation(newSession);
               }
             } else {
+              // edit session
               setState(() {
                 int index = _sessions
                     .indexWhere((s) => s.timestamp == session.timestamp);
@@ -189,6 +195,8 @@ class _NityaSevaState extends State<NityaSeva> {
                   _sessions[index] = newSession;
                 }
               });
+
+              _lastCallbackInvoked = DateTime.now();
               String dbTimestamp =
                   session.timestamp.toIso8601String().replaceAll(".", "^");
               await FB().editJson(

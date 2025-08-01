@@ -244,8 +244,7 @@ class _AddEditSessionDialogState extends State<AddEditSessionDialog> {
                       child: OutlinedButton(
                         child: const Text('Cancel'),
                         onPressed: () {
-                          _sevaAmounts.clear();
-                          _paymentModes.clear();
+                          
                           Navigator.of(context).pop();
                         },
                       ),

@@ -73,54 +73,9 @@ class _NityaSevaState extends State<NityaSeva> {
     _isAdmin = await Utils().isAdmin();
 
     // show tutorials
-    String? lastVersion = await LS().read("lastTutorial");
-    if (lastVersion == null || lastVersion != Const().version) {
-      await Widgets()
-          .showMessage(context, "Some tutorials for you to get started.");
-      await LS().write("lastTutorial", Const().version);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Tutorial(title: "Nitya Seva Tutorial", images: [
-            "assets/images/Tutorials/NityaSevaBasics/01.png",
-            "assets/images/Tutorials/NityaSevaBasics/02.png",
-            "assets/images/Tutorials/NityaSevaBasics/03.png",
-            "assets/images/Tutorials/NityaSevaBasics/04.png",
-            "assets/images/Tutorials/NityaSevaBasics/05.png",
-            "assets/images/Tutorials/NityaSevaBasics/06.png",
-            "assets/images/Tutorials/NityaSevaBasics/07.png",
-            "assets/images/Tutorials/NityaSevaBasics/08.png",
-          ]),
-        ),
-      ).then((_) => refresh());
-      return;
-    }
 
     // admin tutorial
-    if (_isAdmin) {
-      String? lastAdminVersion = await LS().read("lastAdminTutorial");
-      if (lastAdminVersion == null || lastAdminVersion != Const().version) {
-        await Widgets()
-            .showMessage(context, "Some admin related tutorials for you.");
-        await LS().write("lastAdminTutorial", Const().version);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                Tutorial(title: "Nitya Seva Tutorial", images: [
-              "assets/images/Tutorials/NityaSevaAdmin/01.png",
-              "assets/images/Tutorials/NityaSevaAdmin/02.png",
-              "assets/images/Tutorials/NityaSevaAdmin/03.png",
-              "assets/images/Tutorials/NityaSevaAdmin/04.png",
-              "assets/images/Tutorials/NityaSevaAdmin/05.png",
-              "assets/images/Tutorials/NityaSevaAdmin/06.png",
-              "assets/images/Tutorials/NityaSevaAdmin/07.png",
-              "assets/images/Tutorials/NityaSevaAdmin/08.png",
-            ]),
-          ),
-        );
-      }
-    }
+
 
     // fetch festival sevas from db
     _sevaList.clear();

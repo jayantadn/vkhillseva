@@ -27,7 +27,7 @@ class _TicketPageState extends State<TicketPage> {
   String _username = "Guest";
   bool _isSessionLocked = false;
   bool _isAdmin = false;
-  int _nextFestivalTicketNumber = 0;
+  final int _nextFestivalTicketNumber = 1;
 
   // lists
   final List<Ticket> _tickets = [];
@@ -173,9 +173,7 @@ class _TicketPageState extends State<TicketPage> {
     if (_tickets.isEmpty) {
       if (widget.session.name == "Nitya Seva") {
         _showNextTicketNumbers(context);
-      } else {
-        _showFestivalStartingTicketNumber(context);
-      }
+      } 
     }
   }
 
@@ -204,7 +202,11 @@ class _TicketPageState extends State<TicketPage> {
     ticketNumberController.text = ticketNumber.toString();
     sevaNames = _getSevaNames(amount);
     if (ticket == null) {
+      if (widget.session.name == "Nitya Seva") {
       sevaName = sevaNames.isNotEmpty ? sevaNames[0] : "";
+      } else {
+        sevaName = widget.session.name;
+      }
     }
 
     showGeneralDialog(
@@ -241,6 +243,7 @@ class _TicketPageState extends State<TicketPage> {
 
                         // Seva amount label
                         SizedBox(height: 8),
+                        if (widget.session.name == "Nitya Seva")
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
@@ -255,6 +258,7 @@ class _TicketPageState extends State<TicketPage> {
                         ),
 
                         // buttons for seva amounts
+                        if (widget.session.name == "Nitya Seva")
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
@@ -338,7 +342,7 @@ class _TicketPageState extends State<TicketPage> {
                           ),
                         ),
 
-                        // seva amount buttons
+                        // payment mode buttons
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
@@ -404,6 +408,7 @@ class _TicketPageState extends State<TicketPage> {
 
                         // seva name label
                         SizedBox(height: 8),
+                        if (widget.session.name == "Nitya Seva")
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
@@ -418,6 +423,7 @@ class _TicketPageState extends State<TicketPage> {
                         ),
 
                         // seva name dropdown
+                        if (widget.session.name == "Nitya Seva")
                         DropdownButton<String>(
                           isExpanded: true,
                           value: sevaName,
@@ -902,58 +908,6 @@ class _TicketPageState extends State<TicketPage> {
 
     sessions.clear();
     return errors;
-  }
-
-  Future<void> _showFestivalStartingTicketNumber(BuildContext context) async {
-    bool isNewBook = false;
-    TextEditingController ticketNumberController =
-        TextEditingController(text: "1");
-
-    Widget body = StatefulBuilder(builder: (context, setDialogState) {
-      return Column(
-        children: [
-          CheckboxListTile(
-            title: Text("Please check the following"),
-            subtitle: Text("Separate ticket book issued for festival?"),
-            value: isNewBook,
-            onChanged: (value) {
-              setDialogState(() {
-                isNewBook = value!;
-              });
-            },
-          ),
-
-          // text input field
-          SizedBox(height: 8),
-          if (isNewBook)
-            TextField(
-              decoration: InputDecoration(labelText: "Starting ticket number"),
-              controller: ticketNumberController,
-              keyboardType: TextInputType.number,
-            ),
-        ],
-      );
-    });
-
-    Widgets().showResponsiveDialog(
-        context: context,
-        title: "Festival service",
-        child: body,
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-
-              if (isNewBook) {
-                _nextFestivalTicketNumber =
-                    int.tryParse(ticketNumberController.text) ?? 1;
-              } else {
-                _showNextTicketNumbers(context);
-              }
-            },
-            child: Text("OK"),
-          ),
-        ]);
   }
 
   Future<void> _showNextTicketNumbers(BuildContext context) async {

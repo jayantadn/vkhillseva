@@ -19,3 +19,4 @@
 -[] reports
 
 # new features
+-[] festival seva custom amount

@@ -323,114 +323,176 @@ class _SummaryState extends State<Summary> {
                 ),
 
                 // Dropdown with enhanced styling (more compact)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 0), // Minimal vertical padding
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Theme.of(context).primaryColor.withOpacity(0.3),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context).primaryColor.withOpacity(0.1),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                  child: DropdownButton<String>(
-                    value: _period,
-                    underline: Container(),
-                    icon: Icon(
-                      Icons.keyboard_arrow_down,
-                      color: Theme.of(context).primaryColor,
-                      size: 20, // Slightly smaller
-                    ),
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14, // Reduced font size
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: "daily",
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.today, size: 16), // Smaller icons
-                            SizedBox(width: 6), // Reduced spacing
-                            Text("Daily"),
-                          ],
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 0), // Minimal vertical padding
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color:
+                              Theme.of(context).primaryColor.withOpacity(0.3),
+                          width: 2,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                Theme.of(context).primaryColor.withOpacity(0.1),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                          ),
+                        ],
                       ),
-                      DropdownMenuItem(
-                        value: "weekly",
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.view_week, size: 16),
-                            SizedBox(width: 6),
-                            Text("Weekly"),
-                          ],
+                      child: DropdownButton<String>(
+                        value: _period,
+                        underline: Container(),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Theme.of(context).primaryColor,
+                          size: 20, // Slightly smaller
                         ),
-                      ),
-                      DropdownMenuItem(
-                        value: "monthly",
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.calendar_month, size: 16),
-                            SizedBox(width: 6),
-                            Text("Monthly"),
-                          ],
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14, // Reduced font size
                         ),
-                      ),
-                      DropdownMenuItem(
-                        value: "yearly",
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.calendar_today, size: 16),
-                            SizedBox(width: 6),
-                            Text("Yearly"),
-                          ],
-                        ),
-                      ),
-                    ],
-                    onChanged: (String? newValue) {
-                      _period = newValue ?? _period;
+                        items: const [
+                          DropdownMenuItem(
+                            value: "daily",
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.today, size: 16), // Smaller icons
+                                SizedBox(width: 6), // Reduced spacing
+                                Text("Daily"),
+                              ],
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: "weekly",
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.view_week, size: 16),
+                                SizedBox(width: 6),
+                                Text("Weekly"),
+                              ],
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: "monthly",
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.calendar_month, size: 16),
+                                SizedBox(width: 6),
+                                Text("Monthly"),
+                              ],
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: "yearly",
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.calendar_today, size: 16),
+                                SizedBox(width: 6),
+                                Text("Yearly"),
+                              ],
+                            ),
+                          ),
+                        ],
+                        onChanged: (String? newValue) {
+                          _period = newValue ?? _period;
 
-                      // Update period details based on selection
-                      switch (_period) {
-                        case "daily":
-                          _periodDetails =
-                              DateFormat("dd MMM, yyyy").format(DateTime.now());
-                          break;
-                        case "weekly":
-                          DateTime now = DateTime.now();
-                          DateTime startOfWeek =
-                              now.subtract(Duration(days: now.weekday - 1));
-                          DateTime endOfWeek =
-                              startOfWeek.add(Duration(days: 6));
-                          _periodDetails =
-                              "${DateFormat("dd MMM, yyyy").format(startOfWeek)} - ${DateFormat("dd MMM, yyyy").format(endOfWeek)}";
-                          break;
-                        case "monthly":
-                          DateTime now = DateTime.now();
-                          _periodDetails = DateFormat("MMM yyyy").format(now);
-                          break;
-                        case "yearly":
-                          DateTime now = DateTime.now();
-                          _periodDetails = DateFormat("yyyy").format(now);
-                          break;
-                      }
+                          // Update period details based on selection
+                          switch (_period) {
+                            case "daily":
+                              _periodDetails = DateFormat("dd MMM, yyyy")
+                                  .format(DateTime.now());
+                              break;
+                            case "weekly":
+                              DateTime now = DateTime.now();
+                              DateTime startOfWeek =
+                                  now.subtract(Duration(days: now.weekday - 1));
+                              DateTime endOfWeek =
+                                  startOfWeek.add(Duration(days: 6));
+                              _periodDetails =
+                                  "${DateFormat("dd MMM, yyyy").format(startOfWeek)} - ${DateFormat("dd MMM, yyyy").format(endOfWeek)}";
+                              break;
+                            case "monthly":
+                              DateTime now = DateTime.now();
+                              _periodDetails =
+                                  DateFormat("MMM yyyy").format(now);
+                              break;
+                            case "yearly":
+                              DateTime now = DateTime.now();
+                              _periodDetails = DateFormat("yyyy").format(now);
+                              break;
+                          }
 
-                      refresh();
-                    },
-                  ),
+                          refresh();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color:
+                              Theme.of(context).primaryColor.withOpacity(0.3),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                Theme.of(context).primaryColor.withOpacity(0.1),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        tooltip: "Jump to today",
+                        icon: const Icon(Icons.restore, size: 20),
+                        color: Theme.of(context).primaryColor,
+                        onPressed: () {
+                          setState(() {
+                            switch (_period) {
+                              case "daily":
+                                _periodDetails = DateFormat("dd MMM, yyyy")
+                                    .format(DateTime.now());
+                                break;
+                              case "weekly":
+                                DateTime now = DateTime.now();
+                                DateTime startOfWeek = now
+                                    .subtract(Duration(days: now.weekday - 1));
+                                DateTime endOfWeek =
+                                    startOfWeek.add(Duration(days: 6));
+                                _periodDetails =
+                                    "${DateFormat("dd MMM, yyyy").format(startOfWeek)} - ${DateFormat("dd MMM, yyyy").format(endOfWeek)}";
+                                break;
+                              case "monthly":
+                                DateTime now = DateTime.now();
+                                _periodDetails =
+                                    DateFormat("MMM yyyy").format(now);
+                                break;
+                              case "yearly":
+                                DateTime now = DateTime.now();
+                                _periodDetails = DateFormat("yyyy").format(now);
+                                break;
+                            }
+                          });
+                          refresh();
+                        },
+                      ),
+                    ),
+                  ],
                 ),
 
                 // Next button with animation (more compact)

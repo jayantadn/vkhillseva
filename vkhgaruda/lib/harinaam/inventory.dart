@@ -589,21 +589,24 @@ class _InventoryState extends State<Inventory> {
           title: widget.title,
 
           toolbarActions: [
-            // add
-            ResponsiveToolbarAction(
-              icon: Icon(Icons.add_circle_outline),
-              onPressed: () async {
-                await _showDialogInventory("Add");
-              },
-            ),
+            // Only show add/discard buttons if selected year is current year
+            if (_selectedYear == DateTime.now().year.toString()) ...[
+              // add
+              ResponsiveToolbarAction(
+                icon: Icon(Icons.add_circle_outline),
+                onPressed: () async {
+                  await _showDialogInventory("Add");
+                },
+              ),
 
-            // discard
-            ResponsiveToolbarAction(
-              icon: Icon(Icons.remove_circle_outline),
-              onPressed: () async {
-                await _showDialogInventory("Discard");
-              },
-            ),
+              // discard
+              ResponsiveToolbarAction(
+                icon: Icon(Icons.remove_circle_outline),
+                onPressed: () async {
+                  await _showDialogInventory("Discard");
+                },
+              ),
+            ],
           ],
 
           // body

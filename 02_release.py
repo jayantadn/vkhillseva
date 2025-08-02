@@ -55,13 +55,13 @@ def update_changelog(version):
             changelog[f"{version}"]['effort'] = f"{effort}h"
             for msg in log_messages:
                 if msg.startswith("feature:"):
-                    msg = msg.replace("feature:", "").strip()
-                    if msg not in changelog[f"{version}"]['features']:
-                        changelog[f"{version}"]['features'].append(msg)
+                    clean_msg = msg.replace("feature:", "").strip()
+                    if clean_msg not in changelog[f"{version}"]['features']:
+                        changelog[f"{version}"]['features'].append(clean_msg)
                 elif msg.startswith("fix:"):
-                    msg = msg.replace("fix:", "").strip()
-                    if msg not in changelog[f"{version}"]['fixes']:
-                        changelog[f"{version}"]['fixes'].append(msg)
+                    clean_msg = msg.replace("fix:", "").strip()
+                    if clean_msg not in changelog[f"{version}"]['fixes']:
+                        changelog[f"{version}"]['fixes'].append(clean_msg)
         else:
             changelog[f"{version}"] = {
                 'effort': "",
@@ -71,10 +71,11 @@ def update_changelog(version):
             changelog[f"{version}"]['effort'] = f"{effort_hr}h"
             for msg in log_messages:
                 if msg.startswith("feature:"):
-                    msg = msg.replace("feature:", "").strip()
-                    changelog[f"{version}"]['features'].append(msg)
+                    clean_msg = msg.replace("feature:", "").strip()
+                    changelog[f"{version}"]['features'].append(clean_msg)
                 elif msg.startswith("fix:"):
-                    changelog[f"{version}"]['fixes'].append(msg)
+                    clean_msg = msg.replace("fix:", "").strip()
+                    changelog[f"{version}"]['fixes'].append(clean_msg)
     # Sort the changelog dictionary by keys in descending order
     changelog = dict(
         sorted(changelog.items(), key=lambda x: x[0], reverse=True))
@@ -107,7 +108,6 @@ def update_changelog(version):
             testspec.seek(0)
             testspec.write(new_content)
             testspec.truncate()
-
 
 def set_parameters():
     global rootdir

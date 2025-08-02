@@ -97,6 +97,42 @@ class _SummaryState extends State<Summary> {
             _totalChanters += chanter.count;
           }
 
+          // chanters inventory data
+          _newChanterMalasProcured = 0;
+          _discardedChanterMalas = 0;
+          dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+          List listRaw = await FB().getList(path: dbpath);
+          for (var item in listRaw) {
+            InventoryEntry entry =
+                Utils().convertRawToDatatype(item, InventoryEntry.fromJson);
+            if (entry.malaType == "Chanters") {
+              if (entry.addOrRemove == "Add") {
+                _newChanterMalasProcured += entry.count;
+              } else if (entry.addOrRemove == "Discard") {
+                _discardedChanterMalas += entry.count;
+              }
+            }
+          }
+
+          // number of malas sold
+          _totalMalasSold = 0;
+          _totalAmountCollected = 0;
+          dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Morning/Sales";
+          data = await FB().getJson(path: dbpath, silent: true);
+          for (var entry in data.entries) {
+            SalesEntry sale =
+                Utils().convertRawToDatatype(entry.value, SalesEntry.fromJson);
+            _totalMalasSold += sale.count;
+            _totalAmountCollected += (sale.japamala.saleValue * sale.count);
+          }
+          dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Evening/Sales";
+          data = await FB().getJson(path: dbpath, silent: true);
+          for (var entry in data.entries) {
+            SalesEntry sale =
+                Utils().convertRawToDatatype(entry.value, SalesEntry.fromJson);
+            _totalMalasSold += sale.count;
+            _totalAmountCollected += (sale.japamala.saleValue * sale.count);
+          }
           break;
 
         case "weekly":
@@ -105,35 +141,72 @@ class _SummaryState extends State<Summary> {
           DateTime endDate = DateFormat("dd MMM, yyyy")
               .parse(_periodDetails.split('-')[1].trim());
 
-          // number of chanters
+          // number of chanters and sales
           String dbpath = "${Const().dbrootGaruda}/Harinaam";
           var dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
-          _totalChanters = _getChantersCount(dataRaw);
+          CountTuple countData = _getChantersAndSalesCount(dataRaw);
+          _totalChanters = countData.chantersCount;
+          _totalMalasSold = countData.salesCount;
+          _totalAmountCollected = countData.salesAmount;
+
+          // chanters inventory data
+          _newChanterMalasProcured = 0;
+          _discardedChanterMalas = 0;
+          dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+          dataRaw = await FB().getValuesByDateRange(
+              path: dbpath, startDate: startDate, endDate: endDate);
+          InventoryTuple inventoryData = _getChantersInventory(dataRaw as Map);
+          _newChanterMalasProcured = inventoryData.addedMalas;
+          _discardedChanterMalas = inventoryData.discardedMalas;
 
           break;
+
         case "monthly":
           DateTime month = DateFormat("MMM yyyy").parse(_periodDetails);
           DateTime startDate = DateTime(month.year, month.month, 1);
           DateTime endDate = DateTime(month.year, month.month + 1, 0);
 
-          // number of chanters
+          // number of chanters and sales
           String dbpath = "${Const().dbrootGaruda}/Harinaam";
           var dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
-          _totalChanters = _getChantersCount(dataRaw);
+          CountTuple countData = _getChantersAndSalesCount(dataRaw);
+          _totalChanters = countData.chantersCount;
+          _totalMalasSold = countData.salesCount;
+          _totalAmountCollected = countData.salesAmount;
+
+          // chanters inventory data
+          dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+          dataRaw = await FB().getValuesByDateRange(
+              path: dbpath, startDate: startDate, endDate: endDate);
+          InventoryTuple inventoryData = _getChantersInventory(dataRaw as Map);
+          _newChanterMalasProcured = inventoryData.addedMalas;
+          _discardedChanterMalas = inventoryData.discardedMalas;
 
           break;
+
         case "yearly":
           DateTime year = DateFormat("yyyy").parse(_periodDetails);
           DateTime startDate = DateTime(year.year, 1, 1);
           DateTime endDate = DateTime(year.year, 12, 31);
 
-          // number of chanters
+          // number of chanters and sales
           String dbpath = "${Const().dbrootGaruda}/Harinaam";
           var dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
-          _totalChanters = _getChantersCount(dataRaw);
+          CountTuple countData = _getChantersAndSalesCount(dataRaw);
+          _totalChanters = countData.chantersCount;
+          _totalMalasSold = countData.salesCount;
+          _totalAmountCollected = countData.salesAmount;
+
+          // chanters inventory data
+          dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+          dataRaw = await FB().getValuesByDateRange(
+              path: dbpath, startDate: startDate, endDate: endDate);
+          InventoryTuple inventoryData = _getChantersInventory(dataRaw as Map);
+          _newChanterMalasProcured = inventoryData.addedMalas;
+          _discardedChanterMalas = inventoryData.discardedMalas;
 
           break;
       }
@@ -427,8 +500,11 @@ class _SummaryState extends State<Summary> {
     ]);
   }
 
-  int _getChantersCount(Map dataRaw) {
-    int count = 0;
+  CountTuple _getChantersAndSalesCount(Map dataRaw) {
+    int chantersCount = 0;
+    int salesCount = 0;
+    int salesAmount = 0;
+
     for (var entry in dataRaw.entries) {
       // morning chanters
       if (entry.value.containsKey('Morning') &&
@@ -437,7 +513,19 @@ class _SummaryState extends State<Summary> {
         for (var morningEntry in morningData.entries) {
           ChantersEntry chanter = Utils()
               .convertRawToDatatype(morningEntry.value, ChantersEntry.fromJson);
-          count += chanter.count;
+          chantersCount += chanter.count;
+        }
+      }
+
+      // morning sales
+      if (entry.value.containsKey('Morning') &&
+          entry.value['Morning'].containsKey('Sales')) {
+        Map morningSalesData = entry.value['Morning']['Sales'];
+        for (var morningEntry in morningSalesData.entries) {
+          SalesEntry sale = Utils()
+              .convertRawToDatatype(morningEntry.value, SalesEntry.fromJson);
+          salesCount += sale.count;
+          salesAmount += (sale.japamala.saleValue * sale.count);
         }
       }
 
@@ -448,12 +536,50 @@ class _SummaryState extends State<Summary> {
         for (var eveningEntry in eveningData.entries) {
           ChantersEntry chanter = Utils()
               .convertRawToDatatype(eveningEntry.value, ChantersEntry.fromJson);
-          count += chanter.count;
+          chantersCount += chanter.count;
+        }
+      }
+
+      // evening sales
+      if (entry.value.containsKey('Evening') &&
+          entry.value['Evening'].containsKey('Sales')) {
+        Map eveningSalesData = entry.value['Evening']['Sales'];
+        for (var eveningEntry in eveningSalesData.entries) {
+          SalesEntry sale = Utils()
+              .convertRawToDatatype(eveningEntry.value, SalesEntry.fromJson);
+          salesCount += sale.count;
+          salesAmount += (sale.japamala.saleValue * sale.count);
         }
       }
     }
 
-    return count;
+    return CountTuple(
+        chantersCount: chantersCount,
+        salesCount: salesCount,
+        salesAmount: salesAmount);
+  }
+
+  InventoryTuple _getChantersInventory(var dataMap) {
+    int addedMalas = 0;
+    int discardedMalas = 0;
+
+    for (var entry in dataMap.entries) {
+      List listRaw = entry.value;
+      for (var item in listRaw) {
+        InventoryEntry entry =
+            Utils().convertRawToDatatype(item, InventoryEntry.fromJson);
+        if (entry.malaType == "Chanters") {
+          if (entry.addOrRemove == "Add") {
+            addedMalas += entry.count;
+          } else if (entry.addOrRemove == "Discard") {
+            discardedMalas += entry.count;
+          }
+        }
+      }
+    }
+
+    return InventoryTuple(
+        addedMalas: addedMalas, discardedMalas: discardedMalas);
   }
 
   Future<void> _prev() async {
@@ -619,4 +745,22 @@ class _SummaryState extends State<Summary> {
       ],
     );
   }
+}
+
+class InventoryTuple {
+  final int addedMalas;
+  final int discardedMalas;
+
+  InventoryTuple({required this.addedMalas, required this.discardedMalas});
+}
+
+class CountTuple {
+  final int chantersCount;
+  final int salesCount;
+  final int salesAmount;
+
+  CountTuple(
+      {required this.chantersCount,
+      required this.salesCount,
+      required this.salesAmount});
 }

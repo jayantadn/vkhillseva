@@ -100,6 +100,8 @@ class _SummaryState extends State<Summary> {
           // chanters inventory data
           _newChanterMalasProcured = 0;
           _discardedChanterMalas = 0;
+          _newSaleMalasProcured = 0;
+          _discardedSaleMalas = 0;
           dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
           List listRaw = await FB().getList(path: dbpath);
           for (var item in listRaw) {
@@ -110,6 +112,12 @@ class _SummaryState extends State<Summary> {
                 _newChanterMalasProcured += entry.count;
               } else if (entry.addOrRemove == "Discard") {
                 _discardedChanterMalas += entry.count;
+              }
+            } else if (entry.malaType == "Sales") {
+              if (entry.addOrRemove == "Add") {
+                _newSaleMalasProcured += entry.count;
+              } else if (entry.addOrRemove == "Discard") {
+                _discardedSaleMalas += entry.count;
               }
             }
           }
@@ -156,9 +164,12 @@ class _SummaryState extends State<Summary> {
           dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
           dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
-          InventoryTuple inventoryData = _getChantersInventory(dataRaw as Map);
-          _newChanterMalasProcured = inventoryData.addedMalas;
-          _discardedChanterMalas = inventoryData.discardedMalas;
+          InventoryTuple inventoryData =
+              _getChantersAndSalesInventory(dataRaw as Map);
+          _newChanterMalasProcured = inventoryData.addedChantersMalas;
+          _discardedChanterMalas = inventoryData.discardedChantersMalas;
+          _newSaleMalasProcured = inventoryData.addedSalesMalas;
+          _discardedSaleMalas = inventoryData.discardedSalesMalas;
 
           break;
 
@@ -180,9 +191,12 @@ class _SummaryState extends State<Summary> {
           dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
           dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
-          InventoryTuple inventoryData = _getChantersInventory(dataRaw as Map);
-          _newChanterMalasProcured = inventoryData.addedMalas;
-          _discardedChanterMalas = inventoryData.discardedMalas;
+          InventoryTuple inventoryData =
+              _getChantersAndSalesInventory(dataRaw as Map);
+          _newChanterMalasProcured = inventoryData.addedChantersMalas;
+          _discardedChanterMalas = inventoryData.discardedChantersMalas;
+          _newSaleMalasProcured = inventoryData.addedSalesMalas;
+          _discardedSaleMalas = inventoryData.discardedSalesMalas;
 
           break;
 
@@ -204,9 +218,12 @@ class _SummaryState extends State<Summary> {
           dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
           dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
-          InventoryTuple inventoryData = _getChantersInventory(dataRaw as Map);
-          _newChanterMalasProcured = inventoryData.addedMalas;
-          _discardedChanterMalas = inventoryData.discardedMalas;
+          InventoryTuple inventoryData =
+              _getChantersAndSalesInventory(dataRaw as Map);
+          _newChanterMalasProcured = inventoryData.addedChantersMalas;
+          _discardedChanterMalas = inventoryData.discardedChantersMalas;
+          _newSaleMalasProcured = inventoryData.addedSalesMalas;
+          _discardedSaleMalas = inventoryData.discardedSalesMalas;
 
           break;
       }
@@ -559,9 +576,11 @@ class _SummaryState extends State<Summary> {
         salesAmount: salesAmount);
   }
 
-  InventoryTuple _getChantersInventory(var dataMap) {
-    int addedMalas = 0;
-    int discardedMalas = 0;
+  InventoryTuple _getChantersAndSalesInventory(var dataMap) {
+    int addedChantersMalas = 0;
+    int discardedChantersMalas = 0;
+    int addedSalesMalas = 0;
+    int discardedSalesMalas = 0;
 
     for (var entry in dataMap.entries) {
       List listRaw = entry.value;
@@ -570,16 +589,25 @@ class _SummaryState extends State<Summary> {
             Utils().convertRawToDatatype(item, InventoryEntry.fromJson);
         if (entry.malaType == "Chanters") {
           if (entry.addOrRemove == "Add") {
-            addedMalas += entry.count;
+            addedChantersMalas += entry.count;
           } else if (entry.addOrRemove == "Discard") {
-            discardedMalas += entry.count;
+            discardedChantersMalas += entry.count;
+          }
+        } else if (entry.malaType == "Sales") {
+          if (entry.addOrRemove == "Add") {
+            addedSalesMalas += entry.count;
+          } else if (entry.addOrRemove == "Discard") {
+            discardedSalesMalas += entry.count;
           }
         }
       }
     }
 
     return InventoryTuple(
-        addedMalas: addedMalas, discardedMalas: discardedMalas);
+        addedChantersMalas: addedChantersMalas,
+        discardedChantersMalas: discardedChantersMalas,
+        addedSalesMalas: addedSalesMalas,
+        discardedSalesMalas: discardedSalesMalas);
   }
 
   Future<void> _prev() async {
@@ -748,10 +776,16 @@ class _SummaryState extends State<Summary> {
 }
 
 class InventoryTuple {
-  final int addedMalas;
-  final int discardedMalas;
+  final int addedChantersMalas;
+  final int discardedChantersMalas;
+  final int addedSalesMalas;
+  final int discardedSalesMalas;
 
-  InventoryTuple({required this.addedMalas, required this.discardedMalas});
+  InventoryTuple(
+      {required this.addedChantersMalas,
+      required this.discardedChantersMalas,
+      required this.addedSalesMalas,
+      required this.discardedSalesMalas});
 }
 
 class CountTuple {

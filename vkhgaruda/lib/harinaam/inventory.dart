@@ -122,17 +122,19 @@ class _InventoryState extends State<Inventory> {
       // refill inventory entries
       _inventoryEntries.clear();
       String dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
-      List rawList =
+      List rawTopList =
           await FB().getListByYear(path: dbpath, year: _selectedYear);
-      if (rawList.isNotEmpty) {
-        for (var rawItem in rawList[0]) {
-          // rawList[0]: dont know why a double list is returned
-          Map rawMap = rawItem as Map;
-          InventoryEntry entry =
-              Utils().convertRawToDatatype(rawMap, InventoryEntry.fromJson);
-          _inventoryEntries.insert(0, entry);
+      if (rawTopList.isNotEmpty) {
+        for (var rawList in rawTopList) {
+          for (var rawItem in rawList) {
+            Map rawMap = rawItem as Map;
+            InventoryEntry entry =
+                Utils().convertRawToDatatype(rawMap, InventoryEntry.fromJson);
+            _inventoryEntries.insert(0, entry);
+          }
         }
       }
+      _inventoryEntries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
       // calculate dashboard counters
       int chantersCount = 0;
@@ -156,7 +158,7 @@ class _InventoryState extends State<Inventory> {
       // offset by the sales count
       int salesOffset = 0;
       dbpath = "${Const().dbrootGaruda}/Harinaam";
-      rawList = await FB().getListByYear(path: dbpath, year: _selectedYear);
+      var rawList = await FB().getListByYear(path: dbpath, year: _selectedYear);
       if (rawList.isNotEmpty) {
         for (var rawItem in rawList) {
           Map rawMap = rawItem as Map;

@@ -430,6 +430,8 @@ class _DaySummaryState extends State<DaySummary> {
   }
 
   Widget _createTicketTable(BuildContext context) {
+    return Placeholder();
+
     if (_amountTableHeaderRow.length == 1 ||
         _grandTotal.isEmpty ||
         _grandTotal[0] == 0) {

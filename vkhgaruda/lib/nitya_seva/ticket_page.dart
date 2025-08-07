@@ -27,7 +27,7 @@ class _TicketPageState extends State<TicketPage> {
   String _username = "Guest";
   bool _isSessionLocked = false;
   bool _isAdmin = false;
-  final int _nextFestivalTicketNumber = 1;
+  int _nextFestivalTicketNumber = 1;
 
   // lists
   final List<Ticket> _tickets = [];
@@ -173,6 +173,9 @@ class _TicketPageState extends State<TicketPage> {
     if (_tickets.isEmpty) {
       if (widget.session.name == "Nitya Seva") {
         _showNextTicketNumbers(context);
+      } else {
+        // if festival seva, fetch next ticket number
+        _showFestivalNextTicketDialog(context);
       }
     }
   }
@@ -917,6 +920,81 @@ class _TicketPageState extends State<TicketPage> {
 
     sessions.clear();
     return errors;
+  }
+
+  Future<void> _showFestivalNextTicketDialog(BuildContext context) async {
+    int lastTicketNumber = 0;
+
+    // for the same date check if any previous session with the same amount
+    String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
+    var sessionsList =
+        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
+    List<Session> sessions = [];
+    for (var sessionRaw in sessionsList) {
+      Map<String, dynamic> s =
+          Map<String, dynamic>.from(sessionRaw['Settings']);
+      sessions.add(Session.fromJson(s));
+    }
+    sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    for (int i = sessions.length - 1; i >= 0; i--) {
+      if (sessions[i].timestamp == widget.session.timestamp) {
+        if (i != 0 &&
+            sessions[i - 1].defaultAmount == widget.session.defaultAmount) {
+          String key =
+              sessions[i - 1].timestamp.toIso8601String().replaceAll(".", "^");
+          String sessionPath =
+              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key/Tickets";
+          var ticketsList = await FB().getList(path: sessionPath);
+          if (ticketsList.isNotEmpty) {
+            Map<String, dynamic> lastTicketJson =
+                Map<String, dynamic>.from(ticketsList.last);
+            lastTicketNumber = lastTicketJson['ticketNumber'] ?? 0;
+
+            if (lastTicketNumber > 0) {
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    // if no previous session found, get the next ticket number from previous day
+    if (lastTicketNumber == 0) {
+      DateTime previousDay =
+          widget.session.timestamp.subtract(Duration(days: 1));
+      String dbDatePrev = DateFormat("yyyy-MM-dd").format(previousDay);
+      var sessionsListPrev = await FB()
+          .getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDatePrev");
+      if (sessionsListPrev.isNotEmpty) {
+        List<Session> sessions = [];
+        for (var sessionRaw in sessionsListPrev) {
+          Map<String, dynamic> s =
+              Map<String, dynamic>.from(sessionRaw['Settings']);
+          sessions.add(Session.fromJson(s));
+        }
+        sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+        for (int i = sessions.length - 1; i >= 0; i--) {
+          if (sessions[i].defaultAmount == widget.session.defaultAmount) {
+            String key =
+                sessions[i].timestamp.toIso8601String().replaceAll(".", "^");
+            String sessionPath =
+                "${Const().dbrootGaruda}/NityaSeva/$dbDatePrev/$key/Tickets";
+            var ticketsList = await FB().getList(path: sessionPath);
+            if (ticketsList.isNotEmpty) {
+              Map<String, dynamic> lastTicketJson =
+                  Map<String, dynamic>.from(ticketsList.last);
+              lastTicketNumber = lastTicketJson['ticketNumber'] ?? 0;
+
+              if (lastTicketNumber > 0) {
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    print(lastTicketNumber);
   }
 
   Future<void> _showNextTicketNumbers(BuildContext context) async {

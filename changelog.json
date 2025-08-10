@@ -1,4 +1,18 @@
 {
+    "7.8.1": {
+        "effort": "2h",
+        "features": [
+            "festival seva custom amount",
+            "dialog to enter next ticket number"
+        ],
+        "fixes": [
+            "fix: double add session",
+            "fix: dashboard display custom amount",
+            "fix: audio clip upload issue",
+            "fix: day summary",
+            "fix: session summary"
+        ]
+    },
     "7.8.0": {
         "effort": "0.0h",
         "features": [

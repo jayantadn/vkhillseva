@@ -939,7 +939,8 @@ class _TicketPageState extends State<TicketPage> {
     for (int i = sessions.length - 1; i >= 0; i--) {
       if (sessions[i].timestamp == widget.session.timestamp) {
         if (i != 0 &&
-            sessions[i - 1].defaultAmount == widget.session.defaultAmount) {
+            sessions[i - 1].defaultAmount == widget.session.defaultAmount &&
+            sessions[i - 1].name == widget.session.name) {
           String key =
               sessions[i - 1].timestamp.toIso8601String().replaceAll(".", "^");
           String sessionPath =
@@ -974,12 +975,15 @@ class _TicketPageState extends State<TicketPage> {
         }
         sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
         for (int i = sessions.length - 1; i >= 0; i--) {
-          if (sessions[i].defaultAmount == widget.session.defaultAmount) {
+          if (sessions[i].defaultAmount == widget.session.defaultAmount &&
+              sessions[i].name == widget.session.name) {
             String key =
                 sessions[i].timestamp.toIso8601String().replaceAll(".", "^");
             String sessionPath =
                 "${Const().dbrootGaruda}/NityaSeva/$dbDatePrev/$key/Tickets";
             var ticketsList = await FB().getList(path: sessionPath);
+            ticketsList.sort((a, b) =>
+                (a['ticketNumber'] ?? 0).compareTo(b['ticketNumber'] ?? 0));
             if (ticketsList.isNotEmpty) {
               Map<String, dynamic> lastTicketJson =
                   Map<String, dynamic>.from(ticketsList.last);
@@ -994,7 +998,65 @@ class _TicketPageState extends State<TicketPage> {
       }
     }
 
-    print(lastTicketNumber);
+    _nextFestivalTicketNumber = lastTicketNumber + 1;
+    TextEditingController nextTicketNumberController = TextEditingController(
+        text: lastTicketNumber == 0 ? "1" : (lastTicketNumber + 1).toString());
+    final formKey = GlobalKey<FormState>();
+    await Widgets().showResponsiveDialog(
+      context: context,
+      title: "Next Ticket Number",
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              Text(
+                  "Please verify the next ticket number as per the book. If it does not match, please contact admin."),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: nextTicketNumberController,
+                decoration: InputDecoration(
+                  labelText: "Next Ticket Number",
+                ),
+                keyboardType: TextInputType.number,
+                readOnly: _isAdmin ? false : true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter a ticket number";
+                  }
+                  if (int.tryParse(value) == null) {
+                    return "Please enter a valid number";
+                  }
+                  if (int.parse(value) == 0) {
+                    return "Ticket number cannot be zero";
+                  }
+
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            if (!formKey.currentState!.validate()) {
+              return;
+            }
+
+            setState(() {
+              _nextFestivalTicketNumber =
+                  int.tryParse(nextTicketNumberController.text.trim()) ?? 1;
+            });
+
+            Navigator.pop(context);
+          },
+          child: Text("OK"),
+        ),
+      ],
+    );
   }
 
   Future<void> _showNextTicketNumbers(BuildContext context) async {

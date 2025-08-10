@@ -115,6 +115,9 @@ class _DaySummaryState extends State<DaySummary> {
   }
 
   Future<void> refresh() async {
+    // FIXME
+    return;
+
     // perform async work here
     String dbDate = DateFormat("yyyy-MM-dd").format(widget.date);
     List sessionsList =

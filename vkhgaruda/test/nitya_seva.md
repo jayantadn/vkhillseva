@@ -2,16 +2,18 @@
 -[] signup
 
 # Nitya Seva
--[] session create / edit / delete 
--[] ticket add / edit / delete
--[] lock/unlock session
--[] session/day summary
+-[x] session create / edit / delete 
+-[x] ticket add / edit / delete
+-[x] lock / unlock session
+-[x] session / day summary
 -[] restore ticket numbers
 -[] festival seva custom amount
+    -[] create session with custom amount
+    -[] test above scenarios
 
 # Laddu seva
--[] add / serve / return
--[] settings
+-[x] add / serve / return
+-[x] settings
 
 # new features
 -[] festival seva custom amount

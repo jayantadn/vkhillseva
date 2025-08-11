@@ -1,5 +1,5 @@
 # General
--[x] signup
+-[] signup
 
 # Nitya Seva
 -[] session create / edit / delete 
@@ -12,8 +12,8 @@
     -[] test above scenarios
 
 # Laddu seva
--[x] add / serve / return
--[x] settings
+-[] add / serve / return
+-[] settings
 
 # Harinaam
 -[] add / edit / delete chanters
@@ -23,3 +23,21 @@
 -[] reports
 
 # new features
+-[] HMI chanters
+-[] HMI sales
+-[] counter display
+-[] chanters entry tile
+-[] edit chanters
+-[] forbid data modification for another day
+-[] validator sales
+-[] radio row for session
+-[] japamala sale value in settings
+-[] delete sales
+-[] edit sales
+-[] lock sales session
+-[] HMI and dash for inventory
+-[] edit inventory entry
+-[] inventory management
+-[] festival seva custom amount
+-[] summary table
+-[] jump to today

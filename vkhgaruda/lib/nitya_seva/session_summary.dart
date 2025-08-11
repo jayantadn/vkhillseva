@@ -55,9 +55,11 @@ class _SessionSummaryState extends State<SessionSummary> {
     int totalCashAmount = 0;
     int totalCardAmount = 0;
 
-    List<int> pushpanjaliTickets = Const().nityaSeva['amounts']!.map((e) {
-      return int.parse(e.keys.first);
-    }).toList();
+    // check in _listEntries if there are any additional ticket amounts
+    Set<int> pushpanjaliTicketSet = {};
+    pushpanjaliTicketSet.addAll(_listEntries.map((ticket) => ticket.amount));
+    List<int> pushpanjaliTickets = pushpanjaliTicketSet.toList();
+    pushpanjaliTickets.sort();
 
     for (int? amount in pushpanjaliTickets) {
       // get a filtered list per amount
@@ -231,7 +233,9 @@ class _SessionSummaryState extends State<SessionSummary> {
 
     // Get the last part and convert it to an integer
     int number = 0;
-    if (header.trim() != 'Total') {
+    if (header.trim() == 'Total') {
+      return Colors.grey;
+    } else {
       number = int.parse(parts.last);
     }
 
@@ -245,7 +249,7 @@ class _SessionSummaryState extends State<SessionSummary> {
       }
     }
 
-    return Colors.grey;
+    return Colors.black;
   }
 
   List<Widget> _getListOfRows(List<String> rows) {

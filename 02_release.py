@@ -293,14 +293,14 @@ def release(app):
         else:
             print("ERROR: APK not found")
 
-        print("upload apk to my google drive")
-        drive_path = "X:/GoogleDrive/PublicRO/Garuda"
-        if os.path.exists(drive_path):
-            shutil.copy(new_apk_path, drive_path)
-            shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{version}.apk'), os.path.join(
-                drive_path, 'vkhgaruda_latest.apk'))
-        else:
-            print("ERROR: Google Drive not found in your local system")
+        # print("upload apk to my google drive")
+        # drive_path = "X:/GoogleDrive/PublicRO/Garuda"
+        # if os.path.exists(drive_path):
+        #     shutil.copy(new_apk_path, drive_path)
+        #     shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{version}.apk'), os.path.join(
+        #         drive_path, 'vkhgaruda_latest.apk'))
+        # else:
+        #     print("ERROR: Google Drive not found in your local system")
 
     print("all operations completed")
 

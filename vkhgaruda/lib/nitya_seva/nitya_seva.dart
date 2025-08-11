@@ -77,7 +77,6 @@ class _NityaSevaState extends State<NityaSeva> {
 
     // admin tutorial
 
-
     // fetch festival sevas from db
     _sevaList.clear();
     dynamic data = await FB()
@@ -162,7 +161,6 @@ class _NityaSevaState extends State<NityaSeva> {
                     .createErrorDialog(context: context, errors: errors);
               }
 
-              
               if (errors.isEmpty || ret == 'Proceed') {
                 _lastCallbackInvoked = DateTime.now();
 

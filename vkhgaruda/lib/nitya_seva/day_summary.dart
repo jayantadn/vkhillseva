@@ -143,6 +143,18 @@ class _DaySummaryState extends State<DaySummary> {
       ticketsList.add(tickets);
     }
 
+    // get the list of amounts from ticketsList
+    List<String> amounts = [];
+    for (var tickets in ticketsList) {
+      for (var ticket in tickets) {
+        Map<String, dynamic> ticketJson = Map<String, dynamic>.from(ticket);
+        Ticket ticketTyped = Ticket.fromJson(ticketJson);
+        if (!amounts.contains(ticketTyped.amount.toString())) {
+          amounts.add(ticketTyped.amount.toString());
+        }
+      }
+    }
+
     await _lock.synchronized(() async {
       if (mounted) {
         // perform sync work here
@@ -201,6 +213,26 @@ class _DaySummaryState extends State<DaySummary> {
                 _amountTableTicketRow.add([amountMap.keys.first]);
                 _amountTableTicketRow[_amountTableTicketRow.length - 1]
                     .add("0");
+              }
+            }
+
+            // doing zero fill for any extra tickets
+            for (var amount in amounts) {
+              int index =
+                  _amountTableTicketRow.indexWhere((row) => row[0] == amount);
+              if (index < 0) {
+                // no entry found for the amount, so add a new row with zero fill
+                _amountTableTicketRow.add([amount]);
+                _amountTableTicketRow[_amountTableTicketRow.length - 1]
+                    .add("0");
+              } else {
+                // amount was indeed entered, so just add zero for this session
+                if (_amountTableTicketRow[index].length > indexSession + 1) {
+                  // Value already exists at (indexSession + 1), do nothing or handle as needed
+                } else {
+                  // Add zero for this session
+                  _amountTableTicketRow[index].add("0");
+                }
               }
             }
 

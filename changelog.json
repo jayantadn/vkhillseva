@@ -6,11 +6,6 @@
             "dialog to enter next ticket number"
         ],
         "fixes": [
-            "fix: double add session",
-            "fix: dashboard display custom amount",
-            "fix: audio clip upload issue",
-            "fix: day summary",
-            "fix: session summary",
             "double add session",
             "dashboard display custom amount",
             "audio clip upload issue",

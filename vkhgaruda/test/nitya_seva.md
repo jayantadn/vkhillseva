@@ -17,15 +17,9 @@
 
 # Harinaam
 -[] add / edit / delete chanters
--[] add / edit / delete procurement
 -[] add / edit / delete sales
+-[] add / edit / delete procurement
 -[] weekly settlement
 -[] reports
 
 # new features
-<<<<<<< HEAD
-
-=======
--[] festival seva custom amount
--[] dialog to enter next ticket number
->>>>>>> main

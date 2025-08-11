@@ -27,7 +27,7 @@ class _TicketPageState extends State<TicketPage> {
   String _username = "Guest";
   bool _isSessionLocked = false;
   bool _isAdmin = false;
-  int _nextFestivalTicketNumber = 0;
+  int _nextFestivalTicketNumber = 1;
 
   // lists
   final List<Ticket> _tickets = [];
@@ -174,7 +174,8 @@ class _TicketPageState extends State<TicketPage> {
       if (widget.session.name == "Nitya Seva") {
         _showNextTicketNumbers(context);
       } else {
-        _showFestivalStartingTicketNumber(context);
+        // if festival seva, fetch next ticket number
+        _showFestivalNextTicketDialog(context);
       }
     }
   }
@@ -204,7 +205,11 @@ class _TicketPageState extends State<TicketPage> {
     ticketNumberController.text = ticketNumber.toString();
     sevaNames = _getSevaNames(amount);
     if (ticket == null) {
-      sevaName = sevaNames.isNotEmpty ? sevaNames[0] : "";
+      if (widget.session.name == "Nitya Seva") {
+        sevaName = sevaNames.isNotEmpty ? sevaNames[0] : "";
+      } else {
+        sevaName = widget.session.name;
+      }
     }
 
     showGeneralDialog(
@@ -241,87 +246,91 @@ class _TicketPageState extends State<TicketPage> {
 
                         // Seva amount label
                         SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Seva Amount",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                        if (widget.session.name == "Nitya Seva")
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Seva Amount",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                            ),
                           ),
-                        ),
 
                         // buttons for seva amounts
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              ...Const().nityaSeva['amounts']!.map((seva) {
-                                // skip obsolete seva amounts
-                                if (seva.values.first['obsolete'] == true) {
-                                  return Container();
-                                }
+                        if (widget.session.name == "Nitya Seva")
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                ...Const().nityaSeva['amounts']!.map((seva) {
+                                  // skip obsolete seva amounts
+                                  if (seva.values.first['obsolete'] == true) {
+                                    return Container();
+                                  }
 
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      amount = int.parse(seva.keys.first);
-                                      if (ticket != null &&
-                                          ticket.amount == amount) {
-                                        ticketNumberController.text =
-                                            ticket.ticketNumber.toString();
-                                      } else {
-                                        ticketNumberController.text =
-                                            (await _getNextTicketNumber(amount))
-                                                .toString();
-                                      }
-                                      setDialogState(() {
-                                        sevaNames = _getSevaNames(amount);
-                                        sevaName = sevaNames.isNotEmpty
-                                            ? sevaNames[0]
-                                            : "";
-                                      });
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color:
-                                            amount.toString() == seva.keys.first
-                                                ? seva.values.first['color']!
-                                                    as Color
-                                                : Colors.transparent,
-                                        border: Border.all(
-                                            color: seva.values.first['color']!
-                                                as Color),
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          seva.keys.first,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge!
-                                              .copyWith(
-                                                  color: amount.toString() ==
-                                                          seva.keys.first
-                                                      ? Colors.white
-                                                      : seva.values
-                                                              .first['color']
-                                                          as Color),
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        amount = int.parse(seva.keys.first);
+                                        if (ticket != null &&
+                                            ticket.amount == amount) {
+                                          ticketNumberController.text =
+                                              ticket.ticketNumber.toString();
+                                        } else {
+                                          ticketNumberController.text =
+                                              (await _getNextTicketNumber(
+                                                      amount))
+                                                  .toString();
+                                        }
+                                        setDialogState(() {
+                                          sevaNames = _getSevaNames(amount);
+                                          sevaName = sevaNames.isNotEmpty
+                                              ? sevaNames[0]
+                                              : "";
+                                        });
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: amount.toString() ==
+                                                  seva.keys.first
+                                              ? seva.values.first['color']!
+                                                  as Color
+                                              : Colors.transparent,
+                                          border: Border.all(
+                                              color: seva.values.first['color']!
+                                                  as Color),
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            seva.keys.first,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge!
+                                                .copyWith(
+                                                    color: amount.toString() ==
+                                                            seva.keys.first
+                                                        ? Colors.white
+                                                        : seva.values
+                                                                .first['color']
+                                                            as Color),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              }),
-                            ],
+                                  );
+                                }),
+                              ],
+                            ),
                           ),
-                        ),
 
                         // Payment mode label
                         SizedBox(height: 8),
@@ -338,7 +347,7 @@ class _TicketPageState extends State<TicketPage> {
                           ),
                         ),
 
-                        // seva amount buttons
+                        // payment mode buttons
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
@@ -404,39 +413,42 @@ class _TicketPageState extends State<TicketPage> {
 
                         // seva name label
                         SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Seva Name",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                        if (widget.session.name == "Nitya Seva")
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Seva Name",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                            ),
                           ),
-                        ),
 
                         // seva name dropdown
-                        DropdownButton<String>(
-                          isExpanded: true,
-                          value: sevaName,
-                          items: sevaNames.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setDialogState(() {
-                              sevaName = newValue!;
-                            });
-                          },
-                          hint: Text(
-                            "Select Seva",
-                            style: Theme.of(context).textTheme.bodySmall,
+                        if (widget.session.name == "Nitya Seva")
+                          DropdownButton<String>(
+                            isExpanded: true,
+                            value: sevaName,
+                            items: sevaNames.map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setDialogState(() {
+                                sevaName = newValue!;
+                              });
+                            },
+                            hint: Text(
+                              "Select Seva",
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ),
-                        ),
 
                         // note field
                         SizedBox(height: 8),
@@ -630,10 +642,16 @@ class _TicketPageState extends State<TicketPage> {
     String time = DateFormat("HH:mm:ss").format(ticket.timestamp);
 
     Color color = Const()
-        .nityaSeva['amounts']!
-        .firstWhere((element) => element.keys.first == ticket.amount.toString())
-        .values
-        .first['color']! as Color;
+            .nityaSeva['amounts']!
+            .where((element) => element.keys.first == ticket.amount.toString())
+            .isNotEmpty
+        ? Const()
+            .nityaSeva['amounts']!
+            .firstWhere(
+                (element) => element.keys.first == ticket.amount.toString())
+            .values
+            .first['color']! as Color
+        : Colors.black;
 
     return Widgets().createTopLevelCard(
       context: context,
@@ -904,56 +922,141 @@ class _TicketPageState extends State<TicketPage> {
     return errors;
   }
 
-  Future<void> _showFestivalStartingTicketNumber(BuildContext context) async {
-    bool isNewBook = false;
-    TextEditingController ticketNumberController =
-        TextEditingController(text: "1");
+  Future<void> _showFestivalNextTicketDialog(BuildContext context) async {
+    int lastTicketNumber = 0;
 
-    Widget body = StatefulBuilder(builder: (context, setDialogState) {
-      return Column(
-        children: [
-          CheckboxListTile(
-            title: Text("Please check the following"),
-            subtitle: Text("Separate ticket book issued for festival?"),
-            value: isNewBook,
-            onChanged: (value) {
-              setDialogState(() {
-                isNewBook = value!;
-              });
-            },
-          ),
+    // for the same date check if any previous session with the same amount
+    String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
+    var sessionsList =
+        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
+    List<Session> sessions = [];
+    for (var sessionRaw in sessionsList) {
+      Map<String, dynamic> s =
+          Map<String, dynamic>.from(sessionRaw['Settings']);
+      sessions.add(Session.fromJson(s));
+    }
+    sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    for (int i = sessions.length - 1; i >= 0; i--) {
+      if (sessions[i].timestamp == widget.session.timestamp) {
+        if (i != 0 &&
+            sessions[i - 1].defaultAmount == widget.session.defaultAmount &&
+            sessions[i - 1].name == widget.session.name) {
+          String key =
+              sessions[i - 1].timestamp.toIso8601String().replaceAll(".", "^");
+          String sessionPath =
+              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key/Tickets";
+          var ticketsList = await FB().getList(path: sessionPath);
+          if (ticketsList.isNotEmpty) {
+            Map<String, dynamic> lastTicketJson =
+                Map<String, dynamic>.from(ticketsList.last);
+            lastTicketNumber = lastTicketJson['ticketNumber'] ?? 0;
 
-          // text input field
-          SizedBox(height: 8),
-          if (isNewBook)
-            TextField(
-              decoration: InputDecoration(labelText: "Starting ticket number"),
-              controller: ticketNumberController,
-              keyboardType: TextInputType.number,
-            ),
-        ],
-      );
-    });
+            if (lastTicketNumber > 0) {
+              break;
+            }
+          }
+        }
+      }
+    }
 
-    Widgets().showResponsiveDialog(
-        context: context,
-        title: "Festival service",
-        child: body,
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
+    // if no previous session found, get the next ticket number from previous day
+    if (lastTicketNumber == 0) {
+      DateTime previousDay =
+          widget.session.timestamp.subtract(Duration(days: 1));
+      String dbDatePrev = DateFormat("yyyy-MM-dd").format(previousDay);
+      var sessionsListPrev = await FB()
+          .getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDatePrev");
+      if (sessionsListPrev.isNotEmpty) {
+        List<Session> sessions = [];
+        for (var sessionRaw in sessionsListPrev) {
+          Map<String, dynamic> s =
+              Map<String, dynamic>.from(sessionRaw['Settings']);
+          sessions.add(Session.fromJson(s));
+        }
+        sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+        for (int i = sessions.length - 1; i >= 0; i--) {
+          if (sessions[i].defaultAmount == widget.session.defaultAmount &&
+              sessions[i].name == widget.session.name) {
+            String key =
+                sessions[i].timestamp.toIso8601String().replaceAll(".", "^");
+            String sessionPath =
+                "${Const().dbrootGaruda}/NityaSeva/$dbDatePrev/$key/Tickets";
+            var ticketsList = await FB().getList(path: sessionPath);
+            ticketsList.sort((a, b) =>
+                (a['ticketNumber'] ?? 0).compareTo(b['ticketNumber'] ?? 0));
+            if (ticketsList.isNotEmpty) {
+              Map<String, dynamic> lastTicketJson =
+                  Map<String, dynamic>.from(ticketsList.last);
+              lastTicketNumber = lastTicketJson['ticketNumber'] ?? 0;
 
-              if (isNewBook) {
-                _nextFestivalTicketNumber =
-                    int.tryParse(ticketNumberController.text) ?? 1;
-              } else {
-                _showNextTicketNumbers(context);
+              if (lastTicketNumber > 0) {
+                break;
               }
-            },
-            child: Text("OK"),
+            }
+          }
+        }
+      }
+    }
+
+    _nextFestivalTicketNumber = lastTicketNumber + 1;
+    TextEditingController nextTicketNumberController = TextEditingController(
+        text: lastTicketNumber == 0 ? "1" : (lastTicketNumber + 1).toString());
+    final formKey = GlobalKey<FormState>();
+    await Widgets().showResponsiveDialog(
+      context: context,
+      title: "Next Ticket Number",
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              Text(
+                  "Please verify the next ticket number as per the book. If it does not match, please contact admin."),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: nextTicketNumberController,
+                decoration: InputDecoration(
+                  labelText: "Next Ticket Number",
+                ),
+                keyboardType: TextInputType.number,
+                readOnly: _isAdmin ? false : true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter a ticket number";
+                  }
+                  if (int.tryParse(value) == null) {
+                    return "Please enter a valid number";
+                  }
+                  if (int.parse(value) == 0) {
+                    return "Ticket number cannot be zero";
+                  }
+
+                  return null;
+                },
+              ),
+            ],
           ),
-        ]);
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            if (!formKey.currentState!.validate()) {
+              return;
+            }
+
+            setState(() {
+              _nextFestivalTicketNumber =
+                  int.tryParse(nextTicketNumberController.text.trim()) ?? 1;
+            });
+
+            Navigator.pop(context);
+          },
+          child: Text("OK"),
+        ),
+      ],
+    );
   }
 
   Future<void> _showNextTicketNumbers(BuildContext context) async {

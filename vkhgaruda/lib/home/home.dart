@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/deepotsava/main.dart';
 import 'package:vkhgaruda/harinaam/harinaam.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'package:vkhgaruda/home/settings.dart';
@@ -222,6 +223,22 @@ class _HomePageState extends State<HomePage> {
                                 image:
                                     'assets/images/LauncherIcons/Deepotsava.png',
                                 title: "Karthika\nDeepotsava",
+                                callback:
+                                      LauncherTileCallback(onClick: () async {
+                                    bool perm = await Utils()
+                                        .checkPermission("Karthika Deepotsava");
+                                    if (perm) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                Deepotsava(
+                                                )),
+                                      );
+                                    } else {
+                                      Toaster().error("Access Denied");
+                                    }
+                                  })
                               ),
 
                               // Sangeet Seva

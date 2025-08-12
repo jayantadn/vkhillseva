@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:vkhgaruda/deepotsava/main.dart';
 import 'package:vkhgaruda/harinaam/inventory.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'firebase_options.dart';
@@ -23,10 +24,10 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   final Widget home = const Landing(title: "Hare Krishna");
-  final Widget test = const Inventory(title: "Testing");
+  final Widget test = Deepotsava();
 
   // This widget is the root of your application.
   @override
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Garuda',
       theme: themeGaruda,
-      home: home,
+      home: test,
     );
   }
 }

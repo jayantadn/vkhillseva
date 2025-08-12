@@ -78,10 +78,10 @@ class _DeepotsavaState extends State<Deepotsava>
               child: GestureDetector(
                 onTap: _onRKCDeepamSalesTap,
                 child: CardWidget(
-                  image: 'assets/images/RKC.png',
+                  image: 'assets/images/VKHillDieties/RadhaKrishna.png',
                   text: 'RKC Deepam Sales',
                   isImageLeft: true,
-                  color: Colors.deepOrange, // Set desired card color
+                  color: Colors.pink, // Set desired card color
                   textColor: Colors.white, // Set desired text color
                 ),
               ),
@@ -91,11 +91,11 @@ class _DeepotsavaState extends State<Deepotsava>
               child: GestureDetector(
                 onTap: _onRRGDeepamSalesTap,
                 child: CardWidget(
-                  image: 'assets/images/RRG.png',
+                  image: 'assets/images/VKHillDieties/Govinda.png',
                   text: 'RRG Deepam Sales',
                   isImageLeft: false,
-                  color: Colors.green, // Set desired card color
-                  textColor: Colors.black, // Set desired text color
+                  color: Colors.black, // Set desired card color
+                  textColor: Colors.white, // Set desired text color
                 ),
               ),
             ),
@@ -104,11 +104,11 @@ class _DeepotsavaState extends State<Deepotsava>
               child: GestureDetector(
                 onTap: _onDeepamMakingTap,
                 child: CardWidget(
-                  image: 'assets/images/deepotsava.jpg',
+                  image: 'assets/images/LauncherIcons/Deepotsava.png',
                   text: 'Deepam Making',
                   isImageLeft: true,
-                  color: Colors.blue, // Set desired card color
-                  textColor: Colors.yellow, // Set desired text color
+                  color: Colors.deepOrange,
+                  textColor: Colors.white, // Set desired text color
                 ),
               ),
             ),
@@ -117,11 +117,11 @@ class _DeepotsavaState extends State<Deepotsava>
               child: GestureDetector(
                 onTap: _onAccountingTap,
                 child: CardWidget(
-                  image: 'assets/images/icon_cash.png',
+                  image: 'assets/images/PaymentModes/icon_cash.png',
                   text: 'Accounting',
                   isImageLeft: false,
-                  color: Colors.yellow, // Set desired card color
-                  textColor: Colors.red, // Set desired text color
+                  color: Colors.lightGreenAccent, // Set desired card color
+                  textColor: Colors.black, // Set desired text color
                 ),
               ),
             ),

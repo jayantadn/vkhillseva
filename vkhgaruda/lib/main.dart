@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide Summary;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:vkhgaruda/harinaam/inventory.dart';
+import 'package:vkhgaruda/harinaam/summary.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const Landing(title: "Hare Krishna");
-  final Widget test = const Inventory(title: "Testing");
+  final Widget test = const Summary(title: "Testing");
 
   // This widget is the root of your application.
   @override

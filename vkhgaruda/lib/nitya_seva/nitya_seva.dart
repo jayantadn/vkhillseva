@@ -28,6 +28,7 @@ class _NityaSevaState extends State<NityaSeva> {
   DateTime _lastCallbackInvoked = DateTime.now();
   String _username = "Guest";
   bool _isAdmin = false;
+  GlobalKey<DaySummaryState> _daySummaryKey = GlobalKey<DaySummaryState>();
 
   // lists
   final List<FestivalSettings> _sevaList = [];
@@ -102,6 +103,8 @@ class _NityaSevaState extends State<NityaSeva> {
       }
     }
     _sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+    _daySummaryKey.currentState?.refresh();
 
     if (mounted) {
       setState(() {
@@ -392,6 +395,8 @@ class _NityaSevaState extends State<NityaSeva> {
                                       path:
                                           "${Const().dbrootGaruda}/NityaSeva/OpenSessions",
                                       value: openSessions);
+
+                                  _daySummaryKey.currentState?.refresh();
                                 }));
                           } else if (value == "Lock") {
                             String dbDate =
@@ -610,7 +615,7 @@ class _NityaSevaState extends State<NityaSeva> {
                     }),
 
                     // summary
-                    DaySummary(date: _selectedDate),
+                    DaySummary(key: _daySummaryKey, date: _selectedDate),
 
                     // leave some bottom spacing
                     SizedBox(height: 100),

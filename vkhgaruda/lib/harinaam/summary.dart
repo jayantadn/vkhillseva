@@ -34,6 +34,7 @@ class _SummaryState extends State<Summary> {
   int _totalAmountCollected = 0;
   int _newSaleMalasProcured = 0;
   int _discardedSaleMalas = 0;
+  final Map<String, dynamic> _paymentModeSummary = {};
 
   // lists
 
@@ -122,7 +123,7 @@ class _SummaryState extends State<Summary> {
             }
           }
 
-          // number of malas sold
+          // number of malas sold morning
           _totalMalasSold = 0;
           _totalAmountCollected = 0;
           dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Morning/Sales";
@@ -132,7 +133,23 @@ class _SummaryState extends State<Summary> {
                 Utils().convertRawToDatatype(entry.value, SalesEntry.fromJson);
             _totalMalasSold += sale.count;
             _totalAmountCollected += (sale.japamala.saleValue * sale.count);
+
+            // payment modes
+            if (_paymentModeSummary.containsKey(sale.paymentMode)) {
+              Map<String, dynamic> data =
+                  _paymentModeSummary[sale.paymentMode] as Map<String, dynamic>;
+              data['count'] += sale.count;
+              data['amount'] += (sale.japamala.saleValue * sale.count);
+              _paymentModeSummary[sale.paymentMode] = data;
+            } else {
+              _paymentModeSummary[sale.paymentMode] = {
+                'count': sale.count,
+                'amount': (sale.japamala.saleValue * sale.count),
+              };
+            }
           }
+
+          // number of malas sold evening
           dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Evening/Sales";
           data = await FB().getJson(path: dbpath, silent: true);
           for (var entry in data.entries) {
@@ -140,6 +157,20 @@ class _SummaryState extends State<Summary> {
                 Utils().convertRawToDatatype(entry.value, SalesEntry.fromJson);
             _totalMalasSold += sale.count;
             _totalAmountCollected += (sale.japamala.saleValue * sale.count);
+
+            // payment modes
+            if (_paymentModeSummary.containsKey(sale.paymentMode)) {
+              Map<String, dynamic> data =
+                  _paymentModeSummary[sale.paymentMode] as Map<String, dynamic>;
+              data['count'] += sale.count;
+              data['amount'] += (sale.japamala.saleValue * sale.count);
+              _paymentModeSummary[sale.paymentMode] = data;
+            } else {
+              _paymentModeSummary[sale.paymentMode] = {
+                'count': sale.count,
+                'amount': (sale.japamala.saleValue * sale.count),
+              };
+            }
           }
           break;
 
@@ -252,6 +283,26 @@ class _SummaryState extends State<Summary> {
         ));
   }
 
+  Widget _createPaymentModeSummary() {
+    return Widgets().createTopLevelCard(
+        context: context,
+        title: "Payment Modes",
+        child: Column(
+          children:
+              _paymentModeSummary.entries.toList().asMap().entries.map((entry) {
+            int idx = entry.key;
+            String paymentMode = entry.value.key;
+            Map<String, dynamic> data = entry.value.value;
+            bool isLast = idx == _paymentModeSummary.entries.length - 1;
+            return _createTableEntry(
+              paymentMode,
+              "${data['count']} (₹${data['amount']})",
+              divider: !isLast,
+            );
+          }).toList(),
+        ));
+  }
+
   Widget _createSalesSummary() {
     return Widgets().createTopLevelCard(
         context: context,
@@ -259,9 +310,9 @@ class _SummaryState extends State<Summary> {
         child: Column(
           children: [
             _createTableEntry("Total malas sold", "$_totalMalasSold"),
+            _createTableEntry("New malas procured", "$_newSaleMalasProcured"),
             _createTableEntry(
                 "Total amount collected", "₹$_totalAmountCollected"),
-            _createTableEntry("New malas procured", "$_newSaleMalasProcured"),
             _createTableEntry("Discarded malas", "$_discardedSaleMalas",
                 divider: false),
           ],
@@ -459,7 +510,7 @@ class _SummaryState extends State<Summary> {
                       ),
                       child: IconButton(
                         tooltip: "Jump to today",
-                        icon: const Icon(Icons.restore, size: 20),
+                        icon: const Icon(Icons.event, size: 20),
                         color: Theme.of(context).primaryColor,
                         onPressed: () {
                           setState(() {
@@ -816,6 +867,9 @@ class _SummaryState extends State<Summary> {
 
                       SizedBox(height: 10),
                       _createSalesSummary(),
+
+                      SizedBox(height: 10),
+                      _createPaymentModeSummary(),
 
                       // leave some space at bottom
                       SizedBox(height: 500),

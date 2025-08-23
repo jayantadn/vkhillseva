@@ -1,39 +1,8 @@
 {
     "8.1.1": {
         "effort": "0.0h",
-        "features": [
-            "HMI chanters",
-            "HMI sales",
-            "counter display",
-            "chanters entry tile",
-            "edit chanters",
-            "forbid data modification for another day",
-            "validator sales",
-            "radio row for session",
-            "japamala sale value in settings",
-            "delete sales",
-            "edit sales",
-            "lock sales session",
-            "HMI and dash for inventory",
-            "edit inventory entry",
-            "inventory management",
-            "festival seva custom amount",
-            "summary table",
-            "jump to today",
-            "payment mode daily summary",
-            "payment mode summary"
-        ],
+        "features": [],
         "fixes": [
-            "remove settings from nitya seva",
-            "double add session",
-            "dashboard display custom amount",
-            "all sale data were not appearing",
-            "changelog generator",
-            "ticket amount not visible",
-            "auto lock session",
-            "disable context menu in tiles if sale is not live",
-            "remove lock, add 10x",
-            "added title to inventory cards",
             "dart fix",
             "invetory edit"
         ]

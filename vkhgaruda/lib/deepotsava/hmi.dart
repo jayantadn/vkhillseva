@@ -3,8 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:vkhgaruda/deepotsava/datatypes.dart';
 import 'package:vkhgaruda/deepotsava/fbl.dart';
 import 'package:vkhgaruda/deepotsava/themeDeepotsava.dart';
-import 'package:vkhpackages/common/const.dart';
-import 'package:vkhpackages/common/theme.dart';
 import 'package:vkhpackages/common/utils.dart';
 
 class HMI extends StatefulWidget {
@@ -29,7 +27,7 @@ class _HMIState extends State<HMI> {
   Color? _textColor;
   Color? _bgColor;
 
-  FixedExtentScrollController _cupertinoController =
+  final FixedExtentScrollController _cupertinoController =
       FixedExtentScrollController(initialItem: 0);
 
   @override
@@ -264,7 +262,6 @@ class _HMIState extends State<HMI> {
 
               // serve button
               ElevatedButton(
-                child: Text('+'),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.zero,
                   minimumSize: Size(40, 40), // Small size
@@ -272,6 +269,7 @@ class _HMIState extends State<HMI> {
                 onPressed: () {
                   _addSale(_cupertinoController.selectedItem);
                 },
+                child: Text('+'),
               )
             ],
           ),

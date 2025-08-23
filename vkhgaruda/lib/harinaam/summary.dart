@@ -34,6 +34,7 @@ class _SummaryState extends State<Summary> {
   int _totalAmountCollected = 0;
   int _newSaleMalasProcured = 0;
   int _discardedSaleMalas = 0;
+  final Map<String, dynamic> _paymentModeSummary = {};
 
   // lists
 
@@ -71,6 +72,7 @@ class _SummaryState extends State<Summary> {
 
     await _lock.synchronized(() async {
       // your code here
+      _paymentModeSummary.clear();
       switch (_period) {
         case "daily":
           DateTime date = DateFormat("dd MMM, yyyy").parse(_periodDetails);
@@ -122,7 +124,7 @@ class _SummaryState extends State<Summary> {
             }
           }
 
-          // number of malas sold
+          // number of malas sold morning
           _totalMalasSold = 0;
           _totalAmountCollected = 0;
           dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Morning/Sales";
@@ -132,7 +134,23 @@ class _SummaryState extends State<Summary> {
                 Utils().convertRawToDatatype(entry.value, SalesEntry.fromJson);
             _totalMalasSold += sale.count;
             _totalAmountCollected += (sale.japamala.saleValue * sale.count);
+
+            // payment modes
+            if (_paymentModeSummary.containsKey(sale.paymentMode)) {
+              Map<String, dynamic> data =
+                  _paymentModeSummary[sale.paymentMode] as Map<String, dynamic>;
+              data['count'] += sale.count;
+              data['amount'] += (sale.japamala.saleValue * sale.count);
+              _paymentModeSummary[sale.paymentMode] = data;
+            } else {
+              _paymentModeSummary[sale.paymentMode] = {
+                'count': sale.count,
+                'amount': (sale.japamala.saleValue * sale.count),
+              };
+            }
           }
+
+          // number of malas sold evening
           dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Evening/Sales";
           data = await FB().getJson(path: dbpath, silent: true);
           for (var entry in data.entries) {
@@ -140,6 +158,20 @@ class _SummaryState extends State<Summary> {
                 Utils().convertRawToDatatype(entry.value, SalesEntry.fromJson);
             _totalMalasSold += sale.count;
             _totalAmountCollected += (sale.japamala.saleValue * sale.count);
+
+            // payment modes
+            if (_paymentModeSummary.containsKey(sale.paymentMode)) {
+              Map<String, dynamic> data =
+                  _paymentModeSummary[sale.paymentMode] as Map<String, dynamic>;
+              data['count'] += sale.count;
+              data['amount'] += (sale.japamala.saleValue * sale.count);
+              _paymentModeSummary[sale.paymentMode] = data;
+            } else {
+              _paymentModeSummary[sale.paymentMode] = {
+                'count': sale.count,
+                'amount': (sale.japamala.saleValue * sale.count),
+              };
+            }
           }
           break;
 
@@ -157,6 +189,7 @@ class _SummaryState extends State<Summary> {
           _totalChanters = countData.chantersCount;
           _totalMalasSold = countData.salesCount;
           _totalAmountCollected = countData.salesAmount;
+          _paymentModeSummary.addAll(countData.paymentModeSummary);
 
           // chanters inventory data
           _newChanterMalasProcured = 0;
@@ -186,6 +219,7 @@ class _SummaryState extends State<Summary> {
           _totalChanters = countData.chantersCount;
           _totalMalasSold = countData.salesCount;
           _totalAmountCollected = countData.salesAmount;
+          _paymentModeSummary.addAll(countData.paymentModeSummary);
 
           // chanters inventory data
           dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
@@ -213,6 +247,7 @@ class _SummaryState extends State<Summary> {
           _totalChanters = countData.chantersCount;
           _totalMalasSold = countData.salesCount;
           _totalAmountCollected = countData.salesAmount;
+          _paymentModeSummary.addAll(countData.paymentModeSummary);
 
           // chanters inventory data
           dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
@@ -249,6 +284,26 @@ class _SummaryState extends State<Summary> {
             _createTableEntry("Discarded malas", "$_discardedChanterMalas",
                 divider: false),
           ],
+        ));
+  }
+
+  Widget _createPaymentModeSummary() {
+    return Widgets().createTopLevelCard(
+        context: context,
+        title: "Payment Modes",
+        child: Column(
+          children:
+              _paymentModeSummary.entries.toList().asMap().entries.map((entry) {
+            int idx = entry.key;
+            String paymentMode = entry.value.key;
+            Map<String, dynamic> data = entry.value.value;
+            bool isLast = idx == _paymentModeSummary.entries.length - 1;
+            return _createTableEntry(
+              paymentMode,
+              "${data['count']} (₹${data['amount']})",
+              divider: !isLast,
+            );
+          }).toList(),
         ));
   }
 
@@ -459,7 +514,7 @@ class _SummaryState extends State<Summary> {
                       ),
                       child: IconButton(
                         tooltip: "Jump to today",
-                        icon: const Icon(Icons.restore, size: 20),
+                        icon: const Icon(Icons.event, size: 20),
                         color: Theme.of(context).primaryColor,
                         onPressed: () {
                           setState(() {
@@ -583,6 +638,7 @@ class _SummaryState extends State<Summary> {
     int chantersCount = 0;
     int salesCount = 0;
     int salesAmount = 0;
+    Map<String, dynamic> paymentModeSummary = {};
 
     for (var entry in dataRaw.entries) {
       // morning chanters
@@ -605,6 +661,19 @@ class _SummaryState extends State<Summary> {
               .convertRawToDatatype(morningEntry.value, SalesEntry.fromJson);
           salesCount += sale.count;
           salesAmount += (sale.japamala.saleValue * sale.count);
+
+          if (paymentModeSummary.containsKey(sale.paymentMode)) {
+            Map<String, dynamic> data =
+                paymentModeSummary[sale.paymentMode] as Map<String, dynamic>;
+            data['count'] += sale.count;
+            data['amount'] += (sale.japamala.saleValue * sale.count);
+            paymentModeSummary[sale.paymentMode] = data;
+          } else {
+            paymentModeSummary[sale.paymentMode] = {
+              'count': sale.count,
+              'amount': (sale.japamala.saleValue * sale.count),
+            };
+          }
         }
       }
 
@@ -628,6 +697,19 @@ class _SummaryState extends State<Summary> {
               .convertRawToDatatype(eveningEntry.value, SalesEntry.fromJson);
           salesCount += sale.count;
           salesAmount += (sale.japamala.saleValue * sale.count);
+
+          if (paymentModeSummary.containsKey(sale.paymentMode)) {
+            Map<String, dynamic> data =
+                paymentModeSummary[sale.paymentMode] as Map<String, dynamic>;
+            data['count'] += sale.count;
+            data['amount'] += (sale.japamala.saleValue * sale.count);
+            paymentModeSummary[sale.paymentMode] = data;
+          } else {
+            paymentModeSummary[sale.paymentMode] = {
+              'count': sale.count,
+              'amount': (sale.japamala.saleValue * sale.count),
+            };
+          }
         }
       }
     }
@@ -635,7 +717,8 @@ class _SummaryState extends State<Summary> {
     return CountTuple(
         chantersCount: chantersCount,
         salesCount: salesCount,
-        salesAmount: salesAmount);
+        salesAmount: salesAmount,
+        paymentModeSummary: paymentModeSummary);
   }
 
   InventoryTuple _getChantersAndSalesInventory(var dataMap) {
@@ -817,6 +900,9 @@ class _SummaryState extends State<Summary> {
                       SizedBox(height: 10),
                       _createSalesSummary(),
 
+                      SizedBox(height: 10),
+                      _createPaymentModeSummary(),
+
                       // leave some space at bottom
                       SizedBox(height: 500),
                     ],
@@ -854,9 +940,11 @@ class CountTuple {
   final int chantersCount;
   final int salesCount;
   final int salesAmount;
+  Map<String, dynamic> paymentModeSummary;
 
   CountTuple(
       {required this.chantersCount,
       required this.salesCount,
-      required this.salesAmount});
+      required this.salesAmount,
+      required this.paymentModeSummary});
 }

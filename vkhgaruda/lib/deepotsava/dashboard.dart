@@ -18,7 +18,7 @@ class _DashboardState extends State<Dashboard> {
   final _lockInit = Lock();
   int _lampsIssued = 0;
   int _platesIssued = 0;
-  Map<String, int> _modeCount = {};
+  final Map<String, int> _modeCount = {};
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Widget _createLampCount(double height) {
-    return Container(
+    return SizedBox(
       height: height,
       width: height,
       child: CircleAvatar(
@@ -69,7 +69,7 @@ class _DashboardState extends State<Dashboard> {
           child: Row(
             children: [
               // left side widget
-              Container(
+              SizedBox(
                 height: height,
                 width: height,
                 child: Center(
@@ -103,7 +103,7 @@ class _DashboardState extends State<Dashboard> {
               Spacer(),
 
               // right side widget
-              Container(
+              SizedBox(
                 height: height,
                 width: height,
                 child: Center(

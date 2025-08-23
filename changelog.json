@@ -1,4 +1,26 @@
 {
+    "8.1.1": {
+        "effort": "0.0h",
+        "features": [],
+        "fixes": [
+            "dart fix",
+            "invetory edit"
+        ]
+    },
+    "8.1.0": {
+        "effort": "3.0h",
+        "features": [
+            "payment mode daily summary",
+            "payment mode summary"
+        ],
+        "fixes": [
+            "ticket amount not visible",
+            "auto lock session",
+            "disable context menu in tiles if sale is not live",
+            "remove lock, add 10x",
+            "added title to inventory cards"
+        ]
+    },
     "8.0.0": {
         "effort": "27h",
         "features": [

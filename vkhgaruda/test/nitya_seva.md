@@ -18,9 +18,8 @@
 # Harinaam
 -[] add / edit / delete chanters
 -[] add / edit / delete sales
--[] add / edit / delete procurement
--[] weekly settlement
--[] reports
+-[] add / edit / delete inventory
+-[] summary daily / weekly / monthly / yearly
 
 # new features
 -[] HMI chanters
@@ -41,3 +40,5 @@
 -[] festival seva custom amount
 -[] summary table
 -[] jump to today
+-[] payment mode daily summary
+-[] payment mode summary

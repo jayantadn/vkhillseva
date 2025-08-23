@@ -622,6 +622,7 @@ class _InventoryState extends State<Inventory> {
                       // dashboard
                       Widgets().createTopLevelCard(
                           context: context,
+                          title: "Available stock",
                           child: Column(
                             children: [
                               _createYearSelector(),
@@ -637,6 +638,7 @@ class _InventoryState extends State<Inventory> {
                       // inventory entries
                       Widgets().createTopLevelCard(
                           context: context,
+                          title: "Entry records",
                           child: Column(
                             children: [
                               ...List.generate(_inventoryEntries.length,

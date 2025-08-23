@@ -412,7 +412,7 @@ class _InventoryState extends State<Inventory> {
     }
   }
 
-  Future<void> _updateInventoryEntry(
+  Future<void> _editInventoryEntry(
       InventoryEntry oldEntry, InventoryEntry newEntry) async {
     // update the entry in the list
     int index = _inventoryEntries.indexOf(oldEntry);
@@ -423,39 +423,76 @@ class _InventoryState extends State<Inventory> {
     }
 
     // update the dashboard counters
-    if (oldEntry.malaType == "Chanters") {
-      if (oldEntry.addOrRemove == "Add") {
-        await keyDashboard.currentState?.setChanters(
-            keyDashboard.currentState!.getChanters() -
-                oldEntry.count +
-                newEntry.count);
-      } else {
-        int count = keyDashboard.currentState!.getChanters();
-        int diff = newEntry.count - oldEntry.count;
-        count -= diff;
+    if (oldEntry.malaType == newEntry.malaType) {
+      if (oldEntry.malaType == "Chanters") {
+        if (oldEntry.addOrRemove == "Add") {
+          await keyDashboard.currentState?.setChanters(
+              keyDashboard.currentState!.getChanters() -
+                  oldEntry.count +
+                  newEntry.count);
+        } else {
+          int count = keyDashboard.currentState!.getChanters();
+          int diff = newEntry.count - oldEntry.count;
+          count -= diff;
 
-        if (count < 0) {
-          count = 0;
-          Toaster().error("Chanters mala count cannot be negative.");
+          if (count < 0) {
+            count = 0;
+            Toaster().error("Chanters mala count cannot be negative.");
+          }
+          await keyDashboard.currentState?.setChanters(count);
         }
-        await keyDashboard.currentState?.setChanters(count);
+      } else if (oldEntry.malaType == "Sales") {
+        if (oldEntry.addOrRemove == "Add") {
+          await keyDashboard.currentState?.setSales(
+              keyDashboard.currentState!.getSales() -
+                  oldEntry.count +
+                  newEntry.count);
+        } else {
+          int count = keyDashboard.currentState!.getSales();
+          int diff = newEntry.count - oldEntry.count;
+          count -= diff;
+
+          if (count < 0) {
+            count = 0;
+            Toaster().error("Sales mala count cannot be negative.");
+          }
+          await keyDashboard.currentState?.setSales(count);
+        }
       }
-    } else if (oldEntry.malaType == "Sales") {
-      if (oldEntry.addOrRemove == "Add") {
-        await keyDashboard.currentState?.setSales(
-            keyDashboard.currentState!.getSales() -
-                oldEntry.count +
-                newEntry.count);
-      } else {
-        int count = keyDashboard.currentState!.getSales();
-        int diff = newEntry.count - oldEntry.count;
-        count -= diff;
+    } else {
+      if (oldEntry.malaType == "Chanters") {
+        if (oldEntry.addOrRemove == "Add") {
+          await keyDashboard.currentState?.setChanters(
+              keyDashboard.currentState!.getChanters() - oldEntry.count);
+          await keyDashboard.currentState!.addSales(newEntry.count);
+        } else {
+          await keyDashboard.currentState?.addChanters(oldEntry.count);
 
-        if (count < 0) {
-          count = 0;
-          Toaster().error("Sales mala count cannot be negative.");
+          int count = keyDashboard.currentState!.getSales();
+          count -= newEntry.count;
+          if (count < 0) {
+            count = 0;
+            Toaster().error("Sales mala count cannot be negative.");
+          }
+          await keyDashboard.currentState!.setSales(count);
         }
-        await keyDashboard.currentState?.setSales(count);
+      } else if (oldEntry.malaType == "Sales") {
+        if (oldEntry.addOrRemove == "Add") {
+          await keyDashboard.currentState!.addChanters(newEntry.count);
+
+          await keyDashboard.currentState?.setSales(
+              keyDashboard.currentState!.getSales() - oldEntry.count);
+        } else {
+          int count = keyDashboard.currentState!.getChanters();
+          count -= newEntry.count;
+          if (count < 0) {
+            count = 0;
+            Toaster().error("Sales mala count cannot be negative.");
+          }
+          await keyDashboard.currentState!.setChanters(count);
+
+          await keyDashboard.currentState?.addSales(oldEntry.count);
+        }
       }
     }
 
@@ -571,7 +608,7 @@ class _InventoryState extends State<Inventory> {
                   if (oldEntry == null) {
                     await _addInventoryEntry(entry);
                   } else {
-                    await _updateInventoryEntry(oldEntry, entry);
+                    await _editInventoryEntry(oldEntry, entry);
                   }
                 }
               },

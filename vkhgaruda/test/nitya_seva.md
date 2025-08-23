@@ -16,9 +16,9 @@
 -[] settings
 
 # Harinaam
--[] add / edit / delete chanters
--[] add / edit / delete sales
--[] add / edit / delete procurement
+-[x] add / edit / delete chanters
+-[x] add / edit / delete sales
+-[] add / edit / delete inventory
 -[] weekly settlement
 -[] reports
 

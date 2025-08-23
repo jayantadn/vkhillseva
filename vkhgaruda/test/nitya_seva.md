@@ -16,9 +16,9 @@
 -[] settings
 
 # Harinaam
--[x] add / edit / delete chanters
--[x] add / edit / delete sales
--[x] add / edit / delete inventory
+-[] add / edit / delete chanters
+-[] add / edit / delete sales
+-[] add / edit / delete inventory
 -[] summary daily / weekly / monthly / yearly
 
 # new features

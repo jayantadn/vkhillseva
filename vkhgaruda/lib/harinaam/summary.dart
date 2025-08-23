@@ -314,9 +314,9 @@ class _SummaryState extends State<Summary> {
         child: Column(
           children: [
             _createTableEntry("Total malas sold", "$_totalMalasSold"),
-            _createTableEntry("New malas procured", "$_newSaleMalasProcured"),
             _createTableEntry(
                 "Total amount collected", "₹$_totalAmountCollected"),
+            _createTableEntry("New malas procured", "$_newSaleMalasProcured"),
             _createTableEntry("Discarded malas", "$_discardedSaleMalas",
                 divider: false),
           ],

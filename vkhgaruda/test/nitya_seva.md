@@ -18,9 +18,8 @@
 # Harinaam
 -[x] add / edit / delete chanters
 -[x] add / edit / delete sales
--[] add / edit / delete inventory
--[] weekly settlement
--[] reports
+-[x] add / edit / delete inventory
+-[] summary daily / weekly / monthly / yearly
 
 # new features
 -[] HMI chanters

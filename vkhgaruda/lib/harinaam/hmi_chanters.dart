@@ -134,6 +134,7 @@ class HmiChantersState extends State<HmiChanters> {
               },
             ),
           ),
+
           // Increment button
           IconButton(
             onPressed: _isLocked ? null : _increment,
@@ -141,6 +142,7 @@ class HmiChantersState extends State<HmiChanters> {
                 Icon(Icons.add, color: _isLocked ? Colors.grey : Colors.brown),
             tooltip: 'Increment',
           ),
+
           // 10x increment button
           IconButton(
             onPressed: _isLocked ? null : _increment10x,
@@ -148,6 +150,7 @@ class HmiChantersState extends State<HmiChanters> {
                 color: _isLocked ? Colors.grey : Colors.brown),
             tooltip: 'Increment by 10',
           ),
+
           // Submit button
           IconButton(
             onPressed: _submit,

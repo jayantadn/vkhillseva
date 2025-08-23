@@ -392,17 +392,20 @@ class _HarinaamState extends State<Harinaam> {
               ),
 
               // context menu
-              trailing: Widgets().createContextMenu(
-                color: Colors.brown,
-                items: ["Edit", "Delete"],
-                onPressed: (action) {
-                  if (action == "Edit") {
-                    _editChanters(index);
-                  } else if (action == "Delete") {
-                    _deleteChanters(index);
-                  }
-                },
-              ),
+              trailing: _isSessionLive()
+                  ? Widgets().createContextMenu(
+                      color: Colors.brown,
+                      items: ["Edit", "Delete"],
+                      onPressed: (action) {
+                        if (action == "Edit") {
+                          _editChanters(index);
+                        } else if (action == "Delete") {
+                          _deleteChanters(index);
+                        }
+                      },
+                    )
+                  : null,
+
               borderRadius: borderRadius,
             ),
           ),
@@ -463,16 +466,18 @@ class _HarinaamState extends State<Harinaam> {
               ),
 
               // context menu
-              trailing: Widgets().createContextMenu(
-                items: ["Edit", "Delete"],
-                onPressed: (String action) {
-                  if (action == "Edit") {
-                    _editSales(index);
-                  } else if (action == "Delete") {
-                    _deleteSales(index);
-                  }
-                },
-              ),
+              trailing: _isSessionLive()
+                  ? Widgets().createContextMenu(
+                      items: ["Edit", "Delete"],
+                      onPressed: (String action) {
+                        if (action == "Edit") {
+                          _editSales(index);
+                        } else if (action == "Delete") {
+                          _deleteSales(index);
+                        }
+                      },
+                    )
+                  : null,
             ),
           ),
         ),

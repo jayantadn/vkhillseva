@@ -122,7 +122,7 @@ class HmiSalesState extends State<HmiSales> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             IconButton(
-              onPressed: _decrementQuantity,
+              onPressed: _isLocked ? null : _decrementQuantity,
               icon: const Icon(Icons.remove),
             ),
             SizedBox(
@@ -131,6 +131,7 @@ class HmiSalesState extends State<HmiSales> {
                 controller: _quantityController,
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.center,
+                readOnly: _isLocked ? true : false,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   contentPadding:
@@ -139,7 +140,7 @@ class HmiSalesState extends State<HmiSales> {
               ),
             ),
             IconButton(
-              onPressed: _incrementQuantity,
+              onPressed: _isLocked ? null : _incrementQuantity,
               icon: const Icon(Icons.add),
             ),
 

@@ -50,7 +50,7 @@ class _HarinaamState extends State<Harinaam> {
     super.initState();
 
     // set session
-    if (DateTime.now().hour > Const().morningCutoff) {
+    if (DateTime.now().hour >= Const().morningCutoff) {
       _session = "Evening";
     } else {
       _session = "Morning";
@@ -198,22 +198,13 @@ class _HarinaamState extends State<Harinaam> {
     }
 
     await _lock.synchronized(() async {
-      // lock session if not today
-      bool isToday = DateTime.now().year == _selectedDate.year &&
-          DateTime.now().month == _selectedDate.month &&
-          DateTime.now().day == _selectedDate.day;
-      if (!isToday) {
+      // lock session if not live
+      if (_isSessionLive()) {
+        _keyHmiSales.currentState!.setLockState(false);
+        _keyHmiChanters.currentState!.setLockState(false);
+      } else {
         _keyHmiSales.currentState!.setLockState(true);
-      }
-
-      // lock if cutoff is passed
-      if (_session == "Morning" &&
-          DateTime.now().hour > Const().morningCutoff) {
-        _keyHmiSales.currentState!.setLockState(true);
-      }
-      if (_session == "Evening" &&
-          DateTime.now().hour > Const().eveningCutoff) {
-        _keyHmiSales.currentState!.setLockState(true);
+        _keyHmiChanters.currentState!.setLockState(true);
       }
 
       // add chanters records from database
@@ -731,6 +722,22 @@ class _HarinaamState extends State<Harinaam> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  bool _isSessionLive() {
+    // check if today
+    bool isToday = DateTime.now().year == _selectedDate.year &&
+        DateTime.now().month == _selectedDate.month &&
+        DateTime.now().day == _selectedDate.day;
+
+    String sessionTime =
+        DateTime.now().hour < Const().morningCutoff ? "Morning" : "Evening";
+
+    if (isToday && _session == sessionTime) {
+      return true;
+    } else {
+      return false;
     }
   }
 

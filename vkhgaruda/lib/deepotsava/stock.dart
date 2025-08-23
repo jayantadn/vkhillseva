@@ -59,14 +59,14 @@ class _StockPageState extends State<StockPage> {
       _gheePackets = 0;
       _oilCans = 0;
 
-      stocks.forEach((stock) {
+      for (var stock in stocks) {
         _preparedLamps += stock.preparedLamps;
         _unpreparedLamps += stock.unpreparedLamps;
         _plates += stock.plates;
         _wicks += stock.wicks;
         _gheePackets += stock.gheePackets;
         _oilCans += stock.oilCans;
-      });
+      }
     });
   }
 

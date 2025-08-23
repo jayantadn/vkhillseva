@@ -235,10 +235,10 @@ def release(app):
                     file.write(line)
 
         print("Applying dart fix")
-        os.chdir(f"{rootdir}/{app}")
+        os.chdir(f"{rootdir}/vkhgaruda")
         try:
             result = subprocess.run(
-                ["dart", "fix", "--apply"], capture_output=True, text=True, shell=True)
+                "dart fix --apply", capture_output=True, text=True, shell=True)
             print(result.stdout)
             if result.returncode != 0:
                 print(result.stderr)
@@ -310,6 +310,8 @@ def main():
     set_parameters()
     release("vkhgaruda")
     release("vkhsangeetseva")
+  
+
 
 
 if __name__ == '__main__':

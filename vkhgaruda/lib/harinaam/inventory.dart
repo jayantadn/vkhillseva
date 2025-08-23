@@ -319,7 +319,7 @@ class _InventoryState extends State<Inventory> {
       height: 50,
       width: containerWidth,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(25),
       ),
       child: ListView.builder(

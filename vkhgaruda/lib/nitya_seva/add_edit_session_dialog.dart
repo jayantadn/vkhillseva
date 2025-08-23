@@ -12,7 +12,7 @@ class AddEditSessionDialog extends StatefulWidget {
   final Function(Session) onAddOrUpdate;
 
   const AddEditSessionDialog({
-    Key? key,
+    super.key,
     required this.session,
     required this.sevaList,
     required this.sevaAmounts,
@@ -21,7 +21,7 @@ class AddEditSessionDialog extends StatefulWidget {
     required this.now,
     required this.dbDate,
     required this.onAddOrUpdate,
-  }) : super(key: key);
+  });
 
   @override
   State<AddEditSessionDialog> createState() => _AddEditSessionDialogState();

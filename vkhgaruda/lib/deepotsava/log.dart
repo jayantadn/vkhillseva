@@ -108,7 +108,7 @@ class _LogState extends State<Log> {
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Text(
-                        "${value.user}",
+                        value.user,
                         style: TextStyle(fontSize: 12),
                       ),
                     ),

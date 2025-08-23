@@ -306,10 +306,10 @@ def release(app):
 
 
 def main():
-    input("Please stop the timetracker if running")
+    input("Please stop the timetracker if running...")
     set_parameters()
     release("vkhgaruda")
-    #release("vkhsangeetseva")
+    release("vkhsangeetseva")
 
 
 if __name__ == '__main__':

@@ -41,3 +41,5 @@
 -[] festival seva custom amount
 -[] summary table
 -[] jump to today
+-[] payment mode daily summary
+-[] payment mode summary

@@ -20,8 +20,8 @@ import 'package:path_provider/path_provider.dart';
 
 // Add these imports for web-specific functionality
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
-import 'package:js/js_util.dart' as js_util;
+// Conditional import for PDF sharing
+import 'pdf_share_io.dart' if (dart.library.html) 'pdf_share_web.dart';
 
 class Harinaam extends StatefulWidget {
   final String title;
@@ -795,66 +795,9 @@ class _HarinaamState extends State<Harinaam> {
     }
   }
 
-  /// 2) Share the PDF. Uses a switch to route to Web share or Native share.
+  /// Share the PDF using platform-specific implementation
   Future<void> _sharePdf(Uint8List pdfBytes) async {
-    // 1) Build the PDF bytes using your existing function
-    const filename = 'report.pdf';
-
-    // 2) Switch: Web vs Native
-    if (kIsWeb) {
-      // ---- WEB: Use Web Share API (with files) if available; else download ----
-      try {
-        // ignore: avoid_web_libraries_in_flutter
-        final blob = html.Blob([pdfBytes], 'application/pdf');
-        final file = html.File([blob], filename, {'type': 'application/pdf'});
-
-        final nav = html.window.navigator;
-        final hasShare = js_util.hasProperty(nav, 'share');
-        final hasCanShare = js_util.hasProperty(nav, 'canShare');
-
-        if (hasShare && hasCanShare) {
-          final canShareFiles = js_util.callMethod<bool>(nav, 'canShare', [
-                {
-                  'files': [file]
-                }
-              ]) ??
-              false;
-
-          if (canShareFiles) {
-            await js_util.promiseToFuture(js_util.callMethod(nav, 'share', [
-              {
-                'title': filename,
-                'text': 'Sharing a PDF.',
-                'files': [file],
-              }
-            ]));
-            return; // success
-          }
-        }
-
-        // Fallback on web: trigger a download so the user can attach in WhatsApp Web, email, etc.
-        final url = html.Url.createObjectUrlFromBlob(blob);
-        final a = html.AnchorElement(href: url)..download = filename;
-        html.document.body?.append(a);
-        a.click();
-        a.remove();
-        html.Url.revokeObjectUrl(url);
-      } catch (e) {
-        // As a last resort, silently ignore or show a toast/snackbar in your app
-        // print('Web sharing failed: $e');
-      }
-    } else {
-      // ---- NATIVE (Android/iOS/Desktop): Save temp + open OS share sheet ----
-      final dir = await getTemporaryDirectory();
-      final file = io.File('${dir.path}/$filename');
-      await file.writeAsBytes(pdfBytes, flush: true);
-
-      await Share.shareXFiles(
-        [XFile(file.path, mimeType: 'application/pdf', name: filename)],
-        text: 'Here is your PDF.',
-        subject: 'PDF Share',
-      );
-    }
+    await sharePdf(pdfBytes, filename: 'report.pdf');
   }
 
   Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {

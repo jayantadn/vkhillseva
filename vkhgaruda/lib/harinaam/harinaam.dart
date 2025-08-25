@@ -1,11 +1,10 @@
 import 'dart:async';
-
+import 'dart:io' as io;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/harinaam/dashboard.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
@@ -14,6 +13,15 @@ import 'package:vkhgaruda/harinaam/hmi_sales.dart';
 import 'package:vkhgaruda/harinaam/inventory.dart';
 import 'package:vkhgaruda/harinaam/summary.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, TargetPlatform, kIsWeb;
+import 'package:path_provider/path_provider.dart';
+
+// Add these imports for web-specific functionality
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
+import 'package:js/js_util.dart' as js_util;
 
 class Harinaam extends StatefulWidget {
   final String title;
@@ -416,6 +424,45 @@ class _HarinaamState extends State<Harinaam> {
     );
   }
 
+  Future<Uint8List> _createPdf() async {
+    final doc = pw.Document();
+
+    doc.addPage(
+      pw.Page(
+        margin: const pw.EdgeInsets.all(24),
+        build: (ctx) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+          children: [
+            pw.Text('Sales Report',
+                style:
+                    pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 8),
+            pw.Text('Period: Jan–Mar 2025'),
+            pw.SizedBox(height: 16),
+            pw.Table.fromTextArray(
+              headers: ['Item', 'Qty', 'Price'],
+              data: [
+                ['Apples', '12', '₹240'],
+                ['Mangoes', '8', '₹320'],
+                ['Bananas', '18', '₹180'],
+              ],
+              cellAlignment: pw.Alignment.centerLeft,
+            ),
+            pw.SizedBox(height: 16),
+            pw.Align(
+              alignment: pw.Alignment.centerRight,
+              child: pw.Text('Total: ₹740',
+                  style: pw.TextStyle(
+                      fontSize: 14, fontWeight: pw.FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return doc.save();
+  }
+
   Widget _createSalesTile(int index) {
     SalesEntry entry = _salesEntries[index];
     String time = DateFormat("HH:mm:ss").format(entry.timestamp);
@@ -748,137 +795,66 @@ class _HarinaamState extends State<Harinaam> {
     }
   }
 
-  void _sharePdf() async {
-    setState(() {
-      _isLoading = true;
-    });
+  /// 2) Share the PDF. Uses a switch to route to Web share or Native share.
+  Future<void> _sharePdf(Uint8List pdfBytes) async {
+    // 1) Build the PDF bytes using your existing function
+    const filename = 'report.pdf';
 
-    final pdf = pw.Document();
-    final tableHeaders = ['Sl', 'Name', 'Gotra', 'Nakshatra'];
+    // 2) Switch: Web vs Native
+    if (kIsWeb) {
+      // ---- WEB: Use Web Share API (with files) if available; else download ----
+      try {
+        // ignore: avoid_web_libraries_in_flutter
+        final blob = html.Blob([pdfBytes], 'application/pdf');
+        final file = html.File([blob], filename, {'type': 'application/pdf'});
 
-    String formattedDate = DateFormat('dd MMM, yyyy').format(_selectedDate);
+        final nav = html.window.navigator;
+        final hasShare = js_util.hasProperty(nav, 'share');
+        final hasCanShare = js_util.hasProperty(nav, 'canShare');
 
-    List sevakartasReversed = [];
-    sevakartasReversed.sort((a, b) => b["Name"]!.compareTo(a["Name"]!));
+        if (hasShare && hasCanShare) {
+          final canShareFiles = js_util.callMethod<bool>(nav, 'canShare', [
+                {
+                  'files': [file]
+                }
+              ]) ??
+              false;
 
-    final tableData = sevakartasReversed.asMap().entries.map((entry) {
-      int index = entry.key;
-      var sevakarta = entry.value;
-      return [
-        index + 1,
-        sevakarta["Name"]!,
-        sevakarta["Gotra"] ?? "",
-        sevakarta["Nakshatra"] ?? ""
-      ];
-    }).toList();
+          if (canShareFiles) {
+            await js_util.promiseToFuture(js_util.callMethod(nav, 'share', [
+              {
+                'title': filename,
+                'text': 'Sharing a PDF.',
+                'files': [file],
+              }
+            ]));
+            return; // success
+          }
+        }
 
-    String pujariTime = "";
-    String securityTime = "";
-    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
-    dynamic data = await FB()
-        .getValue(path: "TAS/DataEntries/$dbDate/pujariSignature/Timestamp");
-    if (data != null) {
-      DateTime parsedData = DateTime.parse(data.toString());
-      pujariTime = DateFormat('dd MMM, yyyy - HH:mm').format(parsedData);
+        // Fallback on web: trigger a download so the user can attach in WhatsApp Web, email, etc.
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final a = html.AnchorElement(href: url)..download = filename;
+        html.document.body?.append(a);
+        a.click();
+        a.remove();
+        html.Url.revokeObjectUrl(url);
+      } catch (e) {
+        // As a last resort, silently ignore or show a toast/snackbar in your app
+        // print('Web sharing failed: $e');
+      }
+    } else {
+      // ---- NATIVE (Android/iOS/Desktop): Save temp + open OS share sheet ----
+      final dir = await getTemporaryDirectory();
+      final file = io.File('${dir.path}/$filename');
+      await file.writeAsBytes(pdfBytes, flush: true);
+
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'application/pdf', name: filename)],
+        text: 'Here is your PDF.',
+        subject: 'PDF Share',
+      );
     }
-    data = await FB()
-        .getValue(path: "TAS/DataEntries/$dbDate/securitySignature/Timestamp");
-    if (data != null) {
-      DateTime parsedData = DateTime.parse(data.toString());
-      securityTime = DateFormat('dd MMM, yyyy - HH:mm').format(parsedData);
-    }
-
-    pdf.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              // header
-              pw.Center(
-                child: pw.Text(
-                  'Tulasi Archana Seva',
-                  style: pw.TextStyle(
-                      fontSize: 24, fontWeight: pw.FontWeight.bold),
-                ),
-              ),
-              pw.SizedBox(height: 8),
-              pw.Center(
-                child: pw.Text(
-                  formattedDate,
-                  style: pw.TextStyle(fontSize: 16),
-                ),
-              ),
-
-              pw.SizedBox(height: 16),
-
-              // table of sevakartas
-              pw.Table(
-                border: pw.TableBorder.all(),
-                children: [
-                  pw.TableRow(
-                    children: tableHeaders.map((header) {
-                      return pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(header,
-                            style:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      );
-                    }).toList(),
-                  ),
-                  ...tableData.map((row) {
-                    return pw.TableRow(
-                      children: row.map((cell) {
-                        return pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(cell.toString()),
-                        );
-                      }).toList(),
-                    );
-                  }),
-                ],
-              ),
-
-              // signature boxes
-              pw.SizedBox(height: 100),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
-                children: [
-                  pw.Column(
-                    mainAxisAlignment: pw.MainAxisAlignment.start,
-                    children: [
-                      pw.Text("Pujari signature: ",
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      // pw.Text(_pujariSignatureController.text),
-                      pw.Text(pujariTime)
-                    ],
-                  ),
-                  pw.Column(
-                    children: [
-                      pw.Text("Security signature: ",
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      // pw.Text(_securitySignatureController.text),
-                      pw.Text(securityTime)
-                    ],
-                  )
-                ],
-              ),
-            ],
-          );
-        },
-      ),
-    );
-
-    final pdfBytes = await pdf.save();
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
-    await Printing.sharePdf(
-        bytes: pdfBytes, filename: 'TAS_$formattedDate.pdf');
   }
 
   Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {
@@ -1074,8 +1050,9 @@ class _HarinaamState extends State<Harinaam> {
             // share
             ResponsiveToolbarAction(
               icon: const Icon(Icons.share),
-              onPressed: () {
-                _sharePdf();
+              onPressed: () async {
+                final pdfBytes = await _createPdf();
+                _sharePdf(pdfBytes);
               },
             ),
           ],

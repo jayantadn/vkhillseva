@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/harinaam/dashboard.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
@@ -745,6 +748,139 @@ class _HarinaamState extends State<Harinaam> {
     }
   }
 
+  void _sharePdf() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final pdf = pw.Document();
+    final tableHeaders = ['Sl', 'Name', 'Gotra', 'Nakshatra'];
+
+    String formattedDate = DateFormat('dd MMM, yyyy').format(_selectedDate);
+
+    List sevakartasReversed = [];
+    sevakartasReversed.sort((a, b) => b["Name"]!.compareTo(a["Name"]!));
+
+    final tableData = sevakartasReversed.asMap().entries.map((entry) {
+      int index = entry.key;
+      var sevakarta = entry.value;
+      return [
+        index + 1,
+        sevakarta["Name"]!,
+        sevakarta["Gotra"] ?? "",
+        sevakarta["Nakshatra"] ?? ""
+      ];
+    }).toList();
+
+    String pujariTime = "";
+    String securityTime = "";
+    String dbDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+    dynamic data = await FB()
+        .getValue(path: "TAS/DataEntries/$dbDate/pujariSignature/Timestamp");
+    if (data != null) {
+      DateTime parsedData = DateTime.parse(data.toString());
+      pujariTime = DateFormat('dd MMM, yyyy - HH:mm').format(parsedData);
+    }
+    data = await FB()
+        .getValue(path: "TAS/DataEntries/$dbDate/securitySignature/Timestamp");
+    if (data != null) {
+      DateTime parsedData = DateTime.parse(data.toString());
+      securityTime = DateFormat('dd MMM, yyyy - HH:mm').format(parsedData);
+    }
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              // header
+              pw.Center(
+                child: pw.Text(
+                  'Tulasi Archana Seva',
+                  style: pw.TextStyle(
+                      fontSize: 24, fontWeight: pw.FontWeight.bold),
+                ),
+              ),
+              pw.SizedBox(height: 8),
+              pw.Center(
+                child: pw.Text(
+                  formattedDate,
+                  style: pw.TextStyle(fontSize: 16),
+                ),
+              ),
+
+              pw.SizedBox(height: 16),
+
+              // table of sevakartas
+              pw.Table(
+                border: pw.TableBorder.all(),
+                children: [
+                  pw.TableRow(
+                    children: tableHeaders.map((header) {
+                      return pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(header,
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      );
+                    }).toList(),
+                  ),
+                  ...tableData.map((row) {
+                    return pw.TableRow(
+                      children: row.map((cell) {
+                        return pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(cell.toString()),
+                        );
+                      }).toList(),
+                    );
+                  }),
+                ],
+              ),
+
+              // signature boxes
+              pw.SizedBox(height: 100),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
+                children: [
+                  pw.Column(
+                    mainAxisAlignment: pw.MainAxisAlignment.start,
+                    children: [
+                      pw.Text("Pujari signature: ",
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      // pw.Text(_pujariSignatureController.text),
+                      pw.Text(pujariTime)
+                    ],
+                  ),
+                  pw.Column(
+                    children: [
+                      pw.Text("Security signature: ",
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      // pw.Text(_securitySignatureController.text),
+                      pw.Text(securityTime)
+                    ],
+                  )
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    final pdfBytes = await pdf.save();
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate);
+    await Printing.sharePdf(
+        bytes: pdfBytes, filename: 'TAS_$formattedDate.pdf');
+  }
+
   Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {
     final TextEditingController controller =
         TextEditingController(text: entry.count.toString());
@@ -932,6 +1068,14 @@ class _HarinaamState extends State<Harinaam> {
                         builder: (context) => Summary(
                             title: "Summary",
                             splashImage: widget.splashImage)));
+              },
+            ),
+
+            // share
+            ResponsiveToolbarAction(
+              icon: const Icon(Icons.share),
+              onPressed: () {
+                _sharePdf();
               },
             ),
           ],

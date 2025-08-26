@@ -425,30 +425,147 @@ class _HarinaamState extends State<Harinaam> {
     doc.addPage(
       pw.Page(
         margin: const pw.EdgeInsets.all(24),
+        // orientation: pw.PageOrientation.landscape,
         build: (ctx) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.stretch,
           children: [
-            pw.Text('Sales Report',
-                style:
-                    pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold)),
-            pw.SizedBox(height: 8),
-            pw.Text('Period: Jan–Mar 2025'),
-            pw.SizedBox(height: 16),
-            pw.Table.fromTextArray(
-              headers: ['Item', 'Qty', 'Price'],
-              data: [
-                ['Apples', '12', '₹240'],
-                ['Mangoes', '8', '₹320'],
-                ['Bananas', '18', '₹180'],
-              ],
-              cellAlignment: pw.Alignment.centerLeft,
+            // page title
+            pw.Center(
+              child: pw.Text(
+                "Harinam Mantap \nHare Krishna Mahamantra Chanters Club",
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
             ),
-            pw.SizedBox(height: 16),
+
+            // date
+            pw.SizedBox(height: 12),
             pw.Align(
-              alignment: pw.Alignment.centerRight,
-              child: pw.Text('Total: ₹740',
-                  style: pw.TextStyle(
-                      fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              alignment: pw.Alignment.centerLeft,
+              child: pw.Text(
+                "${DateFormat('EEEE').format(_selectedDate)}, ${DateFormat('dd-MM-yyyy').format(_selectedDate)}",
+                style: pw.TextStyle(
+                  fontSize: 14,
+                  fontWeight: pw.FontWeight.normal,
+                ),
+                textAlign: pw.TextAlign.left,
+              ),
+            ),
+
+            // header for morning entry
+            pw.SizedBox(height: 10),
+            pw.Center(
+              child: pw.Text(
+                "Morning",
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
+            ),
+
+            // Morning table
+            pw.SizedBox(height: 12),
+            pw.Row(children: [
+              // chanters count
+              pw.Column(children: [
+                pw.Text("Chanters count"),
+                pw.Table.fromTextArray(
+                  headers: ['Sevakarta', 'Count'],
+                  data: [
+                    ['Ramesh', '5'],
+                    ['Suresh', '3'],
+                    ['Priya', '7'],
+                    ['Amit', '2'],
+                    ['Total', '17']
+                  ],
+                )
+              ]),
+
+              // Chant malas inventory
+              pw.SizedBox(width: 10),
+              pw.Column(children: [
+                pw.Text("Chant malas"),
+                pw.Table.fromTextArray(
+                  data: [
+                    ['Opening balance', '150'],
+                    ['Discarded', '3'],
+                    ['New addition', '7'],
+                    ['Closing balance', '17']
+                  ],
+                )
+              ]),
+
+              // Sale malas inventory
+              pw.SizedBox(width: 10),
+              pw.Column(children: [
+                pw.Text("Sale malas"),
+                pw.Table.fromTextArray(
+                  data: [
+                    ['Opening balance', '150'],
+                    ['Discarded', '3'],
+                    ['New addition', '7'],
+                    ['Total sales', '7'],
+                    ['Closing balance', '17']
+                  ],
+                )
+              ]),
+
+              // payment mode
+              pw.SizedBox(width: 10),
+              pw.Column(children: [
+                pw.Text("Payment mode"),
+                pw.Table.fromTextArray(
+                  data: [
+                    ['Cash', '70'],
+                    ['UPI', '30'],
+                    ['Card', '100'],
+                    ['Gift', '0']
+                  ],
+                )
+              ]),
+            ]),
+
+            // Summary
+            pw.SizedBox(height: 10),
+            pw.Center(
+              child: pw.Text(
+                "Mala sales: 6",
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
+            ),
+            pw.Center(
+              child: pw.Text(
+                "Chanters count: 88",
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
+            ),
+
+            pw.Divider(),
+
+            // evening header
+            pw.SizedBox(height: 10),
+            pw.Center(
+              child: pw.Text(
+                "Evening",
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
             ),
           ],
         ),

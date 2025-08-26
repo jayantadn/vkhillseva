@@ -459,7 +459,7 @@ class _HarinaamState extends State<Harinaam> {
             pw.SizedBox(height: 10),
             pw.Center(
               child: pw.Text(
-                "Morning",
+                "***Morning***",
                 style: pw.TextStyle(
                   fontSize: 18,
                   fontWeight: pw.FontWeight.bold,
@@ -470,65 +470,85 @@ class _HarinaamState extends State<Harinaam> {
 
             // Morning table
             pw.SizedBox(height: 12),
-            pw.Row(children: [
-              // chanters count
-              pw.Column(children: [
-                pw.Text("Chanters count"),
-                pw.Table.fromTextArray(
-                  headers: ['Sevakarta', 'Count'],
-                  data: [
-                    ['Ramesh', '5'],
-                    ['Suresh', '3'],
-                    ['Priya', '7'],
-                    ['Amit', '2'],
-                    ['Total', '17']
-                  ],
-                )
-              ]),
-
-              // Chant malas inventory
-              pw.SizedBox(width: 10),
-              pw.Column(children: [
-                pw.Text("Chant malas"),
-                pw.Table.fromTextArray(
-                  data: [
-                    ['Opening balance', '150'],
-                    ['Discarded', '3'],
-                    ['New addition', '7'],
-                    ['Closing balance', '17']
-                  ],
-                )
-              ]),
-
-              // Sale malas inventory
-              pw.SizedBox(width: 10),
-              pw.Column(children: [
-                pw.Text("Sale malas"),
-                pw.Table.fromTextArray(
-                  data: [
-                    ['Opening balance', '150'],
-                    ['Discarded', '3'],
-                    ['New addition', '7'],
-                    ['Total sales', '7'],
-                    ['Closing balance', '17']
-                  ],
-                )
-              ]),
-
-              // payment mode
-              pw.SizedBox(width: 10),
-              pw.Column(children: [
-                pw.Text("Payment mode"),
-                pw.Table.fromTextArray(
-                  data: [
-                    ['Cash', '70'],
-                    ['UPI', '30'],
-                    ['Card', '100'],
-                    ['Gift', '0']
-                  ],
-                )
-              ]),
-            ]),
+            pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Expanded(
+                  child: pw.Column(children: [
+                    pw.Text("Chanters count"),
+                    pw.Table.fromTextArray(
+                      headers: ['Sevakarta', 'Count'],
+                      data: [
+                        ['Ramesh', '5'],
+                        ['Suresh', '3'],
+                        ['Priya', '7'],
+                        ['Amit', '2'],
+                        ['Total', '17']
+                      ],
+                      columnWidths: {
+                        1: const pw.FixedColumnWidth(
+                            50), // Minimum width for numbers
+                      },
+                    )
+                  ]),
+                ),
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                  child: pw.Column(children: [
+                    pw.Text("Chant malas"),
+                    pw.Table.fromTextArray(
+                      headers: null,
+                      data: [
+                        ['Opening balance', '150'],
+                        ['Discarded', '3'],
+                        ['New addition', '7'],
+                        ['Closing balance', '17']
+                      ],
+                      columnWidths: {
+                        1: const pw.FixedColumnWidth(50),
+                      },
+                    )
+                  ]),
+                ),
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                  child: pw.Column(children: [
+                    pw.Text("Sale malas"),
+                    pw.Table.fromTextArray(
+                      headers: null,
+                      data: [
+                        ['Opening balance', '150'],
+                        ['Discarded', '3'],
+                        ['New addition', '7'],
+                        ['Total sales', '7'],
+                        ['Closing balance', '17']
+                      ],
+                      columnWidths: {
+                        1: const pw.FixedColumnWidth(50),
+                      },
+                    )
+                  ]),
+                ),
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                  child: pw.Column(children: [
+                    pw.Text("Payment mode"),
+                    pw.Table.fromTextArray(
+                      headers: null,
+                      data: [
+                        ['Cash', '70'],
+                        ['UPI', '30'],
+                        ['Card', '100'],
+                        ['Gift', '0']
+                      ],
+                      columnWidths: {
+                        1: const pw.FixedColumnWidth(50),
+                      },
+                    )
+                  ]),
+                ),
+              ],
+            ),
 
             // Summary
             pw.SizedBox(height: 10),
@@ -559,7 +579,111 @@ class _HarinaamState extends State<Harinaam> {
             pw.SizedBox(height: 10),
             pw.Center(
               child: pw.Text(
-                "Evening",
+                "---Evening---",
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
+            ),
+
+            pw.SizedBox(height: 12),
+            pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Expanded(
+                  child: pw.Column(children: [
+                    pw.Text("Chanters count"),
+                    pw.Table.fromTextArray(
+                      headers: ['Sevakarta', 'Count'],
+                      data: [
+                        ['Ramesh', '5'],
+                        ['Suresh', '3'],
+                        ['Priya', '7'],
+                        ['Amit', '2'],
+                        ['Total', '17']
+                      ],
+                      columnWidths: {
+                        1: const pw.FixedColumnWidth(
+                            50), // Minimum width for numbers
+                      },
+                    )
+                  ]),
+                ),
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                  child: pw.Column(children: [
+                    pw.Text("Chant malas"),
+                    pw.Table.fromTextArray(
+                      headers: null,
+                      data: [
+                        ['Opening balance', '150'],
+                        ['Discarded', '3'],
+                        ['New addition', '7'],
+                        ['Closing balance', '17']
+                      ],
+                      columnWidths: {
+                        1: const pw.FixedColumnWidth(50),
+                      },
+                    )
+                  ]),
+                ),
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                  child: pw.Column(children: [
+                    pw.Text("Sale malas"),
+                    pw.Table.fromTextArray(
+                      headers: null,
+                      data: [
+                        ['Opening balance', '150'],
+                        ['Discarded', '3'],
+                        ['New addition', '7'],
+                        ['Total sales', '7'],
+                        ['Closing balance', '17']
+                      ],
+                      columnWidths: {
+                        1: const pw.FixedColumnWidth(50),
+                      },
+                    )
+                  ]),
+                ),
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                  child: pw.Column(children: [
+                    pw.Text("Payment mode"),
+                    pw.Table.fromTextArray(
+                      headers: null,
+                      data: [
+                        ['Cash', '70'],
+                        ['UPI', '30'],
+                        ['Card', '100'],
+                        ['Gift', '0']
+                      ],
+                      columnWidths: {
+                        1: const pw.FixedColumnWidth(50),
+                      },
+                    )
+                  ]),
+                ),
+              ],
+            ),
+
+            // Summary
+            pw.SizedBox(height: 10),
+            pw.Center(
+              child: pw.Text(
+                "Mala sales: 6",
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
+            ),
+            pw.Center(
+              child: pw.Text(
+                "Chanters count: 88",
                 style: pw.TextStyle(
                   fontSize: 18,
                   fontWeight: pw.FontWeight.bold,

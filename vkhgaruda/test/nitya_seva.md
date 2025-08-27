@@ -20,6 +20,7 @@
 -[] add / edit / delete sales
 -[] add / edit / delete inventory
 -[] summary daily / weekly / monthly / yearly
+-[] share daily report
 
 # new features
 -[] HMI chanters

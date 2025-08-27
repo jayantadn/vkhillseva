@@ -421,8 +421,11 @@ class _HarinaamState extends State<Harinaam> {
   }
 
   Future<Uint8List> _createPdf() async {
-    final doc = pw.Document();
+    // list of sevakartas
+    List<String> sevakartasMorning = [];
+    List<String> sevakartasEvening = [];
 
+    final doc = pw.Document();
     doc.addPage(
       pw.Page(
         margin: const pw.EdgeInsets.all(24),
@@ -484,7 +487,7 @@ class _HarinaamState extends State<Harinaam> {
 
             // list of sevakartas
             pw.SizedBox(height: 10),
-            pw.Text("Sevakartas: Person1, Person2, Person3"),
+            pw.Text("Sevakartas: ${sevakartasMorning.join(", ")}"),
 
             // Morning table
             pw.SizedBox(height: 12),
@@ -620,7 +623,7 @@ class _HarinaamState extends State<Harinaam> {
 
             // list of sevakartas
             pw.SizedBox(height: 10),
-            pw.Text("Sevakartas: Person1, Person2, Person3"),
+            pw.Text("Sevakartas: ${sevakartasEvening.join(", ")}"),
 
             // Morning table
             pw.SizedBox(height: 12),

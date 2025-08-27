@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/harinaam/dashboard.dart';
@@ -432,7 +433,7 @@ class _HarinaamState extends State<Harinaam> {
             // page title
             pw.Center(
               child: pw.Text(
-                "Harinam Mantap \nHare Krishna Mahamantra Chanters Club",
+                "Harinaam Mantapa \nHare Krishna Mahamantra Chanters' Club",
                 style: pw.TextStyle(
                   fontSize: 18,
                   fontWeight: pw.FontWeight.bold,
@@ -444,7 +445,7 @@ class _HarinaamState extends State<Harinaam> {
             // date
             pw.SizedBox(height: 12),
             pw.Align(
-              alignment: pw.Alignment.centerLeft,
+              alignment: pw.Alignment.center,
               child: pw.Text(
                 "${DateFormat('EEEE').format(_selectedDate)}, ${DateFormat('dd-MM-yyyy').format(_selectedDate)}",
                 style: pw.TextStyle(
@@ -457,96 +458,109 @@ class _HarinaamState extends State<Harinaam> {
 
             // header for morning entry
             pw.SizedBox(height: 10),
-            pw.Center(
-              child: pw.Text(
-                "***Morning***",
-                style: pw.TextStyle(
-                  fontSize: 18,
-                  fontWeight: pw.FontWeight.bold,
+            pw.Container(
+              width: double.infinity,
+              decoration: pw.BoxDecoration(
+                color: PdfColor.fromInt(0xFF1E3A8A),
+                border: pw.Border.all(
+                  color: PdfColor.fromInt(0xFF1E3A8A),
+                  width: 2,
                 ),
-                textAlign: pw.TextAlign.center,
+                borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
+              ),
+              padding: const pw.EdgeInsets.symmetric(vertical: 4),
+              child: pw.Center(
+                child: pw.Text(
+                  "Morning",
+                  style: pw.TextStyle(
+                    fontSize: 14,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColor.fromInt(0xFFFFFFFF),
+                  ),
+                  textAlign: pw.TextAlign.center,
+                ),
               ),
             ),
+
+            // list of sevakartas
+            pw.SizedBox(height: 10),
+            pw.Text("Sevakartas: Person1, Person2, Person3"),
 
             // Morning table
             pw.SizedBox(height: 12),
             pw.Row(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Expanded(
-                  child: pw.Column(children: [
-                    pw.Text("Chanters count"),
-                    pw.Table.fromTextArray(
-                      headers: ['Sevakarta', 'Count'],
-                      data: [
-                        ['Ramesh', '5'],
-                        ['Suresh', '3'],
-                        ['Priya', '7'],
-                        ['Amit', '2'],
-                        ['Total', '17']
-                      ],
-                      columnWidths: {
-                        1: const pw.FixedColumnWidth(
-                            50), // Minimum width for numbers
-                      },
-                    )
-                  ]),
-                ),
+                // chant malas
                 pw.SizedBox(width: 10),
                 pw.Expanded(
-                  child: pw.Column(children: [
-                    pw.Text("Chant malas"),
-                    pw.Table.fromTextArray(
-                      headers: null,
-                      data: [
-                        ['Opening balance', '150'],
-                        ['Discarded', '3'],
-                        ['New addition', '7'],
-                        ['Closing balance', '17']
-                      ],
-                      columnWidths: {
-                        1: const pw.FixedColumnWidth(50),
-                      },
-                    )
-                  ]),
-                ),
+                    child: pw.Table.fromTextArray(
+                  headers: ["Chant malas", "Count"],
+                  data: [
+                    ['Opening balance', '150'],
+                    ['Discarded', '3'],
+                    ['New addition', '7'],
+                    ['Closing balance', '17']
+                  ],
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(
+                        0xFF90CAF9), // lighter shade of Morning header (0xFF1E3A8A)
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
+
+                // sale malas
                 pw.SizedBox(width: 10),
                 pw.Expanded(
-                  child: pw.Column(children: [
-                    pw.Text("Sale malas"),
-                    pw.Table.fromTextArray(
-                      headers: null,
-                      data: [
-                        ['Opening balance', '150'],
-                        ['Discarded', '3'],
-                        ['New addition', '7'],
-                        ['Total sales', '7'],
-                        ['Closing balance', '17']
-                      ],
-                      columnWidths: {
-                        1: const pw.FixedColumnWidth(50),
-                      },
-                    )
-                  ]),
-                ),
+                    child: pw.Table.fromTextArray(
+                  headers: ["Sale malas", "Count"],
+                  data: [
+                    ['Opening balance', '150'],
+                    ['Discarded', '3'],
+                    ['New addition', '7'],
+                    ['Total sales', '7'],
+                    ['Closing balance', '17']
+                  ],
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFF90CAF9),
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
+
+                // payment modes
                 pw.SizedBox(width: 10),
                 pw.Expanded(
-                  child: pw.Column(children: [
-                    pw.Text("Payment mode"),
-                    pw.Table.fromTextArray(
-                      headers: null,
-                      data: [
-                        ['Cash', '70'],
-                        ['UPI', '30'],
-                        ['Card', '100'],
-                        ['Gift', '0']
-                      ],
-                      columnWidths: {
-                        1: const pw.FixedColumnWidth(50),
-                      },
-                    )
-                  ]),
-                ),
+                    child: pw.Table.fromTextArray(
+                  headers: ["Payment modes", "Count"],
+                  data: [
+                    ['UPI', '150'],
+                    ['Cash', '3'],
+                    ['Card', '7'],
+                    ['Gift', '7'],
+                  ],
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFF90CAF9),
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
               ],
             ),
 
@@ -556,8 +570,9 @@ class _HarinaamState extends State<Harinaam> {
               child: pw.Text(
                 "Mala sales: 6",
                 style: pw.TextStyle(
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: pw.FontWeight.bold,
+                  color: PdfColor.fromInt(0xFF1E3A8A),
                 ),
                 textAlign: pw.TextAlign.center,
               ),
@@ -566,106 +581,121 @@ class _HarinaamState extends State<Harinaam> {
               child: pw.Text(
                 "Chanters count: 88",
                 style: pw.TextStyle(
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: pw.FontWeight.bold,
+                  color: PdfColor.fromInt(0xFF1E3A8A),
                 ),
                 textAlign: pw.TextAlign.center,
               ),
             ),
 
-            pw.Divider(),
+            pw.Divider(color: PdfColor.fromInt(0xFF1E3A8A)),
 
-            // evening header
+            // evening data
+            // header for evening entry
             pw.SizedBox(height: 10),
-            pw.Center(
-              child: pw.Text(
-                "---Evening---",
-                style: pw.TextStyle(
-                  fontSize: 18,
-                  fontWeight: pw.FontWeight.bold,
+            pw.Container(
+              width: double.infinity,
+              decoration: pw.BoxDecoration(
+                color: PdfColor.fromInt(0xFFd65302),
+                border: pw.Border.all(
+                  color: PdfColor.fromInt(0xFFd65302),
+                  width: 2,
                 ),
-                textAlign: pw.TextAlign.center,
+                borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
+              ),
+              padding: const pw.EdgeInsets.symmetric(vertical: 4),
+              child: pw.Center(
+                child: pw.Text(
+                  "Evening",
+                  style: pw.TextStyle(
+                    fontSize: 14,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColor.fromInt(0xFFFFFFFF),
+                  ),
+                  textAlign: pw.TextAlign.center,
+                ),
               ),
             ),
 
+            // list of sevakartas
+            pw.SizedBox(height: 10),
+            pw.Text("Sevakartas: Person1, Person2, Person3"),
+
+            // Morning table
             pw.SizedBox(height: 12),
             pw.Row(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Expanded(
-                  child: pw.Column(children: [
-                    pw.Text("Chanters count"),
-                    pw.Table.fromTextArray(
-                      headers: ['Sevakarta', 'Count'],
-                      data: [
-                        ['Ramesh', '5'],
-                        ['Suresh', '3'],
-                        ['Priya', '7'],
-                        ['Amit', '2'],
-                        ['Total', '17']
-                      ],
-                      columnWidths: {
-                        1: const pw.FixedColumnWidth(
-                            50), // Minimum width for numbers
-                      },
-                    )
-                  ]),
-                ),
+                // chant malas
                 pw.SizedBox(width: 10),
                 pw.Expanded(
-                  child: pw.Column(children: [
-                    pw.Text("Chant malas"),
-                    pw.Table.fromTextArray(
-                      headers: null,
-                      data: [
-                        ['Opening balance', '150'],
-                        ['Discarded', '3'],
-                        ['New addition', '7'],
-                        ['Closing balance', '17']
-                      ],
-                      columnWidths: {
-                        1: const pw.FixedColumnWidth(50),
-                      },
-                    )
-                  ]),
-                ),
+                    child: pw.Table.fromTextArray(
+                  headers: ["Chant malas", "Count"],
+                  data: [
+                    ['Opening balance', '150'],
+                    ['Discarded', '3'],
+                    ['New addition', '7'],
+                    ['Closing balance', '17']
+                  ],
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFFffb587),
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
+
+                // sale malas
                 pw.SizedBox(width: 10),
                 pw.Expanded(
-                  child: pw.Column(children: [
-                    pw.Text("Sale malas"),
-                    pw.Table.fromTextArray(
-                      headers: null,
-                      data: [
-                        ['Opening balance', '150'],
-                        ['Discarded', '3'],
-                        ['New addition', '7'],
-                        ['Total sales', '7'],
-                        ['Closing balance', '17']
-                      ],
-                      columnWidths: {
-                        1: const pw.FixedColumnWidth(50),
-                      },
-                    )
-                  ]),
-                ),
+                    child: pw.Table.fromTextArray(
+                  headers: ["Sale malas", "Count"],
+                  data: [
+                    ['Opening balance', '150'],
+                    ['Discarded', '3'],
+                    ['New addition', '7'],
+                    ['Total sales', '7'],
+                    ['Closing balance', '17']
+                  ],
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFFffb587),
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
+
+                // payment modes
                 pw.SizedBox(width: 10),
                 pw.Expanded(
-                  child: pw.Column(children: [
-                    pw.Text("Payment mode"),
-                    pw.Table.fromTextArray(
-                      headers: null,
-                      data: [
-                        ['Cash', '70'],
-                        ['UPI', '30'],
-                        ['Card', '100'],
-                        ['Gift', '0']
-                      ],
-                      columnWidths: {
-                        1: const pw.FixedColumnWidth(50),
-                      },
-                    )
-                  ]),
-                ),
+                    child: pw.Table.fromTextArray(
+                  headers: ["Payment modes", "Count"],
+                  data: [
+                    ['UPI', '150'],
+                    ['Cash', '3'],
+                    ['Card', '7'],
+                    ['Gift', '7'],
+                  ],
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFFffb587),
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
               ],
             ),
 
@@ -675,8 +705,9 @@ class _HarinaamState extends State<Harinaam> {
               child: pw.Text(
                 "Mala sales: 6",
                 style: pw.TextStyle(
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: pw.FontWeight.bold,
+                  color: PdfColor.fromInt(0xFFd65302),
                 ),
                 textAlign: pw.TextAlign.center,
               ),
@@ -685,12 +716,15 @@ class _HarinaamState extends State<Harinaam> {
               child: pw.Text(
                 "Chanters count: 88",
                 style: pw.TextStyle(
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: pw.FontWeight.bold,
+                  color: PdfColor.fromInt(0xFFd65302),
                 ),
                 textAlign: pw.TextAlign.center,
               ),
             ),
+
+            pw.Divider(color: PdfColor.fromInt(0xFFd65302)),
           ],
         ),
       ),

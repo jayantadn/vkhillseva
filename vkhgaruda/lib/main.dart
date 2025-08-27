@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' hide Summary;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:vkhgaruda/harinaam/harinaam.dart';
 import 'package:vkhgaruda/harinaam/summary.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'firebase_options.dart';
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   final Widget home = const Landing(title: "Hare Krishna");
-  final Widget test = const Summary(title: "Testing");
+  final Widget test = const Harinaam(title: "Testing");
 
   // This widget is the root of your application.
   @override
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Garuda',
       theme: themeGaruda,
-      home: home,
+      home: test,
     );
   }
 }

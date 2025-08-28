@@ -421,10 +421,40 @@ class _HarinaamState extends State<Harinaam> {
   }
 
   Future<Uint8List> _createPdf() async {
-    // list of sevakartas
+    setState(() {
+      _isLoading = true;
+    });
+
+    // fetch table data
     List<String> sevakartasMorning = [];
     List<String> sevakartasEvening = [];
+    String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
 
+    // morning chanters
+    SummaryData summaryData = await _getSummaryData(
+        "${Const().dbrootGaruda}/Harinaam/$dbdate/Morning/Chanters");
+    sevakartasMorning = summaryData.sevakartas;
+
+    // evening chanters
+    summaryData = await _getSummaryData(
+        "${Const().dbrootGaruda}/Harinaam/$dbdate/Evening/Chanters");
+    sevakartasEvening = summaryData.sevakartas;
+
+    // morning sales
+    summaryData = await _getSummaryData(
+        "${Const().dbrootGaruda}/Harinaam/$dbdate/Morning/Sales");
+    sevakartasMorning = [
+      ...{...sevakartasMorning, ...summaryData.sevakartas}
+    ];
+
+    // evening sales
+    summaryData = await _getSummaryData(
+        "${Const().dbrootGaruda}/Harinaam/$dbdate/Evening/Sales");
+    sevakartasEvening = [
+      ...{...sevakartasEvening, ...summaryData.sevakartas}
+    ];
+
+    // create pdf
     final doc = pw.Document();
     doc.addPage(
       pw.Page(
@@ -732,6 +762,10 @@ class _HarinaamState extends State<Harinaam> {
         ),
       ),
     );
+
+    setState(() {
+      _isLoading = false;
+    });
 
     return doc.save();
   }
@@ -1050,6 +1084,25 @@ class _HarinaamState extends State<Harinaam> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<SummaryData> _getSummaryData(String dbpath) async {
+    List<String> sevakartas = [];
+
+    Map<String, dynamic> json = await FB().getJson(path: dbpath, silent: true);
+    for (var entry in json.entries) {
+      ChantersEntry chantersEntry =
+          Utils().convertRawToDatatype(entry.value, ChantersEntry.fromJson);
+
+      // sevakarta
+      if (!sevakartas.contains(chantersEntry.username)) {
+        sevakartas.add(chantersEntry.username);
+      }
+    }
+
+    return SummaryData(
+      sevakartas: sevakartas,
+    );
   }
 
   bool _isSessionLive() {
@@ -1404,4 +1457,12 @@ class _HarinaamState extends State<Harinaam> {
       ],
     );
   }
+}
+
+class SummaryData {
+  final List<String> sevakartas;
+
+  SummaryData({
+    required this.sevakartas,
+  });
 }

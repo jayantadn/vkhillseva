@@ -681,7 +681,8 @@ class _InventoryState extends State<Inventory> {
                               ...List.generate(_inventoryEntries.length,
                                   (index) => _createInventoryTile(index)),
                               if (_inventoryEntries.isEmpty)
-                                Text("No inventory entries found")
+                                Text(
+                                    "No inventory entries found.\nHint: If it's the beginning of the year, please add the balance from previous year with the note 'Carry over'")
                             ],
                           )),
 

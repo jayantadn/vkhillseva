@@ -462,10 +462,6 @@ class _HarinaamState extends State<Harinaam> {
       ...{...sevakartasEvening, ...summaryData.sevakartas}
     ];
 
-    // morning chanters' inventory
-    InventorySummary inventorySummaryMorning =
-        await _getInventorySummary("Morning");
-
     // create pdf
     final doc = pw.Document();
     doc.addPage(
@@ -1098,45 +1094,6 @@ class _HarinaamState extends State<Harinaam> {
     }
   }
 
-  Future<InventorySummary> _getInventorySummary(String session) async {
-    int openingBalanceChanters = 0;
-    int discardedChanters = 0;
-    int newAdditionsChanters = 0;
-    int closingBalanceChanters = 0;
-
-    int openingBalanceSales = 0;
-    int discardedSales = 0;
-    int newAdditionsSales = 0;
-    int closingBalanceSales = 0;
-
-    // get data till previous day
-    String dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
-    DateTime startDate = DateTime(_selectedDate.year, 1, 1);
-    DateTime endDate = _selectedDate.subtract(const Duration(days: 1));
-    Map<String, dynamic> rawTopList = await FB().getValuesByDateRange(
-        path: dbpath, startDate: startDate, endDate: endDate);
-    if (rawTopList.isNotEmpty) {
-      for (var rawList in rawTopList.entries) {
-        for (var rawItem in rawList.value) {
-          Map rawMap = rawItem as Map;
-          InventoryEntry entry =
-              Utils().convertRawToDatatype(rawMap, InventoryEntry.fromJson);
-        }
-      }
-    }
-
-    return InventorySummary(
-      openingBalance: openingBalanceChanters,
-      discarded: discardedChanters,
-      newAdditions: newAdditionsChanters,
-      closingBalance: closingBalanceChanters,
-      openingBalanceSales: openingBalanceSales,
-      discardedSales: discardedSales,
-      newAdditionsSales: newAdditionsSales,
-      closingBalanceSales: closingBalanceSales,
-    );
-  }
-
   Future<SummaryData> _getSummaryData(String dbpath) async {
     List<String> sevakartas = [];
 
@@ -1515,28 +1472,5 @@ class SummaryData {
 
   SummaryData({
     required this.sevakartas,
-  });
-}
-
-class InventorySummary {
-  final int openingBalanceMorning;
-  final int discardedMorning;
-  final int newAdditionsMorning;
-  final int closingBalanceMorning;
-
-  final int openingBalanceEvening;
-  final int discardedEvening;
-  final int newAdditionsEvening;
-  final int closingBalanceEvening;
-
-  InventorySummary({
-    required this.openingBalanceMorning,
-    required this.discardedMorning,
-    required this.newAdditionsMorning,
-    required this.closingBalanceMorning,
-    required this.openingBalanceEvening,
-    required this.discardedEvening,
-    required this.newAdditionsEvening,
-    required this.closingBalanceEvening,
   });
 }

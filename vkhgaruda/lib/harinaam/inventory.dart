@@ -23,7 +23,7 @@ class _InventoryState extends State<Inventory> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  String _selectedYear = DateTime.now().year.toString();
+  final String _selectedYear = DateTime.now().year.toString();
   DateTime _lastDataModification = DateTime.now();
 
   // lists
@@ -31,7 +31,6 @@ class _InventoryState extends State<Inventory> {
 
   // controllers, listeners and focus nodes
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
-  final GlobalKey<DashboardState> keyDashboard = GlobalKey<DashboardState>();
 
   @override
   initState() {
@@ -135,50 +134,6 @@ class _InventoryState extends State<Inventory> {
         }
       }
       _inventoryEntries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-
-      // calculate dashboard counters
-      int chantersCount = 0;
-      int salesCount = 0;
-      for (InventoryEntry entry in _inventoryEntries) {
-        if (entry.malaType == "Chanters") {
-          if (entry.addOrRemove == "Add") {
-            chantersCount += entry.count;
-          } else {
-            chantersCount -= entry.count;
-          }
-        } else if (entry.malaType == "Sales") {
-          if (entry.addOrRemove == "Add") {
-            salesCount += entry.count;
-          } else {
-            salesCount -= entry.count;
-          }
-        }
-      }
-
-      // offset by the sales count
-      int salesOffset = 0;
-      dbpath = "${Const().dbrootGaruda}/Harinaam";
-      var rawList = await FB().getListByYear(path: dbpath, year: _selectedYear);
-      if (rawList.isNotEmpty) {
-        for (var rawItem in rawList) {
-          Map rawMap = rawItem as Map;
-          var entryRaw = rawMap.values.first as Map;
-          var salesRaw = entryRaw["Sales"];
-          if (salesRaw != null) {
-            Map salesMap = salesRaw as Map;
-            for (var entry in salesMap.entries) {
-              SalesEntry salesEntry = Utils()
-                  .convertRawToDatatype(entry.value, SalesEntry.fromJson);
-              salesOffset += salesEntry.count;
-            }
-          }
-        }
-      }
-      salesCount -= salesOffset;
-
-      // display the dashboard counters
-      await keyDashboard.currentState?.setChanters(chantersCount);
-      await keyDashboard.currentState?.setSales(salesCount);
     });
 
     // refresh all child widgets
@@ -189,27 +144,6 @@ class _InventoryState extends State<Inventory> {
   }
 
   Future<void> _addInventoryEntry(InventoryEntry entry) async {
-    // dashboard update
-    if (entry.malaType == "Chanters") {
-      if (entry.addOrRemove == "Add") {
-        await keyDashboard.currentState?.addChanters(entry.count);
-      } else {
-        int? count = keyDashboard.currentState?.getChanters();
-        if (count != null && count > 0) {
-          await keyDashboard.currentState?.setChanters(count - entry.count);
-        }
-      }
-    } else if (entry.malaType == "Sales") {
-      if (entry.addOrRemove == "Add") {
-        await keyDashboard.currentState?.addSales(entry.count);
-      } else {
-        int? count = keyDashboard.currentState?.getSales();
-        if (count != null && count > 0) {
-          await keyDashboard.currentState?.setSales(count - entry.count);
-        }
-      }
-    }
-
     setState(() {
       _inventoryEntries.insert(0, entry);
     });
@@ -309,86 +243,7 @@ class _InventoryState extends State<Inventory> {
     );
   }
 
-  Widget _createYearSelector() {
-    List<int> years = List.generate(5, (index) => DateTime.now().year - index);
-
-    double containerWidth = MediaQuery.of(context).size.width - 32;
-    double itemWidth = 80;
-
-    return Container(
-      height: 50,
-      width: containerWidth,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(
-            horizontal: 8), // Add padding to center content
-        itemCount: years.length,
-        itemBuilder: (context, index) {
-          int year = years[index];
-          bool isSelected = year.toString() == _selectedYear;
-
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedYear = year.toString();
-                refresh();
-              });
-            },
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 300),
-              margin: EdgeInsets.symmetric(horizontal: 4, vertical: 5),
-              width: itemWidth,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  year.toString(),
-                  style: TextStyle(
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.onPrimary
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   Future<void> _deleteInventoryEntry(InventoryEntry entry) async {
-    // dashboard update
-    if (entry.malaType == "Chanters") {
-      if (entry.addOrRemove == "Add") {
-        int? count = keyDashboard.currentState?.getChanters();
-        if (count != null && count > 0) {
-          await keyDashboard.currentState?.setChanters(count - entry.count);
-        }
-      } else {
-        await keyDashboard.currentState?.addChanters(entry.count);
-      }
-    } else if (entry.malaType == "Sales") {
-      if (entry.addOrRemove == "Add") {
-        int? count = keyDashboard.currentState?.getSales();
-        if (count != null && count > 0) {
-          await keyDashboard.currentState?.setSales(count - entry.count);
-        }
-      } else {
-        await keyDashboard.currentState?.addSales(entry.count);
-      }
-    }
-
     setState(() {
       _inventoryEntries.remove(entry);
     });
@@ -420,80 +275,6 @@ class _InventoryState extends State<Inventory> {
       setState(() {
         _inventoryEntries[index] = newEntry;
       });
-    }
-
-    // update the dashboard counters
-    if (oldEntry.malaType == newEntry.malaType) {
-      if (oldEntry.malaType == "Chanters") {
-        if (oldEntry.addOrRemove == "Add") {
-          await keyDashboard.currentState?.setChanters(
-              keyDashboard.currentState!.getChanters() -
-                  oldEntry.count +
-                  newEntry.count);
-        } else {
-          int count = keyDashboard.currentState!.getChanters();
-          int diff = newEntry.count - oldEntry.count;
-          count -= diff;
-
-          if (count < 0) {
-            count = 0;
-            Toaster().error("Chanters mala count cannot be negative.");
-          }
-          await keyDashboard.currentState?.setChanters(count);
-        }
-      } else if (oldEntry.malaType == "Sales") {
-        if (oldEntry.addOrRemove == "Add") {
-          await keyDashboard.currentState?.setSales(
-              keyDashboard.currentState!.getSales() -
-                  oldEntry.count +
-                  newEntry.count);
-        } else {
-          int count = keyDashboard.currentState!.getSales();
-          int diff = newEntry.count - oldEntry.count;
-          count -= diff;
-
-          if (count < 0) {
-            count = 0;
-            Toaster().error("Sales mala count cannot be negative.");
-          }
-          await keyDashboard.currentState?.setSales(count);
-        }
-      }
-    } else {
-      if (oldEntry.malaType == "Chanters") {
-        if (oldEntry.addOrRemove == "Add") {
-          await keyDashboard.currentState?.setChanters(
-              keyDashboard.currentState!.getChanters() - oldEntry.count);
-          await keyDashboard.currentState!.addSales(newEntry.count);
-        } else {
-          await keyDashboard.currentState?.addChanters(oldEntry.count);
-
-          int count = keyDashboard.currentState!.getSales();
-          count -= newEntry.count;
-          if (count < 0) {
-            count = 0;
-            Toaster().error("Sales mala count cannot be negative.");
-          }
-          await keyDashboard.currentState!.setSales(count);
-        }
-      } else if (oldEntry.malaType == "Sales") {
-        if (oldEntry.addOrRemove == "Add") {
-          await keyDashboard.currentState!.addChanters(newEntry.count);
-
-          await keyDashboard.currentState?.setSales(
-              keyDashboard.currentState!.getSales() - oldEntry.count);
-        } else {
-          int count = keyDashboard.currentState!.getChanters();
-          count -= newEntry.count;
-          if (count < 0) {
-            count = 0;
-            Toaster().error("Sales mala count cannot be negative.");
-          }
-          await keyDashboard.currentState!.setChanters(count);
-
-          await keyDashboard.currentState?.addSales(oldEntry.count);
-        }
-      }
     }
 
     // update in the database
@@ -656,33 +437,16 @@ class _InventoryState extends State<Inventory> {
                 child: Center(
                   child: Column(
                     children: [
-                      // dashboard
-                      Widgets().createTopLevelCard(
-                          context: context,
-                          title: "Available stock",
-                          child: Column(
-                            children: [
-                              _createYearSelector(),
-                              SizedBox(height: 4),
-                              Dashboard(
-                                key: keyDashboard,
-                                chantersLabel: "Chanters mala stock",
-                                salesLabel: "Sales mala stock",
-                              )
-                            ],
-                          )),
-
                       // inventory entries
                       Widgets().createTopLevelCard(
                           context: context,
-                          title: "Entry records",
+                          title: "Inventory entries",
                           child: Column(
                             children: [
                               ...List.generate(_inventoryEntries.length,
                                   (index) => _createInventoryTile(index)),
                               if (_inventoryEntries.isEmpty)
-                                Text(
-                                    "No inventory entries found.\nHint: If it's the beginning of the year, please add the balance from previous year with the note 'Carry over'")
+                                Text("No inventory entries found.")
                             ],
                           )),
 

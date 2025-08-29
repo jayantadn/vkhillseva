@@ -26,10 +26,10 @@ class _InventoryState extends State<Inventory> {
   final String _selectedYear = DateTime.now().year.toString();
   DateTime _lastDataModification = DateTime.now();
   late String _session;
-  late InventorySummary _sessionInventoryChanters;
   late InventorySummary _morningInventoryChanters;
-  late InventorySummary _sessionInventorySales;
+  late InventorySummary _eveningInventoryChanters;
   late InventorySummary _morningInventorySales;
+  late InventorySummary _eveningInventorySales;
   bool _firstTimeEntry = false;
 
   // lists
@@ -50,8 +50,8 @@ class _InventoryState extends State<Inventory> {
     }
 
     // set default inventory data
-    _sessionInventoryChanters = _morningInventoryChanters =
-        _sessionInventorySales = _morningInventorySales = InventorySummary(
+    _eveningInventoryChanters = _morningInventoryChanters =
+        _eveningInventorySales = _morningInventorySales = InventorySummary(
       openingBalance: 0,
       discarded: 0,
       newAdditions: 0,
@@ -148,16 +148,24 @@ class _InventoryState extends State<Inventory> {
       }
 
       // populate current session chanters' inventory
-      _sessionInventoryChanters =
-          await _getInventorySummary(_selectedDate, _session, "Chanters");
-      _sessionInventorySales =
-          await _getInventorySummary(_selectedDate, _session, "Sales");
-      if (!_firstTimeEntry && _session == "Evening") {
-        _morningInventoryChanters =
-            await _getInventorySummary(_selectedDate, "Morning", "Chanters");
-        _morningInventorySales =
-            await _getInventorySummary(_selectedDate, "Morning", "Sales");
-      }
+      // _eveningInventoryChanters =
+      //     await _getInventorySummary(_selectedDate, _session, "Chanters");
+      // _eveningInventorySales =
+      //     await _getInventorySummary(_selectedDate, _session, "Sales");
+      // if (!_firstTimeEntry && _session == "Evening") {
+      //   _morningInventoryChanters =
+      //       await _getInventorySummary(_selectedDate, "Morning", "Chanters");
+      //   _morningInventorySales =
+      //       await _getInventorySummary(_selectedDate, "Morning", "Sales");
+      // }
+      _morningInventoryChanters =
+          await _getInventorySummary(_selectedDate, "Morning", "Chanters");
+      _morningInventorySales =
+          await _getInventorySummary(_selectedDate, "Morning", "Sales");
+      _eveningInventoryChanters =
+          await _getInventorySummary(_selectedDate, "Evening", "Chanters");
+      _eveningInventorySales =
+          await _getInventorySummary(_selectedDate, "Evening", "Sales");
 
       // refill inventory entries
       _inventoryEntries.clear();
@@ -194,17 +202,243 @@ class _InventoryState extends State<Inventory> {
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
     await FB().addToList(listpath: dbpath, data: entry.toJson());
+
+    // update inventory summary
   }
 
-  Widget _createInventoryDashboard() {
+  Widget _createDashboardTables() {
     return Column(
       children: [
-        DateHeader(
-          callbacks: DateHeaderCallbacks(onChange: (DateTime date) {
-            _selectedDate = date;
-            refresh();
-          }),
-        )
+        // chanters table
+        Table(
+          border: TableBorder(
+            top: BorderSide(color: Colors.brown),
+            bottom: BorderSide(color: Colors.brown),
+            left: BorderSide(color: Colors.brown),
+            right: BorderSide(color: Colors.brown),
+          ),
+          columnWidths: {
+            0: FlexColumnWidth(1.5), // wider
+            1: FlexColumnWidth(1), // narrower
+            2: FlexColumnWidth(1), // narrower
+          },
+          children: [
+            // headline
+            TableRow(
+                decoration: BoxDecoration(
+                  color: Colors.brown,
+                ),
+                children: [
+                  Text("Chanters",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall!
+                          .copyWith(color: Colors.white),
+                      textAlign: TextAlign.center),
+                  Text("Morning",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall!
+                          .copyWith(color: Colors.white),
+                      textAlign: TextAlign.center),
+                  Text("Evening",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall!
+                          .copyWith(color: Colors.white),
+                      textAlign: TextAlign.center)
+                ]),
+
+            // opening balance
+            TableRow(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Opening balance", textAlign: TextAlign.left),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_morningInventoryChanters.openingBalance.toString(),
+                    textAlign: TextAlign.center),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_eveningInventoryChanters.openingBalance.toString(),
+                    textAlign: TextAlign.center),
+              ),
+            ]),
+
+            // discarded
+            TableRow(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Discarded", textAlign: TextAlign.left),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_morningInventoryChanters.discarded.toString(),
+                    textAlign: TextAlign.center),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_eveningInventoryChanters.discarded.toString(),
+                    textAlign: TextAlign.center),
+              ),
+            ]),
+
+            // New additions
+            TableRow(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("New additions", textAlign: TextAlign.left),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_morningInventoryChanters.newAdditions.toString(),
+                    textAlign: TextAlign.center),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_eveningInventoryChanters.newAdditions.toString(),
+                    textAlign: TextAlign.center),
+              ),
+            ]),
+
+            // closing balance
+            TableRow(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Closing balance", textAlign: TextAlign.left),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_morningInventoryChanters.closingBalance.toString(),
+                    textAlign: TextAlign.center),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_eveningInventoryChanters.closingBalance.toString(),
+                    textAlign: TextAlign.center),
+              ),
+            ]),
+          ],
+        ),
+
+        // sales table
+        SizedBox(
+          height: 10,
+        ),
+        Table(
+          border: TableBorder(
+            top: BorderSide(color: Theme.of(context).colorScheme.primary),
+            bottom: BorderSide(color: Theme.of(context).colorScheme.primary),
+            left: BorderSide(color: Theme.of(context).colorScheme.primary),
+            right: BorderSide(color: Theme.of(context).colorScheme.primary),
+          ),
+          columnWidths: {
+            0: FlexColumnWidth(1.5), // wider
+            1: FlexColumnWidth(1), // narrower
+            2: FlexColumnWidth(1), // narrower
+          },
+          children: [
+            // headline
+            TableRow(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                children: [
+                  Text("Sales",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall!
+                          .copyWith(color: Colors.white),
+                      textAlign: TextAlign.center),
+                  Text("Morning",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall!
+                          .copyWith(color: Colors.white),
+                      textAlign: TextAlign.center),
+                  Text("Evening",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall!
+                          .copyWith(color: Colors.white),
+                      textAlign: TextAlign.center)
+                ]),
+
+            // opening balance
+            TableRow(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Opening balance", textAlign: TextAlign.left),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_morningInventorySales.openingBalance.toString(),
+                    textAlign: TextAlign.center),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_eveningInventorySales.openingBalance.toString(),
+                    textAlign: TextAlign.center),
+              ),
+            ]),
+
+            // discarded
+            TableRow(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Discarded", textAlign: TextAlign.left),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_morningInventorySales.discarded.toString(),
+                    textAlign: TextAlign.center),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_eveningInventorySales.discarded.toString(),
+                    textAlign: TextAlign.center),
+              ),
+            ]),
+
+            // New additions
+            TableRow(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("New additions", textAlign: TextAlign.left),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_morningInventorySales.newAdditions.toString(),
+                    textAlign: TextAlign.center),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_eveningInventorySales.newAdditions.toString(),
+                    textAlign: TextAlign.center),
+              ),
+            ]),
+
+            // closing balance
+            TableRow(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Closing balance", textAlign: TextAlign.left),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_morningInventorySales.closingBalance.toString(),
+                    textAlign: TextAlign.center),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_eveningInventorySales.closingBalance.toString(),
+                    textAlign: TextAlign.center),
+              ),
+            ]),
+          ],
+        ),
       ],
     );
   }
@@ -372,7 +606,12 @@ class _InventoryState extends State<Inventory> {
         "${Const().dbrootGaruda}/HarinaamInventorySummary/$dbdate/$session/$type";
     Map<String, dynamic> summaryDataJson =
         await FB().getJson(path: dbpath, silent: true);
-    if (summaryDataJson.isEmpty) {
+
+    if (summaryDataJson.isEmpty &&
+        _session == session &&
+        _selectedDate.day == DateTime.now().day &&
+        _selectedDate.month == DateTime.now().month &&
+        _selectedDate.year == DateTime.now().year) {
       // if session is evening, check for morning session
       if (session == "Evening") {
         String dbpathTemp =
@@ -618,7 +857,22 @@ class _InventoryState extends State<Inventory> {
                       Widgets().createTopLevelCard(
                           context: context,
                           title: "Dashboard",
-                          child: _createInventoryDashboard()),
+                          child: Column(
+                            children: [
+                              DateHeader(
+                                callbacks: DateHeaderCallbacks(
+                                    onChange: (DateTime date) {
+                                  _selectedDate = date;
+                                  refresh();
+                                }),
+                              ),
+                              SizedBox(height: 10),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: _createDashboardTables(),
+                              )
+                            ],
+                          )),
 
                       // inventory entries
                       Widgets().createTopLevelCard(

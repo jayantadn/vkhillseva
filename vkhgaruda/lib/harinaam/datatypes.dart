@@ -197,3 +197,51 @@ class InventoryEntry {
   int get hashCode =>
       Object.hash(count, note, timestamp, malaType, addOrRemove, username);
 }
+
+class InventorySummary {
+  int openingBalance;
+  int discarded;
+  int newAdditions;
+  int closingBalance;
+
+  InventorySummary({
+    required this.openingBalance,
+    required this.discarded,
+    required this.newAdditions,
+    required this.closingBalance,
+  });
+
+  // Convert from JSON
+  factory InventorySummary.fromJson(Map<String, dynamic> json) {
+    return InventorySummary(
+      openingBalance: json['openingBalance'],
+      discarded: json['discarded'],
+      newAdditions: json['newAdditions'],
+      closingBalance: json['closingBalance'],
+    );
+  }
+
+  // Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'openingBalance': openingBalance,
+      'discarded': discarded,
+      'newAdditions': newAdditions,
+      'closingBalance': closingBalance,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! InventorySummary) return false;
+    return openingBalance == other.openingBalance &&
+        discarded == other.discarded &&
+        newAdditions == other.newAdditions &&
+        closingBalance == other.closingBalance;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(openingBalance, discarded, newAdditions, closingBalance);
+}

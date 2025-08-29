@@ -4,7 +4,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/harinaam/dashboard.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -23,8 +22,15 @@ class _InventoryState extends State<Inventory> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  DateTime _selectedDate = DateTime.now();
   final String _selectedYear = DateTime.now().year.toString();
   DateTime _lastDataModification = DateTime.now();
+  late String _session;
+  late InventorySummary _sessionInventoryChanters;
+  late InventorySummary _morningInventoryChanters;
+  late InventorySummary _sessionInventorySales;
+  late InventorySummary _morningInventorySales;
+  bool _firstTimeEntry = false;
 
   // lists
   final List<InventoryEntry> _inventoryEntries = [];
@@ -35,6 +41,22 @@ class _InventoryState extends State<Inventory> {
   @override
   initState() {
     super.initState();
+
+    // set session
+    if (DateTime.now().hour >= Const().morningCutoff) {
+      _session = "Evening";
+    } else {
+      _session = "Morning";
+    }
+
+    // set default inventory data
+    _sessionInventoryChanters = _morningInventoryChanters =
+        _sessionInventorySales = _morningInventorySales = InventorySummary(
+      openingBalance: 0,
+      discarded: 0,
+      newAdditions: 0,
+      closingBalance: 0,
+    );
 
     FB().listenForChange(
       "${Const().dbrootGaruda}/HarinaamInventory",
@@ -118,6 +140,25 @@ class _InventoryState extends State<Inventory> {
     }
 
     await _lock.synchronized(() async {
+      // set session
+      if (DateTime.now().hour >= Const().morningCutoff) {
+        _session = "Evening";
+      } else {
+        _session = "Morning";
+      }
+
+      // populate current session chanters' inventory
+      _sessionInventoryChanters =
+          await _getInventorySummary(_selectedDate, _session, "Chanters");
+      _sessionInventorySales =
+          await _getInventorySummary(_selectedDate, _session, "Sales");
+      if (!_firstTimeEntry && _session == "Evening") {
+        _morningInventoryChanters =
+            await _getInventorySummary(_selectedDate, "Morning", "Chanters");
+        _morningInventorySales =
+            await _getInventorySummary(_selectedDate, "Morning", "Sales");
+      }
+
       // refill inventory entries
       _inventoryEntries.clear();
       String dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
@@ -153,6 +194,19 @@ class _InventoryState extends State<Inventory> {
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
     await FB().addToList(listpath: dbpath, data: entry.toJson());
+  }
+
+  Widget _createInventoryDashboard() {
+    return Column(
+      children: [
+        DateHeader(
+          callbacks: DateHeaderCallbacks(onChange: (DateTime date) {
+            _selectedDate = date;
+            refresh();
+          }),
+        )
+      ],
+    );
   }
 
   Widget _createInventoryTile(int index) {
@@ -217,7 +271,7 @@ class _InventoryState extends State<Inventory> {
               items: ["Edit", "Delete"],
               onPressed: (String action) {
                 if (action == "Edit") {
-                  _showDialogInventory(entry.addOrRemove, oldEntry: entry);
+                  _showInventoryDialog(entry.addOrRemove, oldEntry: entry);
                 } else if (action == "Delete") {
                   Widgets().showConfirmDialog(
                       context, "Delete this inventory item?", "Delete", () {
@@ -306,7 +360,122 @@ class _InventoryState extends State<Inventory> {
     }
   }
 
-  Future<void> _showDialogInventory(String addOrRemove,
+  Future<InventorySummary> _getInventorySummary(
+      DateTime date, String session, String type) async {
+    int openingBalance = 0;
+    int discarded = 0;
+    int newAdditions = 0;
+    int closingBalance = 0;
+
+    String dbdate = DateFormat("yyyy-MM-dd").format(date);
+    String dbpath =
+        "${Const().dbrootGaruda}/HarinaamInventorySummary/$dbdate/$session/$type";
+    Map<String, dynamic> summaryDataJson =
+        await FB().getJson(path: dbpath, silent: true);
+    if (summaryDataJson.isEmpty) {
+      // if session is evening, check for morning session
+      if (session == "Evening") {
+        dbpath =
+            "${Const().dbrootGaruda}/HarinaamInventorySummary/$dbdate/Morning/$type";
+        summaryDataJson = await FB().getJson(path: dbpath, silent: true);
+        if (summaryDataJson.isEmpty) {
+          // ask for current balance
+          openingBalance =
+              closingBalance = await _showGetCurrentBalanceDialog(type);
+        } else {
+          // fill the current session
+          openingBalance =
+              closingBalance = summaryDataJson['closingBalance'] ?? 0;
+        }
+      }
+
+      // if session is morning, check for previous day's evening session
+      if (session == "Morning") {
+        String prevDbdate =
+            DateFormat("yyyy-MM-dd").format(date.subtract(Duration(days: 1)));
+        dbpath =
+            "${Const().dbrootGaruda}/HarinaamInventorySummary/$prevDbdate/Evening/$type";
+        summaryDataJson = await FB().getJson(path: dbpath, silent: true);
+        if (summaryDataJson.isEmpty) {
+          // ask for current balance
+          openingBalance =
+              closingBalance = await _showGetCurrentBalanceDialog(type);
+        } else {
+          // fill the current session
+          openingBalance =
+              closingBalance = summaryDataJson['closingBalance'] ?? 0;
+        }
+      }
+    } else {
+      // fill the current session
+      openingBalance = summaryDataJson['openingBalance'] ?? 0;
+      discarded = summaryDataJson['discarded'] ?? 0;
+      newAdditions = summaryDataJson['newAdditions'] ?? 0;
+      closingBalance = summaryDataJson['closingBalance'] ?? 0;
+    }
+
+    return InventorySummary(
+      openingBalance: openingBalance,
+      discarded: discarded,
+      newAdditions: newAdditions,
+      closingBalance: closingBalance,
+    );
+  }
+
+  Future<int> _showGetCurrentBalanceDialog(String type) async {
+    int currentBalance = 0;
+    TextEditingController balanceController =
+        TextEditingController(text: currentBalance.toString());
+    final formKey = GlobalKey<FormState>();
+
+    _firstTimeEntry = true;
+
+    await Widgets().showResponsiveDialog(
+        context: context,
+        title: "Enter $type mala balance",
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Current Balance",
+                  border: OutlineInputBorder(),
+                ),
+                controller: balanceController,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a count';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if (int.parse(value) < 0) {
+                    return 'Count cannot be negative';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+              onPressed: () {
+                if (formKey.currentState?.validate() ?? false) {
+                  currentBalance = int.parse(balanceController.text);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: Text("Submit")),
+        ]);
+
+    return currentBalance;
+  }
+
+  Future<void> _showInventoryDialog(String addOrRemove,
       {InventoryEntry? oldEntry}) async {
     final formKey = GlobalKey<FormState>();
 
@@ -413,7 +582,7 @@ class _InventoryState extends State<Inventory> {
               ResponsiveToolbarAction(
                 icon: Icon(Icons.add_circle_outline),
                 onPressed: () async {
-                  await _showDialogInventory("Add");
+                  await _showInventoryDialog("Add");
                 },
               ),
 
@@ -421,7 +590,7 @@ class _InventoryState extends State<Inventory> {
               ResponsiveToolbarAction(
                 icon: Icon(Icons.remove_circle_outline),
                 onPressed: () async {
-                  await _showDialogInventory("Discard");
+                  await _showInventoryDialog("Discard");
                 },
               ),
             ],
@@ -437,6 +606,12 @@ class _InventoryState extends State<Inventory> {
                 child: Center(
                   child: Column(
                     children: [
+                      // inventory dashboard
+                      Widgets().createTopLevelCard(
+                          context: context,
+                          title: "Dashboard",
+                          child: _createInventoryDashboard()),
+
                       // inventory entries
                       Widgets().createTopLevelCard(
                           context: context,

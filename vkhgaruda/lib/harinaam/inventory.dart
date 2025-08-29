@@ -190,6 +190,45 @@ class _InventoryState extends State<Inventory> {
   Future<void> _addInventoryEntry(InventoryEntry entry) async {
     setState(() {
       _inventoryEntries.insert(0, entry);
+
+      // update inventory summary
+      if (entry.malaType == "Chanters") {
+        if (entry.addOrRemove == "Add") {
+          if (_session == "Morning") {
+            _morningInventoryChanters.newAdditions += entry.count;
+            _morningInventoryChanters.closingBalance += entry.count;
+          } else {
+            _eveningInventoryChanters.newAdditions += entry.count;
+            _eveningInventoryChanters.closingBalance += entry.count;
+          }
+        } else {
+          if (_session == "Morning") {
+            _morningInventoryChanters.discarded += entry.count;
+            _morningInventoryChanters.closingBalance -= entry.count;
+          } else {
+            _eveningInventoryChanters.discarded += entry.count;
+            _eveningInventoryChanters.closingBalance -= entry.count;
+          }
+        }
+      } else {
+        if (entry.addOrRemove == "Add") {
+          if (_session == "Morning") {
+            _morningInventorySales.newAdditions += entry.count;
+            _morningInventorySales.closingBalance += entry.count;
+          } else {
+            _eveningInventorySales.newAdditions += entry.count;
+            _eveningInventorySales.closingBalance += entry.count;
+          }
+        } else {
+          if (_session == "Morning") {
+            _morningInventorySales.discarded += entry.count;
+            _morningInventorySales.closingBalance -= entry.count;
+          } else {
+            _eveningInventorySales.discarded += entry.count;
+            _eveningInventorySales.closingBalance -= entry.count;
+          }
+        }
+      }
     });
 
     // store to database
@@ -198,7 +237,18 @@ class _InventoryState extends State<Inventory> {
     String dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory/$dbdate";
     await FB().addToList(listpath: dbpath, data: entry.toJson());
 
-    // update inventory summary
+    // update summary database
+    dbpath =
+        "${Const().dbrootGaruda}/Harinaam/InventorySummary/$dbdate/$_session/${entry.malaType}";
+    Map<String, dynamic> data = await FB().getJson(path: dbpath);
+    if (entry.addOrRemove == "Add") {
+      data["newAdditions"] += entry.count;
+      data["closingBalance"] += entry.count;
+    } else {
+      data["discarded"] += entry.count;
+      data["closingBalance"] -= entry.count;
+    }
+    await FB().setJson(path: dbpath, json: data);
   }
 
   Widget _createDashboardTables() {
@@ -262,24 +312,6 @@ class _InventoryState extends State<Inventory> {
               ),
             ]),
 
-            // discarded
-            TableRow(children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("Discarded", textAlign: TextAlign.left),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(_morningInventoryChanters.discarded.toString(),
-                    textAlign: TextAlign.center),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(_eveningInventoryChanters.discarded.toString(),
-                    textAlign: TextAlign.center),
-              ),
-            ]),
-
             // New additions
             TableRow(children: [
               Padding(
@@ -294,6 +326,24 @@ class _InventoryState extends State<Inventory> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(_eveningInventoryChanters.newAdditions.toString(),
+                    textAlign: TextAlign.center),
+              ),
+            ]),
+
+            // discarded
+            TableRow(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Discarded", textAlign: TextAlign.left),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_morningInventoryChanters.discarded.toString(),
+                    textAlign: TextAlign.center),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_eveningInventoryChanters.discarded.toString(),
                     textAlign: TextAlign.center),
               ),
             ]),
@@ -379,24 +429,6 @@ class _InventoryState extends State<Inventory> {
               ),
             ]),
 
-            // discarded
-            TableRow(children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("Discarded", textAlign: TextAlign.left),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(_morningInventorySales.discarded.toString(),
-                    textAlign: TextAlign.center),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(_eveningInventorySales.discarded.toString(),
-                    textAlign: TextAlign.center),
-              ),
-            ]),
-
             // New additions
             TableRow(children: [
               Padding(
@@ -411,6 +443,24 @@ class _InventoryState extends State<Inventory> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(_eveningInventorySales.newAdditions.toString(),
+                    textAlign: TextAlign.center),
+              ),
+            ]),
+
+            // discarded
+            TableRow(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Discarded", textAlign: TextAlign.left),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_morningInventorySales.discarded.toString(),
+                    textAlign: TextAlign.center),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_eveningInventorySales.discarded.toString(),
                     textAlign: TextAlign.center),
               ),
             ]),

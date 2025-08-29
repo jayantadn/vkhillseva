@@ -375,9 +375,9 @@ class _InventoryState extends State<Inventory> {
     if (summaryDataJson.isEmpty) {
       // if session is evening, check for morning session
       if (session == "Evening") {
-        dbpath =
+        String dbpathTemp =
             "${Const().dbrootGaruda}/HarinaamInventorySummary/$dbdate/Morning/$type";
-        summaryDataJson = await FB().getJson(path: dbpath, silent: true);
+        summaryDataJson = await FB().getJson(path: dbpathTemp, silent: true);
         if (summaryDataJson.isEmpty) {
           // ask for current balance
           openingBalance =
@@ -393,9 +393,9 @@ class _InventoryState extends State<Inventory> {
       if (session == "Morning") {
         String prevDbdate =
             DateFormat("yyyy-MM-dd").format(date.subtract(Duration(days: 1)));
-        dbpath =
+        String dbpathTemp =
             "${Const().dbrootGaruda}/HarinaamInventorySummary/$prevDbdate/Evening/$type";
-        summaryDataJson = await FB().getJson(path: dbpath, silent: true);
+        summaryDataJson = await FB().getJson(path: dbpathTemp, silent: true);
         if (summaryDataJson.isEmpty) {
           // ask for current balance
           openingBalance =
@@ -406,6 +406,14 @@ class _InventoryState extends State<Inventory> {
               closingBalance = summaryDataJson['closingBalance'] ?? 0;
         }
       }
+
+      // write back to db
+      await FB().setValue(path: dbpath, value: {
+        'openingBalance': openingBalance,
+        'discarded': discarded,
+        'newAdditions': newAdditions,
+        'closingBalance': closingBalance,
+      });
     } else {
       // fill the current session
       openingBalance = summaryDataJson['openingBalance'] ?? 0;

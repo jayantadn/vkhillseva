@@ -2,8 +2,6 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/harinaam/dashboard.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
@@ -12,12 +10,6 @@ import 'package:vkhgaruda/harinaam/hmi_sales.dart';
 import 'package:vkhgaruda/harinaam/inventory.dart';
 import 'package:vkhgaruda/harinaam/summary.dart';
 import 'package:vkhpackages/vkhpackages.dart';
-import 'dart:typed_data';
-
-// Add these imports for web-specific functionality
-// ignore: avoid_web_libraries_in_flutter
-// Conditional import for PDF sharing
-import 'pdf_share_io.dart' if (dart.library.html) 'pdf_share_web.dart';
 
 class Harinaam extends StatefulWidget {
   final String title;
@@ -421,364 +413,6 @@ class _HarinaamState extends State<Harinaam> {
     );
   }
 
-  Future<Uint8List> _createPdf() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // reset table data
-    List<String> sevakartasMorning = [];
-    List<String> sevakartasEvening = [];
-    int chantMalasOpeningBalanceMorning = 0;
-    int chantMalasOpeningBalanceEvening = 0;
-    int chantMalasDiscardedMorning = 0;
-    int chantMalasDiscardedEvening = 0;
-    int chantMalasNewAdditionsMorning = 0;
-    int chantMalasNewAdditionsEvening = 0;
-    int chantMalasClosingBalanceMorning = 0;
-    int chantMalasClosingBalanceEvening = 0;
-
-    // morning chanters
-    String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
-    SummaryData summaryData = await _getSummaryData(
-        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Morning/Chanters");
-    sevakartasMorning = summaryData.sevakartas;
-
-    // evening chanters
-    summaryData = await _getSummaryData(
-        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Evening/Chanters");
-    sevakartasEvening = summaryData.sevakartas;
-
-    // morning sales
-    summaryData = await _getSummaryData(
-        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Morning/Sales");
-    sevakartasMorning = [
-      ...{...sevakartasMorning, ...summaryData.sevakartas}
-    ];
-
-    // evening sales
-    summaryData = await _getSummaryData(
-        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Evening/Sales");
-    sevakartasEvening = [
-      ...{...sevakartasEvening, ...summaryData.sevakartas}
-    ];
-
-    // create pdf
-    final doc = pw.Document();
-    doc.addPage(
-      pw.Page(
-        margin: const pw.EdgeInsets.all(24),
-        // orientation: pw.PageOrientation.landscape,
-        build: (ctx) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-          children: [
-            // page title
-            pw.Center(
-              child: pw.Text(
-                "Harinaam Mantapa \nHare Krishna Mahamantra Chanters' Club",
-                style: pw.TextStyle(
-                  fontSize: 18,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-                textAlign: pw.TextAlign.center,
-              ),
-            ),
-
-            // date
-            pw.SizedBox(height: 12),
-            pw.Align(
-              alignment: pw.Alignment.center,
-              child: pw.Text(
-                "${DateFormat('EEEE').format(_selectedDate)}, ${DateFormat('dd-MM-yyyy').format(_selectedDate)}",
-                style: pw.TextStyle(
-                  fontSize: 14,
-                  fontWeight: pw.FontWeight.normal,
-                ),
-                textAlign: pw.TextAlign.left,
-              ),
-            ),
-
-            // header for morning entry
-            pw.SizedBox(height: 10),
-            pw.Container(
-              width: double.infinity,
-              decoration: pw.BoxDecoration(
-                color: PdfColor.fromInt(0xFF1E3A8A),
-                border: pw.Border.all(
-                  color: PdfColor.fromInt(0xFF1E3A8A),
-                  width: 2,
-                ),
-                borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
-              ),
-              padding: const pw.EdgeInsets.symmetric(vertical: 4),
-              child: pw.Center(
-                child: pw.Text(
-                  "Morning",
-                  style: pw.TextStyle(
-                    fontSize: 14,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColor.fromInt(0xFFFFFFFF),
-                  ),
-                  textAlign: pw.TextAlign.center,
-                ),
-              ),
-            ),
-
-            // list of sevakartas
-            pw.SizedBox(height: 10),
-            pw.Text("Sevakartas: ${sevakartasMorning.join(", ")}"),
-
-            // Morning table
-            pw.SizedBox(height: 12),
-            pw.Row(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                // chant malas
-                pw.SizedBox(width: 10),
-                pw.Expanded(
-                    child: pw.Table.fromTextArray(
-                  headers: ["Chant malas", "Count"],
-                  data: [
-                    ['Opening balance', '150'],
-                    ['Discarded', '3'],
-                    ['New addition', '7'],
-                    ['Closing balance', '17']
-                  ],
-                  columnWidths: {
-                    1: const pw.FixedColumnWidth(50),
-                  },
-                  headerDecoration: pw.BoxDecoration(
-                    color: PdfColor.fromInt(
-                        0xFF90CAF9), // lighter shade of Morning header (0xFF1E3A8A)
-                  ),
-                  headerStyle: pw.TextStyle(
-                    color: PdfColor.fromInt(0xFF000000),
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                )),
-
-                // sale malas
-                pw.SizedBox(width: 10),
-                pw.Expanded(
-                    child: pw.Table.fromTextArray(
-                  headers: ["Sale malas", "Count"],
-                  data: [
-                    ['Opening balance', '150'],
-                    ['Discarded', '3'],
-                    ['New addition', '7'],
-                    ['Total sales', '7'],
-                    ['Closing balance', '17']
-                  ],
-                  columnWidths: {
-                    1: const pw.FixedColumnWidth(50),
-                  },
-                  headerDecoration: pw.BoxDecoration(
-                    color: PdfColor.fromInt(0xFF90CAF9),
-                  ),
-                  headerStyle: pw.TextStyle(
-                    color: PdfColor.fromInt(0xFF000000),
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                )),
-
-                // payment modes
-                pw.SizedBox(width: 10),
-                pw.Expanded(
-                    child: pw.Table.fromTextArray(
-                  headers: ["Payment modes", "Count"],
-                  data: [
-                    ['UPI', '150'],
-                    ['Cash', '3'],
-                    ['Card', '7'],
-                    ['Gift', '7'],
-                  ],
-                  columnWidths: {
-                    1: const pw.FixedColumnWidth(50),
-                  },
-                  headerDecoration: pw.BoxDecoration(
-                    color: PdfColor.fromInt(0xFF90CAF9),
-                  ),
-                  headerStyle: pw.TextStyle(
-                    color: PdfColor.fromInt(0xFF000000),
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                )),
-              ],
-            ),
-
-            // Summary
-            pw.SizedBox(height: 10),
-            pw.Center(
-              child: pw.Text(
-                "Mala sales: 6",
-                style: pw.TextStyle(
-                  fontSize: 14,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColor.fromInt(0xFF1E3A8A),
-                ),
-                textAlign: pw.TextAlign.center,
-              ),
-            ),
-            pw.Center(
-              child: pw.Text(
-                "Chanters count: 88",
-                style: pw.TextStyle(
-                  fontSize: 14,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColor.fromInt(0xFF1E3A8A),
-                ),
-                textAlign: pw.TextAlign.center,
-              ),
-            ),
-
-            pw.Divider(color: PdfColor.fromInt(0xFF1E3A8A)),
-
-            // evening data
-            // header for evening entry
-            pw.SizedBox(height: 10),
-            pw.Container(
-              width: double.infinity,
-              decoration: pw.BoxDecoration(
-                color: PdfColor.fromInt(0xFFd65302),
-                border: pw.Border.all(
-                  color: PdfColor.fromInt(0xFFd65302),
-                  width: 2,
-                ),
-                borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
-              ),
-              padding: const pw.EdgeInsets.symmetric(vertical: 4),
-              child: pw.Center(
-                child: pw.Text(
-                  "Evening",
-                  style: pw.TextStyle(
-                    fontSize: 14,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColor.fromInt(0xFFFFFFFF),
-                  ),
-                  textAlign: pw.TextAlign.center,
-                ),
-              ),
-            ),
-
-            // list of sevakartas
-            pw.SizedBox(height: 10),
-            pw.Text("Sevakartas: ${sevakartasEvening.join(", ")}"),
-
-            // Morning table
-            pw.SizedBox(height: 12),
-            pw.Row(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                // chant malas
-                pw.SizedBox(width: 10),
-                pw.Expanded(
-                    child: pw.Table.fromTextArray(
-                  headers: ["Chant malas", "Count"],
-                  data: [
-                    ['Opening balance', '150'],
-                    ['Discarded', '3'],
-                    ['New addition', '7'],
-                    ['Closing balance', '17']
-                  ],
-                  columnWidths: {
-                    1: const pw.FixedColumnWidth(50),
-                  },
-                  headerDecoration: pw.BoxDecoration(
-                    color: PdfColor.fromInt(0xFFffb587),
-                  ),
-                  headerStyle: pw.TextStyle(
-                    color: PdfColor.fromInt(0xFF000000),
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                )),
-
-                // sale malas
-                pw.SizedBox(width: 10),
-                pw.Expanded(
-                    child: pw.Table.fromTextArray(
-                  headers: ["Sale malas", "Count"],
-                  data: [
-                    ['Opening balance', '150'],
-                    ['Discarded', '3'],
-                    ['New addition', '7'],
-                    ['Total sales', '7'],
-                    ['Closing balance', '17']
-                  ],
-                  columnWidths: {
-                    1: const pw.FixedColumnWidth(50),
-                  },
-                  headerDecoration: pw.BoxDecoration(
-                    color: PdfColor.fromInt(0xFFffb587),
-                  ),
-                  headerStyle: pw.TextStyle(
-                    color: PdfColor.fromInt(0xFF000000),
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                )),
-
-                // payment modes
-                pw.SizedBox(width: 10),
-                pw.Expanded(
-                    child: pw.Table.fromTextArray(
-                  headers: ["Payment modes", "Count"],
-                  data: [
-                    ['UPI', '150'],
-                    ['Cash', '3'],
-                    ['Card', '7'],
-                    ['Gift', '7'],
-                  ],
-                  columnWidths: {
-                    1: const pw.FixedColumnWidth(50),
-                  },
-                  headerDecoration: pw.BoxDecoration(
-                    color: PdfColor.fromInt(0xFFffb587),
-                  ),
-                  headerStyle: pw.TextStyle(
-                    color: PdfColor.fromInt(0xFF000000),
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                )),
-              ],
-            ),
-
-            // Summary
-            pw.SizedBox(height: 10),
-            pw.Center(
-              child: pw.Text(
-                "Mala sales: 6",
-                style: pw.TextStyle(
-                  fontSize: 14,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColor.fromInt(0xFFd65302),
-                ),
-                textAlign: pw.TextAlign.center,
-              ),
-            ),
-            pw.Center(
-              child: pw.Text(
-                "Chanters count: 88",
-                style: pw.TextStyle(
-                  fontSize: 14,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColor.fromInt(0xFFd65302),
-                ),
-                textAlign: pw.TextAlign.center,
-              ),
-            ),
-
-            pw.Divider(color: PdfColor.fromInt(0xFFd65302)),
-          ],
-        ),
-      ),
-    );
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    return doc.save();
-  }
-
   Widget _createSalesTile(int index) {
     SalesEntry entry = _salesEntries[index];
     String time = DateFormat("HH:mm:ss").format(entry.timestamp);
@@ -1095,25 +729,6 @@ class _HarinaamState extends State<Harinaam> {
     }
   }
 
-  Future<SummaryData> _getSummaryData(String dbpath) async {
-    List<String> sevakartas = [];
-
-    Map<String, dynamic> json = await FB().getJson(path: dbpath, silent: true);
-    for (var entry in json.entries) {
-      ChantersEntry chantersEntry =
-          Utils().convertRawToDatatype(entry.value, ChantersEntry.fromJson);
-
-      // sevakarta
-      if (!sevakartas.contains(chantersEntry.username)) {
-        sevakartas.add(chantersEntry.username);
-      }
-    }
-
-    return SummaryData(
-      sevakartas: sevakartas,
-    );
-  }
-
   bool _isSessionLive() {
     // check if today
     bool isToday = DateTime.now().year == _selectedDate.year &&
@@ -1128,11 +743,6 @@ class _HarinaamState extends State<Harinaam> {
     } else {
       return false;
     }
-  }
-
-  /// Share the PDF using platform-specific implementation
-  Future<void> _sharePdf(Uint8List pdfBytes) async {
-    await sharePdf(pdfBytes, filename: 'report.pdf');
   }
 
   Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {
@@ -1324,15 +934,6 @@ class _HarinaamState extends State<Harinaam> {
                             splashImage: widget.splashImage)));
               },
             ),
-
-            // share
-            ResponsiveToolbarAction(
-              icon: const Icon(Icons.share),
-              onPressed: () async {
-                final pdfBytes = await _createPdf();
-                _sharePdf(pdfBytes);
-              },
-            ),
           ],
           body: RefreshIndicator(
             onRefresh: refresh,
@@ -1466,12 +1067,4 @@ class _HarinaamState extends State<Harinaam> {
       ],
     );
   }
-}
-
-class SummaryData {
-  final List<String> sevakartas;
-
-  SummaryData({
-    required this.sevakartas,
-  });
 }

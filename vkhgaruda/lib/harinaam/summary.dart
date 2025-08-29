@@ -21,8 +21,8 @@ class _SummaryState extends State<Summary> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  String _period = "daily";
-  String _periodDetails = DateFormat("dd MMM, yyyy").format(DateTime.now());
+  String _period = "weekly";
+  late String _periodDetails;
 
   // variables for chanters summary
   int _totalChanters = 0;
@@ -43,6 +43,8 @@ class _SummaryState extends State<Summary> {
   @override
   initState() {
     super.initState();
+
+    _updatePeriodDetails();
 
     refresh();
   }
@@ -467,30 +469,7 @@ class _SummaryState extends State<Summary> {
                           _period = newValue ?? _period;
 
                           // Update period details based on selection
-                          switch (_period) {
-                            case "daily":
-                              _periodDetails = DateFormat("dd MMM, yyyy")
-                                  .format(DateTime.now());
-                              break;
-                            case "weekly":
-                              DateTime now = DateTime.now();
-                              DateTime startOfWeek =
-                                  now.subtract(Duration(days: now.weekday - 1));
-                              DateTime endOfWeek =
-                                  startOfWeek.add(Duration(days: 6));
-                              _periodDetails =
-                                  "${DateFormat("dd MMM, yyyy").format(startOfWeek)} - ${DateFormat("dd MMM, yyyy").format(endOfWeek)}";
-                              break;
-                            case "monthly":
-                              DateTime now = DateTime.now();
-                              _periodDetails =
-                                  DateFormat("MMM yyyy").format(now);
-                              break;
-                            case "yearly":
-                              DateTime now = DateTime.now();
-                              _periodDetails = DateFormat("yyyy").format(now);
-                              break;
-                          }
+                          _updatePeriodDetails();
 
                           refresh();
                         },
@@ -864,6 +843,29 @@ class _SummaryState extends State<Summary> {
     }
 
     refresh();
+  }
+
+  void _updatePeriodDetails() {
+    switch (_period) {
+      case "daily":
+        _periodDetails = DateFormat("dd MMM, yyyy").format(DateTime.now());
+        break;
+      case "weekly":
+        DateTime now = DateTime.now();
+        DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+        DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
+        _periodDetails =
+            "${DateFormat("dd MMM, yyyy").format(startOfWeek)} - ${DateFormat("dd MMM, yyyy").format(endOfWeek)}";
+        break;
+      case "monthly":
+        DateTime now = DateTime.now();
+        _periodDetails = DateFormat("MMM yyyy").format(now);
+        break;
+      case "yearly":
+        DateTime now = DateTime.now();
+        _periodDetails = DateFormat("yyyy").format(now);
+        break;
+    }
   }
 
   @override

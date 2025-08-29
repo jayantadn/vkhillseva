@@ -19,8 +19,8 @@
 -[] add / edit / delete chanters
 -[] add / edit / delete sales
 -[] add / edit / delete inventory
--[] summary daily / weekly / monthly / yearly
 -[] share daily report
+-[] summary weekly / monthly / yearly
 
 # new features
 -[] HMI chanters

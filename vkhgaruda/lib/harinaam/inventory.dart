@@ -1,11 +1,18 @@
 import 'dart:async';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'dart:typed_data';
+
+// Add these imports for web-specific functionality
+// ignore: avoid_web_libraries_in_flutter
+// Conditional import for PDF sharing
+import 'pdf_share_io.dart' if (dart.library.html) 'pdf_share_web.dart';
 
 class Inventory extends StatefulWidget {
   final String title;
@@ -30,9 +37,8 @@ class _InventoryState extends State<Inventory> {
   late InventorySummary _eveningInventoryChanters;
   late InventorySummary _morningInventorySales;
   late InventorySummary _eveningInventorySales;
-  bool _firstTimeEntry = false;
-  int _morningSales = 0;
-  int _eveningSales = 0;
+  late SaleData _morningSales;
+  late SaleData _eveningSales;
 
   // lists
   final List<InventoryEntry> _inventoryEntries = [];
@@ -59,6 +65,10 @@ class _InventoryState extends State<Inventory> {
       newAdditions: 0,
       closingBalance: 0,
     );
+
+    // set default payment mode counts
+    _morningSales = SaleData(count: 0, paymentModes: {});
+    _eveningSales = SaleData(count: 0, paymentModes: {});
 
     FB().listenForChange(
       "${Const().dbrootGaruda}/Harinaam/Inventory",
@@ -492,14 +502,16 @@ class _InventoryState extends State<Inventory> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                    (_morningInventorySales.closingBalance - _morningSales)
+                    (_morningInventorySales.closingBalance -
+                            _morningSales.count)
                         .toString(),
                     textAlign: TextAlign.center),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                    (_eveningInventorySales.closingBalance - _eveningSales)
+                    (_eveningInventorySales.closingBalance -
+                            _eveningSales.count)
                         .toString(),
                     textAlign: TextAlign.center),
               ),
@@ -596,6 +608,368 @@ class _InventoryState extends State<Inventory> {
         if (_inventoryEntries.length > 1) SizedBox(height: 8),
       ],
     );
+  }
+
+  Future<Uint8List> _createPdf() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // reset table data
+    List<String> sevakartasMorning = [];
+    List<String> sevakartasEvening = [];
+
+    // morning chanters
+    String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+    SummaryData summaryData = await _getSummaryData(
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Morning/Chanters");
+    sevakartasMorning = summaryData.sevakartas;
+
+    // evening chanters
+    summaryData = await _getSummaryData(
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Evening/Chanters");
+    sevakartasEvening = summaryData.sevakartas;
+
+    // morning sales
+    summaryData = await _getSummaryData(
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Morning/Sales");
+    sevakartasMorning = [
+      ...{...sevakartasMorning, ...summaryData.sevakartas}
+    ];
+
+    // evening sales
+    summaryData = await _getSummaryData(
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Evening/Sales");
+    sevakartasEvening = [
+      ...{...sevakartasEvening, ...summaryData.sevakartas}
+    ];
+
+    // transform the payment modes
+    List<List<String>> morningPaymentModes = [];
+    List<List<String>> eveningPaymentModes = [];
+    _morningSales.paymentModes.forEach((key, value) {
+      morningPaymentModes.add([key, value.toString()]);
+    });
+    _eveningSales.paymentModes.forEach((key, value) {
+      eveningPaymentModes.add([key, value.toString()]);
+    });
+
+    // create pdf
+    final doc = pw.Document();
+    doc.addPage(
+      pw.Page(
+        margin: const pw.EdgeInsets.all(24),
+        // orientation: pw.PageOrientation.landscape,
+        build: (ctx) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+          children: [
+            // page title
+            pw.Center(
+              child: pw.Text(
+                "Harinaam Mantapa \nHare Krishna Mahamantra Chanters' Club",
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
+            ),
+
+            // date
+            pw.SizedBox(height: 12),
+            pw.Align(
+              alignment: pw.Alignment.center,
+              child: pw.Text(
+                "${DateFormat('EEEE').format(_selectedDate)}, ${DateFormat('dd-MM-yyyy').format(_selectedDate)}",
+                style: pw.TextStyle(
+                  fontSize: 14,
+                  fontWeight: pw.FontWeight.normal,
+                ),
+                textAlign: pw.TextAlign.left,
+              ),
+            ),
+
+            // header for morning entry
+            pw.SizedBox(height: 10),
+            pw.Container(
+              width: double.infinity,
+              decoration: pw.BoxDecoration(
+                color: PdfColor.fromInt(0xFF1E3A8A),
+                border: pw.Border.all(
+                  color: PdfColor.fromInt(0xFF1E3A8A),
+                  width: 2,
+                ),
+                borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
+              ),
+              padding: const pw.EdgeInsets.symmetric(vertical: 4),
+              child: pw.Center(
+                child: pw.Text(
+                  "Morning",
+                  style: pw.TextStyle(
+                    fontSize: 14,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColor.fromInt(0xFFFFFFFF),
+                  ),
+                  textAlign: pw.TextAlign.center,
+                ),
+              ),
+            ),
+
+            // list of sevakartas
+            pw.SizedBox(height: 10),
+            pw.Text("Sevakartas: ${sevakartasMorning.join(", ")}"),
+
+            // Morning table
+            pw.SizedBox(height: 12),
+            pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                // chant malas
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                    child: pw.Table.fromTextArray(
+                  headers: ["Chant malas", "Count"],
+                  data: [
+                    [
+                      'Opening balance',
+                      _morningInventoryChanters.openingBalance
+                    ],
+                    ['New addition', _morningInventoryChanters.newAdditions],
+                    ['Discarded', _morningInventoryChanters.discarded],
+                    [
+                      'Closing balance',
+                      _morningInventoryChanters.closingBalance
+                    ]
+                  ],
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(
+                        0xFF90CAF9), // lighter shade of Morning header (0xFF1E3A8A)
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
+
+                // sale malas
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                    child: pw.Table.fromTextArray(
+                  headers: ["Sale malas", "Count"],
+                  data: [
+                    ['Opening balance', _morningInventorySales.openingBalance],
+                    ['New addition', _morningInventorySales.newAdditions],
+                    ['Discarded', _morningInventorySales.discarded],
+                    ['Total sales', _morningSales.count],
+                    ['Closing balance', _morningInventorySales.closingBalance]
+                  ],
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFF90CAF9),
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
+
+                // payment modes
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                    child: pw.Table.fromTextArray(
+                  headers: ["Payment modes", "Count"],
+                  data: morningPaymentModes,
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFF90CAF9),
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
+              ],
+            ),
+
+            // Summary
+            pw.SizedBox(height: 10),
+            pw.Center(
+              child: pw.Text(
+                "Mala sales: $_morningSales",
+                style: pw.TextStyle(
+                  fontSize: 14,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColor.fromInt(0xFF1E3A8A),
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
+            ),
+            pw.Center(
+              child: pw.Text(
+                "Chanters count: 88",
+                style: pw.TextStyle(
+                  fontSize: 14,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColor.fromInt(0xFF1E3A8A),
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
+            ),
+
+            pw.Divider(color: PdfColor.fromInt(0xFF1E3A8A)),
+
+            // evening data
+            // header for evening entry
+            pw.SizedBox(height: 10),
+            pw.Container(
+              width: double.infinity,
+              decoration: pw.BoxDecoration(
+                color: PdfColor.fromInt(0xFFd65302),
+                border: pw.Border.all(
+                  color: PdfColor.fromInt(0xFFd65302),
+                  width: 2,
+                ),
+                borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
+              ),
+              padding: const pw.EdgeInsets.symmetric(vertical: 4),
+              child: pw.Center(
+                child: pw.Text(
+                  "Evening",
+                  style: pw.TextStyle(
+                    fontSize: 14,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColor.fromInt(0xFFFFFFFF),
+                  ),
+                  textAlign: pw.TextAlign.center,
+                ),
+              ),
+            ),
+
+            // list of sevakartas
+            pw.SizedBox(height: 10),
+            pw.Text("Sevakartas: ${sevakartasEvening.join(", ")}"),
+
+            // Morning table
+            pw.SizedBox(height: 12),
+            pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                // chant malas
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                    child: pw.Table.fromTextArray(
+                  headers: ["Chant malas", "Count"],
+                  data: [
+                    [
+                      'Opening balance',
+                      _eveningInventoryChanters.openingBalance
+                    ],
+                    ['New addition', _eveningInventoryChanters.newAdditions],
+                    ['Discarded', _eveningInventoryChanters.discarded],
+                    [
+                      'Closing balance',
+                      _eveningInventoryChanters.closingBalance
+                    ]
+                  ],
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFFffb587),
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
+
+                // sale malas
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                    child: pw.Table.fromTextArray(
+                  headers: ["Sale malas", "Count"],
+                  data: [
+                    ['Opening balance', _eveningInventorySales.openingBalance],
+                    ['New addition', _eveningInventorySales.newAdditions],
+                    ['Discarded', _eveningInventorySales.discarded],
+                    ['Total sales', _eveningSales.count],
+                    ['Closing balance', _eveningInventorySales.closingBalance]
+                  ],
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFFffb587),
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
+
+                // payment modes
+                pw.SizedBox(width: 10),
+                pw.Expanded(
+                    child: pw.Table.fromTextArray(
+                  headers: ["Payment modes", "Count"],
+                  data: eveningPaymentModes,
+                  columnWidths: {
+                    1: const pw.FixedColumnWidth(50),
+                  },
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFFffb587),
+                  ),
+                  headerStyle: pw.TextStyle(
+                    color: PdfColor.fromInt(0xFF000000),
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                )),
+              ],
+            ),
+
+            // Summary
+            pw.SizedBox(height: 10),
+            pw.Center(
+              child: pw.Text(
+                "Mala sales: $_eveningSales",
+                style: pw.TextStyle(
+                  fontSize: 14,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColor.fromInt(0xFFd65302),
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
+            ),
+            pw.Center(
+              child: pw.Text(
+                "Chanters count: 88",
+                style: pw.TextStyle(
+                  fontSize: 14,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColor.fromInt(0xFFd65302),
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
+            ),
+
+            pw.Divider(color: PdfColor.fromInt(0xFFd65302)),
+          ],
+        ),
+      ),
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    return doc.save();
   }
 
   Future<void> _deleteInventoryEntry(InventoryEntry entry) async {
@@ -736,20 +1110,53 @@ class _InventoryState extends State<Inventory> {
     );
   }
 
-  Future<int> _getSales(String session) async {
+  Future<SaleData> _getSales(String session) async {
     int sales = 0;
+    Map<String, int> paymentModes = {};
+    Const().paymentModes.forEach((key, value) {
+      paymentModes[key] = 0;
+    });
     String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
     String dbpathService =
         "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$session/Sales";
     Map<String, dynamic> salesDataJson =
         await FB().getJson(path: dbpathService, silent: true);
     for (var value in salesDataJson.values) {
-      InventoryEntry entry =
-          Utils().convertRawToDatatype(value, InventoryEntry.fromJson);
+      SalesEntry entry =
+          Utils().convertRawToDatatype(value, SalesEntry.fromJson);
       sales += entry.count;
+      paymentModes[entry.paymentMode] =
+          (paymentModes[entry.paymentMode] ?? 0) + entry.count;
     }
 
-    return sales;
+    return SaleData(
+      count: sales,
+      paymentModes: paymentModes,
+    );
+  }
+
+  Future<SummaryData> _getSummaryData(String dbpath) async {
+    List<String> sevakartas = [];
+
+    Map<String, dynamic> json = await FB().getJson(path: dbpath, silent: true);
+    for (var entry in json.entries) {
+      ChantersEntry chantersEntry =
+          Utils().convertRawToDatatype(entry.value, ChantersEntry.fromJson);
+
+      // sevakarta
+      if (!sevakartas.contains(chantersEntry.username)) {
+        sevakartas.add(chantersEntry.username);
+      }
+    }
+
+    return SummaryData(
+      sevakartas: sevakartas,
+    );
+  }
+
+  /// Share the PDF using platform-specific implementation
+  Future<void> _sharePdf(Uint8List pdfBytes) async {
+    await sharePdf(pdfBytes, filename: 'report.pdf');
   }
 
   Future<int> _showGetCurrentBalanceDialog(String type) async {
@@ -757,8 +1164,6 @@ class _InventoryState extends State<Inventory> {
     TextEditingController balanceController =
         TextEditingController(text: currentBalance.toString());
     final formKey = GlobalKey<FormState>();
-
-    _firstTimeEntry = true;
 
     await Widgets().showResponsiveDialog(
         context: context,
@@ -923,6 +1328,15 @@ class _InventoryState extends State<Inventory> {
                   await _showInventoryDialog("Discard");
                 },
               ),
+
+              // share
+              ResponsiveToolbarAction(
+                icon: const Icon(Icons.share),
+                onPressed: () async {
+                  final pdfBytes = await _createPdf();
+                  _sharePdf(pdfBytes);
+                },
+              ),
             ],
           ],
 
@@ -988,4 +1402,22 @@ class _InventoryState extends State<Inventory> {
       ],
     );
   }
+}
+
+class SummaryData {
+  final List<String> sevakartas;
+
+  SummaryData({
+    required this.sevakartas,
+  });
+}
+
+class SaleData {
+  int count;
+  Map<String, int> paymentModes;
+
+  SaleData({
+    required this.count,
+    required this.paymentModes,
+  });
 }

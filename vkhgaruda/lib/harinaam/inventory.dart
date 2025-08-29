@@ -31,6 +31,8 @@ class _InventoryState extends State<Inventory> {
   late InventorySummary _morningInventorySales;
   late InventorySummary _eveningInventorySales;
   bool _firstTimeEntry = false;
+  int _morningSales = 0;
+  int _eveningSales = 0;
 
   // lists
   final List<InventoryEntry> _inventoryEntries = [];
@@ -147,17 +149,6 @@ class _InventoryState extends State<Inventory> {
         _session = "Morning";
       }
 
-      // populate current session chanters' inventory
-      // _eveningInventoryChanters =
-      //     await _getInventorySummary(_selectedDate, _session, "Chanters");
-      // _eveningInventorySales =
-      //     await _getInventorySummary(_selectedDate, _session, "Sales");
-      // if (!_firstTimeEntry && _session == "Evening") {
-      //   _morningInventoryChanters =
-      //       await _getInventorySummary(_selectedDate, "Morning", "Chanters");
-      //   _morningInventorySales =
-      //       await _getInventorySummary(_selectedDate, "Morning", "Sales");
-      // }
       _morningInventoryChanters =
           await _getInventorySummary(_selectedDate, "Morning", "Chanters");
       _morningInventorySales =
@@ -183,6 +174,10 @@ class _InventoryState extends State<Inventory> {
         }
       }
       _inventoryEntries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+      // sales count
+      _morningSales = await _getSales("Morning");
+      _eveningSales = await _getSales("Evening");
     });
 
     // refresh all child widgets
@@ -420,6 +415,24 @@ class _InventoryState extends State<Inventory> {
               ),
             ]),
 
+            // Sales
+            TableRow(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Total sales", textAlign: TextAlign.left),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child:
+                    Text(_morningSales.toString(), textAlign: TextAlign.center),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child:
+                    Text(_eveningSales.toString(), textAlign: TextAlign.center),
+              ),
+            ]),
+
             // closing balance
             TableRow(children: [
               Padding(
@@ -428,12 +441,16 @@ class _InventoryState extends State<Inventory> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(_morningInventorySales.closingBalance.toString(),
+                child: Text(
+                    (_morningInventorySales.closingBalance - _morningSales)
+                        .toString(),
                     textAlign: TextAlign.center),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(_eveningInventorySales.closingBalance.toString(),
+                child: Text(
+                    (_eveningInventorySales.closingBalance - _eveningSales)
+                        .toString(),
                     textAlign: TextAlign.center),
               ),
             ]),
@@ -667,6 +684,22 @@ class _InventoryState extends State<Inventory> {
       newAdditions: newAdditions,
       closingBalance: closingBalance,
     );
+  }
+
+  Future<int> _getSales(String session) async {
+    int sales = 0;
+    String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+    String dbpathService =
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$session/Sales";
+    Map<String, dynamic> salesDataJson =
+        await FB().getJson(path: dbpathService, silent: true);
+    for (var value in salesDataJson.values) {
+      InventoryEntry entry =
+          Utils().convertRawToDatatype(value, InventoryEntry.fromJson);
+      sales += entry.count;
+    }
+
+    return sales;
   }
 
   Future<int> _showGetCurrentBalanceDialog(String type) async {

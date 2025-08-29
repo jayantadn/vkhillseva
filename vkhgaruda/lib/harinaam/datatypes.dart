@@ -161,7 +161,7 @@ class InventoryEntry {
   factory InventoryEntry.fromJson(Map<String, dynamic> json) {
     return InventoryEntry(
       count: json['count'],
-      note: json['note'],
+      note: json['note'] ?? "",
       timestamp: DateTime.parse(json['timestamp']),
       username: json['username'] ?? 'Unknown',
       malaType: json['malaType'] ?? 'Unknown',

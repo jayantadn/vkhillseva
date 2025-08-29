@@ -59,7 +59,7 @@ class _InventoryState extends State<Inventory> {
     );
 
     FB().listenForChange(
-      "${Const().dbrootGaruda}/HarinaamInventory",
+      "${Const().dbrootGaruda}/Harinaam/Inventory",
       FBCallbacks(
         // add
         add: (data) {
@@ -169,7 +169,7 @@ class _InventoryState extends State<Inventory> {
 
       // refill inventory entries
       _inventoryEntries.clear();
-      String dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+      String dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory";
       List rawTopList =
           await FB().getListByYear(path: dbpath, year: _selectedYear);
       if (rawTopList.isNotEmpty) {
@@ -200,7 +200,7 @@ class _InventoryState extends State<Inventory> {
     // store to database
     _lastDataModification = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
-    String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory/$dbdate";
     await FB().addToList(listpath: dbpath, data: entry.toJson());
 
     // update inventory summary
@@ -539,7 +539,7 @@ class _InventoryState extends State<Inventory> {
     // delete from database
     _lastDataModification = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
-    String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory/$dbdate";
     List inventoryEntriesRaw = await FB().getList(path: dbpath);
     List<InventoryEntry> inventoryEntries = inventoryEntriesRaw
         .map((e) => Utils().convertRawToDatatype(e, InventoryEntry.fromJson))
@@ -568,7 +568,7 @@ class _InventoryState extends State<Inventory> {
     // update in the database
     _lastDataModification = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(newEntry.timestamp);
-    String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory/$dbdate";
     List<dynamic> inventoryListRaw = await FB().getList(path: dbpath);
     if (inventoryListRaw.isEmpty) {
       Toaster().error("No inventory entries found for the date");
@@ -603,7 +603,7 @@ class _InventoryState extends State<Inventory> {
 
     String dbdate = DateFormat("yyyy-MM-dd").format(date);
     String dbpath =
-        "${Const().dbrootGaruda}/HarinaamInventorySummary/$dbdate/$session/$type";
+        "${Const().dbrootGaruda}/Harinaam/InventorySummary/$dbdate/$session/$type";
     Map<String, dynamic> summaryDataJson =
         await FB().getJson(path: dbpath, silent: true);
 
@@ -615,7 +615,7 @@ class _InventoryState extends State<Inventory> {
       // if session is evening, check for morning session
       if (session == "Evening") {
         String dbpathTemp =
-            "${Const().dbrootGaruda}/HarinaamInventorySummary/$dbdate/Morning/$type";
+            "${Const().dbrootGaruda}/Harinaam/InventorySummary/$dbdate/Morning/$type";
         summaryDataJson = await FB().getJson(path: dbpathTemp, silent: true);
         if (summaryDataJson.isEmpty) {
           // ask for current balance
@@ -633,7 +633,7 @@ class _InventoryState extends State<Inventory> {
         String prevDbdate =
             DateFormat("yyyy-MM-dd").format(date.subtract(Duration(days: 1)));
         String dbpathTemp =
-            "${Const().dbrootGaruda}/HarinaamInventorySummary/$prevDbdate/Evening/$type";
+            "${Const().dbrootGaruda}/Harinaam/InventorySummary/$prevDbdate/Evening/$type";
         summaryDataJson = await FB().getJson(path: dbpathTemp, silent: true);
         if (summaryDataJson.isEmpty) {
           // ask for current balance

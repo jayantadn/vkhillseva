@@ -81,7 +81,7 @@ class _SummaryState extends State<Summary> {
           // collect morning chaters data
           _totalChanters = 0;
           String dbpath =
-              "${Const().dbrootGaruda}/Harinaam/$dbdate/Morning/Chanters";
+              "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Morning/Chanters";
           Map<String, dynamic> data =
               await FB().getJson(path: dbpath, silent: true);
           for (var entry in data.entries) {
@@ -91,7 +91,8 @@ class _SummaryState extends State<Summary> {
           }
 
           // collect evening chaters data
-          dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Evening/Chanters";
+          dbpath =
+              "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Evening/Chanters";
           data = await FB().getJson(path: dbpath, silent: true);
           for (var entry in data.entries) {
             ChantersEntry chanter = Utils()
@@ -104,7 +105,7 @@ class _SummaryState extends State<Summary> {
           _discardedChanterMalas = 0;
           _newSaleMalasProcured = 0;
           _discardedSaleMalas = 0;
-          dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+          dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory/$dbdate";
           List listRaw = await FB().getList(path: dbpath);
           for (var item in listRaw) {
             InventoryEntry entry =
@@ -127,7 +128,8 @@ class _SummaryState extends State<Summary> {
           // number of malas sold morning
           _totalMalasSold = 0;
           _totalAmountCollected = 0;
-          dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Morning/Sales";
+          dbpath =
+              "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Morning/Sales";
           data = await FB().getJson(path: dbpath, silent: true);
           for (var entry in data.entries) {
             SalesEntry sale =
@@ -151,7 +153,8 @@ class _SummaryState extends State<Summary> {
           }
 
           // number of malas sold evening
-          dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Evening/Sales";
+          dbpath =
+              "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Evening/Sales";
           data = await FB().getJson(path: dbpath, silent: true);
           for (var entry in data.entries) {
             SalesEntry sale =
@@ -182,7 +185,7 @@ class _SummaryState extends State<Summary> {
               .parse(_periodDetails.split('-')[1].trim());
 
           // number of chanters and sales
-          String dbpath = "${Const().dbrootGaruda}/Harinaam";
+          String dbpath = "${Const().dbrootGaruda}/Harinaam/ServiceEntries";
           var dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           CountTuple countData = _getChantersAndSalesCount(dataRaw);
@@ -194,7 +197,7 @@ class _SummaryState extends State<Summary> {
           // chanters inventory data
           _newChanterMalasProcured = 0;
           _discardedChanterMalas = 0;
-          dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+          dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory";
           dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           InventoryTuple inventoryData =
@@ -212,7 +215,7 @@ class _SummaryState extends State<Summary> {
           DateTime endDate = DateTime(month.year, month.month + 1, 0);
 
           // number of chanters and sales
-          String dbpath = "${Const().dbrootGaruda}/Harinaam";
+          String dbpath = "${Const().dbrootGaruda}/Harinaam/ServiceEntries";
           var dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           CountTuple countData = _getChantersAndSalesCount(dataRaw);
@@ -222,7 +225,7 @@ class _SummaryState extends State<Summary> {
           _paymentModeSummary.addAll(countData.paymentModeSummary);
 
           // chanters inventory data
-          dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+          dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory";
           dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           InventoryTuple inventoryData =
@@ -240,7 +243,7 @@ class _SummaryState extends State<Summary> {
           DateTime endDate = DateTime(year.year, 12, 31);
 
           // number of chanters and sales
-          String dbpath = "${Const().dbrootGaruda}/Harinaam";
+          String dbpath = "${Const().dbrootGaruda}/Harinaam/ServiceEntries";
           var dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           CountTuple countData = _getChantersAndSalesCount(dataRaw);
@@ -250,7 +253,7 @@ class _SummaryState extends State<Summary> {
           _paymentModeSummary.addAll(countData.paymentModeSummary);
 
           // chanters inventory data
-          dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+          dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory";
           dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           InventoryTuple inventoryData =

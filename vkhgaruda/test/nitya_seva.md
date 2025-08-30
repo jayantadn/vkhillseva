@@ -43,3 +43,5 @@
 -[] jump to today
 -[] payment mode daily summary
 -[] payment mode summary
+-[] daily inventory table
+-[] share day summary

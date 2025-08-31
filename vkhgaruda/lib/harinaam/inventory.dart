@@ -483,13 +483,13 @@ class _InventoryState extends State<Inventory> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child:
-                    Text(_morningSales.toString(), textAlign: TextAlign.center),
+                child: Text(_morningSales.count.toString(),
+                    textAlign: TextAlign.center),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child:
-                    Text(_eveningSales.toString(), textAlign: TextAlign.center),
+                child: Text(_eveningSales.count.toString(),
+                    textAlign: TextAlign.center),
               ),
             ]),
 
@@ -524,6 +524,7 @@ class _InventoryState extends State<Inventory> {
 
   Widget _createInventoryTile(int index) {
     InventoryEntry entry = _inventoryEntries[index];
+    bool isTodaysEntry = DateUtils.isSameDay(entry.timestamp, DateTime.now());
 
     return Column(
       children: [
@@ -580,18 +581,20 @@ class _InventoryState extends State<Inventory> {
           infotext: entry.note.isNotEmpty ? Text("Note: ${entry.note}") : null,
 
           // context menu
-          trailing: Widgets().createContextMenu(
-              items: ["Edit", "Delete"],
-              onPressed: (String action) {
-                if (action == "Edit") {
-                  _showInventoryDialog(entry.addOrRemove, oldEntry: entry);
-                } else if (action == "Delete") {
-                  Widgets().showConfirmDialog(
-                      context, "Delete this inventory item?", "Delete", () {
-                    _deleteInventoryEntry(entry);
-                  });
-                }
-              }),
+          trailing: isTodaysEntry
+              ? Widgets().createContextMenu(
+                  items: ["Edit", "Delete"],
+                  onPressed: (String action) {
+                    if (action == "Edit") {
+                      _showInventoryDialog(entry.addOrRemove, oldEntry: entry);
+                    } else if (action == "Delete") {
+                      Widgets().showConfirmDialog(
+                          context, "Delete this inventory item?", "Delete", () {
+                        _deleteInventoryEntry(entry);
+                      });
+                    }
+                  })
+              : null,
         ),
 
         // divider
@@ -1003,6 +1006,48 @@ class _InventoryState extends State<Inventory> {
     if (index != -1) {
       setState(() {
         _inventoryEntries[index] = newEntry;
+
+        // update inventory summary
+        int delta = newEntry.count - oldEntry.count;
+        if (oldEntry.malaType == newEntry.malaType) {
+          if (newEntry.malaType == "Chanters") {
+            if (newEntry.addOrRemove == "Add") {
+              if (_session == "Morning") {
+                _morningInventoryChanters.newAdditions += delta;
+                _morningInventoryChanters.closingBalance += delta;
+              } else {
+                _eveningInventoryChanters.newAdditions += delta;
+                _eveningInventoryChanters.closingBalance += delta;
+              }
+            } else {
+              if (_session == "Morning") {
+                _morningInventoryChanters.discarded += delta;
+                _morningInventoryChanters.closingBalance -= delta;
+              } else {
+                _eveningInventoryChanters.discarded += delta;
+                _eveningInventoryChanters.closingBalance -= delta;
+              }
+            }
+          } else {
+            if (newEntry.addOrRemove == "Add") {
+              if (_session == "Morning") {
+                _morningInventorySales.newAdditions += delta;
+                _morningInventorySales.closingBalance += delta;
+              } else {
+                _eveningInventorySales.newAdditions += delta;
+                _eveningInventorySales.closingBalance += delta;
+              }
+            } else {
+              if (_session == "Morning") {
+                _morningInventorySales.discarded += delta;
+                _morningInventorySales.closingBalance -= delta;
+              } else {
+                _eveningInventorySales.discarded += delta;
+                _eveningInventorySales.closingBalance -= delta;
+              }
+            }
+          }
+        }
       });
     }
 

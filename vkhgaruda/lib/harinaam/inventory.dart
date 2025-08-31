@@ -1047,6 +1047,68 @@ class _InventoryState extends State<Inventory> {
               }
             }
           }
+        } else {
+          if (newEntry.malaType == "Chanters") {
+            if (newEntry.addOrRemove == "Add") {
+              if (_session == "Morning") {
+                _morningInventorySales.newAdditions -= oldEntry.count;
+                _morningInventorySales.closingBalance -= oldEntry.count;
+
+                _morningInventoryChanters.newAdditions += newEntry.count;
+                _morningInventoryChanters.closingBalance += newEntry.count;
+              } else {
+                _eveningInventorySales.newAdditions -= oldEntry.count;
+                _eveningInventorySales.closingBalance -= oldEntry.count;
+
+                _eveningInventoryChanters.newAdditions += newEntry.count;
+                _eveningInventoryChanters.closingBalance += newEntry.count;
+              }
+            } else {
+              if (_session == "Morning") {
+                _morningInventorySales.discarded -= oldEntry.count;
+                _morningInventorySales.closingBalance += oldEntry.count;
+
+                _morningInventoryChanters.discarded += newEntry.count;
+                _morningInventoryChanters.closingBalance -= newEntry.count;
+              } else {
+                _eveningInventorySales.discarded -= oldEntry.count;
+                _eveningInventorySales.closingBalance += oldEntry.count;
+
+                _eveningInventoryChanters.discarded += newEntry.count;
+                _eveningInventoryChanters.closingBalance -= newEntry.count;
+              }
+            }
+          } else {
+            if (newEntry.addOrRemove == "Add") {
+              if (_session == "Morning") {
+                _morningInventoryChanters.newAdditions -= oldEntry.count;
+                _morningInventoryChanters.closingBalance -= oldEntry.count;
+
+                _morningInventorySales.newAdditions += newEntry.count;
+                _morningInventorySales.closingBalance += newEntry.count;
+              } else {
+                _eveningInventoryChanters.newAdditions -= oldEntry.count;
+                _eveningInventoryChanters.closingBalance -= oldEntry.count;
+
+                _eveningInventorySales.newAdditions += newEntry.count;
+                _eveningInventorySales.closingBalance += newEntry.count;
+              }
+            } else {
+              if (_session == "Morning") {
+                _morningInventoryChanters.discarded -= oldEntry.count;
+                _morningInventoryChanters.closingBalance += oldEntry.count;
+
+                _morningInventorySales.discarded += newEntry.count;
+                _morningInventorySales.closingBalance -= newEntry.count;
+              } else {
+                _eveningInventoryChanters.discarded -= oldEntry.count;
+                _eveningInventoryChanters.closingBalance += oldEntry.count;
+
+                _eveningInventorySales.discarded += newEntry.count;
+                _eveningInventorySales.closingBalance -= newEntry.count;
+              }
+            }
+          }
         }
       });
     }

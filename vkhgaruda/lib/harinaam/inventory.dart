@@ -30,6 +30,7 @@ class _InventoryState extends State<Inventory> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   DateTime _selectedDate = DateTime.now();
+  late bool _isToday;
   final String _selectedYear = DateTime.now().year.toString();
   DateTime _lastDataModification = DateTime.now();
   late String _session;
@@ -49,6 +50,8 @@ class _InventoryState extends State<Inventory> {
   @override
   initState() {
     super.initState();
+
+    _isToday = DateUtils.isSameDay(DateTime.now(), _selectedDate);
 
     // set session
     if (DateTime.now().hour >= Const().morningCutoff) {
@@ -152,6 +155,8 @@ class _InventoryState extends State<Inventory> {
     }
 
     await _lock.synchronized(() async {
+      _isToday = DateUtils.isSameDay(DateTime.now(), _selectedDate);
+
       // set session
       if (DateTime.now().hour >= Const().morningCutoff) {
         _session = "Evening";
@@ -199,47 +204,49 @@ class _InventoryState extends State<Inventory> {
 
   Future<void> _addInventoryEntry(InventoryEntry entry) async {
     setState(() {
-      _inventoryEntries.insert(0, entry);
+      _isLoading = true;
+    });
 
-      // update inventory summary
-      if (entry.malaType == "Chanters") {
-        if (entry.addOrRemove == "Add") {
-          if (_session == "Morning") {
-            _morningInventoryChanters.newAdditions += entry.count;
-            _morningInventoryChanters.closingBalance += entry.count;
-          } else {
-            _eveningInventoryChanters.newAdditions += entry.count;
-            _eveningInventoryChanters.closingBalance += entry.count;
-          }
+    _inventoryEntries.insert(0, entry);
+
+    // update inventory summary
+    if (entry.malaType == "Chanters") {
+      if (entry.addOrRemove == "Add") {
+        if (_session == "Morning") {
+          _morningInventoryChanters.newAdditions += entry.count;
+          _morningInventoryChanters.closingBalance += entry.count;
         } else {
-          if (_session == "Morning") {
-            _morningInventoryChanters.discarded += entry.count;
-            _morningInventoryChanters.closingBalance -= entry.count;
-          } else {
-            _eveningInventoryChanters.discarded += entry.count;
-            _eveningInventoryChanters.closingBalance -= entry.count;
-          }
+          _eveningInventoryChanters.newAdditions += entry.count;
+          _eveningInventoryChanters.closingBalance += entry.count;
         }
       } else {
-        if (entry.addOrRemove == "Add") {
-          if (_session == "Morning") {
-            _morningInventorySales.newAdditions += entry.count;
-            _morningInventorySales.closingBalance += entry.count;
-          } else {
-            _eveningInventorySales.newAdditions += entry.count;
-            _eveningInventorySales.closingBalance += entry.count;
-          }
+        if (_session == "Morning") {
+          _morningInventoryChanters.discarded += entry.count;
+          _morningInventoryChanters.closingBalance -= entry.count;
         } else {
-          if (_session == "Morning") {
-            _morningInventorySales.discarded += entry.count;
-            _morningInventorySales.closingBalance -= entry.count;
-          } else {
-            _eveningInventorySales.discarded += entry.count;
-            _eveningInventorySales.closingBalance -= entry.count;
-          }
+          _eveningInventoryChanters.discarded += entry.count;
+          _eveningInventoryChanters.closingBalance -= entry.count;
         }
       }
-    });
+    } else {
+      if (entry.addOrRemove == "Add") {
+        if (_session == "Morning") {
+          _morningInventorySales.newAdditions += entry.count;
+          _morningInventorySales.closingBalance += entry.count;
+        } else {
+          _eveningInventorySales.newAdditions += entry.count;
+          _eveningInventorySales.closingBalance += entry.count;
+        }
+      } else {
+        if (_session == "Morning") {
+          _morningInventorySales.discarded += entry.count;
+          _morningInventorySales.closingBalance -= entry.count;
+        } else {
+          _eveningInventorySales.discarded += entry.count;
+          _eveningInventorySales.closingBalance -= entry.count;
+        }
+      }
+    }
 
     // store to database
     _lastDataModification = DateTime.now();
@@ -259,6 +266,10 @@ class _InventoryState extends State<Inventory> {
       data["closingBalance"] -= entry.count;
     }
     await FB().setJson(path: dbpath, json: data);
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Widget _createDashboardTables() {
@@ -977,8 +988,10 @@ class _InventoryState extends State<Inventory> {
 
   Future<void> _deleteInventoryEntry(InventoryEntry entry) async {
     setState(() {
-      _inventoryEntries.remove(entry);
+      _isLoading = true;
     });
+
+    _inventoryEntries.remove(entry);
 
     // delete from database
     _lastDataModification = DateTime.now();
@@ -997,120 +1010,126 @@ class _InventoryState extends State<Inventory> {
           .toList(); // convert back to raw format
       await FB().setValue(path: dbpath, value: inventoryEntriesRaw);
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _editInventoryEntry(
       InventoryEntry oldEntry, InventoryEntry newEntry) async {
+    setState(() {
+      _isLoading = true;
+    });
+
     // update the entry in the list
     int index = _inventoryEntries.indexOf(oldEntry);
     if (index != -1) {
-      setState(() {
-        _inventoryEntries[index] = newEntry;
+      _inventoryEntries[index] = newEntry;
 
-        // update inventory summary
-        int delta = newEntry.count - oldEntry.count;
-        if (oldEntry.malaType == newEntry.malaType) {
-          if (newEntry.malaType == "Chanters") {
-            if (newEntry.addOrRemove == "Add") {
-              if (_session == "Morning") {
-                _morningInventoryChanters.newAdditions += delta;
-                _morningInventoryChanters.closingBalance += delta;
-              } else {
-                _eveningInventoryChanters.newAdditions += delta;
-                _eveningInventoryChanters.closingBalance += delta;
-              }
+      // update inventory summary
+      int delta = newEntry.count - oldEntry.count;
+      if (oldEntry.malaType == newEntry.malaType) {
+        if (newEntry.malaType == "Chanters") {
+          if (newEntry.addOrRemove == "Add") {
+            if (_session == "Morning") {
+              _morningInventoryChanters.newAdditions += delta;
+              _morningInventoryChanters.closingBalance += delta;
             } else {
-              if (_session == "Morning") {
-                _morningInventoryChanters.discarded += delta;
-                _morningInventoryChanters.closingBalance -= delta;
-              } else {
-                _eveningInventoryChanters.discarded += delta;
-                _eveningInventoryChanters.closingBalance -= delta;
-              }
+              _eveningInventoryChanters.newAdditions += delta;
+              _eveningInventoryChanters.closingBalance += delta;
             }
           } else {
-            if (newEntry.addOrRemove == "Add") {
-              if (_session == "Morning") {
-                _morningInventorySales.newAdditions += delta;
-                _morningInventorySales.closingBalance += delta;
-              } else {
-                _eveningInventorySales.newAdditions += delta;
-                _eveningInventorySales.closingBalance += delta;
-              }
+            if (_session == "Morning") {
+              _morningInventoryChanters.discarded += delta;
+              _morningInventoryChanters.closingBalance -= delta;
             } else {
-              if (_session == "Morning") {
-                _morningInventorySales.discarded += delta;
-                _morningInventorySales.closingBalance -= delta;
-              } else {
-                _eveningInventorySales.discarded += delta;
-                _eveningInventorySales.closingBalance -= delta;
-              }
+              _eveningInventoryChanters.discarded += delta;
+              _eveningInventoryChanters.closingBalance -= delta;
             }
           }
         } else {
-          if (newEntry.malaType == "Chanters") {
-            if (newEntry.addOrRemove == "Add") {
-              if (_session == "Morning") {
-                _morningInventorySales.newAdditions -= oldEntry.count;
-                _morningInventorySales.closingBalance -= oldEntry.count;
-
-                _morningInventoryChanters.newAdditions += newEntry.count;
-                _morningInventoryChanters.closingBalance += newEntry.count;
-              } else {
-                _eveningInventorySales.newAdditions -= oldEntry.count;
-                _eveningInventorySales.closingBalance -= oldEntry.count;
-
-                _eveningInventoryChanters.newAdditions += newEntry.count;
-                _eveningInventoryChanters.closingBalance += newEntry.count;
-              }
+          if (newEntry.addOrRemove == "Add") {
+            if (_session == "Morning") {
+              _morningInventorySales.newAdditions += delta;
+              _morningInventorySales.closingBalance += delta;
             } else {
-              if (_session == "Morning") {
-                _morningInventorySales.discarded -= oldEntry.count;
-                _morningInventorySales.closingBalance += oldEntry.count;
-
-                _morningInventoryChanters.discarded += newEntry.count;
-                _morningInventoryChanters.closingBalance -= newEntry.count;
-              } else {
-                _eveningInventorySales.discarded -= oldEntry.count;
-                _eveningInventorySales.closingBalance += oldEntry.count;
-
-                _eveningInventoryChanters.discarded += newEntry.count;
-                _eveningInventoryChanters.closingBalance -= newEntry.count;
-              }
+              _eveningInventorySales.newAdditions += delta;
+              _eveningInventorySales.closingBalance += delta;
             }
           } else {
-            if (newEntry.addOrRemove == "Add") {
-              if (_session == "Morning") {
-                _morningInventoryChanters.newAdditions -= oldEntry.count;
-                _morningInventoryChanters.closingBalance -= oldEntry.count;
-
-                _morningInventorySales.newAdditions += newEntry.count;
-                _morningInventorySales.closingBalance += newEntry.count;
-              } else {
-                _eveningInventoryChanters.newAdditions -= oldEntry.count;
-                _eveningInventoryChanters.closingBalance -= oldEntry.count;
-
-                _eveningInventorySales.newAdditions += newEntry.count;
-                _eveningInventorySales.closingBalance += newEntry.count;
-              }
+            if (_session == "Morning") {
+              _morningInventorySales.discarded += delta;
+              _morningInventorySales.closingBalance -= delta;
             } else {
-              if (_session == "Morning") {
-                _morningInventoryChanters.discarded -= oldEntry.count;
-                _morningInventoryChanters.closingBalance += oldEntry.count;
-
-                _morningInventorySales.discarded += newEntry.count;
-                _morningInventorySales.closingBalance -= newEntry.count;
-              } else {
-                _eveningInventoryChanters.discarded -= oldEntry.count;
-                _eveningInventoryChanters.closingBalance += oldEntry.count;
-
-                _eveningInventorySales.discarded += newEntry.count;
-                _eveningInventorySales.closingBalance -= newEntry.count;
-              }
+              _eveningInventorySales.discarded += delta;
+              _eveningInventorySales.closingBalance -= delta;
             }
           }
         }
-      });
+      } else {
+        if (newEntry.malaType == "Chanters") {
+          if (newEntry.addOrRemove == "Add") {
+            if (_session == "Morning") {
+              _morningInventorySales.newAdditions -= oldEntry.count;
+              _morningInventorySales.closingBalance -= oldEntry.count;
+
+              _morningInventoryChanters.newAdditions += newEntry.count;
+              _morningInventoryChanters.closingBalance += newEntry.count;
+            } else {
+              _eveningInventorySales.newAdditions -= oldEntry.count;
+              _eveningInventorySales.closingBalance -= oldEntry.count;
+
+              _eveningInventoryChanters.newAdditions += newEntry.count;
+              _eveningInventoryChanters.closingBalance += newEntry.count;
+            }
+          } else {
+            if (_session == "Morning") {
+              _morningInventorySales.discarded -= oldEntry.count;
+              _morningInventorySales.closingBalance += oldEntry.count;
+
+              _morningInventoryChanters.discarded += newEntry.count;
+              _morningInventoryChanters.closingBalance -= newEntry.count;
+            } else {
+              _eveningInventorySales.discarded -= oldEntry.count;
+              _eveningInventorySales.closingBalance += oldEntry.count;
+
+              _eveningInventoryChanters.discarded += newEntry.count;
+              _eveningInventoryChanters.closingBalance -= newEntry.count;
+            }
+          }
+        } else {
+          if (newEntry.addOrRemove == "Add") {
+            if (_session == "Morning") {
+              _morningInventoryChanters.newAdditions -= oldEntry.count;
+              _morningInventoryChanters.closingBalance -= oldEntry.count;
+
+              _morningInventorySales.newAdditions += newEntry.count;
+              _morningInventorySales.closingBalance += newEntry.count;
+            } else {
+              _eveningInventoryChanters.newAdditions -= oldEntry.count;
+              _eveningInventoryChanters.closingBalance -= oldEntry.count;
+
+              _eveningInventorySales.newAdditions += newEntry.count;
+              _eveningInventorySales.closingBalance += newEntry.count;
+            }
+          } else {
+            if (_session == "Morning") {
+              _morningInventoryChanters.discarded -= oldEntry.count;
+              _morningInventoryChanters.closingBalance += oldEntry.count;
+
+              _morningInventorySales.discarded += newEntry.count;
+              _morningInventorySales.closingBalance -= newEntry.count;
+            } else {
+              _eveningInventoryChanters.discarded -= oldEntry.count;
+              _eveningInventoryChanters.closingBalance += oldEntry.count;
+
+              _eveningInventorySales.discarded += newEntry.count;
+              _eveningInventorySales.closingBalance -= newEntry.count;
+            }
+          }
+        }
+      }
     }
 
     // update in the database
@@ -1136,10 +1155,68 @@ class _InventoryState extends State<Inventory> {
           newInventoryListRaw.add(inventoryItem);
         }
       }
-
       _lastDataModification = DateTime.now();
       await FB().setValue(path: dbpath, value: newInventoryListRaw);
     }
+
+    // update summary database
+    if (oldEntry.malaType == newEntry.malaType) {
+      // no changes in mala type
+      if (_session == "Morning") {
+        if (newEntry.malaType == "Chanters") {
+          dbpath =
+              "${Const().dbrootGaruda}/Harinaam/InventorySummary/$dbdate/Morning/Chanters";
+          Map<String, dynamic> data = await FB().getJson(path: dbpath);
+          data['newAdditions'] = _morningInventoryChanters.newAdditions;
+          data['discarded'] = _morningInventoryChanters.discarded;
+          data['closingBalance'] = _morningInventoryChanters.closingBalance;
+          await FB().setJson(path: dbpath, json: data);
+        } else {
+          // Sales mala
+          dbpath =
+              "${Const().dbrootGaruda}/Harinaam/InventorySummary/$dbdate/Morning/Sales";
+          Map<String, dynamic> data = await FB().getJson(path: dbpath);
+          data['newAdditions'] = _morningInventorySales.newAdditions;
+          data['discarded'] = _morningInventorySales.discarded;
+          data['closingBalance'] = _morningInventorySales.closingBalance;
+          await FB().setJson(path: dbpath, json: data);
+        }
+      } else {
+        // evening
+        if (newEntry.malaType == "Chanters") {
+          dbpath =
+              "${Const().dbrootGaruda}/Harinaam/InventorySummary/$dbdate/Evening/Chanters";
+          Map<String, dynamic> data = await FB().getJson(path: dbpath);
+          data['newAdditions'] = _eveningInventoryChanters.newAdditions;
+          data['discarded'] = _eveningInventoryChanters.discarded;
+          data['closingBalance'] = _eveningInventoryChanters.closingBalance;
+          await FB().setJson(path: dbpath, json: data);
+        } else {
+          // Sales mala
+          dbpath =
+              "${Const().dbrootGaruda}/Harinaam/InventorySummary/$dbdate/Evening/Sales";
+          Map<String, dynamic> data = await FB().getJson(path: dbpath);
+          data['newAdditions'] = _eveningInventorySales.newAdditions;
+          data['discarded'] = _eveningInventorySales.discarded;
+          data['closingBalance'] = _eveningInventorySales.closingBalance;
+          await FB().setJson(path: dbpath, json: data);
+        }
+      }
+    } else {
+      // mala type changed
+      if (_session == "Morning") {
+      } else {
+        // evening
+        if (newEntry.malaType == "Chanters") {
+        } else {
+          // Sales mala
+        }
+      }
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<InventorySummary> _getInventorySummary(
@@ -1418,8 +1495,8 @@ class _InventoryState extends State<Inventory> {
           title: widget.title,
 
           toolbarActions: [
-            // Only show add/discard buttons if selected year is current year
-            if (_selectedYear == DateTime.now().year.toString()) ...[
+            // Only show add/discard buttons if today
+            if (_isToday) ...[
               // add
               ResponsiveToolbarAction(
                 icon: Icon(Icons.add_circle_outline),

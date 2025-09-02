@@ -64,7 +64,7 @@ class _HarinaamState extends State<Harinaam> {
     // listen to database events for chanters
     String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
     String dbpathChanters =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Chanters";
     FB().listenForChange(
         dbpathChanters,
         FBCallbacks(
@@ -117,7 +117,7 @@ class _HarinaamState extends State<Harinaam> {
 
     // listen to database events for sales
     String dbpathSales =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Sales";
     FB().listenForChange(
         dbpathSales,
         FBCallbacks(
@@ -216,7 +216,7 @@ class _HarinaamState extends State<Harinaam> {
       _chantersEntries.clear();
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
       String dbpath =
-          "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters";
+          "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Chanters";
       Map<String, dynamic> chantersJson =
           await FB().getJson(path: dbpath, silent: true);
       int countChanters = 0;
@@ -232,7 +232,8 @@ class _HarinaamState extends State<Harinaam> {
       // add sales records from database
       _salesEntries.clear();
       dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
-      dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales";
+      dbpath =
+          "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Sales";
       Map<String, dynamic> salesJson =
           await FB().getJson(path: dbpath, silent: true);
       int countSales = 0;
@@ -296,7 +297,7 @@ class _HarinaamState extends State<Harinaam> {
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters/$dbtime";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Chanters/$dbtime";
     FB().setJson(path: dbpath, json: entry.toJson());
 
     setState(() {
@@ -347,7 +348,7 @@ class _HarinaamState extends State<Harinaam> {
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales/$dbtime";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Sales/$dbtime";
     FB().setJson(path: dbpath, json: entry.toJson());
 
     setState(() {
@@ -622,7 +623,7 @@ class _HarinaamState extends State<Harinaam> {
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters/$dbtime";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Chanters/$dbtime";
     FB().deleteValue(path: dbpath);
 
     // remove from the list
@@ -670,7 +671,7 @@ class _HarinaamState extends State<Harinaam> {
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales/$dbtime";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Sales/$dbtime";
     FB().deleteValue(path: dbpath);
 
     // remove from the list
@@ -711,7 +712,7 @@ class _HarinaamState extends State<Harinaam> {
       String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
       String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
       String dbpath =
-          "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters/$dbtime";
+          "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Chanters/$dbtime";
       FB().setJson(path: dbpath, json: editedEntry.toJson());
 
       // Update dashboard counter
@@ -758,7 +759,7 @@ class _HarinaamState extends State<Harinaam> {
       String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
       String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
       String dbpath =
-          "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales/$dbtime";
+          "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Sales/$dbtime";
       FB().setJson(path: dbpath, json: editedEntry.toJson());
 
       // Update dashboard counter

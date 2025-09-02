@@ -5,8 +5,13 @@ import 'dart:html' as html;
 import 'package:js/js_util.dart' as js_util;
 import 'dart:typed_data';
 
-Future<void> sharePdf(Uint8List pdfBytes,
-    {String filename = 'report.pdf'}) async {
+// importing modules shall import like below
+// import 'pdf_share_io.dart' if (dart.library.html) 'pdf_share_web.dart';
+
+Future<void> sharePdf(
+  Uint8List pdfBytes, {
+  String filename = 'report.pdf',
+}) async {
   try {
     final blob = html.Blob([pdfBytes], 'application/pdf');
     final file = html.File([blob], filename, {'type': 'application/pdf'});
@@ -14,20 +19,23 @@ Future<void> sharePdf(Uint8List pdfBytes,
     final hasShare = js_util.hasProperty(nav, 'share');
     final hasCanShare = js_util.hasProperty(nav, 'canShare');
     if (hasShare && hasCanShare) {
-      final canShareFiles = js_util.callMethod<bool>(nav, 'canShare', [
+      final canShareFiles =
+          js_util.callMethod<bool>(nav, 'canShare', [
             {
-              'files': [file]
-            }
+              'files': [file],
+            },
           ]) ??
           false;
       if (canShareFiles) {
-        await js_util.promiseToFuture(js_util.callMethod(nav, 'share', [
-          {
-            'title': filename,
-            'text': 'Sharing a PDF.',
-            'files': [file],
-          }
-        ]));
+        await js_util.promiseToFuture(
+          js_util.callMethod(nav, 'share', [
+            {
+              'title': filename,
+              'text': 'Sharing a PDF.',
+              'files': [file],
+            },
+          ]),
+        );
         return;
       }
     }

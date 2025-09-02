@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/harinaam/dashboard.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
@@ -11,12 +10,6 @@ import 'package:vkhgaruda/harinaam/hmi_sales.dart';
 import 'package:vkhgaruda/harinaam/inventory.dart';
 import 'package:vkhgaruda/harinaam/summary.dart';
 import 'package:vkhpackages/vkhpackages.dart';
-import 'dart:typed_data';
-
-// Add these imports for web-specific functionality
-// ignore: avoid_web_libraries_in_flutter
-// Conditional import for PDF sharing
-import 'pdf_share_io.dart' if (dart.library.html) 'pdf_share_web.dart';
 
 class Harinaam extends StatefulWidget {
   final String title;

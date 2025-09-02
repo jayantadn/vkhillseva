@@ -1,10 +1,17 @@
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+
+// Conditional import for screenshot sharing
+import 'screenshot_share_io.dart'
+    if (dart.library.html) 'screenshot_share_web.dart';
 
 class Summary extends StatefulWidget {
   final String title;
@@ -23,6 +30,7 @@ class _SummaryState extends State<Summary> {
   bool _isLoading = true;
   String _period = "weekly";
   late String _periodDetails;
+  final GlobalKey _repaintBoundaryKey = GlobalKey();
 
   // variables for chanters summary
   int _totalChanters = 0;
@@ -868,6 +876,50 @@ class _SummaryState extends State<Summary> {
     refresh();
   }
 
+  /// Capture screenshot of the widget
+  Future<Uint8List?> _takeScreenshot() async {
+    try {
+      // Find the RenderRepaintBoundary
+      RenderRepaintBoundary boundary = _repaintBoundaryKey.currentContext!
+          .findRenderObject() as RenderRepaintBoundary;
+
+      // Capture the image
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+
+      // Convert to bytes
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      return byteData?.buffer.asUint8List();
+    } catch (e) {
+      Toaster().error("Failed to take screenshot: $e");
+      return null;
+    }
+  }
+
+  /// Share the screenshot using platform-specific implementation
+  Future<void> _shareImage() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      Uint8List? screenshotBytes = await _takeScreenshot();
+      if (screenshotBytes != null) {
+        await shareScreenshot(screenshotBytes,
+            filename:
+                'harinaam_summary_${DateTime.now().millisecondsSinceEpoch}.png');
+      } else {
+        Toaster().error("Failed to capture screenshot");
+      }
+    } catch (e) {
+      Toaster().error("Failed to share screenshot: $e");
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   void _updatePeriodDetails() {
     switch (_period) {
       case "daily":
@@ -901,39 +953,45 @@ class _SummaryState extends State<Summary> {
 
           // toolbar icons
           toolbarActions: [
-            // ResponsiveToolbarAction(
-            //   icon: Icon(Icons.refresh),
-            // ),
+            ResponsiveToolbarAction(
+              icon: Icon(Icons.share),
+              onPressed: () {
+                _shareImage();
+              },
+            ),
           ],
 
           // body
-          body: RefreshIndicator(
-            onRefresh: refresh,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: Column(
-                    children: [
-                      // leave some space at top
-                      SizedBox(height: 10),
+          body: RepaintBoundary(
+            key: _repaintBoundaryKey,
+            child: RefreshIndicator(
+              onRefresh: refresh,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        // leave some space at top
+                        SizedBox(height: 10),
 
-                      // your widgets here
-                      _createHMI(),
+                        // your widgets here
+                        _createHMI(),
 
-                      SizedBox(height: 10),
-                      _createChantersSummary(),
+                        SizedBox(height: 10),
+                        _createChantersSummary(),
 
-                      SizedBox(height: 10),
-                      _createSalesSummary(),
+                        SizedBox(height: 10),
+                        _createSalesSummary(),
 
-                      SizedBox(height: 10),
-                      _createPaymentModeSummary(),
+                        SizedBox(height: 10),
+                        _createPaymentModeSummary(),
 
-                      // leave some space at bottom
-                      SizedBox(height: 500),
-                    ],
+                        // leave some space at bottom
+                        SizedBox(height: 500),
+                      ],
+                    ),
                   ),
                 ),
               ),

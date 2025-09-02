@@ -420,45 +420,6 @@ class _HarinaamState extends State<Harinaam> {
     );
   }
 
-  Future<Uint8List> _createPdf() async {
-    final doc = pw.Document();
-
-    doc.addPage(
-      pw.Page(
-        margin: const pw.EdgeInsets.all(24),
-        build: (ctx) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-          children: [
-            pw.Text('Sales Report',
-                style:
-                    pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold)),
-            pw.SizedBox(height: 8),
-            pw.Text('Period: Jan–Mar 2025'),
-            pw.SizedBox(height: 16),
-            pw.Table.fromTextArray(
-              headers: ['Item', 'Qty', 'Price'],
-              data: [
-                ['Apples', '12', '₹240'],
-                ['Mangoes', '8', '₹320'],
-                ['Bananas', '18', '₹180'],
-              ],
-              cellAlignment: pw.Alignment.centerLeft,
-            ),
-            pw.SizedBox(height: 16),
-            pw.Align(
-              alignment: pw.Alignment.centerRight,
-              child: pw.Text('Total: ₹740',
-                  style: pw.TextStyle(
-                      fontSize: 14, fontWeight: pw.FontWeight.bold)),
-            ),
-          ],
-        ),
-      ),
-    );
-
-    return doc.save();
-  }
-
   Widget _createSalesTile(int index) {
     SalesEntry entry = _salesEntries[index];
     String time = DateFormat("HH:mm:ss").format(entry.timestamp);
@@ -791,11 +752,6 @@ class _HarinaamState extends State<Harinaam> {
     }
   }
 
-  /// Share the PDF using platform-specific implementation
-  Future<void> _sharePdf(Uint8List pdfBytes) async {
-    await sharePdf(pdfBytes, filename: 'report.pdf');
-  }
-
   Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {
     final TextEditingController controller =
         TextEditingController(text: entry.count.toString());
@@ -983,15 +939,6 @@ class _HarinaamState extends State<Harinaam> {
                         builder: (context) => Summary(
                             title: "Summary",
                             splashImage: widget.splashImage)));
-              },
-            ),
-
-            // share
-            ResponsiveToolbarAction(
-              icon: const Icon(Icons.share),
-              onPressed: () async {
-                final pdfBytes = await _createPdf();
-                _sharePdf(pdfBytes);
               },
             ),
           ],

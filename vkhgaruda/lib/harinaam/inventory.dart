@@ -656,28 +656,14 @@ class _InventoryState extends State<Inventory> {
                 child: Center(
                   child: Column(
                     children: [
-                      // dashboard
-                      Widgets().createTopLevelCard(
-                          context: context,
-                          title: "Available stock",
-                          child: Column(
-                            children: [
-                              _createYearSelector(),
-                              SizedBox(height: 4),
-                              Dashboard(
-                                key: keyDashboard,
-                                chantersLabel: "Chanters mala stock",
-                                salesLabel: "Sales mala stock",
-                              )
-                            ],
-                          )),
-
                       // inventory entries
                       Widgets().createTopLevelCard(
                           context: context,
                           title: "Entry records",
                           child: Column(
                             children: [
+                              _createYearSelector(),
+                              Divider(),
                               ...List.generate(_inventoryEntries.length,
                                   (index) => _createInventoryTile(index)),
                               if (_inventoryEntries.isEmpty)

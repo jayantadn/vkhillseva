@@ -125,7 +125,7 @@ class _HarinaamState extends State<Harinaam> {
             SalesEntry entry =
                 Utils().convertRawToDatatype(data, SalesEntry.fromJson);
             if (!_salesEntries.contains(entry)) {
-              _addSales(entry);
+              _addSales(entry, updateBalance: false);
             }
           },
 
@@ -328,7 +328,7 @@ class _HarinaamState extends State<Harinaam> {
     });
   }
 
-  Future<void> _addSales(SalesEntry entry) async {
+  Future<void> _addSales(SalesEntry entry, {bool updateBalance = true}) async {
     // forbid changes for another day
     bool isToday = DateTime.now().year == _selectedDate.year &&
         DateTime.now().month == _selectedDate.month &&
@@ -377,6 +377,16 @@ class _HarinaamState extends State<Harinaam> {
     setState(() {
       _isLoading = false;
     });
+
+    // update balance in database
+    if (updateBalance) {
+      String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+      String dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+
+      Map<String, dynamic> data = await FB().getJson(path: dbpath);
+      data['SalesClosingBalance'] -= entry.count;
+      FB().setJson(path: dbpath, json: data);
+    }
   }
 
   Widget _createChantersTile(int index) {

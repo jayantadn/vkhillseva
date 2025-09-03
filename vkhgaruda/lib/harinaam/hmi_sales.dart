@@ -87,8 +87,7 @@ class HmiSalesState extends State<HmiSales> {
     _quantityController.text = '0';
 
     // read ticket from db
-    String dbpath =
-        "${Const().dbrootGaruda}/Settings/Harinaam/ServiceEntries/Japamalas";
+    String dbpath = "${Const().dbrootGaruda}/Settings/Harinaam/Japamalas";
     List japamalasRaw = await FB().getList(path: dbpath);
     Japamala japamala =
         Utils().convertRawToDatatype(japamalasRaw.first, Japamala.fromJson);

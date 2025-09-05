@@ -42,3 +42,5 @@
 -[] jump to today
 -[] payment mode daily summary
 -[] payment mode summary
+-[] summary defaults to weekly
+-[] summary page share

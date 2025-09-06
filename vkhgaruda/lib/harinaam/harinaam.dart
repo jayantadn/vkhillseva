@@ -668,6 +668,13 @@ class _HarinaamState extends State<Harinaam> {
         "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Sales/$dbtime";
     FB().deleteValue(path: dbpath);
 
+    // update balance in database
+    String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+    dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+    Map<String, dynamic> data = await FB().getJson(path: dbpath);
+    data['SalesClosingBalance'] += entry.count;
+    FB().setJson(path: dbpath, json: data);
+
     // remove from the list
     setState(() {
       _salesEntries.removeAt(index);
@@ -742,6 +749,10 @@ class _HarinaamState extends State<Harinaam> {
 
     // If user saved changes, update the entry
     if (editedEntry != null) {
+      int oldValue = entry.count;
+      int newValue = editedEntry.count;
+      int delta = oldValue - newValue;
+
       // Update the list
       setState(() {
         _isLoading = true;
@@ -766,6 +777,13 @@ class _HarinaamState extends State<Harinaam> {
       setState(() {
         _isLoading = false;
       });
+
+      // update balance in database
+      String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+      dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+      Map<String, dynamic> data = await FB().getJson(path: dbpath);
+      data['SalesClosingBalance'] += delta;
+      FB().setJson(path: dbpath, json: data);
     }
   }
 

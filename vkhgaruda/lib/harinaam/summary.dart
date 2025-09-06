@@ -28,20 +28,24 @@ class _SummaryState extends State<Summary> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  String _period = "weekly";
+  String _period = "daily";
   late String _periodDetails;
   final GlobalKey _repaintBoundaryKey = GlobalKey();
 
   // variables for chanters summary
   int _totalChanters = 0;
+  int _openingBalanceChanters = 0;
   int _newChanterMalasProcured = 0;
   int _discardedChanterMalas = 0;
+  int _closingBalanceChanters = 0;
 
   // variables for sales summary
   int _totalMalasSold = 0;
+  int _openingBalanceSales = 0;
   int _totalAmountCollected = 0;
   int _newSaleMalasProcured = 0;
   int _discardedSaleMalas = 0;
+  int _closingBalanceSales = 0;
   final Map<String, dynamic> _paymentModeSummary = {};
 
   // lists
@@ -52,7 +56,7 @@ class _SummaryState extends State<Summary> {
   initState() {
     super.initState();
 
-    _updatePeriodDetails();
+    _initPeriodDetails();
 
     refresh();
   }
@@ -275,6 +279,8 @@ class _SummaryState extends State<Summary> {
 
           break;
       }
+
+      await _updateBalances();
     });
 
     // refresh all child widgets
@@ -292,10 +298,12 @@ class _SummaryState extends State<Summary> {
         child: Column(
           children: [
             _createTableEntry("Total Chanters", "$_totalChanters"),
+            _createTableEntry("Opening balance", "$_openingBalanceChanters"),
             _createTableEntry(
                 "New malas procured", "$_newChanterMalasProcured"),
             _createTableEntry("Discarded malas", "$_discardedChanterMalas",
                 divider: false),
+            _createTableEntry("Closing balance", "$_closingBalanceChanters")
           ],
         ));
   }
@@ -327,11 +335,13 @@ class _SummaryState extends State<Summary> {
         child: Column(
           children: [
             _createTableEntry("Total malas sold", "$_totalMalasSold"),
+            _createTableEntry("Opening balance", "$_openingBalanceSales"),
             _createTableEntry(
                 "Total amount collected", "₹$_totalAmountCollected"),
             _createTableEntry("New malas procured", "$_newSaleMalasProcured"),
             _createTableEntry("Discarded malas", "$_discardedSaleMalas",
                 divider: false),
+            _createTableEntry("Closing balance", "$_closingBalanceSales"),
           ],
         ));
   }
@@ -354,7 +364,6 @@ class _SummaryState extends State<Summary> {
         ),
         child: Column(
           children: [
-            // Period selector row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -506,6 +515,8 @@ class _SummaryState extends State<Summary> {
                         },
                       ),
                     ),
+
+                    // today button
                     const SizedBox(width: 6),
                     Container(
                       decoration: BoxDecoration(
@@ -556,6 +567,7 @@ class _SummaryState extends State<Summary> {
                                 break;
                             }
                           });
+
                           refresh();
                         },
                       ),
@@ -768,6 +780,46 @@ class _SummaryState extends State<Summary> {
         discardedSalesMalas: discardedSalesMalas);
   }
 
+  DateTime? _getStartAndEndDateOfPeriod(String neededDate) {
+    DateTime? date;
+
+    switch (_period) {
+      case "daily":
+        date = DateFormat("dd MMM, yyyy").parse(_periodDetails);
+        break;
+      case "weekly":
+        // "${DateFormat("dd MMM, yyyy").format(startOfWeek)} - ${DateFormat("dd MMM, yyyy").format(endOfWeek)}";
+        if (neededDate == "startDate") {
+          String strDate = _periodDetails.split('-')[0];
+          strDate = strDate.trim();
+          date = DateFormat("dd MMM, yyyy").parse(strDate);
+        } else if (neededDate == "endDate") {
+          String strDate = _periodDetails.split('-')[1];
+          strDate = strDate.trim();
+          date = DateFormat("dd MMM, yyyy").parse(strDate);
+        }
+        break;
+      case "monthly":
+        date = DateFormat("MMM yyyy").parse(_periodDetails);
+        if (neededDate == "startDate") {
+          date = DateTime(date.year, date.month, 1);
+        } else if (neededDate == "endDate") {
+          date = DateTime(date.year, date.month + 1, 0);
+        }
+        break;
+      case "yearly":
+        date = DateFormat("yyyy").parse(_periodDetails);
+        if (neededDate == "startDate") {
+          date = DateTime(date.year, 1, 1);
+        } else if (neededDate == "endDate") {
+          date = DateTime(date.year, 12, 31);
+        }
+        break;
+    }
+
+    return date;
+  }
+
   Future<void> _prev() async {
     switch (_period) {
       case "daily":
@@ -920,7 +972,7 @@ class _SummaryState extends State<Summary> {
     });
   }
 
-  void _updatePeriodDetails() {
+  void _initPeriodDetails() {
     switch (_period) {
       case "daily":
         _periodDetails = DateFormat("dd MMM, yyyy").format(DateTime.now());
@@ -943,6 +995,30 @@ class _SummaryState extends State<Summary> {
     }
   }
 
+  Future<void> _updateBalances() async {
+    DateTime? startDate = _getStartAndEndDateOfPeriod("startDate");
+    DateTime? endDate = _getStartAndEndDateOfPeriod("endDate");
+    if (startDate == null || endDate == null) {
+      Toaster().error("Could not determine start or end date of the period");
+      return;
+    }
+
+    // opening balance
+    String dbdate = DateFormat("yyyy-MM-dd").format(startDate);
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$dbdate";
+    Map<String, dynamic> dataBalance =
+        await FB().getJson(path: dbpath, silent: true);
+    _openingBalanceChanters = dataBalance["ChantersOpeningBalance"] ?? 0;
+    _openingBalanceSales = dataBalance["SalesOpeningBalance"] ?? 0;
+
+    // closing balance
+    dbdate = DateFormat("yyyy-MM-dd").format(endDate);
+    dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$dbdate";
+    dataBalance = await FB().getJson(path: dbpath, silent: true);
+    _closingBalanceChanters = dataBalance["ChantersClosingBalance"] ?? 0;
+    _closingBalanceSales = dataBalance["SalesClosingBalance"] ?? 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -953,12 +1029,13 @@ class _SummaryState extends State<Summary> {
 
           // toolbar icons
           toolbarActions: [
-            ResponsiveToolbarAction(
-              icon: Icon(Icons.share),
-              onPressed: () {
-                _shareImage();
-              },
-            ),
+            // share button
+            // ResponsiveToolbarAction(
+            //   icon: Icon(Icons.share),
+            //   onPressed: () {
+            //     _shareImage();
+            //   },
+            // ),
           ],
 
           // body

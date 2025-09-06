@@ -46,3 +46,5 @@
 -[] payment mode summary
 -[] summary defaults to weekly
 -[] summary page share
+-[] sales data update will reflect in closing balance
+-[] inventory update reflect in closing balance

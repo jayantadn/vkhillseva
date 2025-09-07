@@ -60,8 +60,8 @@ class HmiSalesState extends State<HmiSales> {
   }
 
   void _decrementQuantity() {
-    int currentValue = int.tryParse(_quantityController.text) ?? 1;
-    if (currentValue > 1) {
+    int currentValue = int.tryParse(_quantityController.text) ?? 0;
+    if (currentValue > 0) {
       _quantityController.text = (currentValue - 1).toString();
     }
   }

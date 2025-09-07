@@ -118,7 +118,7 @@ class HmiChantersState extends State<HmiChanters> {
               onChanged: (value) {
                 // Additional validation on change
                 if (value.isEmpty) {
-                  _numberController.text = '1';
+                  _numberController.text = '0';
                   _numberController.selection = TextSelection.fromPosition(
                     TextPosition(offset: _numberController.text.length),
                   );

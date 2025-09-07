@@ -238,38 +238,6 @@ class _HarinaamState extends State<Harinaam> {
       }
       _salesEntries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       _keyDashboard.currentState!.setSales(countSales);
-
-      // populate mala balances for today
-      String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
-      dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
-      Map<String, dynamic> todayData = {
-        "ChantersOpeningBalance": 0,
-        "ChantersClosingBalance": 0,
-        "SalesOpeningBalance": 0,
-        "SalesClosingBalance": 0,
-      };
-      if (!await FB().pathExists(dbpath)) {
-        String prevday = DateFormat("yyyy-MM-dd")
-            .format(DateTime.now().subtract(Duration(days: 1)));
-        String dbpathPrevday =
-            "${Const().dbrootGaruda}/Harinaam/MalaBalance/$prevday/";
-
-        Map<String, dynamic> prevDayData =
-            await FB().getJson(path: dbpathPrevday, silent: true);
-        if (prevDayData.isEmpty) {
-          await _showGetCurrentBalanceDialog();
-        } else {
-          todayData["ChantersOpeningBalance"] =
-              prevDayData["ChantersClosingBalance"];
-          todayData["SalesOpeningBalance"] = prevDayData["SalesClosingBalance"];
-
-          todayData["ChantersClosingBalance"] =
-              prevDayData["ChantersClosingBalance"];
-          todayData["SalesClosingBalance"] = prevDayData["SalesClosingBalance"];
-        }
-
-        await FB().setJson(path: dbpath, json: todayData);
-      }
     });
 
     // refresh all child widgets
@@ -959,97 +927,6 @@ class _HarinaamState extends State<Harinaam> {
             },
             child: const Text("Save"),
           ),
-        ]);
-  }
-
-  Future<void> _showGetCurrentBalanceDialog() async {
-    TextEditingController chantersBalanceController = TextEditingController();
-    TextEditingController saleBalanceController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-
-    await Widgets().showResponsiveDialog(
-        context: context,
-        title: "Enter mala balance",
-        child: Form(
-          key: formKey,
-          child: Column(
-            children: [
-              // chanters
-              SizedBox(height: 10),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: "Chanters' Balance",
-                  border: OutlineInputBorder(),
-                ),
-                controller: chantersBalanceController,
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a count';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  if (int.parse(value) < 0) {
-                    return 'Count cannot be negative';
-                  }
-                  return null;
-                },
-              ),
-
-              // sale
-              SizedBox(height: 10),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: "Sales Balance",
-                  border: OutlineInputBorder(),
-                ),
-                controller: saleBalanceController,
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a count';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  if (int.parse(value) < 0) {
-                    return 'Count cannot be negative';
-                  }
-                  return null;
-                },
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          ElevatedButton(
-              onPressed: () async {
-                if (formKey.currentState?.validate() ?? false) {
-                  Map<String, dynamic> todayData = {
-                    "ChantersOpeningBalance":
-                        int.parse(chantersBalanceController.text),
-                    "ChantersClosingBalance":
-                        int.parse(chantersBalanceController.text),
-                    "SalesOpeningBalance":
-                        int.parse(saleBalanceController.text),
-                    "SalesClosingBalance":
-                        int.parse(saleBalanceController.text),
-                  };
-
-                  String today =
-                      DateFormat("yyyy-MM-dd").format(DateTime.now());
-                  String dbpath =
-                      "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
-
-                  await FB().setJson(path: dbpath, json: todayData);
-
-                  if (mounted) {
-                    Navigator.of(context).pop();
-                  }
-                }
-              },
-              child: Text("Submit")),
         ]);
   }
 

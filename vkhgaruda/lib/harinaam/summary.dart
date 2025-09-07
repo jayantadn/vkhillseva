@@ -280,6 +280,42 @@ class _SummaryState extends State<Summary> {
           break;
       }
 
+      // populate mala balances for today
+      String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+      String dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+      Map<String, dynamic> todayData = {
+        "ChantersOpeningBalance": 0,
+        "ChantersClosingBalance": 0,
+        "SalesOpeningBalance": 0,
+        "SalesClosingBalance": 0,
+      };
+      if (!await FB().pathExists(dbpath)) {
+        String prevday = DateFormat("yyyy-MM-dd")
+            .format(DateTime.now().subtract(Duration(days: 1)));
+        String dbpathPrevday =
+            "${Const().dbrootGaruda}/Harinaam/MalaBalance/$prevday/";
+
+        Map<String, dynamic> prevDayData =
+            await FB().getJson(path: dbpathPrevday, silent: true);
+        if (prevDayData.isEmpty) {
+          await _showGetCurrentBalanceDialog();
+        } else {
+          todayData["ChantersOpeningBalance"] =
+              prevDayData["ChantersClosingBalance"];
+          todayData["SalesOpeningBalance"] = prevDayData["SalesClosingBalance"];
+
+          todayData["ChantersClosingBalance"] =
+              prevDayData["ChantersClosingBalance"];
+          todayData["SalesClosingBalance"] = prevDayData["SalesClosingBalance"];
+        }
+
+        // Only save if at least one value is not 0
+        if (todayData.values.any((value) => value != 0)) {
+          await FB().setJson(path: dbpath, json: todayData);
+        }
+      }
+
+      // display the balances
       await _updateBalances();
     });
 
@@ -794,7 +830,6 @@ class _SummaryState extends State<Summary> {
         date = DateFormat("dd MMM, yyyy").parse(_periodDetails);
         break;
       case "weekly":
-        // "${DateFormat("dd MMM, yyyy").format(startOfWeek)} - ${DateFormat("dd MMM, yyyy").format(endOfWeek)}";
         if (neededDate == "startDate") {
           String strDate = _periodDetails.split('-')[0];
           strDate = strDate.trim();
@@ -934,26 +969,6 @@ class _SummaryState extends State<Summary> {
     refresh();
   }
 
-  /// Capture screenshot of the widget
-  Future<Uint8List?> _takeScreenshot() async {
-    try {
-      // Find the RenderRepaintBoundary
-      RenderRepaintBoundary boundary = _repaintBoundaryKey.currentContext!
-          .findRenderObject() as RenderRepaintBoundary;
-
-      // Capture the image
-      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-
-      // Convert to bytes
-      ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
-    } catch (e) {
-      Toaster().error("Failed to take screenshot: $e");
-      return null;
-    }
-  }
-
   /// Share the screenshot using platform-specific implementation
   Future<void> _shareImage() async {
     setState(() {
@@ -976,6 +991,121 @@ class _SummaryState extends State<Summary> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _showGetCurrentBalanceDialog() async {
+    TextEditingController chantersBalanceController = TextEditingController();
+    TextEditingController saleBalanceController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    String user = Utils().getUsername();
+
+    await Widgets().showResponsiveDialog(
+        context: context,
+        title: "Enter mala balance",
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              // chanters
+              SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Chanters' Balance",
+                  border: OutlineInputBorder(),
+                ),
+                controller: chantersBalanceController,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a count';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if (int.parse(value) < 0) {
+                    return 'Count cannot be negative';
+                  }
+                  return null;
+                },
+              ),
+
+              // sale
+              SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Sales Balance",
+                  border: OutlineInputBorder(),
+                ),
+                controller: saleBalanceController,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a count';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if (int.parse(value) < 0) {
+                    return 'Count cannot be negative';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState?.validate() ?? false) {
+                  Map<String, dynamic> todayData = {
+                    "ChantersOpeningBalance":
+                        int.parse(chantersBalanceController.text),
+                    "ChantersClosingBalance":
+                        int.parse(chantersBalanceController.text),
+                    "SalesOpeningBalance":
+                        int.parse(saleBalanceController.text),
+                    "SalesClosingBalance":
+                        int.parse(saleBalanceController.text),
+                    "User": user,
+                    "Timestamp": DateTime.now().toIso8601String(),
+                  };
+
+                  String today =
+                      DateFormat("yyyy-MM-dd").format(DateTime.now());
+                  String dbpath =
+                      "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+
+                  await FB().setJson(path: dbpath, json: todayData);
+
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
+                }
+              },
+              child: Text("Submit")),
+        ]);
+  }
+
+  /// Capture screenshot of the widget
+  Future<Uint8List?> _takeScreenshot() async {
+    try {
+      // Find the RenderRepaintBoundary
+      RenderRepaintBoundary boundary = _repaintBoundaryKey.currentContext!
+          .findRenderObject() as RenderRepaintBoundary;
+
+      // Capture the image
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+
+      // Convert to bytes
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      return byteData?.buffer.asUint8List();
+    } catch (e) {
+      Toaster().error("Failed to take screenshot: $e");
+      return null;
+    }
   }
 
   void _initPeriodDetails() {

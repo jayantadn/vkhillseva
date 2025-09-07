@@ -48,3 +48,4 @@
 -[] summary page share
 -[] sales data update will reflect in closing balance
 -[] inventory update reflect in closing balance
+-[] opening and closing balance in summary

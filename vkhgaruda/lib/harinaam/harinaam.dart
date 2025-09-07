@@ -267,6 +267,8 @@ class _HarinaamState extends State<Harinaam> {
               prevDayData["ChantersClosingBalance"];
           todayData["SalesClosingBalance"] = prevDayData["SalesClosingBalance"];
         }
+
+        await FB().setJson(path: dbpath, json: todayData);
       }
     });
 

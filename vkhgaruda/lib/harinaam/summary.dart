@@ -334,14 +334,20 @@ class _SummaryState extends State<Summary> {
         title: "Japamala Sales",
         child: Column(
           children: [
-            _createTableEntry("Total malas sold", "$_totalMalasSold"),
             _createTableEntry("Opening balance", "$_openingBalanceSales"),
-            _createTableEntry(
-                "Total amount collected", "₹$_totalAmountCollected"),
+            _createTableEntry("Total malas sold", "$_totalMalasSold"),
             _createTableEntry("New malas procured", "$_newSaleMalasProcured"),
-            _createTableEntry("Discarded malas", "$_discardedSaleMalas",
+            _createTableEntry(
+              "Discarded malas",
+              "$_discardedSaleMalas",
+            ),
+            _createTableEntry(
+              "Closing balance",
+              "$_closingBalanceSales",
+            ),
+            _createTableEntry(
+                "Total amount collected", "₹$_totalAmountCollected",
                 divider: false),
-            _createTableEntry("Closing balance", "$_closingBalanceSales"),
           ],
         ));
   }
@@ -1004,17 +1010,16 @@ class _SummaryState extends State<Summary> {
     }
 
     // opening balance
-    String dbdate = DateFormat("yyyy-MM-dd").format(startDate);
-    String dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$dbdate";
-    Map<String, dynamic> dataBalance =
-        await FB().getJson(path: dbpath, silent: true);
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance";
+    Map<String, dynamic> dataBalance = await FB().getJsonForFirstDateInRange(
+        path: dbpath, startDate: startDate, endDate: endDate, silent: true);
     _openingBalanceChanters = dataBalance["ChantersOpeningBalance"] ?? 0;
     _openingBalanceSales = dataBalance["SalesOpeningBalance"] ?? 0;
 
     // closing balance
-    dbdate = DateFormat("yyyy-MM-dd").format(endDate);
-    dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$dbdate";
-    dataBalance = await FB().getJson(path: dbpath, silent: true);
+    dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance";
+    dataBalance = await FB().getJsonForLastDateInRange(
+        path: dbpath, startDate: startDate, endDate: endDate, silent: true);
     _closingBalanceChanters = dataBalance["ChantersClosingBalance"] ?? 0;
     _closingBalanceSales = dataBalance["SalesClosingBalance"] ?? 0;
   }

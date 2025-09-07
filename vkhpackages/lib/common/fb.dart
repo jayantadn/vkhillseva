@@ -337,6 +337,102 @@ class FB {
     }
   }
 
+  Future<Map<String, dynamic>> getJsonByDateRange({
+    required String path,
+    required DateTime startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      DatabaseReference dbref = FirebaseDatabase.instance.ref(path);
+
+      // Format the start and end dates to match the database key format
+      String startDateStr = DateFormat("yyyy-MM-dd").format(startDate);
+      String endDateStr =
+          endDate != null
+              ? DateFormat("yyyy-MM-dd").format(endDate)
+              : startDateStr;
+
+      // Create a query to filter by the date range
+      Query query = dbref.orderByKey().startAt(startDateStr);
+      if (endDate != null) {
+        query = query.endAt(endDateStr);
+      }
+
+      DataSnapshot snapshot = await query.get();
+
+      if (snapshot.value is Map) {
+        return Map<String, dynamic>.from(snapshot.value as Map);
+      } else {
+        return {};
+      }
+    } catch (e) {
+      Toaster().error("Error getting data by date range: $e");
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> getJsonForFirstDateInRange({
+    required String path,
+    required DateTime startDate,
+    required DateTime endDate,
+    bool silent = false,
+  }) async {
+    final dbRef = FirebaseDatabase.instance.ref(path);
+    String startDateStr = DateFormat("yyyy-MM-dd").format(startDate);
+    String endDateStr = DateFormat("yyyy-MM-dd").format(endDate);
+
+    final q = dbRef
+        .orderByKey()
+        .startAt(startDateStr)
+        .endAt(endDateStr)
+        .limitToFirst(1);
+
+    final snapshot = await q.get();
+    if (!snapshot.exists) {
+      if (!silent) {
+        Toaster().error("No data found in the specified date range");
+      }
+      return {};
+    }
+
+    // snapshot.value may be a map with a single entry
+    final map = Map<String, dynamic>.from(snapshot.value as Map);
+    final firstKey = map.keys.first;
+    return map[firstKey] != null
+        ? Map<String, dynamic>.from(map[firstKey])
+        : {};
+  }
+
+  Future<Map<String, dynamic>> getJsonForLastDateInRange({
+    required String path,
+    required DateTime startDate,
+    required DateTime endDate,
+    bool silent = false,
+  }) async {
+    final dbRef = FirebaseDatabase.instance.ref(path);
+    String startDateStr = DateFormat("yyyy-MM-dd").format(startDate);
+    String endDateStr = DateFormat("yyyy-MM-dd").format(endDate);
+
+    final q = dbRef
+        .orderByKey()
+        .startAt(startDateStr)
+        .endAt(endDateStr)
+        .limitToLast(1);
+
+    final snapshot = await q.get();
+    if (!snapshot.exists) {
+      if (!silent) {
+        Toaster().error("No data found in the specified date range");
+      }
+      return {};
+    }
+
+    // snapshot.value may be a map with a single entry
+    final map = Map<String, dynamic>.from(snapshot.value as Map);
+    final lastKey = map.keys.first;
+    return map[lastKey] != null ? Map<String, dynamic>.from(map[lastKey]) : {};
+  }
+
   Future<List<dynamic>> getList({required String path}) async {
     try {
       DatabaseReference dbref = FirebaseDatabase.instance.ref(path);

@@ -96,6 +96,9 @@ class _ProcurementState extends State<Inventory> {
                           subtitle: Text("This is a sample card"),
                         ),
                       ),
+
+                      // leave some space at bottom
+                      SizedBox(height: 100),
                     ],
                   ),
                 ),

@@ -16,10 +16,10 @@
 -[] settings
 
 # Harinaam
--[] add / edit / delete chanters
--[] add / edit / delete sales
--[] chanters inventory add / discard
--[] sales inventory add / discard
+-[x] add / edit / delete chanters
+-[x] add / edit / delete sales
+-[x] chanters inventory add / discard (check reflection in db)
+-[x] sales inventory add / discard (check reflection in db)
 -[] summary daily / weekly / monthly / yearly
 -[] share weekly summary
 

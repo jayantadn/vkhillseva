@@ -34,6 +34,7 @@ class _HarinaamState extends State<Harinaam> {
   DateTime _lastCallbackInvokedChanters = DateTime.now();
   DateTime _lastCallbackInvokedSales = DateTime.now();
   late String _session;
+  bool _isBalanceAvailable = false;
 
   // lists
   final List<ChantersEntry> _chantersEntries = [];
@@ -196,15 +197,6 @@ class _HarinaamState extends State<Harinaam> {
     }
 
     await _lock.synchronized(() async {
-      // lock session if not live
-      if (_isSessionLive()) {
-        _keyHmiSales.currentState!.setLockState(false);
-        _keyHmiChanters.currentState!.setLockState(false);
-      } else {
-        _keyHmiSales.currentState!.setLockState(true);
-        _keyHmiChanters.currentState!.setLockState(true);
-      }
-
       // add chanters records from database
       _chantersEntries.clear();
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
@@ -238,6 +230,58 @@ class _HarinaamState extends State<Harinaam> {
       }
       _salesEntries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       _keyDashboard.currentState!.setSales(countSales);
+
+      // populate mala balances for today
+      String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+      dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+      Map<String, dynamic> todayData = {
+        "ChantersOpeningBalance": 0,
+        "ChantersClosingBalance": 0,
+        "SalesOpeningBalance": 0,
+        "SalesClosingBalance": 0,
+      };
+      if (!await FB().pathExists(dbpath)) {
+        String prevday = DateFormat("yyyy-MM-dd")
+            .format(DateTime.now().subtract(Duration(days: 1)));
+        String dbpathPrevday =
+            "${Const().dbrootGaruda}/Harinaam/MalaBalance/$prevday/";
+
+        Map<String, dynamic> prevDayData =
+            await FB().getJson(path: dbpathPrevday, silent: true);
+        if (prevDayData.isEmpty) {
+          await _showGetCurrentBalanceDialog();
+        } else {
+          todayData["ChantersOpeningBalance"] =
+              prevDayData["ChantersClosingBalance"];
+          todayData["SalesOpeningBalance"] = prevDayData["SalesClosingBalance"];
+
+          todayData["ChantersClosingBalance"] =
+              prevDayData["ChantersClosingBalance"];
+          todayData["SalesClosingBalance"] = prevDayData["SalesClosingBalance"];
+        }
+
+        // Only save if at least one value is not 0
+        if (todayData.values.any((value) => value != 0)) {
+          await FB().setJson(path: dbpath, json: todayData);
+        }
+      }
+
+      // lock session if not live
+      if (_isSessionLive()) {
+        _keyHmiSales.currentState!.setLockState(false);
+        _keyHmiChanters.currentState!.setLockState(false);
+      } else {
+        _keyHmiSales.currentState!.setLockState(true);
+        _keyHmiChanters.currentState!.setLockState(true);
+      }
+
+      // check if balance is available
+      dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+      _isBalanceAvailable = await FB().pathExists(dbpath);
+      if (!_isBalanceAvailable) {
+        _keyHmiSales.currentState!.setLockState(true);
+        _keyHmiChanters.currentState!.setLockState(true);
+      }
     });
 
     // refresh all child widgets
@@ -773,6 +817,101 @@ class _HarinaamState extends State<Harinaam> {
     }
   }
 
+  Future<void> _showGetCurrentBalanceDialog() async {
+    TextEditingController chantersBalanceController = TextEditingController();
+    TextEditingController saleBalanceController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    String user = Utils().getUsername();
+
+    await Widgets().showResponsiveDialog(
+        context: context,
+        title: "Enter mala balance",
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              // chanters
+              SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Chanters' Balance",
+                  border: OutlineInputBorder(),
+                ),
+                controller: chantersBalanceController,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a count';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if (int.parse(value) < 0) {
+                    return 'Count cannot be negative';
+                  }
+                  return null;
+                },
+              ),
+
+              // sale
+              SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Sales Balance",
+                  border: OutlineInputBorder(),
+                ),
+                controller: saleBalanceController,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a count';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if (int.parse(value) < 0) {
+                    return 'Count cannot be negative';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState?.validate() ?? false) {
+                  Map<String, dynamic> todayData = {
+                    "ChantersOpeningBalance":
+                        int.parse(chantersBalanceController.text),
+                    "ChantersClosingBalance":
+                        int.parse(chantersBalanceController.text),
+                    "SalesOpeningBalance":
+                        int.parse(saleBalanceController.text),
+                    "SalesClosingBalance":
+                        int.parse(saleBalanceController.text),
+                    "User": user,
+                    "Timestamp": DateTime.now().toIso8601String(),
+                  };
+
+                  String today =
+                      DateFormat("yyyy-MM-dd").format(DateTime.now());
+                  String dbpath =
+                      "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+
+                  await FB().setJson(path: dbpath, json: todayData);
+
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
+                }
+              },
+              child: Text("Submit")),
+        ]);
+  }
+
   Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {
     final TextEditingController controller =
         TextEditingController(text: entry.count.toString());
@@ -975,6 +1114,20 @@ class _HarinaamState extends State<Harinaam> {
                       // leave some space at top
                       SizedBox(height: 10),
 
+                      // declaimer if balance not available
+                      if (!_isBalanceAvailable)
+                        Widgets().createTopLevelCard(
+                          context: context,
+                          title: "Disclaimer",
+                          color: Colors.red,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "Japamala sales balance for today is not available. Please refresh the page to add current stock of malas as balance.",
+                            ),
+                          ),
+                        ),
+
                       // date header
                       DateHeader(
                           callbacks: DateHeaderCallbacks(onChange: (date) {
@@ -1002,6 +1155,7 @@ class _HarinaamState extends State<Harinaam> {
                       ),
 
                       // Chanters' club
+                      SizedBox(height: 10),
                       Widgets().createTopLevelCard(
                         context: context,
                         title: "Chanters' club",

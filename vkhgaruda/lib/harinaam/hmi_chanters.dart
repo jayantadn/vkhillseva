@@ -115,23 +115,7 @@ class HmiChantersState extends State<HmiChanters> {
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 8),
               ),
-              onChanged: (value) {
-                // Additional validation on change
-                if (value.isEmpty) {
-                  _numberController.text = '0';
-                  _numberController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: _numberController.text.length),
-                  );
-                } else {
-                  int? intValue = int.tryParse(value);
-                  if (intValue == null || intValue < 1) {
-                    _numberController.text = '1';
-                    _numberController.selection = TextSelection.fromPosition(
-                      TextPosition(offset: _numberController.text.length),
-                    );
-                  }
-                }
-              },
+              onChanged: (value) {},
             ),
           ),
 

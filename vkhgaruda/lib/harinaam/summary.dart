@@ -298,7 +298,7 @@ class _SummaryState extends State<Summary> {
         color: Colors.brown,
         child: Column(
           children: [
-            _createTableEntry("Total Chanters", "$_totalChanters"),
+            _createTableEntry("Total Chanters", "$_totalChanters", bold: true),
             _createTableEntry("Opening balance", "$_openingBalanceChanters"),
             _createTableEntry(
                 "New malas procured", "$_newChanterMalasProcured"),
@@ -336,8 +336,9 @@ class _SummaryState extends State<Summary> {
         child: Column(
           children: [
             _createTableEntry("Opening balance", "$_openingBalanceSales"),
-            _createTableEntry("Total malas sold", "$_totalMalasSold"),
             _createTableEntry("New malas procured", "$_newSaleMalasProcured"),
+            _createTableEntry("Total malas sold", "$_totalMalasSold",
+                bold: true),
             _createTableEntry(
               "Discarded malas",
               "$_discardedSaleMalas",
@@ -348,7 +349,7 @@ class _SummaryState extends State<Summary> {
             ),
             _createTableEntry(
                 "Total amount collected", "₹$_totalAmountCollected",
-                divider: false),
+                divider: false, bold: true),
           ],
         ));
   }
@@ -645,7 +646,8 @@ class _SummaryState extends State<Summary> {
     );
   }
 
-  Widget _createTableEntry(String label, String value, {bool divider = true}) {
+  Widget _createTableEntry(String label, String value,
+      {bool divider = true, bool bold = false}) {
     return Column(children: [
       Table(
         columnWidths: const {
@@ -655,8 +657,12 @@ class _SummaryState extends State<Summary> {
         children: [
           TableRow(
             children: [
-              Text(label),
-              Text(value),
+              Text(label,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
+              Text(value,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
             ],
           ),
         ],

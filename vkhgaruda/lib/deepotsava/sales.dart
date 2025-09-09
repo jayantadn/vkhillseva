@@ -1,90 +1,126 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:vkhgaruda/deepotsava/dashboard.dart';
-import 'package:vkhgaruda/deepotsava/datatypes.dart';
-import 'package:vkhgaruda/deepotsava/hmi.dart';
-import 'package:vkhgaruda/deepotsava/log.dart';
-import 'package:vkhgaruda/deepotsava/stats.dart';
-import 'package:vkhgaruda/deepotsava/stock.dart';
-import 'package:vkhgaruda/deepotsava/themeDeepotsava.dart';
-import 'package:vkhpackages/widgets/date_header.dart';
+import 'package:synchronized/synchronized.dart';
+import 'package:vkhpackages/vkhpackages.dart';
 
 class Sales extends StatefulWidget {
+  final String title;
+  final String? splashImage;
   final String stall;
 
-  const Sales({super.key, required this.stall});
+  const Sales(
+      {super.key, required this.title, this.splashImage, required this.stall});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SalesState createState() => _SalesState();
 }
 
 class _SalesState extends State<Sales> {
+  // scalars
+  final Lock _lock = Lock();
+  bool _isLoading = true;
+
+  // lists
+
+  // controllers, listeners and focus nodes
+
   @override
   initState() {
     super.initState();
 
-    _refresh();
+    refresh();
   }
 
-  Future<void> _refresh() async {
-    setState(() {});
+  @override
+  dispose() {
+    // clear all lists and maps
+
+    // dispose all controllers and focus nodes
+
+    // listeners
+
+    super.dispose();
   }
 
-  Widget _createCardPage() {
-    return Card(
-      child: SizedBox(
-        height: 150.0,
-        child: PageView(
-          children: [
-            StockPage(stall: widget.stall),
-            StatsPage(stall: widget.stall),
-          ],
-        ),
-      ),
-    );
-  }
+  Future<void> refresh() async {
+    setState(() {
+      _isLoading = true;
+    });
 
-  Future<void> serveLamps(DeepamSale sale) async {
-    if (mounted) {
-      dashboardKey.currentState!.addLampsServed(sale);
-      logKey.currentState!.addLog(sale);
-    }
+    // access control
+
+    await _lock.synchronized(() async {
+      // your code here
+    });
+
+    // refresh all child widgets
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Select theme based on the value of stall
-    ThemeData selectedTheme;
-    if (widget.stall == 'RRG') {
-      selectedTheme = themeRRG;
-    } else if (widget.stall == 'RKC') {
-      selectedTheme = themeRKC;
-    } else {
-      selectedTheme = themeDefault;
+    ThemeData? theme;
+    if (widget.stall == "RKC") {
+      theme = ThemeCreator(primaryColor: Colors.pink).create();
+    } else if (widget.stall == "RRG") {
+      theme = ThemeCreator(primaryColor: Colors.black).create();
     }
 
     return Theme(
-      data: selectedTheme,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('${widget.stall} Deepam Sales'),
-        ),
-        body: RefreshIndicator(
-          onRefresh: _refresh,
+      data: theme ?? Theme.of(context),
+      child: Stack(
+        children: [
+          ResponsiveScaffold(
+            // title
+            title: widget.title,
 
-          // here a ListView is used to allow the content to be scrollable and refreshable.
-          // If you use ListView.builder inside this, then the ListView here can be removed.
-          child: ListView(
-            children: [
-              DateHeader(),
-              _createCardPage(),
-              Dashboard(key: dashboardKey, stall: widget.stall),
-              HMI(
-                  stall: widget.stall,
-                  callbacks: HMICallbacks(add: serveLamps)),
-              Log(key: logKey, stall: widget.stall),
+            // toolbar icons
+            toolbarActions: [
+              // ResponsiveToolbarAction(
+              //   icon: Icon(Icons.refresh),
+              // ),
             ],
+
+            // body
+            body: RefreshIndicator(
+              onRefresh: refresh,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        // leave some space at top
+                        SizedBox(height: 10),
+
+                        // your widgets here
+                        Widgets().createTopLevelCard(
+                          context: context,
+                          child: ListTile(
+                            title: Text("Hello World"),
+                            subtitle: Text("This is a sample card"),
+                          ),
+                        ),
+
+                        // leave some space at bottom
+                        SizedBox(height: 100),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
+
+          // circular progress indicator
+          if (_isLoading) LoadingOverlay(image: widget.splashImage),
+        ],
       ),
     );
   }

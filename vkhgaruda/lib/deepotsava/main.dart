@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:vkhgaruda/deepotsava/sales.dart';
 import 'package:vkhpackages/common/toaster.dart';
 
@@ -46,14 +47,16 @@ class _DeepotsavaState extends State<Deepotsava>
   void _onRKCDeepamSalesTap() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Sales(stall: "RKC")),
+      MaterialPageRoute(
+          builder: (context) => Sales(title: "RKC Deepam Sales", stall: "RKC")),
     );
   }
 
   void _onRRGDeepamSalesTap() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Sales(stall: "RRG")),
+      MaterialPageRoute(
+          builder: (context) => Sales(title: "RRG Deepam Sales", stall: "RRG")),
     );
   }
 
@@ -141,7 +144,8 @@ class CardWidget extends StatelessWidget {
   final Color color; // Add color parameter
   final Color textColor; // Add textColor parameter
 
-  const CardWidget({super.key, 
+  const CardWidget({
+    super.key,
     required this.image,
     required this.text,
     required this.isImageLeft,
@@ -169,11 +173,12 @@ class CardWidget extends StatelessWidget {
                 child: Text(
                   text,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'HowdyLemon',
-                    fontSize: 32, // Increased font size
-                    fontWeight: FontWeight.bold,
-                    color: textColor, // Use the textColor parameter
+                  style: GoogleFonts.pacifico(
+                    textStyle:
+                        Theme.of(context).textTheme.headlineLarge!.copyWith(
+                              fontSize: 32, // Increased font size
+                              color: textColor, // Use the textColor parameter
+                            ),
                   ),
                   overflow: TextOverflow.visible, // Ensure text wraps
                 ),
@@ -183,11 +188,12 @@ class CardWidget extends StatelessWidget {
                 child: Text(
                   text,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'HowdyLemon',
-                    fontSize: 32, // Increased font size
-                    fontWeight: FontWeight.bold,
-                    color: textColor, // Use the textColor parameter
+                  style: GoogleFonts.pacifico(
+                    textStyle:
+                        Theme.of(context).textTheme.headlineLarge!.copyWith(
+                              fontSize: 32, // Increased font size
+                              color: textColor, // Use the textColor parameter
+                            ),
                   ),
                   overflow: TextOverflow.visible, // Ensure text wraps
                 ),

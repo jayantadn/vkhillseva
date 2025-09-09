@@ -2,15 +2,15 @@ Hare Krishna dear devotees,
 
 All glories to Srila Prabhupada.
 
-This is for your kind information that, Garuda app has been updated to incorporate some important changes for festival. 
+This is for your kind information that, Garuda app has been updated to incorporate Harinaam Mantapa. 
 
-List of new features:
-1. Ticket amount can be configured while creating a session during festival.
-2. Next ticket number is automatically displayed for new session. 
+There are no significant changes in Nitya Seva, other than some minor fixes. Nevertheless, it is advised to update the app to avoid any unforseen issues.
 
-Please use the following URL to access the Garuda app, there are no changes in URL. Check for version 7.8.1 or above on the home page. Kindly refresh the page using the browser button to get this version.
+Please use the following URL to access the Garuda app, there are no changes in URL. Check for version 8.4.3 or above on the home page. 
 
 https://vkhillgaruda.web.app/
+
+Kindly refresh the page using the browser button to get this version (you may have to click refresh multiple times).
 
 Requesting everyone to update the app from home, in order to avoid any service interruptions in the temple.
 For any issues kindly contact me directly or reply to this post.

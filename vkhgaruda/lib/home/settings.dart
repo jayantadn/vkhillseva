@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:vkhgaruda/home/festival_settings_page.dart';
-import 'package:vkhgaruda/home/harinaam_settings.dart';
 import 'package:vkhgaruda/home/ticket_settings.dart';
 import 'package:vkhgaruda/home/user_management.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -125,18 +124,18 @@ class _SettingsState extends State<Settings> {
                   ),
 
                   // Harinaam settings
-                  _createSettingsCard(
-                    title: 'Harinaam Mantapa',
-                    icon: Icons.brightness_low,
-                    callback: SettingsCallback(onClick: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HarinaamSettings(
-                                title: "Harinaam settings")),
-                      );
-                    }),
-                  ),
+                  // _createSettingsCard(
+                  //   title: 'Harinaam Mantapa',
+                  //   icon: Icons.brightness_low,
+                  //   callback: SettingsCallback(onClick: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //           builder: (context) => const HarinaamSettings(
+                  //               title: "Harinaam settings")),
+                  //     );
+                  //   }),
+                  // ),
                 ],
               ),
             ),

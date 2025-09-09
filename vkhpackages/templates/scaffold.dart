@@ -98,7 +98,7 @@ class _ProcurementState extends State<Inventory> {
                       ),
 
                       // leave some space at bottom
-                      SizedBox(height: 500),
+                      SizedBox(height: 100),
                     ],
                   ),
                 ),

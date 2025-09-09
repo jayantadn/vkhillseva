@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -36,6 +34,7 @@ class _HarinaamState extends State<Harinaam> {
   DateTime _lastCallbackInvokedChanters = DateTime.now();
   DateTime _lastCallbackInvokedSales = DateTime.now();
   late String _session;
+  bool _isBalanceAvailable = false;
 
   // lists
   final List<ChantersEntry> _chantersEntries = [];
@@ -50,7 +49,7 @@ class _HarinaamState extends State<Harinaam> {
     super.initState();
 
     // set session
-    if (DateTime.now().hour > Const().morningCutoff) {
+    if (DateTime.now().hour >= Const().morningCutoff) {
       _session = "Evening";
     } else {
       _session = "Morning";
@@ -59,7 +58,7 @@ class _HarinaamState extends State<Harinaam> {
     // listen to database events for chanters
     String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
     String dbpathChanters =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Chanters";
     FB().listenForChange(
         dbpathChanters,
         FBCallbacks(
@@ -112,7 +111,7 @@ class _HarinaamState extends State<Harinaam> {
 
     // listen to database events for sales
     String dbpathSales =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Sales";
     FB().listenForChange(
         dbpathSales,
         FBCallbacks(
@@ -127,7 +126,7 @@ class _HarinaamState extends State<Harinaam> {
             SalesEntry entry =
                 Utils().convertRawToDatatype(data, SalesEntry.fromJson);
             if (!_salesEntries.contains(entry)) {
-              _addSales(entry);
+              _addSales(entry, updateBalance: false);
             }
           },
 
@@ -198,29 +197,11 @@ class _HarinaamState extends State<Harinaam> {
     }
 
     await _lock.synchronized(() async {
-      // lock session if not today
-      bool isToday = DateTime.now().year == _selectedDate.year &&
-          DateTime.now().month == _selectedDate.month &&
-          DateTime.now().day == _selectedDate.day;
-      if (!isToday) {
-        _keyHmiSales.currentState!.setLockState(true);
-      }
-
-      // lock if cutoff is passed
-      if (_session == "Morning" &&
-          DateTime.now().hour > Const().morningCutoff) {
-        _keyHmiSales.currentState!.setLockState(true);
-      }
-      if (_session == "Evening" &&
-          DateTime.now().hour > Const().eveningCutoff) {
-        _keyHmiSales.currentState!.setLockState(true);
-      }
-
       // add chanters records from database
       _chantersEntries.clear();
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
       String dbpath =
-          "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters";
+          "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Chanters";
       Map<String, dynamic> chantersJson =
           await FB().getJson(path: dbpath, silent: true);
       int countChanters = 0;
@@ -236,7 +217,8 @@ class _HarinaamState extends State<Harinaam> {
       // add sales records from database
       _salesEntries.clear();
       dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
-      dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales";
+      dbpath =
+          "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Sales";
       Map<String, dynamic> salesJson =
           await FB().getJson(path: dbpath, silent: true);
       int countSales = 0;
@@ -248,6 +230,58 @@ class _HarinaamState extends State<Harinaam> {
       }
       _salesEntries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       _keyDashboard.currentState!.setSales(countSales);
+
+      // populate mala balances for today
+      String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+      dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+      Map<String, dynamic> todayData = {
+        "ChantersOpeningBalance": 0,
+        "ChantersClosingBalance": 0,
+        "SalesOpeningBalance": 0,
+        "SalesClosingBalance": 0,
+      };
+      if (!await FB().pathExists(dbpath)) {
+        String prevday = DateFormat("yyyy-MM-dd")
+            .format(DateTime.now().subtract(Duration(days: 1)));
+        String dbpathPrevday =
+            "${Const().dbrootGaruda}/Harinaam/MalaBalance/$prevday/";
+
+        Map<String, dynamic> prevDayData =
+            await FB().getJson(path: dbpathPrevday, silent: true);
+        if (prevDayData.isEmpty) {
+          await _showGetCurrentBalanceDialog();
+        } else {
+          todayData["ChantersOpeningBalance"] =
+              prevDayData["ChantersClosingBalance"];
+          todayData["SalesOpeningBalance"] = prevDayData["SalesClosingBalance"];
+
+          todayData["ChantersClosingBalance"] =
+              prevDayData["ChantersClosingBalance"];
+          todayData["SalesClosingBalance"] = prevDayData["SalesClosingBalance"];
+        }
+
+        // Only save if at least one value is not 0
+        if (todayData.values.any((value) => value != 0)) {
+          await FB().setJson(path: dbpath, json: todayData);
+        }
+      }
+
+      // lock session if not live
+      if (_isSessionLive()) {
+        _keyHmiSales.currentState!.setLockState(false);
+        _keyHmiChanters.currentState!.setLockState(false);
+      } else {
+        _keyHmiSales.currentState!.setLockState(true);
+        _keyHmiChanters.currentState!.setLockState(true);
+      }
+
+      // check if balance is available
+      dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+      _isBalanceAvailable = await FB().pathExists(dbpath);
+      if (!_isBalanceAvailable) {
+        _keyHmiSales.currentState!.setLockState(true);
+        _keyHmiChanters.currentState!.setLockState(true);
+      }
     });
 
     // refresh all child widgets
@@ -300,7 +334,7 @@ class _HarinaamState extends State<Harinaam> {
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters/$dbtime";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Chanters/$dbtime";
     FB().setJson(path: dbpath, json: entry.toJson());
 
     setState(() {
@@ -308,7 +342,7 @@ class _HarinaamState extends State<Harinaam> {
     });
   }
 
-  Future<void> _addSales(SalesEntry entry) async {
+  Future<void> _addSales(SalesEntry entry, {bool updateBalance = true}) async {
     // forbid changes for another day
     bool isToday = DateTime.now().year == _selectedDate.year &&
         DateTime.now().month == _selectedDate.month &&
@@ -351,12 +385,22 @@ class _HarinaamState extends State<Harinaam> {
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales/$dbtime";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Sales/$dbtime";
     FB().setJson(path: dbpath, json: entry.toJson());
 
     setState(() {
       _isLoading = false;
     });
+
+    // update balance in database
+    if (updateBalance) {
+      String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+      String dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+
+      Map<String, dynamic> data = await FB().getJson(path: dbpath);
+      data['SalesClosingBalance'] -= entry.count;
+      FB().setJson(path: dbpath, json: data);
+    }
   }
 
   Widget _createChantersTile(int index) {
@@ -401,17 +445,20 @@ class _HarinaamState extends State<Harinaam> {
               ),
 
               // context menu
-              trailing: Widgets().createContextMenu(
-                color: Colors.brown,
-                items: ["Edit", "Delete"],
-                onPressed: (action) {
-                  if (action == "Edit") {
-                    _editChanters(index);
-                  } else if (action == "Delete") {
-                    _deleteChanters(index);
-                  }
-                },
-              ),
+              trailing: _isSessionLive()
+                  ? Widgets().createContextMenu(
+                      color: Colors.brown,
+                      items: ["Edit", "Delete"],
+                      onPressed: (action) {
+                        if (action == "Edit") {
+                          _editChanters(index);
+                        } else if (action == "Delete") {
+                          _deleteChanters(index);
+                        }
+                      },
+                    )
+                  : null,
+
               borderRadius: borderRadius,
             ),
           ),
@@ -472,16 +519,18 @@ class _HarinaamState extends State<Harinaam> {
               ),
 
               // context menu
-              trailing: Widgets().createContextMenu(
-                items: ["Edit", "Delete"],
-                onPressed: (String action) {
-                  if (action == "Edit") {
-                    _editSales(index);
-                  } else if (action == "Delete") {
-                    _deleteSales(index);
-                  }
-                },
-              ),
+              trailing: _isSessionLive()
+                  ? Widgets().createContextMenu(
+                      items: ["Edit", "Delete"],
+                      onPressed: (String action) {
+                        if (action == "Edit") {
+                          _editSales(index);
+                        } else if (action == "Delete") {
+                          _deleteSales(index);
+                        }
+                      },
+                    )
+                  : null,
             ),
           ),
         ),
@@ -582,7 +631,7 @@ class _HarinaamState extends State<Harinaam> {
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters/$dbtime";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Chanters/$dbtime";
     FB().deleteValue(path: dbpath);
 
     // remove from the list
@@ -630,8 +679,15 @@ class _HarinaamState extends State<Harinaam> {
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
     String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
     String dbpath =
-        "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales/$dbtime";
+        "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Sales/$dbtime";
     FB().deleteValue(path: dbpath);
+
+    // update balance in database
+    String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+    dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+    Map<String, dynamic> data = await FB().getJson(path: dbpath);
+    data['SalesClosingBalance'] += entry.count;
+    FB().setJson(path: dbpath, json: data);
 
     // remove from the list
     setState(() {
@@ -671,7 +727,7 @@ class _HarinaamState extends State<Harinaam> {
       String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
       String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
       String dbpath =
-          "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Chanters/$dbtime";
+          "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Chanters/$dbtime";
       FB().setJson(path: dbpath, json: editedEntry.toJson());
 
       // Update dashboard counter
@@ -707,6 +763,10 @@ class _HarinaamState extends State<Harinaam> {
 
     // If user saved changes, update the entry
     if (editedEntry != null) {
+      int oldValue = entry.count;
+      int newValue = editedEntry.count;
+      int delta = oldValue - newValue;
+
       // Update the list
       setState(() {
         _isLoading = true;
@@ -718,7 +778,7 @@ class _HarinaamState extends State<Harinaam> {
       String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
       String dbtime = DateFormat("HH-mm-ss-ms").format(entry.timestamp);
       String dbpath =
-          "${Const().dbrootGaruda}/Harinaam/$dbdate/$_session/Sales/$dbtime";
+          "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/$_session/Sales/$dbtime";
       FB().setJson(path: dbpath, json: editedEntry.toJson());
 
       // Update dashboard counter
@@ -731,7 +791,125 @@ class _HarinaamState extends State<Harinaam> {
       setState(() {
         _isLoading = false;
       });
+
+      // update balance in database
+      String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+      dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+      Map<String, dynamic> data = await FB().getJson(path: dbpath);
+      data['SalesClosingBalance'] += delta;
+      FB().setJson(path: dbpath, json: data);
     }
+  }
+
+  bool _isSessionLive() {
+    // check if today
+    bool isToday = DateTime.now().year == _selectedDate.year &&
+        DateTime.now().month == _selectedDate.month &&
+        DateTime.now().day == _selectedDate.day;
+
+    String sessionTime =
+        DateTime.now().hour < Const().morningCutoff ? "Morning" : "Evening";
+
+    if (isToday && _session == sessionTime) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<void> _showGetCurrentBalanceDialog() async {
+    TextEditingController chantersBalanceController = TextEditingController();
+    TextEditingController saleBalanceController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    String user = Utils().getUsername();
+
+    await Widgets().showResponsiveDialog(
+        context: context,
+        title: "Enter mala balance",
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              // chanters
+              SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Chanters' Balance",
+                  border: OutlineInputBorder(),
+                ),
+                controller: chantersBalanceController,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a count';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if (int.parse(value) < 0) {
+                    return 'Count cannot be negative';
+                  }
+                  return null;
+                },
+              ),
+
+              // sale
+              SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Sales Balance",
+                  border: OutlineInputBorder(),
+                ),
+                controller: saleBalanceController,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a count';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if (int.parse(value) < 0) {
+                    return 'Count cannot be negative';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState?.validate() ?? false) {
+                  Map<String, dynamic> todayData = {
+                    "ChantersOpeningBalance":
+                        int.parse(chantersBalanceController.text),
+                    "ChantersClosingBalance":
+                        int.parse(chantersBalanceController.text),
+                    "SalesOpeningBalance":
+                        int.parse(saleBalanceController.text),
+                    "SalesClosingBalance":
+                        int.parse(saleBalanceController.text),
+                    "User": user,
+                    "Timestamp": DateTime.now().toIso8601String(),
+                  };
+
+                  String today =
+                      DateFormat("yyyy-MM-dd").format(DateTime.now());
+                  String dbpath =
+                      "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+
+                  await FB().setJson(path: dbpath, json: todayData);
+
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
+                }
+              },
+              child: Text("Submit")),
+        ]);
   }
 
   Future<ChantersEntry?> _showDialogEditChanters(ChantersEntry entry) async {
@@ -936,6 +1114,20 @@ class _HarinaamState extends State<Harinaam> {
                       // leave some space at top
                       SizedBox(height: 10),
 
+                      // declaimer if balance not available
+                      if (!_isBalanceAvailable)
+                        Widgets().createTopLevelCard(
+                          context: context,
+                          title: "Disclaimer",
+                          color: Colors.red,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "Japamala sales balance for today is not available. Please refresh the page to add current stock of malas as balance.",
+                            ),
+                          ),
+                        ),
+
                       // date header
                       DateHeader(
                           callbacks: DateHeaderCallbacks(onChange: (date) {
@@ -963,6 +1155,7 @@ class _HarinaamState extends State<Harinaam> {
                       ),
 
                       // Chanters' club
+                      SizedBox(height: 10),
                       Widgets().createTopLevelCard(
                         context: context,
                         title: "Chanters' club",
@@ -1037,9 +1230,6 @@ class _HarinaamState extends State<Harinaam> {
                           ],
                         ),
                       ),
-
-                      // leave some space at bottom
-                      SizedBox(height: 500),
                     ],
                   ),
                 ),

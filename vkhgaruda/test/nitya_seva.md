@@ -18,9 +18,9 @@
 # Harinaam
 -[] add / edit / delete chanters
 -[] add / edit / delete sales
--[] add / edit / delete procurement
--[] weekly settlement
--[] reports
+-[] chanters inventory add / discard (check reflection in db)
+-[] sales inventory add / discard (check reflection in db)
+-[] summary daily / weekly / monthly / yearly
+-[] share summary
 
 # new features
-

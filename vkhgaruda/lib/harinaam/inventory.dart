@@ -4,7 +4,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/harinaam/dashboard.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -31,14 +30,13 @@ class _InventoryState extends State<Inventory> {
 
   // controllers, listeners and focus nodes
   List<StreamSubscription<DatabaseEvent>> _listeners = [];
-  final GlobalKey<DashboardState> keyDashboard = GlobalKey<DashboardState>();
 
   @override
   initState() {
     super.initState();
 
     FB().listenForChange(
-      "${Const().dbrootGaruda}/HarinaamInventory",
+      "${Const().dbrootGaruda}/Harinaam/Inventory",
       FBCallbacks(
         // add
         add: (data) {
@@ -121,7 +119,7 @@ class _InventoryState extends State<Inventory> {
     await _lock.synchronized(() async {
       // refill inventory entries
       _inventoryEntries.clear();
-      String dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+      String dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory";
       List rawTopList =
           await FB().getListByYear(path: dbpath, year: _selectedYear);
       if (rawTopList.isNotEmpty) {
@@ -157,7 +155,7 @@ class _InventoryState extends State<Inventory> {
 
       // offset by the sales count
       int salesOffset = 0;
-      dbpath = "${Const().dbrootGaruda}/Harinaam";
+      dbpath = "${Const().dbrootGaruda}/Harinaam/ServiceEntries";
       var rawList = await FB().getListByYear(path: dbpath, year: _selectedYear);
       if (rawList.isNotEmpty) {
         for (var rawItem in rawList) {
@@ -175,10 +173,6 @@ class _InventoryState extends State<Inventory> {
         }
       }
       salesCount -= salesOffset;
-
-      // display the dashboard counters
-      await keyDashboard.currentState?.setChanters(chantersCount);
-      await keyDashboard.currentState?.setSales(salesCount);
     });
 
     // refresh all child widgets
@@ -189,27 +183,6 @@ class _InventoryState extends State<Inventory> {
   }
 
   Future<void> _addInventoryEntry(InventoryEntry entry) async {
-    // dashboard update
-    if (entry.malaType == "Chanters") {
-      if (entry.addOrRemove == "Add") {
-        await keyDashboard.currentState?.addChanters(entry.count);
-      } else {
-        int? count = keyDashboard.currentState?.getChanters();
-        if (count != null && count > 0) {
-          await keyDashboard.currentState?.setChanters(count - entry.count);
-        }
-      }
-    } else if (entry.malaType == "Sales") {
-      if (entry.addOrRemove == "Add") {
-        await keyDashboard.currentState?.addSales(entry.count);
-      } else {
-        int? count = keyDashboard.currentState?.getSales();
-        if (count != null && count > 0) {
-          await keyDashboard.currentState?.setSales(count - entry.count);
-        }
-      }
-    }
-
     setState(() {
       _inventoryEntries.insert(0, entry);
     });
@@ -217,8 +190,39 @@ class _InventoryState extends State<Inventory> {
     // store to database
     _lastDataModification = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
-    String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory/$dbdate";
     await FB().addToList(listpath: dbpath, data: entry.toJson());
+
+    // update balance in db
+    String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+    dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+    Map<String, dynamic> data = await FB().getJson(path: dbpath);
+    if (entry.malaType == "Chanters") {
+      if (entry.addOrRemove == "Add") {
+        data['ChantersClosingBalance'] =
+            (data['ChantersClosingBalance'] ?? 0) + entry.count;
+      } else {
+        data['ChantersClosingBalance'] =
+            (data['ChantersClosingBalance'] ?? 0) - entry.count;
+        if (data['ChantersClosingBalance'] < 0) {
+          data['ChantersClosingBalance'] = 0;
+          Toaster().error("Chanters mala count cannot be negative.");
+        }
+      }
+    } else {
+      if (entry.addOrRemove == "Add") {
+        data['SalesClosingBalance'] =
+            (data['SalesClosingBalance'] ?? 0) + entry.count;
+      } else {
+        data['SalesClosingBalance'] =
+            (data['SalesClosingBalance'] ?? 0) - entry.count;
+        if (data['SalesClosingBalance'] < 0) {
+          data['SalesClosingBalance'] = 0;
+          Toaster().error("Sales mala count cannot be negative.");
+        }
+      }
+    }
+    FB().setJson(path: dbpath, json: data);
   }
 
   Widget _createInventoryTile(int index) {
@@ -319,7 +323,7 @@ class _InventoryState extends State<Inventory> {
       height: 50,
       width: containerWidth,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(25),
       ),
       child: ListView.builder(
@@ -368,27 +372,6 @@ class _InventoryState extends State<Inventory> {
   }
 
   Future<void> _deleteInventoryEntry(InventoryEntry entry) async {
-    // dashboard update
-    if (entry.malaType == "Chanters") {
-      if (entry.addOrRemove == "Add") {
-        int? count = keyDashboard.currentState?.getChanters();
-        if (count != null && count > 0) {
-          await keyDashboard.currentState?.setChanters(count - entry.count);
-        }
-      } else {
-        await keyDashboard.currentState?.addChanters(entry.count);
-      }
-    } else if (entry.malaType == "Sales") {
-      if (entry.addOrRemove == "Add") {
-        int? count = keyDashboard.currentState?.getSales();
-        if (count != null && count > 0) {
-          await keyDashboard.currentState?.setSales(count - entry.count);
-        }
-      } else {
-        await keyDashboard.currentState?.addSales(entry.count);
-      }
-    }
-
     setState(() {
       _inventoryEntries.remove(entry);
     });
@@ -396,7 +379,7 @@ class _InventoryState extends State<Inventory> {
     // delete from database
     _lastDataModification = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
-    String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory/$dbdate";
     List inventoryEntriesRaw = await FB().getList(path: dbpath);
     List<InventoryEntry> inventoryEntries = inventoryEntriesRaw
         .map((e) => Utils().convertRawToDatatype(e, InventoryEntry.fromJson))
@@ -410,9 +393,39 @@ class _InventoryState extends State<Inventory> {
           .toList(); // convert back to raw format
       await FB().setValue(path: dbpath, value: inventoryEntriesRaw);
     }
+
+    // update balance in db
+    String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+    String dbpathBalance =
+        "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+    Map<String, dynamic> dataBalance = await FB().getJson(path: dbpathBalance);
+    if (entry.malaType == "Chanters") {
+      if (entry.addOrRemove == "Add") {
+        dataBalance['ChantersClosingBalance'] =
+            (dataBalance['ChantersClosingBalance'] ?? 0) - entry.count;
+      } else if (entry.addOrRemove == "Remove") {
+        dataBalance['ChantersClosingBalance'] =
+            (dataBalance['ChantersClosingBalance'] ?? 0) + entry.count;
+      } else {
+        Toaster().error("Invalid entry");
+      }
+    } else if (entry.malaType == "Sales") {
+      if (entry.addOrRemove == "Add") {
+        dataBalance['SalesClosingBalance'] =
+            (dataBalance['SalesClosingBalance'] ?? 0) - entry.count;
+      } else if (entry.addOrRemove == "Remove") {
+        dataBalance['SalesClosingBalance'] =
+            (dataBalance['SalesClosingBalance'] ?? 0) + entry.count;
+      } else {
+        Toaster().error("Invalid entry");
+      }
+    } else {
+      Toaster().error("Invalid entry");
+    }
+    FB().setJson(path: dbpathBalance, json: dataBalance);
   }
 
-  Future<void> _updateInventoryEntry(
+  Future<void> _editInventoryEntry(
       InventoryEntry oldEntry, InventoryEntry newEntry) async {
     // update the entry in the list
     int index = _inventoryEntries.indexOf(oldEntry);
@@ -422,47 +435,64 @@ class _InventoryState extends State<Inventory> {
       });
     }
 
-    // update the dashboard counters
-    if (oldEntry.malaType == "Chanters") {
-      if (oldEntry.addOrRemove == "Add") {
-        await keyDashboard.currentState?.setChanters(
-            keyDashboard.currentState!.getChanters() -
-                oldEntry.count +
-                newEntry.count);
-      } else {
-        int count = keyDashboard.currentState!.getChanters();
-        int diff = newEntry.count - oldEntry.count;
-        count -= diff;
+    // prepare for balance update
+    String today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+    String dbpathBalance =
+        "${Const().dbrootGaruda}/Harinaam/MalaBalance/$today/";
+    Map<String, dynamic> dataBalance = await FB().getJson(path: dbpathBalance);
 
-        if (count < 0) {
-          count = 0;
-          Toaster().error("Chanters mala count cannot be negative.");
+    // update the balance in db
+    int delta = newEntry.count - oldEntry.count;
+    if (oldEntry.malaType == newEntry.malaType) {
+      if (oldEntry.malaType == "Chanters") {
+        if (oldEntry.addOrRemove == "Add") {
+          dataBalance['ChantersClosingBalance'] =
+              (dataBalance['ChantersClosingBalance'] ?? 0) + delta;
+        } else {
+          dataBalance['ChantersClosingBalance'] =
+              (dataBalance['ChantersClosingBalance'] ?? 0) - delta;
         }
-        await keyDashboard.currentState?.setChanters(count);
+      } else if (oldEntry.malaType == "Sales") {
+        if (oldEntry.addOrRemove == "Add") {
+          dataBalance['SalesClosingBalance'] =
+              (dataBalance['SalesClosingBalance'] ?? 0) + delta;
+        } else {
+          dataBalance['SalesClosingBalance'] =
+              (dataBalance['SalesClosingBalance'] ?? 0) - delta;
+        }
       }
-    } else if (oldEntry.malaType == "Sales") {
-      if (oldEntry.addOrRemove == "Add") {
-        await keyDashboard.currentState?.setSales(
-            keyDashboard.currentState!.getSales() -
-                oldEntry.count +
-                newEntry.count);
-      } else {
-        int count = keyDashboard.currentState!.getSales();
-        int diff = newEntry.count - oldEntry.count;
-        count -= diff;
-
-        if (count < 0) {
-          count = 0;
-          Toaster().error("Sales mala count cannot be negative.");
+    } else {
+      if (oldEntry.malaType == "Chanters") {
+        if (oldEntry.addOrRemove == "Add") {
+          dataBalance['SalesClosingBalance'] =
+              (dataBalance['SalesClosingBalance'] ?? 0) + newEntry.count;
+          dataBalance['ChantersClosingBalance'] =
+              (dataBalance['ChantersClosingBalance'] ?? 0) - oldEntry.count;
+        } else {
+          dataBalance['ChantersClosingBalance'] =
+              (dataBalance['ChantersClosingBalance'] ?? 0) + oldEntry.count;
+          dataBalance['SalesClosingBalance'] =
+              (dataBalance['SalesClosingBalance'] ?? 0) - newEntry.count;
         }
-        await keyDashboard.currentState?.setSales(count);
+      } else if (oldEntry.malaType == "Sales") {
+        if (oldEntry.addOrRemove == "Add") {
+          dataBalance['SalesClosingBalance'] =
+              (dataBalance['SalesClosingBalance'] ?? 0) - oldEntry.count;
+          dataBalance['ChantersClosingBalance'] =
+              (dataBalance['ChantersClosingBalance'] ?? 0) + newEntry.count;
+        } else {
+          dataBalance['SalesClosingBalance'] =
+              (dataBalance['SalesClosingBalance'] ?? 0) + oldEntry.count;
+          dataBalance['ChantersClosingBalance'] =
+              (dataBalance['ChantersClosingBalance'] ?? 0) - newEntry.count;
+        }
       }
     }
 
     // update in the database
     _lastDataModification = DateTime.now();
     String dbdate = DateFormat("yyyy-MM-dd").format(newEntry.timestamp);
-    String dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory/$dbdate";
     List<dynamic> inventoryListRaw = await FB().getList(path: dbpath);
     if (inventoryListRaw.isEmpty) {
       Toaster().error("No inventory entries found for the date");
@@ -486,6 +516,9 @@ class _InventoryState extends State<Inventory> {
       _lastDataModification = DateTime.now();
       await FB().setValue(path: dbpath, value: newInventoryListRaw);
     }
+
+    // update balance in db
+    FB().setJson(path: dbpathBalance, json: dataBalance);
   }
 
   Future<void> _showDialogInventory(String addOrRemove,
@@ -571,7 +604,7 @@ class _InventoryState extends State<Inventory> {
                   if (oldEntry == null) {
                     await _addInventoryEntry(entry);
                   } else {
-                    await _updateInventoryEntry(oldEntry, entry);
+                    await _editInventoryEntry(oldEntry, entry);
                   }
                 }
               },
@@ -619,26 +652,14 @@ class _InventoryState extends State<Inventory> {
                 child: Center(
                   child: Column(
                     children: [
-                      // dashboard
-                      Widgets().createTopLevelCard(
-                          context: context,
-                          child: Column(
-                            children: [
-                              _createYearSelector(),
-                              SizedBox(height: 4),
-                              Dashboard(
-                                key: keyDashboard,
-                                chantersLabel: "Chanters mala stock",
-                                salesLabel: "Sales mala stock",
-                              )
-                            ],
-                          )),
-
                       // inventory entries
                       Widgets().createTopLevelCard(
                           context: context,
+                          title: "Entry records",
                           child: Column(
                             children: [
+                              _createYearSelector(),
+                              Divider(),
                               ...List.generate(_inventoryEntries.length,
                                   (index) => _createInventoryTile(index)),
                               if (_inventoryEntries.isEmpty)

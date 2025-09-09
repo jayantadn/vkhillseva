@@ -19,6 +19,7 @@ class HmiChantersState extends State<HmiChanters> {
   final Lock _lock = Lock();
   final TextEditingController _numberController =
       TextEditingController(text: '0');
+  bool _isLocked = false;
 
   @override
   void initState() {
@@ -63,6 +64,12 @@ class HmiChantersState extends State<HmiChanters> {
     _numberController.text = (currentValue + 10).toString();
   }
 
+  void setLockState(bool isLocked) {
+    setState(() {
+      _isLocked = isLocked;
+    });
+  }
+
   void _submit() {
     int value = int.tryParse(_numberController.text) ?? 0;
     if (value <= 0) {
@@ -85,8 +92,11 @@ class HmiChantersState extends State<HmiChanters> {
         children: [
           // Decrement button
           IconButton(
-            onPressed: _decrement,
-            icon: const Icon(Icons.remove, color: Colors.brown),
+            onPressed: _isLocked ? null : _decrement,
+            icon: Icon(
+              Icons.remove,
+              color: _isLocked ? Colors.grey : Colors.brown,
+            ),
             tooltip: 'Decrement',
           ),
           // Numeric input field
@@ -96,6 +106,7 @@ class HmiChantersState extends State<HmiChanters> {
               controller: _numberController,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
+              readOnly: _isLocked ? true : false,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(6),
@@ -104,41 +115,31 @@ class HmiChantersState extends State<HmiChanters> {
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 8),
               ),
-              onChanged: (value) {
-                // Additional validation on change
-                if (value.isEmpty) {
-                  _numberController.text = '1';
-                  _numberController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: _numberController.text.length),
-                  );
-                } else {
-                  int? intValue = int.tryParse(value);
-                  if (intValue == null || intValue < 1) {
-                    _numberController.text = '1';
-                    _numberController.selection = TextSelection.fromPosition(
-                      TextPosition(offset: _numberController.text.length),
-                    );
-                  }
-                }
-              },
+              onChanged: (value) {},
             ),
           ),
+
           // Increment button
           IconButton(
-            onPressed: _increment,
-            icon: const Icon(Icons.add, color: Colors.brown),
+            onPressed: _isLocked ? null : _increment,
+            icon:
+                Icon(Icons.add, color: _isLocked ? Colors.grey : Colors.brown),
             tooltip: 'Increment',
           ),
+
           // 10x increment button
           IconButton(
-            onPressed: _increment10x,
-            icon: const Icon(Icons.add_box_outlined, color: Colors.brown),
+            onPressed: _isLocked ? null : _increment10x,
+            icon: Icon(Icons.add_box_outlined,
+                color: _isLocked ? Colors.grey : Colors.brown),
             tooltip: 'Increment by 10',
           ),
+
           // Submit button
           IconButton(
             onPressed: _submit,
-            icon: const Icon(Icons.check, color: Colors.brown),
+            icon: Icon(Icons.check,
+                color: _isLocked ? Colors.grey : Colors.brown),
             tooltip: 'Submit',
           ),
         ],

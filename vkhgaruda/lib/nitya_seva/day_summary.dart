@@ -16,12 +16,10 @@ class DaySummary extends StatefulWidget {
   const DaySummary({super.key, required this.date});
 
   @override
-  State<DaySummary> createState() => _DaySummaryState();
+  State<DaySummary> createState() => DaySummaryState();
 }
 
-GlobalKey<_DaySummaryState> daySummaryKey = GlobalKey<_DaySummaryState>();
-
-class _DaySummaryState extends State<DaySummary> {
+class DaySummaryState extends State<DaySummary> {
   final Lock _lock = Lock();
   DateTime _lastCallbackInvoked = DateTime.now();
   List<StreamSubscription<DatabaseEvent>> _listeners = [];

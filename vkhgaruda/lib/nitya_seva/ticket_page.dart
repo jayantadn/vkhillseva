@@ -670,12 +670,18 @@ class _TicketPageState extends State<TicketPage> {
         ),
 
         // seva name
-        title: Text(
-          "Tkt# ${ticket.ticketNumber},  Amt: ₹${ticket.amount}",
+        title: Widgets().createResponsiveRow(context, [Text(
+          "Tkt# ${ticket.ticketNumber},  ",
           overflow: TextOverflow.ellipsis,
           style:
               Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16),
         ),
+        Text(
+          "Amt: ₹${ticket.amount}",
+          overflow: TextOverflow.ellipsis,
+          style:
+              Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16),
+        )]),
 
         subtitle: Widgets().createResponsiveRow(context, [
           // time and user

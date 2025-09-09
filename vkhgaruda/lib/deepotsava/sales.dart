@@ -11,7 +11,7 @@ import 'package:vkhpackages/widgets/date_header.dart';
 class Sales extends StatefulWidget {
   final String stall;
 
-  Sales({required this.stall});
+  const Sales({super.key, required this.stall});
 
   @override
   _SalesState createState() => _SalesState();

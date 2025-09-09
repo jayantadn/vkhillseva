@@ -7,7 +7,7 @@ class StockAddDialog extends StatefulWidget {
   final String stall;
   final StockCallbacks callbacks;
 
-  StockAddDialog({required this.stall, required this.callbacks});
+  const StockAddDialog({super.key, required this.stall, required this.callbacks});
 
   @override
   _StockAddDialogState createState() => _StockAddDialogState();

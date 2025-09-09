@@ -1,10 +1,17 @@
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/harinaam/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+
+// Conditional import for screenshot sharing
+import 'screenshot_share_io.dart'
+    if (dart.library.html) 'screenshot_share_web.dart';
 
 class Summary extends StatefulWidget {
   final String title;
@@ -22,18 +29,24 @@ class _SummaryState extends State<Summary> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   String _period = "daily";
-  String _periodDetails = DateFormat("dd MMM, yyyy").format(DateTime.now());
+  late String _periodDetails;
+  final GlobalKey _repaintBoundaryKey = GlobalKey();
 
   // variables for chanters summary
   int _totalChanters = 0;
+  int _openingBalanceChanters = 0;
   int _newChanterMalasProcured = 0;
   int _discardedChanterMalas = 0;
+  int _closingBalanceChanters = 0;
 
   // variables for sales summary
   int _totalMalasSold = 0;
+  int _openingBalanceSales = 0;
   int _totalAmountCollected = 0;
   int _newSaleMalasProcured = 0;
   int _discardedSaleMalas = 0;
+  int _closingBalanceSales = 0;
+  final Map<String, dynamic> _paymentModeSummary = {};
 
   // lists
 
@@ -42,6 +55,8 @@ class _SummaryState extends State<Summary> {
   @override
   initState() {
     super.initState();
+
+    _initPeriodDetails();
 
     refresh();
   }
@@ -71,6 +86,7 @@ class _SummaryState extends State<Summary> {
 
     await _lock.synchronized(() async {
       // your code here
+      _paymentModeSummary.clear();
       switch (_period) {
         case "daily":
           DateTime date = DateFormat("dd MMM, yyyy").parse(_periodDetails);
@@ -79,7 +95,7 @@ class _SummaryState extends State<Summary> {
           // collect morning chaters data
           _totalChanters = 0;
           String dbpath =
-              "${Const().dbrootGaruda}/Harinaam/$dbdate/Morning/Chanters";
+              "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Morning/Chanters";
           Map<String, dynamic> data =
               await FB().getJson(path: dbpath, silent: true);
           for (var entry in data.entries) {
@@ -89,7 +105,8 @@ class _SummaryState extends State<Summary> {
           }
 
           // collect evening chaters data
-          dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Evening/Chanters";
+          dbpath =
+              "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Evening/Chanters";
           data = await FB().getJson(path: dbpath, silent: true);
           for (var entry in data.entries) {
             ChantersEntry chanter = Utils()
@@ -102,7 +119,7 @@ class _SummaryState extends State<Summary> {
           _discardedChanterMalas = 0;
           _newSaleMalasProcured = 0;
           _discardedSaleMalas = 0;
-          dbpath = "${Const().dbrootGaruda}/HarinaamInventory/$dbdate";
+          dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory/$dbdate";
           List listRaw = await FB().getList(path: dbpath);
           for (var item in listRaw) {
             InventoryEntry entry =
@@ -122,24 +139,56 @@ class _SummaryState extends State<Summary> {
             }
           }
 
-          // number of malas sold
+          // number of malas sold morning
           _totalMalasSold = 0;
           _totalAmountCollected = 0;
-          dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Morning/Sales";
+          dbpath =
+              "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Morning/Sales";
           data = await FB().getJson(path: dbpath, silent: true);
           for (var entry in data.entries) {
             SalesEntry sale =
                 Utils().convertRawToDatatype(entry.value, SalesEntry.fromJson);
             _totalMalasSold += sale.count;
             _totalAmountCollected += (sale.japamala.saleValue * sale.count);
+
+            // payment modes
+            if (_paymentModeSummary.containsKey(sale.paymentMode)) {
+              Map<String, dynamic> data =
+                  _paymentModeSummary[sale.paymentMode] as Map<String, dynamic>;
+              data['count'] += sale.count;
+              data['amount'] += (sale.japamala.saleValue * sale.count);
+              _paymentModeSummary[sale.paymentMode] = data;
+            } else {
+              _paymentModeSummary[sale.paymentMode] = {
+                'count': sale.count,
+                'amount': (sale.japamala.saleValue * sale.count),
+              };
+            }
           }
-          dbpath = "${Const().dbrootGaruda}/Harinaam/$dbdate/Evening/Sales";
+
+          // number of malas sold evening
+          dbpath =
+              "${Const().dbrootGaruda}/Harinaam/ServiceEntries/$dbdate/Evening/Sales";
           data = await FB().getJson(path: dbpath, silent: true);
           for (var entry in data.entries) {
             SalesEntry sale =
                 Utils().convertRawToDatatype(entry.value, SalesEntry.fromJson);
             _totalMalasSold += sale.count;
             _totalAmountCollected += (sale.japamala.saleValue * sale.count);
+
+            // payment modes
+            if (_paymentModeSummary.containsKey(sale.paymentMode)) {
+              Map<String, dynamic> data =
+                  _paymentModeSummary[sale.paymentMode] as Map<String, dynamic>;
+              data['count'] += sale.count;
+              data['amount'] += (sale.japamala.saleValue * sale.count);
+              _paymentModeSummary[sale.paymentMode] = data;
+            } else {
+              _paymentModeSummary[sale.paymentMode] = {
+                'count': sale.count,
+                'amount': (sale.japamala.saleValue * sale.count),
+              };
+            }
           }
           break;
 
@@ -150,18 +199,19 @@ class _SummaryState extends State<Summary> {
               .parse(_periodDetails.split('-')[1].trim());
 
           // number of chanters and sales
-          String dbpath = "${Const().dbrootGaruda}/Harinaam";
+          String dbpath = "${Const().dbrootGaruda}/Harinaam/ServiceEntries";
           var dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           CountTuple countData = _getChantersAndSalesCount(dataRaw);
           _totalChanters = countData.chantersCount;
           _totalMalasSold = countData.salesCount;
           _totalAmountCollected = countData.salesAmount;
+          _paymentModeSummary.addAll(countData.paymentModeSummary);
 
           // chanters inventory data
           _newChanterMalasProcured = 0;
           _discardedChanterMalas = 0;
-          dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+          dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory";
           dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           InventoryTuple inventoryData =
@@ -179,16 +229,17 @@ class _SummaryState extends State<Summary> {
           DateTime endDate = DateTime(month.year, month.month + 1, 0);
 
           // number of chanters and sales
-          String dbpath = "${Const().dbrootGaruda}/Harinaam";
+          String dbpath = "${Const().dbrootGaruda}/Harinaam//ServiceEntries";
           var dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           CountTuple countData = _getChantersAndSalesCount(dataRaw);
           _totalChanters = countData.chantersCount;
           _totalMalasSold = countData.salesCount;
           _totalAmountCollected = countData.salesAmount;
+          _paymentModeSummary.addAll(countData.paymentModeSummary);
 
           // chanters inventory data
-          dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+          dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory";
           dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           InventoryTuple inventoryData =
@@ -206,16 +257,17 @@ class _SummaryState extends State<Summary> {
           DateTime endDate = DateTime(year.year, 12, 31);
 
           // number of chanters and sales
-          String dbpath = "${Const().dbrootGaruda}/Harinaam";
+          String dbpath = "${Const().dbrootGaruda}/Harinaam//ServiceEntries";
           var dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           CountTuple countData = _getChantersAndSalesCount(dataRaw);
           _totalChanters = countData.chantersCount;
           _totalMalasSold = countData.salesCount;
           _totalAmountCollected = countData.salesAmount;
+          _paymentModeSummary.addAll(countData.paymentModeSummary);
 
           // chanters inventory data
-          dbpath = "${Const().dbrootGaruda}/HarinaamInventory";
+          dbpath = "${Const().dbrootGaruda}/Harinaam/Inventory";
           dataRaw = await FB().getValuesByDateRange(
               path: dbpath, startDate: startDate, endDate: endDate);
           InventoryTuple inventoryData =
@@ -227,6 +279,9 @@ class _SummaryState extends State<Summary> {
 
           break;
       }
+
+      // display the balances
+      await _updateBalances();
     });
 
     // refresh all child widgets
@@ -243,12 +298,34 @@ class _SummaryState extends State<Summary> {
         color: Colors.brown,
         child: Column(
           children: [
-            _createTableEntry("Total Chanters", "$_totalChanters"),
+            _createTableEntry("Total Chanters", "$_totalChanters", bold: true),
+            _createTableEntry("Opening balance", "$_openingBalanceChanters"),
             _createTableEntry(
                 "New malas procured", "$_newChanterMalasProcured"),
             _createTableEntry("Discarded malas", "$_discardedChanterMalas",
                 divider: false),
+            _createTableEntry("Closing balance", "$_closingBalanceChanters")
           ],
+        ));
+  }
+
+  Widget _createPaymentModeSummary() {
+    return Widgets().createTopLevelCard(
+        context: context,
+        title: "Payment Modes",
+        child: Column(
+          children:
+              _paymentModeSummary.entries.toList().asMap().entries.map((entry) {
+            int idx = entry.key;
+            String paymentMode = entry.value.key;
+            Map<String, dynamic> data = entry.value.value;
+            bool isLast = idx == _paymentModeSummary.entries.length - 1;
+            return _createTableEntry(
+              paymentMode,
+              "${data['count']} (₹${data['amount']})",
+              divider: !isLast,
+            );
+          }).toList(),
         ));
   }
 
@@ -258,12 +335,21 @@ class _SummaryState extends State<Summary> {
         title: "Japamala Sales",
         child: Column(
           children: [
-            _createTableEntry("Total malas sold", "$_totalMalasSold"),
-            _createTableEntry(
-                "Total amount collected", "₹$_totalAmountCollected"),
+            _createTableEntry("Opening balance", "$_openingBalanceSales"),
             _createTableEntry("New malas procured", "$_newSaleMalasProcured"),
-            _createTableEntry("Discarded malas", "$_discardedSaleMalas",
-                divider: false),
+            _createTableEntry("Total malas sold", "$_totalMalasSold",
+                bold: true),
+            _createTableEntry(
+              "Discarded malas",
+              "$_discardedSaleMalas",
+            ),
+            _createTableEntry(
+              "Closing balance",
+              "$_closingBalanceSales",
+            ),
+            _createTableEntry(
+                "Total amount collected", "₹$_totalAmountCollected",
+                divider: false, bold: true),
           ],
         ));
   }
@@ -286,7 +372,6 @@ class _SummaryState extends State<Summary> {
         ),
         child: Column(
           children: [
-            // Period selector row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -438,6 +523,8 @@ class _SummaryState extends State<Summary> {
                         },
                       ),
                     ),
+
+                    // today button
                     const SizedBox(width: 6),
                     Container(
                       decoration: BoxDecoration(
@@ -459,7 +546,7 @@ class _SummaryState extends State<Summary> {
                       ),
                       child: IconButton(
                         tooltip: "Jump to today",
-                        icon: const Icon(Icons.restore, size: 20),
+                        icon: const Icon(Icons.event, size: 20),
                         color: Theme.of(context).primaryColor,
                         onPressed: () {
                           setState(() {
@@ -488,6 +575,7 @@ class _SummaryState extends State<Summary> {
                                 break;
                             }
                           });
+
                           refresh();
                         },
                       ),
@@ -558,7 +646,8 @@ class _SummaryState extends State<Summary> {
     );
   }
 
-  Widget _createTableEntry(String label, String value, {bool divider = true}) {
+  Widget _createTableEntry(String label, String value,
+      {bool divider = true, bool bold = false}) {
     return Column(children: [
       Table(
         columnWidths: const {
@@ -568,8 +657,12 @@ class _SummaryState extends State<Summary> {
         children: [
           TableRow(
             children: [
-              Text(label),
-              Text(value),
+              Text(label,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
+              Text(value,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
             ],
           ),
         ],
@@ -583,6 +676,7 @@ class _SummaryState extends State<Summary> {
     int chantersCount = 0;
     int salesCount = 0;
     int salesAmount = 0;
+    Map<String, dynamic> paymentModeSummary = {};
 
     for (var entry in dataRaw.entries) {
       // morning chanters
@@ -605,6 +699,19 @@ class _SummaryState extends State<Summary> {
               .convertRawToDatatype(morningEntry.value, SalesEntry.fromJson);
           salesCount += sale.count;
           salesAmount += (sale.japamala.saleValue * sale.count);
+
+          if (paymentModeSummary.containsKey(sale.paymentMode)) {
+            Map<String, dynamic> data =
+                paymentModeSummary[sale.paymentMode] as Map<String, dynamic>;
+            data['count'] += sale.count;
+            data['amount'] += (sale.japamala.saleValue * sale.count);
+            paymentModeSummary[sale.paymentMode] = data;
+          } else {
+            paymentModeSummary[sale.paymentMode] = {
+              'count': sale.count,
+              'amount': (sale.japamala.saleValue * sale.count),
+            };
+          }
         }
       }
 
@@ -628,6 +735,19 @@ class _SummaryState extends State<Summary> {
               .convertRawToDatatype(eveningEntry.value, SalesEntry.fromJson);
           salesCount += sale.count;
           salesAmount += (sale.japamala.saleValue * sale.count);
+
+          if (paymentModeSummary.containsKey(sale.paymentMode)) {
+            Map<String, dynamic> data =
+                paymentModeSummary[sale.paymentMode] as Map<String, dynamic>;
+            data['count'] += sale.count;
+            data['amount'] += (sale.japamala.saleValue * sale.count);
+            paymentModeSummary[sale.paymentMode] = data;
+          } else {
+            paymentModeSummary[sale.paymentMode] = {
+              'count': sale.count,
+              'amount': (sale.japamala.saleValue * sale.count),
+            };
+          }
         }
       }
     }
@@ -635,7 +755,8 @@ class _SummaryState extends State<Summary> {
     return CountTuple(
         chantersCount: chantersCount,
         salesCount: salesCount,
-        salesAmount: salesAmount);
+        salesAmount: salesAmount,
+        paymentModeSummary: paymentModeSummary);
   }
 
   InventoryTuple _getChantersAndSalesInventory(var dataMap) {
@@ -670,6 +791,45 @@ class _SummaryState extends State<Summary> {
         discardedChantersMalas: discardedChantersMalas,
         addedSalesMalas: addedSalesMalas,
         discardedSalesMalas: discardedSalesMalas);
+  }
+
+  DateTime? _getStartAndEndDateOfPeriod(String neededDate) {
+    DateTime? date;
+
+    switch (_period) {
+      case "daily":
+        date = DateFormat("dd MMM, yyyy").parse(_periodDetails);
+        break;
+      case "weekly":
+        if (neededDate == "startDate") {
+          String strDate = _periodDetails.split('-')[0];
+          strDate = strDate.trim();
+          date = DateFormat("dd MMM, yyyy").parse(strDate);
+        } else if (neededDate == "endDate") {
+          String strDate = _periodDetails.split('-')[1];
+          strDate = strDate.trim();
+          date = DateFormat("dd MMM, yyyy").parse(strDate);
+        }
+        break;
+      case "monthly":
+        date = DateFormat("MMM yyyy").parse(_periodDetails);
+        if (neededDate == "startDate") {
+          date = DateTime(date.year, date.month, 1);
+        } else if (neededDate == "endDate") {
+          date = DateTime(date.year, date.month + 1, 0);
+        }
+        break;
+      case "yearly":
+        date = DateFormat("yyyy").parse(_periodDetails);
+        if (neededDate == "startDate") {
+          date = DateTime(date.year, 1, 1);
+        } else if (neededDate == "endDate") {
+          date = DateTime(date.year, 12, 31);
+        }
+        break;
+    }
+
+    return date;
   }
 
   Future<void> _prev() async {
@@ -780,6 +940,96 @@ class _SummaryState extends State<Summary> {
     refresh();
   }
 
+  /// Share the screenshot using platform-specific implementation
+  Future<void> _shareImage() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      Uint8List? screenshotBytes = await _takeScreenshot();
+      if (screenshotBytes != null) {
+        await shareScreenshot(screenshotBytes,
+            filename:
+                'harinaam_summary_${DateTime.now().millisecondsSinceEpoch}.png');
+      } else {
+        Toaster().error("Failed to capture screenshot");
+      }
+    } catch (e) {
+      Toaster().error("Failed to share screenshot: $e");
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  /// Capture screenshot of the widget
+  Future<Uint8List?> _takeScreenshot() async {
+    try {
+      // Find the RenderRepaintBoundary
+      RenderRepaintBoundary boundary = _repaintBoundaryKey.currentContext!
+          .findRenderObject() as RenderRepaintBoundary;
+
+      // Capture the image
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+
+      // Convert to bytes
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      return byteData?.buffer.asUint8List();
+    } catch (e) {
+      Toaster().error("Failed to take screenshot: $e");
+      return null;
+    }
+  }
+
+  void _initPeriodDetails() {
+    switch (_period) {
+      case "daily":
+        _periodDetails = DateFormat("dd MMM, yyyy").format(DateTime.now());
+        break;
+      case "weekly":
+        DateTime now = DateTime.now();
+        DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+        DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
+        _periodDetails =
+            "${DateFormat("dd MMM, yyyy").format(startOfWeek)} - ${DateFormat("dd MMM, yyyy").format(endOfWeek)}";
+        break;
+      case "monthly":
+        DateTime now = DateTime.now();
+        _periodDetails = DateFormat("MMM yyyy").format(now);
+        break;
+      case "yearly":
+        DateTime now = DateTime.now();
+        _periodDetails = DateFormat("yyyy").format(now);
+        break;
+    }
+  }
+
+  Future<void> _updateBalances() async {
+    DateTime? startDate = _getStartAndEndDateOfPeriod("startDate");
+    DateTime? endDate = _getStartAndEndDateOfPeriod("endDate");
+    if (startDate == null || endDate == null) {
+      Toaster().error("Could not determine start or end date of the period");
+      return;
+    }
+
+    // opening balance
+    String dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance";
+    Map<String, dynamic> dataBalance = await FB().getJsonForFirstDateInRange(
+        path: dbpath, startDate: startDate, endDate: endDate, silent: true);
+    _openingBalanceChanters = dataBalance["ChantersOpeningBalance"] ?? 0;
+    _openingBalanceSales = dataBalance["SalesOpeningBalance"] ?? 0;
+
+    // closing balance
+    dbpath = "${Const().dbrootGaruda}/Harinaam/MalaBalance";
+    dataBalance = await FB().getJsonForLastDateInRange(
+        path: dbpath, startDate: startDate, endDate: endDate, silent: true);
+    _closingBalanceChanters = dataBalance["ChantersClosingBalance"] ?? 0;
+    _closingBalanceSales = dataBalance["SalesClosingBalance"] ?? 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -790,36 +1040,46 @@ class _SummaryState extends State<Summary> {
 
           // toolbar icons
           toolbarActions: [
+            // share button
             // ResponsiveToolbarAction(
-            //   icon: Icon(Icons.refresh),
+            //   icon: Icon(Icons.share),
+            //   onPressed: () {
+            //     _shareImage();
+            //   },
             // ),
           ],
 
           // body
-          body: RefreshIndicator(
-            onRefresh: refresh,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: Column(
-                    children: [
-                      // leave some space at top
-                      SizedBox(height: 10),
+          body: RepaintBoundary(
+            key: _repaintBoundaryKey,
+            child: RefreshIndicator(
+              onRefresh: refresh,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        // leave some space at top
+                        SizedBox(height: 10),
 
-                      // your widgets here
-                      _createHMI(),
+                        // your widgets here
+                        _createHMI(),
 
-                      SizedBox(height: 10),
-                      _createChantersSummary(),
+                        SizedBox(height: 10),
+                        _createChantersSummary(),
 
-                      SizedBox(height: 10),
-                      _createSalesSummary(),
+                        SizedBox(height: 10),
+                        _createSalesSummary(),
 
-                      // leave some space at bottom
-                      SizedBox(height: 500),
-                    ],
+                        SizedBox(height: 10),
+                        _createPaymentModeSummary(),
+
+                        // leave some space at bottom
+                        SizedBox(height: 500),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -854,9 +1114,11 @@ class CountTuple {
   final int chantersCount;
   final int salesCount;
   final int salesAmount;
+  Map<String, dynamic> paymentModeSummary;
 
   CountTuple(
       {required this.chantersCount,
       required this.salesCount,
-      required this.salesAmount});
+      required this.salesAmount,
+      required this.paymentModeSummary});
 }

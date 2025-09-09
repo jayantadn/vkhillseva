@@ -54,9 +54,14 @@ class HmiSalesState extends State<HmiSales> {
     _quantityController.text = (currentValue + 1).toString();
   }
 
+  void _increment10x() {
+    int currentValue = int.tryParse(_quantityController.text) ?? 0;
+    _quantityController.text = (currentValue + 10).toString();
+  }
+
   void _decrementQuantity() {
-    int currentValue = int.tryParse(_quantityController.text) ?? 1;
-    if (currentValue > 1) {
+    int currentValue = int.tryParse(_quantityController.text) ?? 0;
+    if (currentValue > 0) {
       _quantityController.text = (currentValue - 1).toString();
     }
   }
@@ -121,16 +126,20 @@ class HmiSalesState extends State<HmiSales> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            // decrement
             IconButton(
-              onPressed: _decrementQuantity,
+              onPressed: _isLocked ? null : _decrementQuantity,
               icon: const Icon(Icons.remove),
             ),
+
+            // text field
             SizedBox(
               width: 80,
               child: TextField(
                 controller: _quantityController,
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.center,
+                readOnly: _isLocked ? true : false,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   contentPadding:
@@ -138,9 +147,20 @@ class HmiSalesState extends State<HmiSales> {
                 ),
               ),
             ),
+
+            // increment
             IconButton(
-              onPressed: _incrementQuantity,
+              onPressed: _isLocked ? null : _incrementQuantity,
               icon: const Icon(Icons.add),
+            ),
+
+            // 10x increment button
+            IconButton(
+              onPressed: _isLocked ? null : _increment10x,
+              icon: Icon(
+                Icons.add_box_outlined,
+              ),
+              tooltip: 'Increment by 10',
             ),
 
             // submit button
@@ -150,35 +170,6 @@ class HmiSalesState extends State<HmiSales> {
                 Icons.check,
               ),
             ),
-
-            // lock button
-            if (!_isLocked)
-              IconButton(
-                onPressed: () {
-                  // handle lock action
-                  setState(() {
-                    _isLocked = true;
-                  });
-                },
-                icon: const Icon(Icons.lock_open),
-              ),
-
-            // unlock button
-            if (_isLocked)
-              IconButton(
-                onPressed: () {
-                  if (!_isAdmin) {
-                    Toaster().error('You are not authorized to unlock');
-                    return;
-                  }
-
-                  // handle unlock action
-                  setState(() {
-                    _isLocked = false;
-                  });
-                },
-                icon: const Icon(Icons.lock),
-              ),
           ],
         ),
       ],

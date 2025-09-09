@@ -3,6 +3,8 @@ import 'package:vkhgaruda/deepotsava/sales.dart';
 import 'package:vkhpackages/common/toaster.dart';
 
 class Deepotsava extends StatefulWidget {
+  const Deepotsava({super.key});
+
   @override
   _DeepotsavaState createState() => _DeepotsavaState();
 }
@@ -139,7 +141,7 @@ class CardWidget extends StatelessWidget {
   final Color color; // Add color parameter
   final Color textColor; // Add textColor parameter
 
-  CardWidget({
+  const CardWidget({super.key, 
     required this.image,
     required this.text,
     required this.isImageLeft,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:vkhgaruda/deepotsava/themeDeepotsava.dart';
-import 'package:vkhpackages/common/theme.dart';
 
 class Availability extends StatefulWidget {
   final String stall;

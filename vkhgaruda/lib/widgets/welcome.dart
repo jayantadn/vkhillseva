@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -108,9 +109,10 @@ class _WelcomeState extends State<Welcome> {
         ),
         Text(
           'ISKCON Vaikuntha Hill',
-          style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-              ),
+          style: GoogleFonts.macondo(
+            textStyle: Theme.of(context).textTheme.headlineLarge,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
 
         // version

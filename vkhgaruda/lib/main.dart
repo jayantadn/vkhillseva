@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart' hide Summary;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:vkhgaruda/deepotsava/main.dart';
+import 'package:vkhgaruda/deepotsava/deepotsava.dart';
+import 'package:vkhgaruda/deepotsava/sales/sales.dart';
 import 'package:vkhgaruda/harinaam/inventory.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'firebase_options.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   final Widget home = const Landing(title: "Hare Krishna");
-  final Widget test = Deepotsava();
+  final Widget test = Sales(title: "RKC Deepam Sales", stall: "RKC");
 
   // This widget is the root of your application.
   @override

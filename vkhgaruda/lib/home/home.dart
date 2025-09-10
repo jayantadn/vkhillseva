@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/deepotsava/main.dart';
+import 'package:vkhgaruda/deepotsava/deepotsava.dart';
 import 'package:vkhgaruda/harinaam/harinaam.dart';
 import 'package:vkhgaruda/home/landing.dart';
 import 'package:vkhgaruda/home/settings.dart';
@@ -220,10 +220,10 @@ class _HomePageState extends State<HomePage> {
 
                               // Deepotsava
                               LauncherTile(
-                                image:
-                                    'assets/images/LauncherIcons/Deepotsava.png',
-                                title: "Karthika\nDeepotsava",
-                                callback:
+                                  image:
+                                      'assets/images/LauncherIcons/Deepotsava.png',
+                                  title: "Karthika\nDeepotsava",
+                                  callback:
                                       LauncherTileCallback(onClick: () async {
                                     bool perm = await Utils()
                                         .checkPermission("Karthika Deepotsava");
@@ -231,15 +231,12 @@ class _HomePageState extends State<HomePage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                Deepotsava(
-                                                )),
+                                            builder: (context) => Deepotsava()),
                                       );
                                     } else {
                                       Toaster().error("Access Denied");
                                     }
-                                  })
-                              ),
+                                  })),
 
                               // Sangeet Seva
                               Padding(

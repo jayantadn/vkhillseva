@@ -5,11 +5,13 @@ class RadioRow extends StatefulWidget {
   final List<String> items;
   final int? selectedIndex;
   final void Function(String) onChanged;
+  final Color? color;
   const RadioRow({
     super.key,
     required this.items,
     this.selectedIndex,
     required this.onChanged,
+    this.color,
   });
 
   @override
@@ -59,10 +61,12 @@ class _RadioRowState extends State<RadioRow> {
                   decoration: BoxDecoration(
                     color:
                         _selectedItem == item
-                            ? Theme.of(context).colorScheme.primary
+                            ? widget.color ??
+                                Theme.of(context).colorScheme.primary
                             : Colors.transparent,
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
+                      color:
+                          widget.color ?? Theme.of(context).colorScheme.primary,
                     ),
                     borderRadius: BorderRadius.only(
                       topLeft: index == 0 ? Radius.circular(8) : Radius.zero,
@@ -86,7 +90,8 @@ class _RadioRowState extends State<RadioRow> {
                         color:
                             _selectedItem == item
                                 ? Colors.white
-                                : Theme.of(context).colorScheme.primary,
+                                : widget.color ??
+                                    Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),

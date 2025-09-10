@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/deepotsava/sales/hmi_sales.dart';
 import 'package:vkhgaruda/deepotsava/sales/inventory.dart';
 import 'package:vkhgaruda/deepotsava/sales/log.dart';
 import 'package:vkhgaruda/deepotsava/sales/summary.dart';
@@ -24,6 +25,8 @@ class _SalesState extends State<Sales> {
   // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
+  final GlobalKey<CounterDisplayState> _counterSalesKey =
+      GlobalKey<CounterDisplayState>();
 
   // lists
 
@@ -70,26 +73,26 @@ class _SalesState extends State<Sales> {
         Const().paymentModes[paymentMode]?['color'] as Color? ?? Colors.grey;
 
     return Widgets().createTopLevelCard(
-      context: context,
-      title: paymentMode,
-      color: color,
-      child: Container(),
-    );
+        context: context,
+        title: "$paymentMode - count: 0, amount: ₹0",
+        color: color,
+        child: HmiSales(color: color, onSubmit: (value) {}));
   }
 
   @override
   Widget build(BuildContext context) {
-    ThemeData? theme;
+    Color? color;
     if (widget.stall == "RKC") {
-      theme = ThemeCreator(primaryColor: Colors.pink).create();
+      color = Colors.pink;
     } else if (widget.stall == "RRG") {
-      theme = ThemeCreator(primaryColor: Colors.black).create();
+      color = Colors.black;
     }
+    ThemeData theme = ThemeCreator(primaryColor: color ?? Colors.grey).create();
 
     List<String> paymentModes = Const().paymentModes.keys.toList();
 
     return Theme(
-      data: theme ?? Theme.of(context),
+      data: theme,
       child: Stack(
         children: [
           ResponsiveScaffold(
@@ -152,6 +155,28 @@ class _SalesState extends State<Sales> {
                         SizedBox(height: 10),
 
                         // your widgets here
+
+                        // dashboard
+                        Widgets().createTopLevelCard(
+                            context: context,
+                            title: "Total Sales",
+                            color: color ?? Colors.grey,
+                            child: Column(
+                              children: [
+                                CounterDisplay(
+                                    key: _counterSalesKey,
+                                    fontSize: 48,
+                                    maxValue: 9999,
+                                    color: color ?? Colors.grey),
+                                Text("Total Amount: ₹0",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall),
+                              ],
+                            )),
+
+                        // all HMIs
+                        SizedBox(height: 10),
                         ...List.generate(paymentModes.length, (index) {
                           return _createHMI(paymentModes[index]);
                         }),

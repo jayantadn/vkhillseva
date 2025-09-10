@@ -50,9 +50,39 @@ class HmiSalesState extends State<HmiSales> {
     });
   }
 
-  void _incrementQuantity() {
-    int currentValue = int.tryParse(_quantityController.text) ?? 1;
-    _quantityController.text = (currentValue + 1).toString();
+  Widget _createSubmitButton(BuildContext context) {
+    final bool isActive = int.tryParse(_quantityController.text) != null &&
+        int.parse(_quantityController.text) > 0;
+
+    return GestureDetector(
+      onTap: _isLocked || !isActive ? null : _onSubmit,
+      child: Column(
+        children: [
+          // amount text
+          Text(
+            '₹${_quantityController.text}',
+            style: TextStyle(
+              color: isActive ? widget.color : Colors.grey,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+
+          // submit text
+          Text(
+            'Submit',
+            style: TextStyle(
+              color: isActive ? widget.color : Colors.grey,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              fontSize: 16,
+              decoration:
+                  isActive ? TextDecoration.underline : TextDecoration.none,
+              decorationColor: widget.color,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _decrementQuantity() {
@@ -97,10 +127,9 @@ class HmiSalesState extends State<HmiSales> {
     widget.onSubmit(newEntry);
   }
 
-  void setLockState(bool isLocked) {
-    setState(() {
-      _isLocked = isLocked;
-    });
+  void _incrementQuantity() {
+    int currentValue = int.tryParse(_quantityController.text) ?? 1;
+    _quantityController.text = (currentValue + 1).toString();
   }
 
   Future<void> _showCustomEntryDialog(BuildContext context) async {
@@ -191,7 +220,7 @@ class HmiSalesState extends State<HmiSales> {
 
             // text field
             SizedBox(
-              width: 80,
+              width: 50,
               child: GestureDetector(
                 onTap: _isLocked ? null : () => _showCustomEntryDialog(context),
                 child: AbsorbPointer(
@@ -218,13 +247,7 @@ class HmiSalesState extends State<HmiSales> {
             ),
 
             // submit button
-            IconButton(
-              onPressed: _isLocked ? null : _onSubmit,
-              icon: Icon(
-                Icons.check,
-              ),
-              color: widget.color,
-            ),
+            _createSubmitButton(context),
           ],
         ),
       ],

@@ -82,19 +82,19 @@ class Const {
   final paymentModes = {
     'Cash': {
       'icon': "assets/images/PaymentModes/icon_cash.png",
-      'color': Colors.green,
+      'color': const Color.fromARGB(255, 65, 154, 68),
     },
     'UPI': {
       'icon': "assets/images/PaymentModes/icon_upi.png",
-      'color': Colors.deepOrange,
+      'color': const Color(0xFFE65100),
     },
     'Card': {
       'icon': "assets/images/PaymentModes/icon_card.png",
-      'color': Colors.blue,
+      'color': const Color.fromARGB(255, 22, 76, 163),
     },
     'Gift': {
       'icon': "assets/images/PaymentModes/icon_gift.png",
-      'color': Colors.purple,
+      'color': const Color.fromARGB(255, 127, 33, 143),
     },
   };
 

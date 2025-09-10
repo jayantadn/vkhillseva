@@ -26,7 +26,7 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
     super.initState();
 
     FB().listenForChange(
-      "${Const().dbrootSangeetSeva}/PendingRequests",
+      "${Const().dbrootGaruda}/PendingRequests",
       FBCallbacks(
         // add
         add: (data) {

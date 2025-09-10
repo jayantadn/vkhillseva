@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/deepotsava/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class HmiSales extends StatefulWidget {
   final void Function(SalesEntry) onSubmit;
-  final Color color;
-  const HmiSales({super.key, required this.onSubmit, required this.color});
+  final String paymentMode;
+  const HmiSales(
+      {super.key, required this.onSubmit, required this.paymentMode});
 
   @override
   State<HmiSales> createState() => HmiSalesState();
@@ -22,12 +24,19 @@ class HmiSalesState extends State<HmiSales> {
       TextEditingController(text: '0');
   bool _isLocked = false;
   bool _isPlateIncluded = false;
+  late Color _color;
 
   final GlobalKey<RadioRowState> keyRadioRow = GlobalKey<RadioRowState>();
 
   @override
   void initState() {
     super.initState();
+
+    Const().paymentModes[widget.paymentMode] != null
+        ? _color = Const().paymentModes[widget.paymentMode]!['color'] as Color
+        : _color = Colors.grey;
+
+    Utils().fetchUserBasics();
 
     refresh();
   }
@@ -67,7 +76,7 @@ class HmiSalesState extends State<HmiSales> {
           Text(
             '₹$amount',
             style: TextStyle(
-              color: isActive ? widget.color : Colors.grey,
+              color: isActive ? _color : Colors.grey,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -77,12 +86,12 @@ class HmiSalesState extends State<HmiSales> {
           Text(
             'Submit',
             style: TextStyle(
-              color: isActive ? widget.color : Colors.grey,
+              color: isActive ? _color : Colors.grey,
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
               fontSize: 16,
               decoration:
                   isActive ? TextDecoration.underline : TextDecoration.none,
-              decorationColor: widget.color,
+              decorationColor: _color,
             ),
           ),
         ],
@@ -116,19 +125,27 @@ class HmiSalesState extends State<HmiSales> {
       return;
     }
 
+    SalesEntry newEntry = SalesEntry(
+      timestamp: DateTime.now(),
+      username: Utils().getUsername(),
+      count: int.tryParse(_quantityController.text) ?? 0,
+      paymentMode: widget.paymentMode,
+      isPlateIncluded: _isPlateIncluded,
+      deepamPrice: Const().deepotsava['deepamPrice'] as int,
+      platePrice: Const().deepotsava['platePrice'] as int,
+    );
+
+    // write to db
+    String dbdate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+    String timestamp =
+        newEntry.timestamp.toIso8601String().replaceAll(".", "^");
+    String dbpath =
+        "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate/$timestamp";
+    FB().setJson(path: dbpath, json: newEntry.toJson());
+
     // clear the text field
     _quantityController.text = '0';
     keyRadioRow.currentState?.resetSelection();
-
-    SalesEntry newEntry = SalesEntry(
-        timestamp: DateTime.now(),
-        username: Utils().getUsername(),
-        count: _quantityController.text.isEmpty
-            ? 0
-            : int.parse(_quantityController.text),
-        paymentMode: "Unknown",
-        isPlateIncluded: false // FIXME: get this value from UI
-        );
 
     // handle submit action
     widget.onSubmit(newEntry);
@@ -169,7 +186,7 @@ class HmiSalesState extends State<HmiSales> {
               key: keyRadioRow,
               items: ["1", "2", "5", "10"],
               selectedIndex: -1, // skip selection
-              color: widget.color,
+              color: _color,
               onChanged: (value) {
                 setState(() {
                   _quantityController.text = value;
@@ -205,14 +222,14 @@ class HmiSalesState extends State<HmiSales> {
                 height: 36,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: widget.color, width: 2),
-                  color: _isPlateIncluded ? widget.color : Colors.transparent,
+                  border: Border.all(color: _color, width: 2),
+                  color: _isPlateIncluded ? _color : Colors.transparent,
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   'P',
                   style: TextStyle(
-                    color: _isPlateIncluded ? Colors.white : widget.color,
+                    color: _isPlateIncluded ? Colors.white : _color,
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
@@ -224,7 +241,7 @@ class HmiSalesState extends State<HmiSales> {
             IconButton(
               onPressed: _isLocked ? null : _decrementQuantity,
               icon: const Icon(Icons.remove),
-              color: widget.color,
+              color: _color,
             ),
 
             // text field
@@ -252,7 +269,7 @@ class HmiSalesState extends State<HmiSales> {
             IconButton(
               onPressed: _isLocked ? null : _incrementQuantity,
               icon: const Icon(Icons.add),
-              color: widget.color,
+              color: _color,
             ),
 
             // submit button

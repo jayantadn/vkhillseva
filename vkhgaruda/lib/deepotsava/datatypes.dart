@@ -4,6 +4,8 @@ class SalesEntry {
   int count;
   String paymentMode;
   bool isPlateIncluded;
+  int deepamPrice;
+  int platePrice;
 
   SalesEntry({
     required this.timestamp,
@@ -11,6 +13,8 @@ class SalesEntry {
     required this.count,
     required this.paymentMode,
     required this.isPlateIncluded,
+    required this.deepamPrice,
+    required this.platePrice,
   });
 
   // Convert from JSON
@@ -21,6 +25,8 @@ class SalesEntry {
       count: json['count'],
       paymentMode: json['paymentMode'] ?? 'Unknown',
       isPlateIncluded: json['isPlateIncluded'] ?? false,
+      deepamPrice: json['deepamPrice'] ?? 0,
+      platePrice: json['platePrice'] ?? 0,
     );
   }
 
@@ -32,6 +38,8 @@ class SalesEntry {
       'count': count,
       'paymentMode': paymentMode,
       'isPlateIncluded': isPlateIncluded,
+      'deepamPrice': deepamPrice,
+      'platePrice': platePrice,
     };
   }
 
@@ -43,12 +51,14 @@ class SalesEntry {
         username == other.username &&
         count == other.count &&
         paymentMode == other.paymentMode &&
-        isPlateIncluded == other.isPlateIncluded;
+        isPlateIncluded == other.isPlateIncluded &&
+        deepamPrice == other.deepamPrice &&
+        platePrice == other.platePrice;
   }
 
   @override
-  int get hashCode =>
-      Object.hash(timestamp, username, count, paymentMode, isPlateIncluded);
+  int get hashCode => Object.hash(timestamp, username, count, paymentMode,
+      isPlateIncluded, deepamPrice, platePrice);
 }
 
 class InventoryEntry {

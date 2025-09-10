@@ -1,9 +1,10 @@
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/deepotsava/datatypes.dart';
 import 'package:vkhgaruda/deepotsava/sales/hmi_sales.dart';
-import 'package:vkhgaruda/deepotsava/sales/inventory.dart';
 import 'package:vkhgaruda/deepotsava/sales/log.dart';
 import 'package:vkhgaruda/deepotsava/sales/summary.dart';
 import 'package:vkhpackages/vkhpackages.dart';
@@ -27,14 +28,51 @@ class _SalesState extends State<Sales> {
   bool _isLoading = true;
   final GlobalKey<CounterDisplayState> _counterSalesKey =
       GlobalKey<CounterDisplayState>();
+  bool _firstInit = true;
 
   // lists
 
   // controllers, listeners and focus nodes
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {
     super.initState();
+
+    // listen for database events
+    FB().listenForChange(
+      "${Const().dbrootGaruda}/Deepotsava/Sales/2025-09-10",
+      FBCallbacks(
+        // add
+        add: (data) {
+          if (!_firstInit) {
+            // process the received data
+            SalesEntry entry =
+                Utils().convertRawToDatatype(data, SalesEntry.fromJson);
+            _addSales(entry);
+          }
+        },
+
+        // edit
+        edit: () {
+          refresh();
+        },
+
+        // delete
+        delete: (data) async {
+          if (!_firstInit) {
+            // process the received data
+            print("data: $data");
+          }
+        },
+
+        // get listeners
+        getListeners: (listeners) {
+          _listeners = listeners;
+        },
+      ),
+    );
+    _firstInit = false;
 
     refresh();
   }
@@ -46,6 +84,9 @@ class _SalesState extends State<Sales> {
     // dispose all controllers and focus nodes
 
     // listeners
+    for (var listener in _listeners) {
+      listener.cancel();
+    }
 
     super.dispose();
   }
@@ -68,6 +109,11 @@ class _SalesState extends State<Sales> {
     });
   }
 
+  void _addSales(SalesEntry entry) {
+    // update counter
+    _counterSalesKey.currentState!.addCount(entry.count);
+  }
+
   Widget _createHMI(String paymentMode) {
     Color color =
         Const().paymentModes[paymentMode]?['color'] as Color? ?? Colors.grey;
@@ -76,7 +122,7 @@ class _SalesState extends State<Sales> {
         context: context,
         title: "$paymentMode - count: 0, amount: ₹0",
         color: color,
-        child: HmiSales(color: color, onSubmit: (value) {}));
+        child: HmiSales(paymentMode: paymentMode, onSubmit: (value) {}));
   }
 
   @override

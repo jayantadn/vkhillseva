@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:vkhgaruda/deepotsava/sales.dart';
+import 'package:vkhgaruda/deepotsava/sales/sales.dart';
 import 'package:vkhpackages/common/toaster.dart';
 
 class Deepotsava extends StatefulWidget {

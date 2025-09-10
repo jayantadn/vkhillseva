@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/deepotsava/sales/inventory.dart';
+import 'package:vkhgaruda/deepotsava/sales/log.dart';
+import 'package:vkhgaruda/deepotsava/sales/summary.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Sales extends StatefulWidget {
@@ -81,9 +84,44 @@ class _SalesState extends State<Sales> {
 
             // toolbar icons
             toolbarActions: [
-              // ResponsiveToolbarAction(
-              //   icon: Icon(Icons.refresh),
-              // ),
+              // inventory management
+              ResponsiveToolbarAction(
+                icon: const Icon(Icons.playlist_add),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Inventory(
+                              title: "Inventory",
+                              splashImage: widget.splashImage)));
+                },
+              ),
+
+              // summary
+              ResponsiveToolbarAction(
+                icon: const Icon(Icons.article),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Summary(
+                              title: "Summary",
+                              splashImage: widget.splashImage)));
+                },
+              ),
+
+              // entry logs
+              ResponsiveToolbarAction(
+                icon: const Icon(Icons.receipt_long),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Log(
+                              title: "Inventory",
+                              splashImage: widget.splashImage)));
+                },
+              ),
             ],
 
             // body

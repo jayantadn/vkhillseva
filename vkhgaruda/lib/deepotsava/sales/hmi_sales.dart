@@ -21,6 +21,7 @@ class HmiSalesState extends State<HmiSales> {
   final TextEditingController _quantityController =
       TextEditingController(text: '0');
   bool _isLocked = false;
+  bool _isPlateIncluded = false;
 
   final GlobalKey<RadioRowState> keyRadioRow = GlobalKey<RadioRowState>();
 
@@ -134,6 +135,15 @@ class HmiSalesState extends State<HmiSales> {
               onChanged: (value) {
                 setState(() {
                   _quantityController.text = value;
+
+                  // if value is 5 or more, set plate included to true
+                  if (int.tryParse(value) != null) {
+                    if (int.parse(value) >= 5) {
+                      _isPlateIncluded = true;
+                    } else {
+                      _isPlateIncluded = false;
+                    }
+                  }
                 });
               }),
         ),
@@ -143,6 +153,35 @@ class HmiSalesState extends State<HmiSales> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            // plates button
+            GestureDetector(
+              onTap: _isLocked
+                  ? null
+                  : () {
+                      setState(() {
+                        _isPlateIncluded = !_isPlateIncluded;
+                      });
+                    },
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: widget.color, width: 2),
+                  color: _isPlateIncluded ? widget.color : Colors.transparent,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'P',
+                  style: TextStyle(
+                    color: _isPlateIncluded ? Colors.white : widget.color,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+
             // decrement
             IconButton(
               onPressed: _isLocked ? null : _decrementQuantity,

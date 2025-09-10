@@ -53,6 +53,11 @@ class HmiSalesState extends State<HmiSales> {
   Widget _createSubmitButton(BuildContext context) {
     final bool isActive = int.tryParse(_quantityController.text) != null &&
         int.parse(_quantityController.text) > 0;
+    int amount = (int.tryParse(_quantityController.text) ?? 0) *
+        Const().deepotsava['deepamPrice'] as int;
+    if (_isPlateIncluded) {
+      amount += Const().deepotsava['platePrice'] as int;
+    }
 
     return GestureDetector(
       onTap: _isLocked || !isActive ? null : _onSubmit,
@@ -60,7 +65,7 @@ class HmiSalesState extends State<HmiSales> {
         children: [
           // amount text
           Text(
-            '₹${_quantityController.text}',
+            '₹$amount',
             style: TextStyle(
               color: isActive ? widget.color : Colors.grey,
               fontWeight: FontWeight.bold,
@@ -86,10 +91,12 @@ class HmiSalesState extends State<HmiSales> {
   }
 
   void _decrementQuantity() {
-    int currentValue = int.tryParse(_quantityController.text) ?? 0;
-    if (currentValue > 0) {
-      _quantityController.text = (currentValue - 1).toString();
-    }
+    setState(() {
+      int currentValue = int.tryParse(_quantityController.text) ?? 0;
+      if (currentValue > 0) {
+        _quantityController.text = (currentValue - 1).toString();
+      }
+    });
   }
 
   Future<void> _onSubmit() async {
@@ -128,8 +135,10 @@ class HmiSalesState extends State<HmiSales> {
   }
 
   void _incrementQuantity() {
-    int currentValue = int.tryParse(_quantityController.text) ?? 1;
-    _quantityController.text = (currentValue + 1).toString();
+    setState(() {
+      int currentValue = int.tryParse(_quantityController.text) ?? 1;
+      _quantityController.text = (currentValue + 1).toString();
+    });
   }
 
   Future<void> _showCustomEntryDialog(BuildContext context) async {

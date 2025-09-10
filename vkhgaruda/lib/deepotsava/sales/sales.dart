@@ -65,6 +65,18 @@ class _SalesState extends State<Sales> {
     });
   }
 
+  Widget _createHMI(String paymentMode) {
+    Color color =
+        Const().paymentModes[paymentMode]?['color'] as Color? ?? Colors.grey;
+
+    return Widgets().createTopLevelCard(
+      context: context,
+      title: paymentMode,
+      color: color,
+      child: Container(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData? theme;
@@ -73,6 +85,8 @@ class _SalesState extends State<Sales> {
     } else if (widget.stall == "RRG") {
       theme = ThemeCreator(primaryColor: Colors.black).create();
     }
+
+    List<String> paymentModes = Const().paymentModes.keys.toList();
 
     return Theme(
       data: theme ?? Theme.of(context),
@@ -138,13 +152,9 @@ class _SalesState extends State<Sales> {
                         SizedBox(height: 10),
 
                         // your widgets here
-                        Widgets().createTopLevelCard(
-                          context: context,
-                          child: ListTile(
-                            title: Text("Hello World"),
-                            subtitle: Text("This is a sample card"),
-                          ),
-                        ),
+                        ...List.generate(paymentModes.length, (index) {
+                          return _createHMI(paymentModes[index]);
+                        }),
 
                         // leave some space at bottom
                         SizedBox(height: 100),

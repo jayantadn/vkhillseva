@@ -101,19 +101,6 @@ class _SalesState extends State<Sales> {
 
             // toolbar icons
             toolbarActions: [
-              // inventory management
-              ResponsiveToolbarAction(
-                icon: const Icon(Icons.playlist_add),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Inventory(
-                              title: "Inventory",
-                              splashImage: widget.splashImage)));
-                },
-              ),
-
               // summary
               ResponsiveToolbarAction(
                 icon: const Icon(Icons.article),
@@ -135,7 +122,7 @@ class _SalesState extends State<Sales> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => Log(
-                              title: "Inventory",
+                              title: "Entry Logs",
                               splashImage: widget.splashImage)));
                 },
               ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vkhpackages/vkhpackages.dart';
 
 class RadioRow extends StatefulWidget {
   final List<String> items;
@@ -15,17 +14,19 @@ class RadioRow extends StatefulWidget {
   });
 
   @override
-  State<RadioRow> createState() => _RadioRowState();
+  State<RadioRow> createState() => RadioRowState();
 }
 
-class _RadioRowState extends State<RadioRow> {
+class RadioRowState extends State<RadioRow> {
   String _selectedItem = "";
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.selectedIndex != null &&
+    if (widget.selectedIndex == -1) {
+      _selectedItem = "";
+    } else if (widget.selectedIndex != null &&
         widget.selectedIndex! >= 0 &&
         widget.selectedIndex! < widget.items.length) {
       _selectedItem = widget.items[widget.selectedIndex!];
@@ -41,6 +42,12 @@ class _RadioRowState extends State<RadioRow> {
     // dispose all controllers
 
     super.dispose();
+  }
+
+  void resetSelection() {
+    setState(() {
+      _selectedItem = "";
+    });
   }
 
   @override

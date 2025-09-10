@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/harinaam/datatypes.dart';
+import 'package:vkhgaruda/deepotsava/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class HmiSales extends StatefulWidget {
@@ -20,9 +20,9 @@ class HmiSalesState extends State<HmiSales> {
   final Lock _lock = Lock();
   final TextEditingController _quantityController =
       TextEditingController(text: '0');
-  String _selectedPaymentMode = Const().paymentModes.keys.first;
-  bool _isAdmin = false;
   bool _isLocked = false;
+
+  final GlobalKey<RadioRowState> keyRadioRow = GlobalKey<RadioRowState>();
 
   @override
   void initState() {
@@ -44,7 +44,6 @@ class HmiSalesState extends State<HmiSales> {
   Future<void> refresh() async {
     await _lock.synchronized(() async {
       // perform your work here
-      _isAdmin = await Utils().isAdmin();
 
       setState(() {});
     });
@@ -81,20 +80,17 @@ class HmiSalesState extends State<HmiSales> {
 
     // clear the text field
     _quantityController.text = '0';
-
-    // read ticket from db
-    String dbpath = "${Const().dbrootGaruda}/Settings/Harinaam/Japamalas";
-    List japamalasRaw = await FB().getList(path: dbpath);
-    Japamala japamala =
-        Utils().convertRawToDatatype(japamalasRaw.first, Japamala.fromJson);
+    keyRadioRow.currentState?.resetSelection();
 
     SalesEntry newEntry = SalesEntry(
-      count: intValue,
-      japamala: japamala,
-      timestamp: DateTime.now(),
-      paymentMode: _selectedPaymentMode,
-      username: Utils().getUsername(),
-    );
+        timestamp: DateTime.now(),
+        username: Utils().getUsername(),
+        count: _quantityController.text.isEmpty
+            ? 0
+            : int.parse(_quantityController.text),
+        paymentMode: "Unknown",
+        isPlateIncluded: false // FIXME: get this value from UI
+        );
 
     // handle submit action
     widget.onSubmit(newEntry);
@@ -106,20 +102,43 @@ class HmiSalesState extends State<HmiSales> {
     });
   }
 
+  Future<void> _showCustomEntryDialog(BuildContext context) async {
+    await Widgets().showResponsiveDialog(
+      context: context,
+      title: 'Enter Quantity',
+      child: TextFormField(
+        autofocus: true,
+        controller: _quantityController,
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () {},
+          child: const Text('Submit'),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // radio buttons
         Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
           child: RadioRow(
+              key: keyRadioRow,
               items: ["1", "2", "5", "10"],
+              selectedIndex: -1, // skip selection
               color: widget.color,
-              selectedIndex: 0,
               onChanged: (value) {
-                _selectedPaymentMode = value;
+                setState(() {
+                  _quantityController.text = value;
+                });
               }),
         ),
+
+        // text field with increment and decrement buttons
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -134,15 +153,20 @@ class HmiSalesState extends State<HmiSales> {
             // text field
             SizedBox(
               width: 80,
-              child: TextField(
-                controller: _quantityController,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                readOnly: _isLocked ? true : false,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: GestureDetector(
+                onTap: _isLocked ? null : () => _showCustomEntryDialog(context),
+                child: AbsorbPointer(
+                  child: TextField(
+                    controller: _quantityController,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    ),
+                  ),
                 ),
               ),
             ),

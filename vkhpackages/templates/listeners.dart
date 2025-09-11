@@ -34,10 +34,12 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
             DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
           )) {
             _lastDataModification = DateTime.now();
+
+            // process the received data
+            print(data);
           }
 
-          // process the received data
-          print(data);
+
         },
 
         // edit

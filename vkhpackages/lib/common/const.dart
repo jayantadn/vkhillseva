@@ -98,10 +98,7 @@ class Const {
     },
   };
 
-  final Map<String, dynamic> deepotsava = {
-    'deepamPrice': 5,
-    'platePrice': 10,
-  };
+  final Map<String, dynamic> deepotsava = {'deepamPrice': 5, 'platePrice': 10};
 
   final List<String> icons = [
     "assets/images/Logo/KrishnaLilaPark_circle.png",

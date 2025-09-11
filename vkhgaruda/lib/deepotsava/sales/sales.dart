@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/deepotsava/datatypes.dart';
 import 'package:vkhgaruda/deepotsava/sales/hmi_sales.dart';
@@ -28,7 +29,9 @@ class _SalesState extends State<Sales> {
   bool _isLoading = true;
   final GlobalKey<CounterDisplayState> _counterSalesKey =
       GlobalKey<CounterDisplayState>();
-  bool _firstInit = true;
+  DateTime _lastDataModification = DateTime.now();
+  DateTime _selectedDate = DateTime.now();
+  SalesEntry? _lastEntry;
 
   // lists
 
@@ -38,41 +41,6 @@ class _SalesState extends State<Sales> {
   @override
   initState() {
     super.initState();
-
-    // listen for database events
-    FB().listenForChange(
-      "${Const().dbrootGaruda}/Deepotsava/Sales/2025-09-10",
-      FBCallbacks(
-        // add
-        add: (data) {
-          if (!_firstInit) {
-            // process the received data
-            SalesEntry entry =
-                Utils().convertRawToDatatype(data, SalesEntry.fromJson);
-            _addSales(entry);
-          }
-        },
-
-        // edit
-        edit: () {
-          refresh();
-        },
-
-        // delete
-        delete: (data) async {
-          if (!_firstInit) {
-            // process the received data
-            print("data: $data");
-          }
-        },
-
-        // get listeners
-        getListeners: (listeners) {
-          _listeners = listeners;
-        },
-      ),
-    );
-    _firstInit = false;
 
     refresh();
   }
@@ -100,6 +68,69 @@ class _SalesState extends State<Sales> {
 
     await _lock.synchronized(() async {
       // your code here
+
+      // listen for database events
+      String dateStr = DateFormat("yyyy-MM-dd").format(_selectedDate);
+      for (var listener in _listeners) {
+        listener.cancel();
+      }
+      FB().listenForChange(
+        "${Const().dbrootGaruda}/Deepotsava/Sales/$dateStr",
+        FBCallbacks(
+          // add
+          add: (data) {
+            if (_lastDataModification.isBefore(
+              DateTime.now()
+                  .subtract(Duration(seconds: Const().fbListenerDelay)),
+            )) {
+              _lastDataModification = DateTime.now();
+
+              // process the received data
+              SalesEntry entry =
+                  Utils().convertRawToDatatype(data, SalesEntry.fromJson);
+              if (_lastEntry != null && entry != _lastEntry) {
+                _addSales(entry);
+              } else if (_lastEntry == null) {
+                _addSales(entry);
+              }
+              _lastEntry = entry;
+            }
+          },
+
+          // edit
+          edit: () {
+            if (_lastDataModification.isBefore(
+              DateTime.now()
+                  .subtract(Duration(seconds: Const().fbListenerDelay)),
+            )) {
+              _lastDataModification = DateTime.now();
+
+              refresh();
+            }
+          },
+
+          // delete
+          delete: (data) async {
+            if (_lastDataModification.isBefore(
+              DateTime.now()
+                  .subtract(Duration(seconds: Const().fbListenerDelay)),
+            )) {
+              _lastDataModification = DateTime.now();
+
+              // process the received data
+            }
+          },
+
+          // get listeners
+          getListeners: (listeners) {
+            _listeners = listeners;
+          },
+        ),
+      );
+
+      // read database and populate counter
+      String dbdate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+      String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
     });
 
     // refresh all child widgets

@@ -68,14 +68,27 @@ class _SalesState extends State<Sales> {
 
     await _lock.synchronized(() async {
       // your code here
+      _selectedDate = DateTime.now();
+
+      // read database and populate counter
+      String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
+      String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
+      int count = 0;
+      FB().getList(path: dbpath).then((listRaw) {
+        for (var item in listRaw) {
+          SalesEntry entry =
+              Utils().convertRawToDatatype(item, SalesEntry.fromJson);
+          count += entry.count;
+        }
+        _counterSalesKey.currentState!.setCounterValue(count);
+      });
 
       // listen for database events
-      String dateStr = DateFormat("yyyy-MM-dd").format(_selectedDate);
       for (var listener in _listeners) {
         listener.cancel();
       }
       FB().listenForChange(
-        "${Const().dbrootGaruda}/Deepotsava/Sales/$dateStr",
+        dbpath,
         FBCallbacks(
           // add
           add: (data) {
@@ -127,10 +140,6 @@ class _SalesState extends State<Sales> {
           },
         ),
       );
-
-      // read database and populate counter
-      String dbdate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-      String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
     });
 
     // refresh all child widgets

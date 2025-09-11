@@ -30,8 +30,9 @@ class _SalesState extends State<Sales> {
   final GlobalKey<CounterDisplayState> _counterSalesKey =
       GlobalKey<CounterDisplayState>();
   DateTime _lastDataModification = DateTime.now();
+  SalesEntry? _lastAddedEntry;
+  SalesEntry? _lastDeletedEntry;
   DateTime _selectedDate = DateTime.now();
-  SalesEntry? _lastEntry;
 
   // lists
 
@@ -101,12 +102,12 @@ class _SalesState extends State<Sales> {
               // process the received data
               SalesEntry entry =
                   Utils().convertRawToDatatype(data, SalesEntry.fromJson);
-              if (_lastEntry != null && entry != _lastEntry) {
+              if (_lastAddedEntry != null && entry != _lastAddedEntry) {
                 _addSales(entry);
-              } else if (_lastEntry == null) {
+              } else if (_lastAddedEntry == null) {
                 _addSales(entry);
               }
-              _lastEntry = entry;
+              _lastAddedEntry = entry;
             }
           },
 
@@ -131,6 +132,14 @@ class _SalesState extends State<Sales> {
               _lastDataModification = DateTime.now();
 
               // process the received data
+              SalesEntry entry =
+                  Utils().convertRawToDatatype(data, SalesEntry.fromJson);
+              if (_lastDeletedEntry != null && entry != _lastDeletedEntry) {
+                _deleteSales(entry);
+              } else if (_lastDeletedEntry == null) {
+                _deleteSales(entry);
+              }
+              _lastDeletedEntry = entry;
             }
           },
 
@@ -163,6 +172,16 @@ class _SalesState extends State<Sales> {
         title: "$paymentMode - count: 0, amount: ₹0",
         color: color,
         child: HmiSales(paymentMode: paymentMode, onSubmit: (value) {}));
+  }
+
+  void _deleteSales(SalesEntry entry) {
+    // update counter
+    int value = _counterSalesKey.currentState!.getCount();
+    value -= entry.count;
+    if (value < 0) {
+      value = 0;
+    }
+    _counterSalesKey.currentState!.setCounterValue(value);
   }
 
   @override

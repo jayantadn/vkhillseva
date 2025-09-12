@@ -29,10 +29,8 @@ class _SalesState extends State<Sales> {
   bool _isLoading = true;
   final GlobalKey<CounterDisplayState> _counterSalesKey =
       GlobalKey<CounterDisplayState>();
-  DateTime _lastDataModification = DateTime.now();
-  SalesEntry? _lastAddedEntry;
-  SalesEntry? _lastDeletedEntry;
   DateTime _selectedDate = DateTime.now();
+  final Set _loadedKeys = {};
   int _totalAmount = 0;
   final Map<String, dynamic> _amountPerMode = {
     "Cash": {
@@ -93,110 +91,48 @@ class _SalesState extends State<Sales> {
       // read database and populate counter
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
       String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
+      List<dynamic> listRaw = await FB().getList(path: dbpath);
+      // clear stuff befre loading data
       int count = 0;
       _totalAmount = 0;
       _amountPerMode.forEach((key, value) {
         value['count'] = 0;
         value['amount'] = 0;
       });
-      FB().getList(path: dbpath).then((listRaw) {
-        for (var item in listRaw) {
-          SalesEntry entry =
-              Utils().convertRawToDatatype(item, SalesEntry.fromJson);
-          count += entry.count;
+      _loadedKeys.clear();
 
-          // update total amount
-          if (entry.paymentMode != "Gift") {
-            _totalAmount += (entry.deepamPrice * entry.count);
-            if (entry.isPlateIncluded) {
-              _totalAmount += entry.platePrice;
-            }
-          }
+      for (var item in listRaw) {
+        SalesEntry entry =
+            Utils().convertRawToDatatype(item, SalesEntry.fromJson);
 
-          // set count and amount per mode
-          _amountPerMode[entry.paymentMode]?['count'] =
-              (_amountPerMode[entry.paymentMode]?['count'] ?? 0) + entry.count;
-          if (entry.paymentMode != "Gift") {
-            _amountPerMode[entry.paymentMode]?['amount'] =
-                (_amountPerMode[entry.paymentMode]?['amount'] ?? 0) +
-                    (entry.deepamPrice * entry.count) +
-                    (entry.isPlateIncluded ? entry.platePrice : 0);
+        _loadedKeys.add(entry.timestamp);
+
+        count += entry.count;
+
+        // update total amount
+        if (entry.paymentMode != "Gift") {
+          _totalAmount += (entry.deepamPrice * entry.count);
+          if (entry.isPlateIncluded) {
+            _totalAmount += entry.platePrice;
           }
         }
-        _counterSalesKey.currentState!.setCounterValue(count);
 
-        setState(() {});
-      });
+        // set count and amount per mode
+        _amountPerMode[entry.paymentMode]?['count'] =
+            (_amountPerMode[entry.paymentMode]?['count'] ?? 0) + entry.count;
+        if (entry.paymentMode != "Gift") {
+          _amountPerMode[entry.paymentMode]?['amount'] =
+              (_amountPerMode[entry.paymentMode]?['amount'] ?? 0) +
+                  (entry.deepamPrice * entry.count) +
+                  (entry.isPlateIncluded ? entry.platePrice : 0);
+        }
+      }
+
+      // update the counter
+      _counterSalesKey.currentState!.setCounterValue(count);
 
       // listen for database events
-      for (var listener in _listeners) {
-        listener.cancel();
-      }
-      FB().listenForChange(
-        dbpath,
-        FBCallbacks(
-          // add
-          add: (data) {
-            if (_lastDataModification.isBefore(
-              DateTime.now()
-                  .subtract(Duration(seconds: Const().fbListenerDelay)),
-            )) {
-              _lastDataModification = DateTime.now();
-
-              print("add: $data");
-
-              // process the received data
-              SalesEntry entry =
-                  Utils().convertRawToDatatype(data, SalesEntry.fromJson);
-              if (_lastAddedEntry != null && entry != _lastAddedEntry) {
-                _addSales(entry);
-              } else if (_lastAddedEntry == null) {
-                _addSales(entry);
-              }
-              _lastAddedEntry = entry;
-            }
-          },
-
-          // edit
-          edit: () {
-            if (_lastDataModification.isBefore(
-              DateTime.now()
-                  .subtract(Duration(seconds: Const().fbListenerDelay)),
-            )) {
-              _lastDataModification = DateTime.now();
-
-              print("edit");
-
-              refresh();
-            }
-          },
-
-          // delete
-          delete: (data) async {
-            if (_lastDataModification.isBefore(
-              DateTime.now()
-                  .subtract(Duration(seconds: Const().fbListenerDelay)),
-            )) {
-              _lastDataModification = DateTime.now();
-
-              // process the received data
-              SalesEntry entry =
-                  Utils().convertRawToDatatype(data, SalesEntry.fromJson);
-              if (_lastDeletedEntry != null && entry != _lastDeletedEntry) {
-                _deleteSales(entry);
-              } else if (_lastDeletedEntry == null) {
-                _deleteSales(entry);
-              }
-              _lastDeletedEntry = entry;
-            }
-          },
-
-          // get listeners
-          getListeners: (listeners) {
-            _listeners = listeners;
-          },
-        ),
-      );
+      _addFBListeners(dbpath);
     });
 
     // refresh all child widgets
@@ -204,6 +140,54 @@ class _SalesState extends State<Sales> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  void _addFBListeners(String dbpath) {
+    for (var listener in _listeners) {
+      listener.cancel();
+    }
+    FB().listenForChange(
+      dbpath,
+      FBCallbacks(
+        // add
+        add: (data) {
+          // process the received data
+          SalesEntry entry =
+              Utils().convertRawToDatatype(data, SalesEntry.fromJson);
+
+          // workaround to avoid duplicate entries during initial load
+          if (_loadedKeys.contains(entry.timestamp)) {
+            return;
+          }
+          _loadedKeys.add(entry.timestamp);
+
+          _addSales(entry);
+        },
+
+        // edit
+        edit: () {
+          refresh();
+        },
+
+        // delete
+        delete: (data) async {
+          // process the received data
+          SalesEntry entry =
+              Utils().convertRawToDatatype(data, SalesEntry.fromJson);
+
+          // workaround to avoid duplicate entries during initial load
+          if (_loadedKeys.contains(entry.timestamp)) {
+            _deleteSales(entry);
+            _loadedKeys.remove(entry.timestamp);
+          }
+        },
+
+        // get listeners
+        getListeners: (listeners) {
+          _listeners = listeners;
+        },
+      ),
+    );
   }
 
   void _addSales(SalesEntry entry) {

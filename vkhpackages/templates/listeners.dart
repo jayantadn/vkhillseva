@@ -2,19 +2,26 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
-class RegisteredEvents extends StatefulWidget {
-  const RegisteredEvents({super.key});
+class Sales extends StatefulWidget {
+  final String title;
+  final String? splashImage;
+
+  const Sales({super.key, required this.title, this.splashImage});
 
   @override
   // ignore: library_private_types_in_public_api
-  _RegisteredEventsState createState() => _RegisteredEventsState();
+  _SalesState createState() => _SalesState();
 }
 
-class _RegisteredEventsState extends State<RegisteredEvents> {
+class _SalesState extends State<Sales> {
   // scalars
-  DateTime _lastDataModification = DateTime.now();
+  final Lock _lock = Lock();
+  bool _isLoading = true;
+  final Set _loadedKeys = {};
 
   // lists
 
@@ -25,43 +32,80 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
   initState() {
     super.initState();
 
+    refresh();
+  }
+
+  @override
+  dispose() {
+    // clear all lists and maps
+
+    // dispose all controllers and focus nodes
+
+    // listeners
+    for (var listener in _listeners) {
+      listener.cancel();
+    }
+
+    super.dispose();
+  }
+
+  Future<void> refresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // access control
+
+    await _lock.synchronized(() async {
+      // your code here
+
+      // read database and populate counter
+      String dbdate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+      String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
+
+      // listen for database events
+      _addFBListeners(dbpath);
+    });
+
+    // refresh all child widgets
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void _addFBListeners(String dbpath) {
+    for (var listener in _listeners) {
+      listener.cancel();
+    }
     FB().listenForChange(
-      "${Const().dbrootGaruda}/PendingRequests",
+      dbpath,
       FBCallbacks(
         // add
         add: (data) {
-          if (_lastDataModification.isBefore(
-            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
-          )) {
-            _lastDataModification = DateTime.now();
-
-            // process the received data
-            print(data);
+          // workaround to avoid duplicate entries during initial load
+          if (_loadedKeys.contains(data['timestamp'])) {
+            return;
           }
+          _loadedKeys.add(data['timestamp']);
 
-
+          // process the received data
+          print("data: $data");
         },
 
         // edit
         edit: () {
-          if (_lastDataModification.isBefore(
-            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
-          )) {
-            _lastDataModification = DateTime.now();
-
-            refresh();
-          }
+          refresh();
         },
 
         // delete
         delete: (data) async {
-          if (_lastDataModification.isBefore(
-            DateTime.now().subtract(Duration(seconds: Const().fbListenerDelay)),
-          )) {
-            _lastDataModification = DateTime.now();
+          // workaround to avoid duplicate entries during initial load
+          if (_loadedKeys.contains(data['timestamp'])) {
+            _loadedKeys.remove(data['timestamp']);
 
             // process the received data
-            print(data);
+            print("data: $data");
           }
         },
 
@@ -74,21 +118,44 @@ class _RegisteredEventsState extends State<RegisteredEvents> {
   }
 
   @override
-  dispose() {
-    // clear all lists
-
-    // clear all controllers and focus nodes
-    for (var element in _listeners) {
-      element.cancel();
-    }
-
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Placeholder();
-  }
+    return Stack(
+      children: [
+        ResponsiveScaffold(
+          // title
+          title: widget.title,
 
-  Future<void> refresh() async {}
+          // toolbar icons
+          toolbarActions: [],
+
+          // body
+          body: RefreshIndicator(
+            onRefresh: refresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      // leave some space at top
+                      SizedBox(height: 10),
+
+                      // your widgets here
+
+                      // leave some space at bottom
+                      SizedBox(height: 100),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // circular progress indicator
+        if (_isLoading) LoadingOverlay(image: widget.splashImage),
+      ],
+    );
+  }
 }

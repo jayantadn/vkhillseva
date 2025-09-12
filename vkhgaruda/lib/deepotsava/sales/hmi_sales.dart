@@ -22,7 +22,6 @@ class HmiSalesState extends State<HmiSales> {
   final Lock _lock = Lock();
   final TextEditingController _quantityController =
       TextEditingController(text: '0');
-  bool _isLocked = false;
   bool _isPlateIncluded = false;
   late Color _color;
 
@@ -60,41 +59,48 @@ class HmiSalesState extends State<HmiSales> {
   }
 
   Widget _createSubmitButton(BuildContext context) {
-    final bool isActive = int.tryParse(_quantityController.text) != null &&
+    bool isActive = int.tryParse(_quantityController.text) != null &&
         int.parse(_quantityController.text) > 0;
     int amount = (int.tryParse(_quantityController.text) ?? 0) *
         Const().deepotsava['deepamPrice'] as int;
     if (_isPlateIncluded) {
       amount += Const().deepotsava['platePrice'] as int;
+      isActive = true;
     }
 
-    return GestureDetector(
-      onTap: _isLocked || !isActive ? null : _onSubmit,
-      child: Column(
-        children: [
-          // amount text
-          Text(
-            '₹$amount',
-            style: TextStyle(
-              color: isActive ? _color : Colors.grey,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
+    return Card(
+      color: Theme.of(context).colorScheme.secondary,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+        child: GestureDetector(
+          onTap: _onSubmit,
+          child: Column(
+            children: [
+              // amount text
+              Text(
+                '₹$amount',
+                style: TextStyle(
+                  color: isActive ? _color : Colors.grey,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
 
-          // submit text
-          Text(
-            'Submit',
-            style: TextStyle(
-              color: isActive ? _color : Colors.grey,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-              fontSize: 16,
-              decoration:
-                  isActive ? TextDecoration.underline : TextDecoration.none,
-              decorationColor: _color,
-            ),
+              // submit text
+              Text(
+                'Submit',
+                style: TextStyle(
+                  color: isActive ? _color : Colors.grey,
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 16,
+                  decoration:
+                      isActive ? TextDecoration.underline : TextDecoration.none,
+                  decorationColor: _color,
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -145,7 +151,9 @@ class HmiSalesState extends State<HmiSales> {
 
     // clear the text field
     _quantityController.text = '0';
+    _isPlateIncluded = false;
     keyRadioRow.currentState?.resetSelection();
+    setState(() {});
 
     // handle submit action
     widget.onSubmit(newEntry);
@@ -210,13 +218,11 @@ class HmiSalesState extends State<HmiSales> {
           children: [
             // plates button
             GestureDetector(
-              onTap: _isLocked
-                  ? null
-                  : () {
-                      setState(() {
-                        _isPlateIncluded = !_isPlateIncluded;
-                      });
-                    },
+              onTap: () {
+                setState(() {
+                  _isPlateIncluded = !_isPlateIncluded;
+                });
+              },
               child: Container(
                 width: 36,
                 height: 36,
@@ -239,7 +245,7 @@ class HmiSalesState extends State<HmiSales> {
 
             // decrement
             IconButton(
-              onPressed: _isLocked ? null : _decrementQuantity,
+              onPressed: _decrementQuantity,
               icon: const Icon(Icons.remove),
               color: _color,
             ),
@@ -248,7 +254,7 @@ class HmiSalesState extends State<HmiSales> {
             SizedBox(
               width: 50,
               child: GestureDetector(
-                onTap: _isLocked ? null : () => _showCustomEntryDialog(context),
+                onTap: () => _showCustomEntryDialog(context),
                 child: AbsorbPointer(
                   child: TextField(
                     controller: _quantityController,
@@ -267,7 +273,7 @@ class HmiSalesState extends State<HmiSales> {
 
             // increment
             IconButton(
-              onPressed: _isLocked ? null : _incrementQuantity,
+              onPressed: _incrementQuantity,
               icon: const Icon(Icons.add),
               color: _color,
             ),

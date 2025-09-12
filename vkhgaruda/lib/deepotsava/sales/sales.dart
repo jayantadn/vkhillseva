@@ -189,7 +189,8 @@ class _SalesState extends State<Sales> {
         child: HmiSales(
             paymentMode: paymentMode,
             onSubmit: (value) {
-              Toaster().info("Added ${value.count} lamps");
+              Toaster().info(
+                  "Added ${value.count} lamp${value.count > 1 ? 's' : ''}");
             }));
   }
 

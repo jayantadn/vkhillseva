@@ -8,7 +8,7 @@ class YearHeader extends StatefulWidget {
   const YearHeader({
     super.key,
     this.callbacks,
-    this.startYear = 2020,
+    this.startYear = 2024,
     this.descending = true,
   });
 
@@ -20,6 +20,8 @@ class _YearHeaderState extends State<YearHeader> {
   late int _currentYear;
   late List<int> _years; // generated from startYear..now
   final ScrollController _scrollController = ScrollController();
+  bool _showLeftFade = false;
+  bool _showRightFade = false;
 
   @override
   void initState() {
@@ -30,6 +32,7 @@ class _YearHeaderState extends State<YearHeader> {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => _maybeScrollToSelected(),
     );
+    _scrollController.addListener(_updateFades);
   }
 
   void _buildYearList() {
@@ -50,6 +53,21 @@ class _YearHeaderState extends State<YearHeader> {
         targetOffset.clamp(0.0, _scrollController.position.maxScrollExtent),
       );
     }
+    _updateFades();
+  }
+
+  void _updateFades() {
+    if (!_scrollController.hasClients) return;
+    final max = _scrollController.position.maxScrollExtent;
+    final offset = _scrollController.offset;
+    final left = offset > 4;
+    final right = (max - offset) > 4;
+    if (left != _showLeftFade || right != _showRightFade) {
+      setState(() {
+        _showLeftFade = left;
+        _showRightFade = right;
+      });
+    }
   }
 
   void _select(int year) {
@@ -61,25 +79,100 @@ class _YearHeaderState extends State<YearHeader> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bg = theme.colorScheme.surface;
     return SizedBox(
-      height: 60,
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        child: Row(
-          children:
-              _years
-                  .map(
-                    (y) => _YearChip(
-                      year: y,
-                      selected: y == _currentYear,
-                      onTap: () => _select(y),
-                      theme: theme,
+      height: 80,
+      child: Stack(
+        children: [
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(44),
+              color: bg.withOpacity(0.55),
+              border: Border.all(
+                color: theme.colorScheme.outlineVariant.withOpacity(0.35),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(44),
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (n) {
+                  _updateFades();
+                  return false;
+                },
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children:
+                        _years
+                            .map(
+                              (y) => _YearChip(
+                                year: y,
+                                selected: y == _currentYear,
+                                onTap: () => _select(y),
+                                theme: theme,
+                              ),
+                            )
+                            .toList(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (_showLeftFade)
+            Positioned(
+              left: 8,
+              top: 8,
+              bottom: 8,
+              width: 32,
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.horizontal(
+                      left: Radius.circular(44),
                     ),
-                  )
-                  .toList(),
-        ),
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [bg.withOpacity(0.85), bg.withOpacity(0.0)],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          if (_showRightFade)
+            Positioned(
+              right: 8,
+              top: 8,
+              bottom: 8,
+              width: 32,
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.horizontal(
+                      right: Radius.circular(44),
+                    ),
+                    gradient: LinearGradient(
+                      begin: Alignment.centerRight,
+                      end: Alignment.centerLeft,
+                      colors: [bg.withOpacity(0.85), bg.withOpacity(0.0)],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -103,51 +196,47 @@ class _YearChip extends StatelessWidget {
     final baseColor = theme.colorScheme.primary;
     final onPrimary = theme.colorScheme.onPrimary;
     final borderColor =
-        selected ? baseColor : theme.dividerColor.withOpacity(0.4);
+        selected ? baseColor : theme.dividerColor.withOpacity(0.35);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
       child: InkWell(
         borderRadius: BorderRadius.circular(28),
         onTap: onTap,
-        child: AnimatedScale(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          scale: selected ? 1.06 : 1.0,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: borderColor, width: 1.2),
-              gradient:
-                  selected
-                      ? LinearGradient(
-                        colors: [
-                          baseColor.withOpacity(0.95),
-                          baseColor.withOpacity(0.70),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      )
-                      : null,
-              color:
-                  selected
-                      ? null
-                      : theme.colorScheme.surfaceVariant.withOpacity(0.25),
-              boxShadow:
-                  selected
-                      ? [
-                        BoxShadow(
-                          color: baseColor.withOpacity(0.30),
-                          blurRadius: 14,
-                          offset: const Offset(0, 6),
-                        ),
-                      ]
-                      : [],
-            ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: borderColor, width: 1.2),
+            gradient:
+                selected
+                    ? LinearGradient(
+                      colors: [
+                        baseColor.withOpacity(0.95),
+                        baseColor.withOpacity(0.70),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                    : null,
+            color:
+                selected
+                    ? null
+                    : theme.colorScheme.surfaceVariant.withOpacity(0.25),
+            boxShadow:
+                selected
+                    ? [
+                      BoxShadow(
+                        color: baseColor.withOpacity(0.30),
+                        blurRadius: 14,
+                        offset: const Offset(0, 6),
+                      ),
+                    ]
+                    : [],
+          ),
+          child: Center(
             child: Text(
               year.toString(),
+              strutStyle: const StrutStyle(height: 1.3, leading: 0.2),
               style: theme.textTheme.titleMedium?.copyWith(
                 color:
                     selected ? onPrimary : theme.textTheme.titleMedium?.color,

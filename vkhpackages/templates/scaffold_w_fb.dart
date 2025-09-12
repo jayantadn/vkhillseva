@@ -59,12 +59,13 @@ class _SalesState extends State<Sales> {
     await _lock.synchronized(() async {
       // your code here
 
-      // read database and populate counter
+      // read database and populate data
       String dbdate = DateFormat("yyyy-MM-dd").format(DateTime.now());
       String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
+      await _initData(dbpath);
 
       // listen for database events
-      _addFBListeners(dbpath);
+      _addListeners(dbpath);
     });
 
     // refresh all child widgets
@@ -74,7 +75,11 @@ class _SalesState extends State<Sales> {
     });
   }
 
-  void _addFBListeners(String dbpath) {
+  void _addData(Map data) {
+    setState(() {});
+  }
+
+  void _addListeners(String dbpath) {
     for (var listener in _listeners) {
       listener.cancel();
     }
@@ -90,7 +95,7 @@ class _SalesState extends State<Sales> {
           _loadedKeys.add(data['timestamp']);
 
           // process the received data
-          print("data: $data");
+          _addData(data);
         },
 
         // edit
@@ -105,7 +110,7 @@ class _SalesState extends State<Sales> {
             _loadedKeys.remove(data['timestamp']);
 
             // process the received data
-            print("data: $data");
+            _deleteData(data);
           }
         },
 
@@ -116,6 +121,12 @@ class _SalesState extends State<Sales> {
       ),
     );
   }
+
+  void _deleteData(Map data) {
+    setState(() {});
+  }
+
+  Future<void> _initData(String dbpath) async {}
 
   @override
   Widget build(BuildContext context) {

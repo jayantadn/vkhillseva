@@ -91,45 +91,7 @@ class _SalesState extends State<Sales> {
       // read database and populate counter
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
       String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
-      List<dynamic> listRaw = await FB().getList(path: dbpath);
-      // clear stuff befre loading data
-      int count = 0;
-      _totalAmount = 0;
-      _amountPerMode.forEach((key, value) {
-        value['count'] = 0;
-        value['amount'] = 0;
-      });
-      _loadedKeys.clear();
-
-      for (var item in listRaw) {
-        SalesEntry entry =
-            Utils().convertRawToDatatype(item, SalesEntry.fromJson);
-
-        _loadedKeys.add(entry.timestamp);
-
-        count += entry.count;
-
-        // update total amount
-        if (entry.paymentMode != "Gift") {
-          _totalAmount += (entry.deepamPrice * entry.count);
-          if (entry.isPlateIncluded) {
-            _totalAmount += entry.platePrice;
-          }
-        }
-
-        // set count and amount per mode
-        _amountPerMode[entry.paymentMode]?['count'] =
-            (_amountPerMode[entry.paymentMode]?['count'] ?? 0) + entry.count;
-        if (entry.paymentMode != "Gift") {
-          _amountPerMode[entry.paymentMode]?['amount'] =
-              (_amountPerMode[entry.paymentMode]?['amount'] ?? 0) +
-                  (entry.deepamPrice * entry.count) +
-                  (entry.isPlateIncluded ? entry.platePrice : 0);
-        }
-      }
-
-      // update the counter
-      _counterSalesKey.currentState!.setCounterValue(count);
+      await _initData(dbpath);
 
       // listen for database events
       _addFBListeners(dbpath);
@@ -264,6 +226,48 @@ class _SalesState extends State<Sales> {
     }
 
     setState(() {});
+  }
+
+  Future<void> _initData(String dbpath) async {
+    List<dynamic> listRaw = await FB().getList(path: dbpath);
+    // clear stuff befre loading data
+    int count = 0;
+    _totalAmount = 0;
+    _amountPerMode.forEach((key, value) {
+      value['count'] = 0;
+      value['amount'] = 0;
+    });
+    _loadedKeys.clear();
+
+    for (var item in listRaw) {
+      SalesEntry entry =
+          Utils().convertRawToDatatype(item, SalesEntry.fromJson);
+
+      _loadedKeys.add(entry.timestamp);
+
+      count += entry.count;
+
+      // update total amount
+      if (entry.paymentMode != "Gift") {
+        _totalAmount += (entry.deepamPrice * entry.count);
+        if (entry.isPlateIncluded) {
+          _totalAmount += entry.platePrice;
+        }
+      }
+
+      // set count and amount per mode
+      _amountPerMode[entry.paymentMode]?['count'] =
+          (_amountPerMode[entry.paymentMode]?['count'] ?? 0) + entry.count;
+      if (entry.paymentMode != "Gift") {
+        _amountPerMode[entry.paymentMode]?['amount'] =
+            (_amountPerMode[entry.paymentMode]?['amount'] ?? 0) +
+                (entry.deepamPrice * entry.count) +
+                (entry.isPlateIncluded ? entry.platePrice : 0);
+      }
+    }
+
+    // update the counter
+    _counterSalesKey.currentState!.setCounterValue(count);
   }
 
   @override

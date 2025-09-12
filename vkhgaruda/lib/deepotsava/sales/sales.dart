@@ -33,6 +33,7 @@ class _SalesState extends State<Sales> {
   SalesEntry? _lastAddedEntry;
   SalesEntry? _lastDeletedEntry;
   DateTime _selectedDate = DateTime.now();
+  int _totalAmount = 0;
 
   // lists
 
@@ -75,13 +76,20 @@ class _SalesState extends State<Sales> {
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
       String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
       int count = 0;
+      _totalAmount = 0;
       FB().getList(path: dbpath).then((listRaw) {
         for (var item in listRaw) {
           SalesEntry entry =
               Utils().convertRawToDatatype(item, SalesEntry.fromJson);
           count += entry.count;
+          _totalAmount += (entry.deepamPrice * entry.count);
+          if (entry.isPlateIncluded) {
+            _totalAmount += entry.platePrice;
+          }
         }
         _counterSalesKey.currentState!.setCounterValue(count);
+
+        setState(() {});
       });
 
       // listen for database events
@@ -161,6 +169,13 @@ class _SalesState extends State<Sales> {
   void _addSales(SalesEntry entry) {
     // update counter
     _counterSalesKey.currentState!.addCount(entry.count);
+
+    setState(() {
+      _totalAmount += (entry.deepamPrice * entry.count);
+      if (entry.isPlateIncluded) {
+        _totalAmount += entry.platePrice;
+      }
+    });
   }
 
   Widget _createHMI(String paymentMode) {
@@ -182,6 +197,16 @@ class _SalesState extends State<Sales> {
       value = 0;
     }
     _counterSalesKey.currentState!.setCounterValue(value);
+
+    setState(() {
+      _totalAmount -= (entry.deepamPrice * entry.count);
+      if (entry.isPlateIncluded) {
+        _totalAmount -= entry.platePrice;
+      }
+      if (_totalAmount < 0) {
+        _totalAmount = 0;
+      }
+    });
   }
 
   @override
@@ -260,7 +285,7 @@ class _SalesState extends State<Sales> {
                                     fontSize: 48,
                                     maxValue: 9999,
                                     color: color ?? Colors.grey),
-                                Text("Total Amount: ₹0",
+                                Text("Total Amount: ₹$_totalAmount",
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineSmall),

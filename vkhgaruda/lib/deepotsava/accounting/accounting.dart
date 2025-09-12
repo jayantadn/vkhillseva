@@ -22,6 +22,13 @@ class _AccountingState extends State<Accounting> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   final Set _loadedKeys = {};
+  int _selectedYear = DateTime.now().year;
+  int _totalLamps = 0;
+  int _totalAmount = 0;
+  int _amountCash = 0;
+  int _amountUPI = 0;
+  int _amountCard = 0;
+  int _giftCount = 0;
 
   // lists
 
@@ -153,11 +160,28 @@ class _AccountingState extends State<Accounting> {
                       SizedBox(height: 10),
 
                       // your widgets here
+
+                      // year selector
                       YearHeader(
                         onYearChanged: (year) {
-                          print("Selected year: $year");
+                          setState(() {
+                            _selectedYear = year;
+                          });
                         },
                       ),
+
+                      // stall selector
+                      RadioRow(
+                          items: ["RKC", "RRG", "All"],
+                          onChanged: (value) {
+                            setState(() {
+                              // handle stall selection
+                            });
+                          }),
+
+                      // table of data
+                      Widgets().createTopLevelCard(
+                          context: context, child: Container()),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

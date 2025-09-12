@@ -34,6 +34,24 @@ class _SalesState extends State<Sales> {
   SalesEntry? _lastDeletedEntry;
   DateTime _selectedDate = DateTime.now();
   int _totalAmount = 0;
+  final Map<String, dynamic> _amountPerMode = {
+    "Cash": {
+      "count": 0,
+      "amount": 0,
+    },
+    "UPI": {
+      "count": 0,
+      "amount": 0,
+    },
+    "Card": {
+      "count": 0,
+      "amount": 0,
+    },
+    "Gift": {
+      "count": 0,
+      "amount": 0,
+    },
+  };
 
   // lists
 
@@ -77,14 +95,32 @@ class _SalesState extends State<Sales> {
       String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
       int count = 0;
       _totalAmount = 0;
+      _amountPerMode.forEach((key, value) {
+        value['count'] = 0;
+        value['amount'] = 0;
+      });
       FB().getList(path: dbpath).then((listRaw) {
         for (var item in listRaw) {
           SalesEntry entry =
               Utils().convertRawToDatatype(item, SalesEntry.fromJson);
           count += entry.count;
-          _totalAmount += (entry.deepamPrice * entry.count);
-          if (entry.isPlateIncluded) {
-            _totalAmount += entry.platePrice;
+
+          // update total amount
+          if (entry.paymentMode != "Gift") {
+            _totalAmount += (entry.deepamPrice * entry.count);
+            if (entry.isPlateIncluded) {
+              _totalAmount += entry.platePrice;
+            }
+          }
+
+          // set count and amount per mode
+          _amountPerMode[entry.paymentMode]?['count'] =
+              (_amountPerMode[entry.paymentMode]?['count'] ?? 0) + entry.count;
+          if (entry.paymentMode != "Gift") {
+            _amountPerMode[entry.paymentMode]?['amount'] =
+                (_amountPerMode[entry.paymentMode]?['amount'] ?? 0) +
+                    (entry.deepamPrice * entry.count) +
+                    (entry.isPlateIncluded ? entry.platePrice : 0);
           }
         }
         _counterSalesKey.currentState!.setCounterValue(count);
@@ -107,6 +143,8 @@ class _SalesState extends State<Sales> {
             )) {
               _lastDataModification = DateTime.now();
 
+              print("add: $data");
+
               // process the received data
               SalesEntry entry =
                   Utils().convertRawToDatatype(data, SalesEntry.fromJson);
@@ -126,6 +164,8 @@ class _SalesState extends State<Sales> {
                   .subtract(Duration(seconds: Const().fbListenerDelay)),
             )) {
               _lastDataModification = DateTime.now();
+
+              print("edit");
 
               refresh();
             }
@@ -170,12 +210,25 @@ class _SalesState extends State<Sales> {
     // update counter
     _counterSalesKey.currentState!.addCount(entry.count);
 
-    setState(() {
+    // update total amount
+    if (entry.paymentMode != "Gift") {
       _totalAmount += (entry.deepamPrice * entry.count);
       if (entry.isPlateIncluded) {
         _totalAmount += entry.platePrice;
       }
-    });
+    }
+
+    // update count and amount per mode
+    _amountPerMode[entry.paymentMode]?['count'] =
+        (_amountPerMode[entry.paymentMode]?['count'] ?? 0) + entry.count;
+    if (entry.paymentMode != "Gift") {
+      _amountPerMode[entry.paymentMode]?['amount'] =
+          (_amountPerMode[entry.paymentMode]?['amount'] ?? 0) +
+              (entry.deepamPrice * entry.count) +
+              (entry.isPlateIncluded ? entry.platePrice : 0);
+    }
+
+    setState(() {});
   }
 
   Widget _createHMI(String paymentMode) {
@@ -184,7 +237,8 @@ class _SalesState extends State<Sales> {
 
     return Widgets().createTopLevelCard(
         context: context,
-        title: "$paymentMode - count: 0, amount: ₹0",
+        title:
+            "$paymentMode - count: ${_amountPerMode[paymentMode]?['count'] ?? 0}, amount: ₹${_amountPerMode[paymentMode]?['amount'] ?? 0}",
         color: color,
         child: HmiSales(paymentMode: paymentMode, onSubmit: (value) {}));
   }
@@ -198,7 +252,8 @@ class _SalesState extends State<Sales> {
     }
     _counterSalesKey.currentState!.setCounterValue(value);
 
-    setState(() {
+    // update total amount
+    if (entry.paymentMode != "Gift") {
       _totalAmount -= (entry.deepamPrice * entry.count);
       if (entry.isPlateIncluded) {
         _totalAmount -= entry.platePrice;
@@ -206,7 +261,25 @@ class _SalesState extends State<Sales> {
       if (_totalAmount < 0) {
         _totalAmount = 0;
       }
-    });
+    }
+
+    // update count and amount per mode
+    _amountPerMode[entry.paymentMode]?['count'] =
+        (_amountPerMode[entry.paymentMode]?['count'] ?? 0) - entry.count;
+    if (_amountPerMode[entry.paymentMode]?['count'] < 0) {
+      _amountPerMode[entry.paymentMode]?['count'] = 0;
+    }
+    if (entry.paymentMode != "Gift") {
+      _amountPerMode[entry.paymentMode]?['amount'] =
+          (_amountPerMode[entry.paymentMode]?['amount'] ?? 0) -
+              (entry.deepamPrice * entry.count) -
+              (entry.isPlateIncluded ? entry.platePrice : 0);
+      if (_amountPerMode[entry.paymentMode]?['amount'] < 0) {
+        _amountPerMode[entry.paymentMode]?['amount'] = 0;
+      }
+    }
+
+    setState(() {});
   }
 
   @override

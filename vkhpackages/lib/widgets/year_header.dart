@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class YearHeader extends StatefulWidget {
-  final YearHeaderCallbacks? callbacks;
+  final void Function(int)? onYearChanged;
   final int startYear;
   final bool descending; // when true current year first (default)
 
   const YearHeader({
     super.key,
-    this.callbacks,
+    this.onYearChanged,
     this.startYear = 2024,
     this.descending = true,
   });
@@ -73,7 +73,7 @@ class _YearHeaderState extends State<YearHeader> {
   void _select(int year) {
     if (year == _currentYear) return;
     setState(() => _currentYear = year);
-    widget.callbacks?.onChange(_currentYear);
+    widget.onYearChanged?.call(_currentYear);
   }
 
   @override
@@ -249,9 +249,4 @@ class _YearChip extends StatelessWidget {
       ),
     );
   }
-}
-
-class YearHeaderCallbacks {
-  void Function(int) onChange;
-  YearHeaderCallbacks({required this.onChange});
 }

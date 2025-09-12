@@ -153,7 +153,11 @@ class _AccountingState extends State<Accounting> {
                       SizedBox(height: 10),
 
                       // your widgets here
-                      YearHeader(),
+                      YearHeader(
+                        onYearChanged: (year) {
+                          print("Selected year: $year");
+                        },
+                      ),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

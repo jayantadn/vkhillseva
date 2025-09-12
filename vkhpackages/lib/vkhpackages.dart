@@ -18,6 +18,7 @@ export 'widgets/calendar.dart';
 export 'widgets/loading_overlay.dart';
 export 'widgets/support.dart';
 export 'widgets/date_header.dart';
+export 'widgets/year_header.dart';
 export 'widgets/radio_row.dart';
 export 'widgets/tutorial.dart';
 export 'widgets/counter_display.dart';

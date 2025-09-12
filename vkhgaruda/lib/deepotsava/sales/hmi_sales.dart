@@ -161,7 +161,7 @@ class HmiSalesState extends State<HmiSales> {
 
   void _incrementQuantity() {
     setState(() {
-      int currentValue = int.tryParse(_quantityController.text) ?? 1;
+      int currentValue = int.tryParse(_quantityController.text) ?? 0;
       _quantityController.text = (currentValue + 1).toString();
     });
   }

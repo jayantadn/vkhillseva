@@ -285,7 +285,7 @@ class _SalesState extends State<Sales> {
     }
     ThemeData theme = ThemeCreator(primaryColor: color ?? Colors.grey).create();
 
-    List<String> paymentModes = Const().paymentModes.keys.toList();
+    List<String> paymentModes = ["Cash", "UPI", "Gift", "Card"];
 
     return Theme(
       data: theme,

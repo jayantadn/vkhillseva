@@ -167,17 +167,40 @@ class HmiSalesState extends State<HmiSales> {
   }
 
   Future<void> _showCustomEntryDialog(BuildContext context) async {
+    final formKey = GlobalKey<FormState>();
+
     await Widgets().showResponsiveDialog(
       context: context,
       title: 'Enter Quantity',
-      child: TextFormField(
-        autofocus: true,
-        controller: _quantityController,
+      child: Form(
+        key: formKey,
+        child: TextFormField(
+          autofocus: true,
+          controller: _quantityController,
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a quantity';
+            }
+            final intValue = int.tryParse(value);
+            if (intValue == null || intValue <= 0) {
+              return 'Please enter a valid quantity';
+            }
+            if (!RegExp(r'^\d+$').hasMatch(value)) {
+              return 'Only numbers are allowed';
+            }
+            return null;
+          },
+        ),
       ),
       actions: [
         ElevatedButton(
-          onPressed: () {},
-          child: const Text('Submit'),
+          onPressed: () {
+            if (formKey.currentState!.validate()) {
+              Navigator.of(context).pop();
+            }
+          },
+          child: const Text('OK'),
         ),
       ],
     );

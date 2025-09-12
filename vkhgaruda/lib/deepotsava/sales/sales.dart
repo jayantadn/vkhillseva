@@ -90,7 +90,8 @@ class _SalesState extends State<Sales> {
 
       // read database and populate counter
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
-      String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
+      String dbpath =
+          "${Const().dbrootGaruda}/Deepotsava/${widget.stall}/Sales/$dbdate";
       await _initData(dbpath);
 
       // listen for database events
@@ -188,9 +189,17 @@ class _SalesState extends State<Sales> {
         color: color,
         child: HmiSales(
             paymentMode: paymentMode,
-            onSubmit: (value) {
+            onSubmit: (newEntry) {
+              // write to db
+              String dbdate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+              String timestamp =
+                  newEntry.timestamp.toIso8601String().replaceAll(".", "^");
+              String dbpath =
+                  "${Const().dbrootGaruda}/Deepotsava/${widget.stall}/Sales/$dbdate/$timestamp";
+              FB().setJson(path: dbpath, json: newEntry.toJson());
+
               Toaster().info(
-                  "Added ${value.count} lamp${value.count > 1 ? 's' : ''}");
+                  "Added ${newEntry.count} lamp${newEntry.count > 1 ? 's' : ''}");
             }));
   }
 

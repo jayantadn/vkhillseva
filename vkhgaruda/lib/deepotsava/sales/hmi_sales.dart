@@ -141,14 +141,6 @@ class HmiSalesState extends State<HmiSales> {
       platePrice: Const().deepotsava['platePrice'] as int,
     );
 
-    // write to db
-    String dbdate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-    String timestamp =
-        newEntry.timestamp.toIso8601String().replaceAll(".", "^");
-    String dbpath =
-        "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate/$timestamp";
-    FB().setJson(path: dbpath, json: newEntry.toJson());
-
     // clear the text field
     _quantityController.text = '0';
     _isPlateIncluded = false;

@@ -186,7 +186,11 @@ class _SalesState extends State<Sales> {
         title:
             "$paymentMode - count: ${_amountPerMode[paymentMode]?['count'] ?? 0}, amount: ₹${_amountPerMode[paymentMode]?['amount'] ?? 0}",
         color: color,
-        child: HmiSales(paymentMode: paymentMode, onSubmit: (value) {}));
+        child: HmiSales(
+            paymentMode: paymentMode,
+            onSubmit: (value) {
+              Toaster().info("Added ${value.count} lamps");
+            }));
   }
 
   void _deleteSales(SalesEntry entry) {

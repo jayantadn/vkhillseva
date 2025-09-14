@@ -191,6 +191,49 @@ class Widgets {
     );
   }
 
+  Widget createKVRow(
+    BuildContext context,
+    String label,
+    String value, {
+    bool divider = true,
+    bool bold = false,
+  }) {
+    return Column(
+      children: [
+        Table(
+          columnWidths: const {
+            0: FlexColumnWidth(3), // Label
+            1: FlexColumnWidth(1), // Number
+          },
+          children: [
+            TableRow(
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        if (divider)
+          Divider(
+            height: 1,
+            thickness: 0.5,
+            color: Colors.grey.withOpacity(0.3),
+          ),
+      ],
+    );
+  }
+
   Widget createTopLevelResponsiveContainer(
     BuildContext context,
     List<Widget> children,

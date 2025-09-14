@@ -8,7 +8,7 @@ class YearHeader extends StatefulWidget {
   const YearHeader({
     super.key,
     this.onYearChanged,
-    this.startYear = 2024,
+    this.startYear = 2020,
     this.descending = true,
   });
 
@@ -80,16 +80,27 @@ class _YearHeaderState extends State<YearHeader> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bg = theme.colorScheme.surface;
+    final primary = theme.colorScheme.primary;
     return SizedBox(
-      height: 80,
+      height: 56,
       child: Stack(
         children: [
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            padding: const EdgeInsets.symmetric(horizontal: 6),
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(44),
-              color: bg.withOpacity(0.55),
+              borderRadius: BorderRadius.circular(32),
+              // Subtle primary-tinted gradient background
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  primary.withOpacity(0.12),
+                  primary.withOpacity(0.05),
+                  primary.withOpacity(0.08),
+                ],
+                stops: const [0.0, 0.55, 1.0],
+              ),
               border: Border.all(
                 color: theme.colorScheme.outlineVariant.withOpacity(0.35),
               ),
@@ -102,7 +113,7 @@ class _YearHeaderState extends State<YearHeader> {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(44),
+              borderRadius: BorderRadius.circular(32),
               child: NotificationListener<ScrollNotification>(
                 onNotification: (n) {
                   _updateFades();
@@ -133,14 +144,14 @@ class _YearHeaderState extends State<YearHeader> {
           if (_showLeftFade)
             Positioned(
               left: 8,
-              top: 8,
-              bottom: 8,
-              width: 32,
+              top: 4,
+              bottom: 4,
+              width: 28,
               child: IgnorePointer(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.horizontal(
-                      left: Radius.circular(44),
+                      left: Radius.circular(32),
                     ),
                     gradient: LinearGradient(
                       begin: Alignment.centerLeft,
@@ -154,14 +165,14 @@ class _YearHeaderState extends State<YearHeader> {
           if (_showRightFade)
             Positioned(
               right: 8,
-              top: 8,
-              bottom: 8,
-              width: 32,
+              top: 4,
+              bottom: 4,
+              width: 28,
               child: IgnorePointer(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.horizontal(
-                      right: Radius.circular(44),
+                      right: Radius.circular(32),
                     ),
                     gradient: LinearGradient(
                       begin: Alignment.centerRight,
@@ -198,14 +209,16 @@ class _YearChip extends StatelessWidget {
     final borderColor =
         selected ? baseColor : theme.dividerColor.withOpacity(0.35);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+      // Further reduced vertical padding
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       child: InkWell(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(24),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          // Reduced internal padding
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: borderColor, width: 1.2),
             gradient:
                 selected

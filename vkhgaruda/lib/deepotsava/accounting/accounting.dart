@@ -28,7 +28,6 @@ class _AccountingState extends State<Accounting> {
   int _amountCash = 0;
   int _amountUPI = 0;
   int _amountCard = 0;
-  int _giftCount = 0;
 
   // lists
 
@@ -157,7 +156,6 @@ class _AccountingState extends State<Accounting> {
                   child: Column(
                     children: [
                       // leave some space at top
-                      SizedBox(height: 10),
 
                       // your widgets here
 
@@ -171,6 +169,7 @@ class _AccountingState extends State<Accounting> {
                       ),
 
                       // stall selector
+                      SizedBox(height: 4),
                       RadioRow(
                           items: ["RKC", "RRG", "All"],
                           onChanged: (value) {
@@ -180,8 +179,23 @@ class _AccountingState extends State<Accounting> {
                           }),
 
                       // table of data
+                      SizedBox(height: 10),
                       Widgets().createTopLevelCard(
-                          context: context, child: Container()),
+                          context: context,
+                          title: "Sale data",
+                          child: Column(children: [
+                            Widgets().createKVRow(
+                                context, "Total lamps sold", "$_totalLamps",
+                                bold: true),
+                            Widgets().createKVRow(context,
+                                "Total amount collected", "₹$_totalAmount"),
+                            Widgets().createKVRow(context,
+                                "Amount collected in cash", "₹$_amountCash"),
+                            Widgets().createKVRow(context,
+                                "Amount collected in UPI", "₹$_amountUPI"),
+                            Widgets().createKVRow(context,
+                                "Amount collected in card", "₹$_amountCard"),
+                          ])),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

@@ -62,7 +62,7 @@ class _SalesState extends State<Sales> {
       // read database and populate data
       String dbdate = DateFormat("yyyy-MM-dd").format(DateTime.now());
       String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
-      await _initData(dbpath);
+
 
       // listen for database events
       _addListeners(dbpath);
@@ -126,7 +126,7 @@ class _SalesState extends State<Sales> {
     setState(() {});
   }
 
-  Future<void> _initData(String dbpath) async {}
+
 
   @override
   Widget build(BuildContext context) {

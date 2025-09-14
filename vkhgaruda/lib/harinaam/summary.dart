@@ -298,13 +298,17 @@ class _SummaryState extends State<Summary> {
         color: Colors.brown,
         child: Column(
           children: [
-            _createTableEntry("Total Chanters", "$_totalChanters", bold: true),
-            _createTableEntry("Opening balance", "$_openingBalanceChanters"),
-            _createTableEntry(
-                "New malas procured", "$_newChanterMalasProcured"),
-            _createTableEntry("Discarded malas", "$_discardedChanterMalas",
+            Widgets().createKVRow(context, "Total Chanters", "$_totalChanters",
+                bold: true),
+            Widgets().createKVRow(
+                context, "Opening balance", "$_openingBalanceChanters"),
+            Widgets().createKVRow(
+                context, "New malas procured", "$_newChanterMalasProcured"),
+            Widgets().createKVRow(
+                context, "Discarded malas", "$_discardedChanterMalas",
                 divider: false),
-            _createTableEntry("Closing balance", "$_closingBalanceChanters")
+            Widgets().createKVRow(
+                context, "Closing balance", "$_closingBalanceChanters")
           ],
         ));
   }
@@ -320,7 +324,8 @@ class _SummaryState extends State<Summary> {
             String paymentMode = entry.value.key;
             Map<String, dynamic> data = entry.value.value;
             bool isLast = idx == _paymentModeSummary.entries.length - 1;
-            return _createTableEntry(
+            return Widgets().createKVRow(
+              context,
               paymentMode,
               "${data['count']} (₹${data['amount']})",
               divider: !isLast,
@@ -335,21 +340,30 @@ class _SummaryState extends State<Summary> {
         title: "Japamala Sales",
         child: Column(
           children: [
-            _createTableEntry("Opening balance", "$_openingBalanceSales"),
-            _createTableEntry("New malas procured", "$_newSaleMalasProcured"),
-            _createTableEntry("Total malas sold", "$_totalMalasSold",
+            Widgets().createKVRow(
+                context, "Opening balance", "$_openingBalanceSales"),
+            Widgets().createKVRow(
+                context, "New malas procured", "$_newSaleMalasProcured"),
+            Widgets().createKVRow(
+                context, "Total malas sold", "$_totalMalasSold",
                 bold: true),
-            _createTableEntry(
+            Widgets().createKVRow(
+              context,
               "Discarded malas",
               "$_discardedSaleMalas",
             ),
-            _createTableEntry(
+            Widgets().createKVRow(
+              context,
               "Closing balance",
               "$_closingBalanceSales",
             ),
-            _createTableEntry(
-                "Total amount collected", "₹$_totalAmountCollected",
-                divider: false, bold: true),
+            Widgets().createKVRow(
+              context,
+              "Total amount collected",
+              "₹$_totalAmountCollected",
+              divider: false,
+              bold: true,
+            ),
           ],
         ));
   }
@@ -644,32 +658,6 @@ class _SummaryState extends State<Summary> {
         ),
       ),
     );
-  }
-
-  Widget _createTableEntry(String label, String value,
-      {bool divider = true, bool bold = false}) {
-    return Column(children: [
-      Table(
-        columnWidths: const {
-          0: FlexColumnWidth(3), // Label
-          1: FlexColumnWidth(1), // Number
-        },
-        children: [
-          TableRow(
-            children: [
-              Text(label,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
-              Text(value,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
-            ],
-          ),
-        ],
-      ),
-      if (divider)
-        Divider(height: 1, thickness: 0.5, color: Colors.grey.withOpacity(0.3))
-    ]);
   }
 
   CountTuple _getChantersAndSalesCount(Map dataRaw) {

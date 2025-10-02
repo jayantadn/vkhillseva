@@ -102,13 +102,34 @@ class _LogState extends State<Log> {
               items: ["Edit", "Delete"],
               onPressed: (value) {
                 if (value == "Edit") {
-                  // Handle edit action
+                  _onEditEntry(index);
                 } else if (value == "Delete") {
-                  // Handle delete action
+                  _onDeleteEntry(index);
                 }
               }),
         ));
   }
+
+  Future<void> _onDeleteEntry(int index) async {
+    SalesEntry entry = _salesEntries[index];
+
+    // confirm dialog
+    Widgets().showConfirmDialog(context, "Are you sure?", "Delete", () async {
+      // delete from db
+      String dbdate = DateFormat("yyyy-MM-dd").format(entry.timestamp);
+      String timekey = entry.timestamp.toIso8601String().replaceAll(".", "^");
+      String dbpath =
+          "${Const().dbrootGaruda}/Deepotsava/${widget.stall}/Sales/$dbdate/$timekey";
+      await FB().deleteValue(path: dbpath);
+
+      // delete from local list
+      setState(() {
+        _salesEntries.removeAt(index);
+      });
+    });
+  }
+
+  Future<void> _onEditEntry(int index) async {}
 
   @override
   Widget build(BuildContext context) {

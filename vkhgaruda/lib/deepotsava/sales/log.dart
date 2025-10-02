@@ -255,6 +255,10 @@ class _LogState extends State<Log> {
                       SizedBox(height: 10),
 
                       // your widgets here
+
+                      if (_salesEntries.isEmpty)
+                        Text("No sales entries for this date."),
+
                       ...List.generate(
                         _salesEntries.length,
                         (index) => _createSalesEntryCard(index),

@@ -86,7 +86,6 @@ class _SalesState extends State<Sales> {
 
     await _lock.synchronized(() async {
       // your code here
-      _selectedDate = DateTime.now();
 
       // read database and populate counter
       String dbdate = DateFormat("yyyy-MM-dd").format(_selectedDate);
@@ -345,10 +344,16 @@ class _SalesState extends State<Sales> {
                   child: Center(
                     child: Column(
                       children: [
-                        // leave some space at top
-                        SizedBox(height: 10),
-
                         // your widgets here
+                        // date header
+                        DateHeader(
+                          callbacks: DateHeaderCallbacks(onChange: (date) {
+                            setState(() {
+                              _selectedDate = date;
+                              refresh();
+                            });
+                          }),
+                        ),
 
                         // dashboard
                         Widgets().createTopLevelCard(

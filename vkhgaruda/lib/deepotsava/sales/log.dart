@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/deepotsava/sales/sales.dart';
 import 'package:vkhgaruda/deepotsava/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
@@ -129,7 +128,75 @@ class _LogState extends State<Log> {
     });
   }
 
-  Future<void> _onEditEntry(int index) async {}
+  Future<void> _onEditEntry(int index) async {
+    SalesEntry oldentry = _salesEntries[index];
+    SalesEntry newentry = oldentry;
+
+    Widgets().showResponsiveDialog(
+        context: context,
+        title: "Edit sales entry",
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // count
+              TextFormField(
+                initialValue: oldentry.count.toString(),
+                decoration: InputDecoration(labelText: "Count"),
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  newentry.count = int.tryParse(value) ?? newentry.count;
+                },
+              ),
+
+              // plate include
+              SwitchListTile(
+                title: Text("Plate Included"),
+                value: oldentry.isPlateIncluded,
+                onChanged: (value) {
+                  setState(() {
+                    newentry.isPlateIncluded = value;
+                  });
+                },
+              ),
+
+              // payment mode
+              DropdownButtonFormField<String>(
+                value: Const().paymentModes.keys.contains(oldentry.paymentMode)
+                    ? oldentry.paymentMode
+                    : Const().paymentModes.keys.first,
+                decoration: const InputDecoration(labelText: "Payment Mode"),
+                items: Const()
+                    .paymentModes
+                    .keys
+                    .map(
+                      (mode) => DropdownMenuItem<String>(
+                        value: mode,
+                        child: Text(mode),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      newentry.paymentMode = value;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            child: Text("Update"),
+            onPressed: () {
+              // update db
+            },
+          )
+        ]);
+  }
 
   @override
   Widget build(BuildContext context) {

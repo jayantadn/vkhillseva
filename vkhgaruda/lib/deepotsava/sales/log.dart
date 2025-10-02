@@ -130,69 +130,97 @@ class _LogState extends State<Log> {
 
   Future<void> _onEditEntry(int index) async {
     SalesEntry oldentry = _salesEntries[index];
-    SalesEntry newentry = oldentry;
+    SalesEntry newentry = SalesEntry(
+      timestamp: oldentry.timestamp,
+      username: oldentry.username,
+      count: oldentry.count,
+      isPlateIncluded: oldentry.isPlateIncluded,
+      paymentMode: oldentry.paymentMode,
+      deepamPrice: oldentry.deepamPrice,
+      platePrice: oldentry.platePrice,
+    );
 
     Widgets().showResponsiveDialog(
         context: context,
         title: "Edit sales entry",
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // count
-              TextFormField(
-                initialValue: oldentry.count.toString(),
-                decoration: InputDecoration(labelText: "Count"),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  newentry.count = int.tryParse(value) ?? newentry.count;
-                },
-              ),
+        child: StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // count
+                  TextFormField(
+                    initialValue: newentry.count.toString(),
+                    decoration: InputDecoration(labelText: "Count"),
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      newentry.count = int.tryParse(value) ?? newentry.count;
+                    },
+                  ),
 
-              // plate include
-              SwitchListTile(
-                title: Text("Plate Included"),
-                value: oldentry.isPlateIncluded,
-                onChanged: (value) {
-                  setState(() {
-                    newentry.isPlateIncluded = value;
-                  });
-                },
-              ),
+                  // plate include
+                  SwitchListTile(
+                    title: Text("Plate Included"),
+                    value: newentry.isPlateIncluded,
+                    onChanged: (value) {
+                      setState(() {
+                        newentry.isPlateIncluded = value;
+                      });
+                    },
+                  ),
 
-              // payment mode
-              DropdownButtonFormField<String>(
-                value: Const().paymentModes.keys.contains(oldentry.paymentMode)
-                    ? oldentry.paymentMode
-                    : Const().paymentModes.keys.first,
-                decoration: const InputDecoration(labelText: "Payment Mode"),
-                items: Const()
-                    .paymentModes
-                    .keys
-                    .map(
-                      (mode) => DropdownMenuItem<String>(
-                        value: mode,
-                        child: Text(mode),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      newentry.paymentMode = value;
-                    });
-                  }
-                },
+                  // payment mode
+                  DropdownButtonFormField<String>(
+                    value:
+                        Const().paymentModes.keys.contains(newentry.paymentMode)
+                            ? newentry.paymentMode
+                            : Const().paymentModes.keys.first,
+                    decoration:
+                        const InputDecoration(labelText: "Payment Mode"),
+                    items: Const()
+                        .paymentModes
+                        .keys
+                        .map(
+                          (mode) => DropdownMenuItem<String>(
+                            value: mode,
+                            child: Text(mode),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          newentry.paymentMode = value;
+                        });
+                      }
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
         actions: [
           ElevatedButton(
             child: Text("Update"),
-            onPressed: () {
+            onPressed: () async {
               // update db
+              String dbdate =
+                  DateFormat("yyyy-MM-dd").format(newentry.timestamp);
+              String timekey =
+                  newentry.timestamp.toIso8601String().replaceAll(".", "^");
+              String dbpath =
+                  "${Const().dbrootGaruda}/Deepotsava/${widget.stall}/Sales/$dbdate/$timekey";
+              await FB().setValue(path: dbpath, value: newentry.toJson());
+
+              // update local list
+              setState(() {
+                _salesEntries[index] = newentry;
+              });
+
+              Navigator.of(context).pop();
             },
           )
         ]);

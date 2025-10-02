@@ -30,7 +30,7 @@ class _LogState extends State<Log> {
   bool _isLoading = true;
 
   // lists
-  List<SalesEntry> _salesEntries = [];
+  final List<SalesEntry> _salesEntries = [];
 
   // controllers, listeners and focus nodes
 

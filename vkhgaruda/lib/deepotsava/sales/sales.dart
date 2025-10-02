@@ -7,7 +7,6 @@ import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/deepotsava/datatypes.dart';
 import 'package:vkhgaruda/deepotsava/sales/hmi_sales.dart';
 import 'package:vkhgaruda/deepotsava/sales/log.dart';
-import 'package:vkhgaruda/deepotsava/sales/summary.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Sales extends StatefulWidget {

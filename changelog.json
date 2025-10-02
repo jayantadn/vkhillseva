@@ -1,4 +1,9 @@
 {
+    "9.0.0": {
+        "effort": "12h",
+        "features": [],
+        "fixes": []
+    },
     "8.4.3": {
         "effort": "0.0h",
         "features": [

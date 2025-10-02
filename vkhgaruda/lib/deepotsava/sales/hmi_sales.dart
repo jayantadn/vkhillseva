@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/deepotsava/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';

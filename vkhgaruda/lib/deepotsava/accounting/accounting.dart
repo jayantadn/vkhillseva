@@ -23,11 +23,11 @@ class _AccountingState extends State<Accounting> {
   bool _isLoading = true;
   final Set _loadedKeys = {};
   int _selectedYear = DateTime.now().year;
-  int _totalLamps = 0;
-  int _totalAmount = 0;
-  int _amountCash = 0;
-  int _amountUPI = 0;
-  int _amountCard = 0;
+  final int _totalLamps = 0;
+  final int _totalAmount = 0;
+  final int _amountCash = 0;
+  final int _amountUPI = 0;
+  final int _amountCard = 0;
 
   // lists
 

@@ -23,4 +23,11 @@
 -[] summary daily / weekly / monthly / yearly
 -[] share summary
 
+# Deepotsava
+-[] Entry per mode
+    -[] check count
+    -[] check amount
+-[] plate include
+-[] edit, delete entry
+
 # new features

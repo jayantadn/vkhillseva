@@ -307,17 +307,17 @@ class _SalesState extends State<Sales> {
             // toolbar icons
             toolbarActions: [
               // summary
-              ResponsiveToolbarAction(
-                icon: const Icon(Icons.article),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Summary(
-                              title: "Summary",
-                              splashImage: widget.splashImage)));
-                },
-              ),
+              // ResponsiveToolbarAction(
+              //   icon: const Icon(Icons.article),
+              //   onPressed: () {
+              //     Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //             builder: (context) => Summary(
+              //                 title: "Summary",
+              //                 splashImage: widget.splashImage)));
+              //   },
+              // ),
 
               // entry logs
               ResponsiveToolbarAction(
@@ -328,6 +328,8 @@ class _SalesState extends State<Sales> {
                       MaterialPageRoute(
                           builder: (context) => Log(
                               title: "Entry Logs",
+                              stall: widget.stall,
+                              date: _selectedDate,
                               splashImage: widget.splashImage)));
                 },
               ),

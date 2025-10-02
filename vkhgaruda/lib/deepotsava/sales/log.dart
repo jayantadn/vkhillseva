@@ -1,14 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/deepotsava/sales/sales.dart';
+import 'package:vkhgaruda/deepotsava/datatypes.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Log extends StatefulWidget {
   final String title;
+  final String stall;
+  final DateTime date;
   final String? splashImage;
 
-  const Log({super.key, required this.title, this.splashImage});
+  const Log(
+      {super.key,
+      required this.title,
+      required this.stall,
+      required this.date,
+      required this.splashImage});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -21,6 +31,7 @@ class _LogState extends State<Log> {
   bool _isLoading = true;
 
   // lists
+  List<SalesEntry> _salesEntries = [];
 
   // controllers, listeners and focus nodes
 
@@ -34,10 +45,12 @@ class _LogState extends State<Log> {
   @override
   dispose() {
     // clear all lists and maps
+    _salesEntries.clear();
 
     // dispose all controllers and focus nodes
 
     // listeners
+    // no listeners for this page, only manual refresh
 
     super.dispose();
   }
@@ -51,6 +64,16 @@ class _LogState extends State<Log> {
 
     await _lock.synchronized(() async {
       // your code here
+      String dbdate = DateFormat("yyyy-MM-dd").format(widget.date);
+      String dbpath =
+          "${Const().dbrootGaruda}/Deepotsava/${widget.stall}/Sales/$dbdate";
+      List salesEntriesRaw = await FB().getList(path: dbpath);
+      _salesEntries.clear();
+      for (var entryRaw in salesEntriesRaw) {
+        SalesEntry entry =
+            Utils().convertRawToDatatype(entryRaw, SalesEntry.fromJson);
+        _salesEntries.add(entry);
+      }
     });
 
     // refresh all child widgets
@@ -58,6 +81,33 @@ class _LogState extends State<Log> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Widget _createSalesEntryCard(int index) {
+    SalesEntry entry = _salesEntries[index];
+    return Widgets().createTopLevelCard(
+        context: context,
+        child: ListTileCompact(
+          title: Text(
+              "${DateFormat('HH:mm:ss').format(entry.timestamp)} - ₹${entry.count * entry.deepamPrice + (entry.isPlateIncluded ? entry.platePrice : 0)}"),
+          leading: CircleAvatar(
+            child: Text("${entry.count}"),
+          ),
+          subtitle: Widgets().createResponsiveRow(context, [
+            Text(" mode: ${entry.paymentMode}"),
+            if (entry.isPlateIncluded) Text(", Plate included"),
+          ]),
+          infotext: Text("user: ${entry.username}"),
+          trailing: Widgets().createContextMenu(
+              items: ["Edit", "Delete"],
+              onPressed: (value) {
+                if (value == "Edit") {
+                  // Handle edit action
+                } else if (value == "Delete") {
+                  // Handle delete action
+                }
+              }),
+        ));
   }
 
   @override
@@ -89,12 +139,9 @@ class _LogState extends State<Log> {
                       SizedBox(height: 10),
 
                       // your widgets here
-                      Widgets().createTopLevelCard(
-                        context: context,
-                        child: ListTile(
-                          title: Text("Hello World"),
-                          subtitle: Text("This is a sample card"),
-                        ),
+                      ...List.generate(
+                        _salesEntries.length,
+                        (index) => _createSalesEntryCard(index),
                       ),
 
                       // leave some space at bottom

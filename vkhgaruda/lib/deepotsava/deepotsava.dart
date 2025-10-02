@@ -66,10 +66,11 @@ class _DeepotsavaState extends State<Deepotsava>
   }
 
   void _onAccountingTap() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Accounting(title: "Accounting")),
-    );
+    Toaster().error("Not implemented");
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => Accounting(title: "Accounting")),
+    // );
   }
 
   @override

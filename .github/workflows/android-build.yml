@@ -1,0 +1,114 @@
+name: Build Android APK (vkhgaruda)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-flavor:
+        description: "Optional Flutter build flavor (e.g., prod, dev)."
+        required: false
+        default: ""
+      build-mode:
+        description: "Build mode: release|debug"
+        required: false
+        default: "release"
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    name: Build APK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vkhgaruda
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Enable Android license acceptance
+        run: |
+          yes | sdkmanager --licenses || true
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Set build mode
+        id: mode
+        run: |
+          MODE=${{ github.event.inputs.build-mode || 'release' }}
+          echo "mode=$MODE" >> $GITHUB_OUTPUT
+
+      - name: Build APK
+        run: |
+          if [ -n "${{ github.event.inputs.build-flavor }}" ]; then
+            flutter build apk --flavor ${{ github.event.inputs.build-flavor }} --${{ steps.mode.outputs.mode }}
+          else
+            flutter build apk --${{ steps.mode.outputs.mode }}
+          fi
+
+      - name: List APK outputs
+        run: |
+          ls -R build/app/outputs/apk || true
+
+      - name: Rename APKs to include branch name
+        run: |
+          BRANCH_NAME="${GITHUB_REF_NAME}"
+          MODE="${{ steps.mode.outputs.mode }}"
+          mkdir -p build/dist
+          echo "Branch: $BRANCH_NAME | Mode: $MODE"
+          count=0
+          # Copy and rename all generated APKs, appending branch name
+          shopt -s globstar nullglob
+          for apk in build/app/outputs/apk/**/*.apk; do
+            base=$(basename "$apk")
+            renamed="build/dist/${base%.apk}-${BRANCH_NAME}-${MODE}.apk"
+            echo "Renaming $apk -> $renamed"
+            cp "$apk" "$renamed"
+            count=$((count+1))
+          done
+          echo "Total APKs processed: $count"
+          test $count -gt 0
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vkhgaruda-apk-${{ steps.mode.outputs.mode }}
+          path: |
+            build/dist/*.apk
+          if-no-files-found: error
+
+      - name: Upload mapping (ProGuard/R8) if present
+        uses: actions/upload-artifact@v4
+        with:
+          name: vkhgaruda-mapping
+          path: |
+            build/app/outputs/mapping/**
+          if-no-files-found: ignore

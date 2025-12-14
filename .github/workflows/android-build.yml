@@ -102,7 +102,7 @@ jobs:
         with:
           name: vkhgaruda-apk-${{ steps.mode.outputs.mode }}
           path: |
-            build/dist/*.apk
+            vkhgaruda/build/dist/*.apk
           if-no-files-found: error
 
       - name: Upload mapping (ProGuard/R8) if present
@@ -112,4 +112,5 @@ jobs:
           path: |
             build/app/outputs/mapping/**
           if-no-files-found: ignore
+
 

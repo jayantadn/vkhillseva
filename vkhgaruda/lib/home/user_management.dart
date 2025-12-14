@@ -201,7 +201,7 @@ class _UserManagementState extends State<UserManagement> {
                                         _setUserBasics();
                                       });
                                     },
-                                    value: _dropdownValue,
+                                    initialValue: _dropdownValue,
                                     hint: const Text('Select an option',
                                         textAlign: TextAlign.center),
                                     isExpanded: true,

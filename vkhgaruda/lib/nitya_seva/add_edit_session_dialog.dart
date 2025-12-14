@@ -167,7 +167,7 @@ class _AddEditSessionDialogState extends State<AddEditSessionDialog> {
                 // seva dropdown
                 SizedBox(height: 16.0),
                 DropdownButtonFormField<String>(
-                  value: _selectedSeva,
+                  initialValue: _selectedSeva,
                   decoration: const InputDecoration(labelText: 'Seva'),
                   items: widget.sevaList.map((FestivalSettings value) {
                     return DropdownMenuItem<String>(
@@ -198,7 +198,7 @@ class _AddEditSessionDialogState extends State<AddEditSessionDialog> {
                     if(_selectedSeva == "Nitya Seva")
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: _sevaAmount,
+                        initialValue: _sevaAmount,
                         decoration: const InputDecoration(
                             labelText: 'Default seva amount'),
                         items: _sevaAmounts.map((String value) {
@@ -234,7 +234,7 @@ class _AddEditSessionDialogState extends State<AddEditSessionDialog> {
                     SizedBox(width: 16.0),
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: _paymentMode,
+                        initialValue: _paymentMode,
                         decoration: const InputDecoration(
                             labelText: 'Default payment mode'),
                         items: _paymentModes.map((String value) {

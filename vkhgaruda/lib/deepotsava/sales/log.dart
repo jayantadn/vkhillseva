@@ -173,7 +173,7 @@ class _LogState extends State<Log> {
 
                   // payment mode
                   DropdownButtonFormField<String>(
-                    value:
+                    initialValue:
                         Const().paymentModes.keys.contains(newentry.paymentMode)
                             ? newentry.paymentMode
                             : Const().paymentModes.keys.first,

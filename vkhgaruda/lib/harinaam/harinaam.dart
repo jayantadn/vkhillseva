@@ -991,7 +991,7 @@ class _HarinaamState extends State<Harinaam> {
             children: [
               SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: selectedPaymentMode,
+                initialValue: selectedPaymentMode,
                 decoration: const InputDecoration(
                   labelText: "Payment Mode",
                   border: OutlineInputBorder(),

@@ -274,24 +274,24 @@ def release(app):
         else:
             print("No changes to commit")
 
-    print("building for web")
-    run_command("flutter clean")
-    run_command("flutter pub get")
-    run_command("flutter build web")
-    set_hosting_site(app)
-    run_command(f"firebase deploy --only hosting:{hostingsite}")
+    # print("building for web")
+    # run_command("flutter clean")
+    # run_command("flutter pub get")
+    # run_command("flutter build web")
+    # set_hosting_site(app)
+    # run_command(f"firebase deploy --only hosting:{hostingsite}")
 
-    if reltype == 'release':
-        print("building for android")
-        run_command("flutter build apk")
-        apk_path = "build/app/outputs/flutter-apk/app-release.apk"
-        new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{version}.apk"
-        if os.path.exists(apk_path):
-            if os.path.exists(new_apk_path):
-                os.remove(new_apk_path)
-            os.rename(apk_path, new_apk_path)
-        else:
-            print("ERROR: APK not found")
+    # if reltype == 'release':
+    #     print("building for android")
+    #     run_command("flutter build apk")
+    #     apk_path = "build/app/outputs/flutter-apk/app-release.apk"
+    #     new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{version}.apk"
+    #     if os.path.exists(apk_path):
+    #         if os.path.exists(new_apk_path):
+    #             os.remove(new_apk_path)
+    #         os.rename(apk_path, new_apk_path)
+    #     else:
+    #         print("ERROR: APK not found")
 
         # print("upload apk to my google drive")
         # drive_path = "X:/GoogleDrive/PublicRO/Garuda"
@@ -309,7 +309,7 @@ def main():
     input("Please stop the timetracker if running...")
     set_parameters()
     release("vkhgaruda")
-    release("vkhsangeetseva")
+    # release("vkhsangeetseva")
   
 
 

@@ -1,4 +1,11 @@
 {
+    "9.0.1": {
+        "effort": "0h",
+        "features": [],
+        "fixes": [
+            "balance calculation fixed"
+        ]
+    },
     "9.0.0": {
         "effort": "12h",
         "features": [],

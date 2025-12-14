@@ -48,7 +48,8 @@ dependencies:
   package_info_plus: ^8.3.0
   url_launcher: ^6.3.1
   flutter_colorpicker: ^1.1.0
-  js: ^0.7.2
+  # Downgraded to be compatible with Dart 3.5.0 on CI runners
+  js: ^0.7.1
   
 
 dev_dependencies:

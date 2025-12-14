@@ -1,9 +1,12 @@
 {
     "9.0.1": {
-        "effort": "0h",
+        "effort": "0.0h",
         "features": [],
         "fixes": [
-            "balance calculation fixed"
+            "balance calculation fixed",
+            "downgrade synchronized package to ensure compatibility with Dart 3.5.x",
+            "pin synchronized package to ensure compatibility with Dart 3.5.x",
+            "update Flutter version to 3.38.5 for improved compatibility"
         ]
     },
     "9.0.0": {

@@ -8,8 +8,10 @@ plugins {
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
+def hasSigning = false
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    hasSigning = true
 }
 
 android {
@@ -37,14 +39,16 @@ android {
         versionName = flutter.versionName
     }
 
-    signingConfigs {
-           release {
-               keyAlias keystoreProperties['keyAlias']
-               keyPassword keystoreProperties['keyPassword']
-               storeFile file(keystoreProperties['storeFile'])
-               storePassword keystoreProperties['storePassword']
-           }
-       }
+    if (hasSigning) {
+        signingConfigs {
+            release {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+    }
 
     dependencies {
         implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
@@ -54,7 +58,10 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.release
+            if (hasSigning) {
+                signingConfig = signingConfigs.release
+            }
+            // If no signing config, Gradle will produce an unsigned release APK artifact.
         }
     }
 }

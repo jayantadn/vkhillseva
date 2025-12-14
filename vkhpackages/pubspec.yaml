@@ -21,7 +21,8 @@ dependencies:
   intl: ^0.20.2
   package_info_plus: ^8.3.0
   shared_preferences: ^2.5.2
-  synchronized: ^3.3.1
+  # Downgraded to a version compatible with Dart 3.5.x
+  synchronized: ^3.3.0+3
   table_calendar: ^3.2.0
   url_launcher: ^6.3.1
 

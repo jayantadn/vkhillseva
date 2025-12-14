@@ -524,7 +524,10 @@ class _ServeState extends State<Serve> {
       packsMisc: packsMisc,
       note: _controllerNote.text,
       title: _controllerTitle.text,
-      balance: available - totalServed,
+      // Correct balance calculation: remaining = totalProcured + totalCarry - totalServed
+      // This works for both new and edit modes because totalServed already includes the new packs
+      // (and excludes the previous serve packs in edit mode).
+      balance: totalProcured + totalCarry - totalServed,
       pushpanjaliSlot: widget.slot!.timestamp,
       available: available,
     );

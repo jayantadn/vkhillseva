@@ -148,14 +148,14 @@ def set_hosting_site(app):
 def replace_string_in_file(file, search_string, replacement_string):
     curdir = os.getcwd()
     os.chdir(rootdir)
-    with open(file, 'r') as file:
-        lines = file.readlines()
-    with open(file, 'w') as file:
+    with open(file, 'r') as f:
+        lines = f.readlines()
+    with open(file, 'w') as f:
         for line in lines:
             if search_string in line:
-                file.write(replacement_string)
+                f.write(replacement_string)
             else:
-                file.write(line)
+                f.write(line)
     os.chdir(curdir)
 
 
@@ -275,32 +275,49 @@ def release(app):
             print("No changes to commit")
 
     # print("building for web")
-    # run_command("flutter clean")
-    # run_command("flutter pub get")
-    # run_command("flutter build web")
-    # set_hosting_site(app)
-    # run_command(f"firebase deploy --only hosting:{hostingsite}")
+    run_command("flutter clean")
+    run_command("flutter pub get")
+    run_command("flutter build web")
+    set_hosting_site(app)
+    run_command(f"firebase deploy --only hosting:{hostingsite}")
 
-    # if reltype == 'release':
-    #     print("building for android")
-    #     run_command("flutter build apk")
-    #     apk_path = "build/app/outputs/flutter-apk/app-release.apk"
-    #     new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{version}.apk"
-    #     if os.path.exists(apk_path):
-    #         if os.path.exists(new_apk_path):
-    #             os.remove(new_apk_path)
-    #         os.rename(apk_path, new_apk_path)
-    #     else:
-    #         print("ERROR: APK not found")
-
-        # print("upload apk to my google drive")
-        # drive_path = "X:/GoogleDrive/PublicRO/Garuda"
-        # if os.path.exists(drive_path):
-        #     shutil.copy(new_apk_path, drive_path)
-        #     shutil.copy(os.path.join(drive_path, f'vkhgaruda_v{version}.apk'), os.path.join(
-        #         drive_path, 'vkhgaruda_latest.apk'))
-        # else:
-        #     print("ERROR: Google Drive not found in your local system")
+    if reltype == 'release':
+        print("building for android")
+        run_command("flutter build apk")
+        apk_path = "build/app/outputs/flutter-apk/app-release.apk"
+        new_apk_path = f"build/app/outputs/flutter-apk/vkhgaruda_v{version}.apk"
+        if os.path.exists(apk_path):
+            if os.path.exists(new_apk_path):
+                os.remove(new_apk_path)
+            os.rename(apk_path, new_apk_path)
+            
+            print("uploading to Firebase App Distribution")
+            # Read app ID from .env file
+            app_id = get_value_from_file(f'{rootdir}/{app}/.env', 'FIREBASE_ANDROID_APP_ID')
+            if not app_id:
+                print("ERROR: Could not read FIREBASE_ANDROID_APP_ID from .env file")
+                sys.exit(1)
+            
+            release_notes = f"Version {version} release"
+            
+            # Read release notes from changelog if available
+            try:
+                with open(f'{rootdir}/changelog.json', 'r') as f:
+                    changelog = json.load(f)
+                    if version in changelog:
+                        features = changelog[version].get('features', [])
+                        fixes = changelog[version].get('fixes', [])
+                        release_notes = f"Version {version}\n\n"
+                        if features:
+                            release_notes += "Features:\n" + "\n".join([f"- {f}" for f in features]) + "\n\n"
+                        if fixes:
+                            release_notes += "Fixes:\n" + "\n".join([f"- {f}" for f in fixes])
+            except Exception as e:
+                print(f"Could not read changelog: {e}")
+            
+            run_command(f'firebase appdistribution:distribute "{new_apk_path}" --app {app_id} --release-notes "{release_notes}"')
+        else:
+            print("ERROR: APK not found")
 
     print("all operations completed")
 

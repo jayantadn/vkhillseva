@@ -6,7 +6,7 @@ Seva App for ISKCON Vaikuntha Hill
 ## Pre-requisites
 
 ## Build steps
-1. copy `key.properties` file into root of the repo, which contains the following elements
+1. copy `key.properties` file into the path `\vkhgaruda\android\key.properties`, which contains the following elements
   ```
   storePassword=your_store_password
   keyPassword=your_key_password

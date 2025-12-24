@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
-import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class Utils {
@@ -159,13 +157,6 @@ class Utils {
       amount.toString().replaceAll(RegExp(r'[^\d]'), ''),
     );
     return formatter.format(number);
-  }
-
-  Future<String?> getFcmToken(String mobile) async {
-    String? token = await FB().getValue(
-      path: "${Const().dbrootSangeetSeva}/Users/$mobile/fcmToken",
-    );
-    return token;
   }
 
   String getUsername() {

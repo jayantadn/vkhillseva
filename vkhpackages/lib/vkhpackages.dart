@@ -8,7 +8,6 @@ export 'common/fb.dart';
 export 'common/local_storage.dart';
 export 'common/theme.dart';
 export 'common/themeGaruda.dart';
-export 'common/notification.dart';
 export 'common/utils.dart';
 export 'common/time.dart';
 

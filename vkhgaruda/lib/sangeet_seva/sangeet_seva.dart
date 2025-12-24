@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/sangeet_seva/advisory.dart';
@@ -116,20 +115,6 @@ class _SangeetSevaState extends State<SangeetSeva> {
 
     // perform async operations here
     _pendingRequests = await _getPendingRequestsCount();
-
-    // subscribe to notifications
-    try {
-      await Notifications().setupFirebaseMessaging().timeout(
-        const Duration(seconds: 15),
-        onTimeout: () {
-          Toaster().error("Failed to setup notifications");
-          return;
-        },
-      );
-      FirebaseMessaging.instance.subscribeToTopic("SSAdmin");
-    } catch (e) {
-      Toaster().error("Failed to setup notifications");
-    }
 
     await _lock.synchronized(() async {
       // fetch form values

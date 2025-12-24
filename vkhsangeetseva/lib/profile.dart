@@ -400,20 +400,6 @@ class _ProfileState extends State<Profile> {
         referrals: [],
         friendMobile: widget.friendMobile);
 
-    // set the FCM token
-    String? fcmToken = await Notifications().setupFirebaseMessaging().timeout(
-      const Duration(seconds: 10),
-      onTimeout: () {
-        Toaster().error("Failed to setup notifications");
-        return;
-      },
-    );
-    if (fcmToken == null) {
-      Toaster().error("FCM token not available");
-    } else {
-      details.fcmToken = fcmToken;
-    }
-
     // write to database
     await Utils().setUserDetails(details);
 

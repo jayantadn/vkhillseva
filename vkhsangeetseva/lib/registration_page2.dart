@@ -376,16 +376,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
     // show success message
     Toaster().info("Event deleted successfully");
 
-    // notify admin
-    String msg = Utils().getUsername();
-    String date = DateFormat("dd MMM yyyy").format(widget.oldEvent!.date);
-    msg += ", $date ${widget.slot.from} - ${widget.slot.to}";
-    Notifications().sendPushNotificationToTopic(
-      topic: "SSAdmin",
-      title: "Event request deleted",
-      body: msg,
-    );
-
     // go to homepage
     Navigator.pushReplacement(
       context,
@@ -486,16 +476,6 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
         },
       );
     }
-
-    // notify admin
-    String msg = Utils().getUsername();
-    String date = DateFormat("dd MMM yyyy").format(performanceRequest.date);
-    msg += ", $date";
-    Notifications().sendPushNotificationToTopic(
-      topic: "SSAdmin",
-      title: "Event request submitted",
-      body: msg,
-    );
 
     // show success message
     await Widgets().showMessage(

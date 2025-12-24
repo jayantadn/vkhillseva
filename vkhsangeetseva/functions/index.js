@@ -21,37 +21,3 @@ const logger = require("firebase-functions/logger");
 const functions = require('firebase-functions/v1');
 const admin = require('firebase-admin');
 admin.initializeApp();
-
-exports.sendApprovalNotification = functions.database
-    .ref('/SANGEETSEVA_01/PendingRequests')
-    .onUpdate(async (change, context) => {
-      
-        const tokensRef = admin.database().ref('/SANGEETSEVA_01/FCMTokens');
-        const tokensSnapshot = await tokensRef.once('value');
-        const tokens = tokensSnapshot.val();
-        const token = tokens ? Object.values(tokens)[0] : null;
-
-        if (token) {
-          const payload = {
-            notification: {
-              title: 'Registration Approved!',
-              body: 'Your registration request has been approved.',
-            },
-            token: token,
-          };
-
-          return admin.messaging().send(payload)
-              .then((response) => {
-                console.log('Successfully sent message:', response);
-                return { success: true };
-              })
-              .catch((error) => {
-                console.log('Error sending message:', error);
-                return { error: error };
-              });
-        } else {
-          console.log('No token found for user:', userId);
-          return { error: 'No token found' };
-        }
-      });
-      return null;

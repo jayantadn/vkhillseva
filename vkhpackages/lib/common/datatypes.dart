@@ -1,20 +1,18 @@
 class UserBasics {
   String name;
   final String mobile;
-  String? fcmToken;
 
-  UserBasics({required this.name, required this.mobile, this.fcmToken});
+  UserBasics({required this.name, required this.mobile});
 
   factory UserBasics.fromJson(Map<String, dynamic> json) {
     return UserBasics(
       name: json['name'],
       mobile: json['mobile'],
-      fcmToken: json['fcmToken'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'mobile': mobile, 'fcmToken': fcmToken};
+    return {'name': name, 'mobile': mobile};
   }
 }
 

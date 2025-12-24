@@ -5,9 +5,14 @@ import 'package:vkhsangeetseva/slot_selection.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:vkhsangeetseva/home.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load environment variables
+  await dotenv.load(fileName: ".env");
+  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

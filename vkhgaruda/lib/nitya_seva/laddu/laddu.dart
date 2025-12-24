@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/avilability_bar.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
@@ -12,22 +13,30 @@ import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class LadduMain extends StatefulWidget {
+
   const LadduMain({super.key});
+
 
   @override
   _LadduSevaState createState() => _LadduSevaState();
 }
 
 class _LadduSevaState extends State<LadduMain> {
-  DateTime? session;
-  LadduReturn? lr;
+  DateTime? _session;
+  LadduReturn? _lr;
+  final Lock _lock = Lock();
+  bool _isLoading = true;
+  Map<String, dynamic>? _sessionData;
+
+  // final GlobalKey<AvailabilityBarState> _keyAvailabilityBar =
+  //     GlobalKey<AvailabilityBarState>();
 
   @override
   initState() {
     super.initState();
 
     refresh().then((data) async {
-      await _ensureReturn(context);
+      //TODO: await _ensureReturn(context);
 
       FBL().listenForChange("LadduSeva",
           FBLCallbacks(onChange: (String changeType, dynamic data) async {
@@ -37,27 +46,30 @@ class _LadduSevaState extends State<LadduMain> {
   }
 
   Future<void> refresh() async {
-    // refresh the main widget
-    session = await FBL().readLatestLadduSession();
-    lr = await FBL().readLadduReturnStatus(session!);
+    setState(() {
+      _isLoading = true;
+    });
+
+    // access control
+
+    await _lock.synchronized(() async {
+      // your code here
+
+      // read database and populate data
+      _sessionData = await FBL().readLatestLadduSessionData();
+      _lr = ReadLadduReturnStatus(_sessionData);
+    });
+
+    // refresh all child widgets
+
+    setState(() {
+      _isLoading = false;
+    });
+
     if (mounted) {
       setState(() {});
     }
 
-    if (AvailabilityBarKey.currentState != null) {
-      await AvailabilityBarKey.currentState!.refresh();
-    }
-
-    if (SummaryKey.currentState != null) {
-      await SummaryKey.currentState!.refresh();
-    }
-
-    // refresh Log only when session is open
-    if (lr == null || lr!.count == -1) {
-      if (LogKey.currentState != null) {
-        await LogKey.currentState!.refresh();
-      }
-    }
   }
 
   Widget _createReturnTile(LadduReturn lr) {
@@ -124,7 +136,7 @@ class _LadduSevaState extends State<LadduMain> {
   }
 
   Future<void> _ensureReturn(BuildContext context) async {
-    if (lr == null || lr!.count == -1) {
+    if (_lr == null || _lr!.count == -1) {
       // session in progress
 
       DateTime session = await FBL().readLatestLadduSession();
@@ -176,96 +188,103 @@ class _LadduSevaState extends State<LadduMain> {
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Laddu distribution'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LadduSettings()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: refresh,
-
-        // here a ListView is used to allow the content to be scrollable and refreshable.
-        // If you use ListView.builder inside this, then the ListView here can be removed.
-        child: ListView(
-          children: [
-            AvailabilityBar(key: AvailabilityBarKey),
-
-            Divider(),
-            Summary(key: SummaryKey),
-
-            // button row
-            Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                // stock button
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    addEditStock(context);
-                  },
-                  icon: Icon(
-                    Icons.add,
-                    color: Colors.white,
-                  ),
-                  label: Text('Stock'),
-                ),
-
-                // serve button
-                ElevatedButton.icon(
-                  onPressed: (lr == null || lr!.count == -1)
-                      ? () async {
-                          _createServeDialog(context);
-                        }
-                      : null,
-                  icon: Icon(Icons.remove, color: Colors.white),
-                  label: Text('Serve'),
-                ),
-
-                // return button
-                ElevatedButton.icon(
-                  onPressed: (lr == null || lr!.count == -1)
-                      ? () {
-                          returnStock(context);
-                        }
-                      : null,
-                  icon: Icon(Icons.undo, color: Colors.white),
-                  label: Text('Return'),
-                )
-              ],
+    return Stack(children: [
+      Scaffold(
+        appBar: AppBar(
+          title: Text('Laddu distribution'),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LadduSettings()),
+                );
+              },
             ),
-
-            Divider(),
-
-            // if session is closed, display a message and the return tile
-            if (lr != null && lr!.count >= 0)
-              Column(
-                children: [
-                  Text(
-                    "Click '+ Stock' to start new session",
-                    style: TextStyle(color: Colors.red, fontSize: 20.0),
-                  ),
-                  Divider(),
-                  _createReturnTile(lr!),
-                  Divider(),
-                ],
-              ),
-
-            Log(key: LogKey),
           ],
         ),
+        body: RefreshIndicator(
+          onRefresh: refresh,
+
+          // here a ListView is used to allow the content to be scrollable and refreshable.
+          // If you use ListView.builder inside this, then the ListView here can be removed.
+          child: ListView(
+            children: [
+              AvailabilityBar(key: AvailabilityBarKey),
+
+              Divider(),
+              // Summary(key: SummaryKey),
+
+              // button row
+              Divider(),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //   children: <Widget>[
+              //     // stock button
+              //     ElevatedButton.icon(
+              //       onPressed: () async {
+              //         addEditStock(context);
+              //       },
+              //       icon: Icon(
+              //         Icons.add,
+              //         color: Colors.white,
+              //       ),
+              //       label: Text('Stock'),
+              //     ),
+      
+              //     // serve button
+              //     ElevatedButton.icon(
+              //       onPressed: (_lr == null || _lr!.count == -1)
+              //           ? () async {
+              //               _createServeDialog(context);
+              //             }
+              //           : null,
+              //       icon: Icon(Icons.remove, color: Colors.white),
+              //       label: Text('Serve'),
+              //     ),
+      
+              //     // return button
+              //     ElevatedButton.icon(
+              //       onPressed: (_lr == null || _lr!.count == -1)
+              //           ? () {
+              //               returnStock(context);
+              //             }
+              //           : null,
+              //       icon: Icon(Icons.undo, color: Colors.white),
+              //       label: Text('Return'),
+              //     )
+              //   ],
+              // ),
+
+              Divider(),
+
+              // if session is closed, display a message and the return tile
+              // if (_lr != null && _lr!.count >= 0)
+              //   Column(
+              //     children: [
+              //       Text(
+              //         "Click '+ Stock' to start new session",
+              //         style: TextStyle(color: Colors.red, fontSize: 20.0),
+              //       ),
+              //       Divider(),
+              //       _createReturnTile(_lr!),
+              //       Divider(),
+              //     ],
+              //   ),
+
+              // Log(key: LogKey),
+            ],
+          ),
+        ),
       ),
-    );
+    
+      // circular progress indicator
+      if (_isLoading) LoadingOverlay(),
+    ]);
   }
 }

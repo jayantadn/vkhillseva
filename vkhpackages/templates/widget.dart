@@ -10,7 +10,7 @@ class Summary extends StatefulWidget {
 
 // hint: put the global key as a member of the calling class
 // instantiate this class with a global key
-// final GlobalKey<SummaryState> keySummary = GlobalKey<SummaryState>();
+// final GlobalKey<SummaryState> _keySummary = GlobalKey<SummaryState>();
 
 class SummaryState extends State<Summary> {
   final Lock _lock = Lock();

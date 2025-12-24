@@ -110,6 +110,23 @@ class FBL {
     }
   }
 
+  Future<Map<String, dynamic>?> readLatestLadduSessionData() async {
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva');
+
+    final Query query = dbRef.orderByKey().limitToLast(1);
+
+    final DataSnapshot snapshot = await query.get();
+    if (snapshot.exists) {
+      var data = snapshot.value as Map;
+      var lastValue = data.values.first;
+
+      return Map<String, dynamic>.from(lastValue as Map);
+    } else {
+      return null;
+    }
+  }
+
   Future<List<DateTime>> readLadduSessions(
       DateTime startDate, DateTime endDate) async {
     final DatabaseReference dbRef =

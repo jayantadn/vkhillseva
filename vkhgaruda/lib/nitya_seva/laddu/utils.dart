@@ -1,6 +1,8 @@
 import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
+import 'package:vkhpackages/common/toaster.dart';
+import 'package:vkhpackages/common/utils.dart';
 
 int CalculateTotalLadduPacksServed(LadduServe serve) {
   int total = 0;
@@ -41,4 +43,14 @@ Future<String> CalculateSessionTitle(DateTime session) async {
   }
 
   return sessionTitle;
+}
+
+LadduReturn? ReadLadduReturnStatus(Map<String, dynamic>? sessionData) {
+  if (sessionData == null) {
+    Toaster().error("No data");
+    return null;
+  }
+
+  return Utils()
+      .convertRawToDatatype(sessionData['returned'], LadduReturn.fromJson);
 }

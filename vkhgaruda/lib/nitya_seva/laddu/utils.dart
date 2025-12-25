@@ -52,7 +52,6 @@ Future<String> CalculateSessionTitle(Map<String, dynamic> sessionData) async {
 
 LadduReturn? readLadduReturnStatus(Map<String, dynamic>? sessionData) {
   if (sessionData == null || sessionData.isEmpty) {
-    Toaster().error("No data");
     return null;
   }
 
@@ -65,39 +64,33 @@ LadduReturn? readLadduReturnStatus(Map<String, dynamic>? sessionData) {
 }
 
 List<LadduServe> readLadduServes(Map<String, dynamic>? sessionData) {
-  if (sessionData == null) {
-    Toaster().error("No data");
+  if (sessionData == null || sessionData.isEmpty) {
     return [];
   }
 
   List<LadduServe> list = [];
 
-  if (sessionData.isNotEmpty) {
-    Map<String, dynamic> serves =
-        Map<String, dynamic>.from(sessionData['serves']);
-    serves.forEach((key, value) {
-      list.add(Utils().convertRawToDatatype(value, LadduServe.fromJson));
-    });
-  }
+  Map<String, dynamic> serves =
+      Map<String, dynamic>.from(sessionData['serves']);
+  serves.forEach((key, value) {
+    list.add(Utils().convertRawToDatatype(value, LadduServe.fromJson));
+  });
 
   return list;
 }
 
 List<LadduStock> readLadduStocks(Map<String, dynamic>? sessionData) {
-  if (sessionData == null) {
-    Toaster().error("No data");
+  if (sessionData == null || sessionData.isEmpty) {
     return [];
   }
 
   List<LadduStock> list = [];
 
-  if (sessionData.isNotEmpty) {
-    Map<String, dynamic> serves =
-        Map<String, dynamic>.from(sessionData['stocks']);
-    serves.forEach((key, value) {
-      list.add(Utils().convertRawToDatatype(value, LadduStock.fromJson));
-    });
-  }
+  Map<String, dynamic> serves =
+      Map<String, dynamic>.from(sessionData['stocks']);
+  serves.forEach((key, value) {
+    list.add(Utils().convertRawToDatatype(value, LadduStock.fromJson));
+  });
 
   return list;
 }

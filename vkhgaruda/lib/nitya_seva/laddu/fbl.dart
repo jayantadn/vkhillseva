@@ -84,32 +84,6 @@ class FBL {
     });
   }
 
-  Future<DateTime> readLatestLadduSession() async {
-    final DatabaseReference dbRef =
-        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva');
-
-    DateTime endDate = DateTime.now();
-    DateTime startDate = endDate.subtract(Duration(days: 30));
-
-    final Query query = dbRef
-        .orderByKey()
-        .startAt(startDate.toIso8601String().replaceAll(".", "^"))
-        .endAt(endDate.toIso8601String().replaceAll(".", "^"));
-
-    final DataSnapshot snapshot = await query.get();
-    if (snapshot.exists) {
-      var allotments = snapshot.value as Map;
-      var keys = allotments.keys.toList();
-      keys.sort();
-      var lastKey = keys.last;
-
-      lastKey = lastKey.replaceAll("^", ".");
-      return DateTime.parse(lastKey);
-    } else {
-      return DateTime.now();
-    }
-  }
-
   Future<Map<String, dynamic>?> readLatestLadduSessionData() async {
     final DatabaseReference dbRef =
         FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva');

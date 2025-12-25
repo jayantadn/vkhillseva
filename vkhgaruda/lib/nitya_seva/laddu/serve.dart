@@ -419,23 +419,26 @@ class _ServeState extends State<Serve> {
       _isLoading = true;
     });
 
+    Map<String, dynamic>? sessionData =
+        await FBL().readLatestLadduSessionData();
+    List<LadduStock> stocks = readLadduStocks(sessionData);
+    List<LadduServe> serves = readLadduServes(sessionData);
+
     // calculate available laddu packs
     int available = 0;
     if (widget.serve != null) {
       available = widget.serve!.available ?? 0;
     } else {
-      DateTime session = await FBL().readLatestLadduSession();
-      await FBL().readLadduStocks(session).then((stocks) {
+      if (sessionData != null) {
         for (LadduStock stock in stocks) {
           available += stock.count;
           available += stock.carry ?? 0;
         }
-      });
-      await FBL().readLadduServes(session).then((serves) {
+
         for (LadduServe serve in serves) {
           available -= CalculateTotalLadduPacksServed(serve);
         }
-      });
+      }
     }
 
     // return if low stock
@@ -492,18 +495,13 @@ class _ServeState extends State<Serve> {
     int totalProcured = 0;
     int totalCarry = 0;
     int totalServed = 0;
-    DateTime session = await FBL().readLatestLadduSession();
-    await FBL().readLadduStocks(session).then((stocks) {
-      for (LadduStock stock in stocks) {
-        totalProcured += stock.count;
-        totalCarry += stock.carry ?? 0;
-      }
-    });
-    await FBL().readLadduServes(session).then((serves) {
-      for (LadduServe serve in serves) {
-        totalServed += CalculateTotalLadduPacksServed(serve);
-      }
-    });
+    for (LadduStock stock in stocks) {
+      totalProcured += stock.count;
+      totalCarry += stock.carry ?? 0;
+    }
+    for (LadduServe serve in serves) {
+      totalServed += CalculateTotalLadduPacksServed(serve);
+    }
     if (widget.serve != null) {
       // in edit mode, remove the previous serve count
       totalServed -= CalculateTotalLadduPacksServed(widget.serve!);
@@ -532,6 +530,7 @@ class _ServeState extends State<Serve> {
       available: available,
     );
 
+    DateTime session = await FBL().getLastSessionDateTime();
     if (widget.serve != null) {
       await FBL().editLadduServe(session, ladduServe);
     } else {
@@ -655,7 +654,7 @@ class _ServeState extends State<Serve> {
                             });
 
                             DateTime session =
-                                await FBL().readLatestLadduSession();
+                                await FBL().getLastSessionDateTime();
                             await FBL()
                                 .deleteLadduServe(session, widget.serve!);
 

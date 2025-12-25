@@ -109,7 +109,7 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
           ElevatedButton(
             onPressed: () async {
               DateTime session =
-                  widget.session ?? await FBL().readLatestLadduSession();
+                  widget.session ?? await FBL().getLastSessionDateTime();
 
               // check if this is the only stock entry
               List<LadduStock> stocks = await FBL().readLadduStocks(session);
@@ -210,11 +210,11 @@ class _AddEditStockDialogState extends State<AddEditStockDialog> {
 
               if (widget.edit) {
                 session =
-                    widget.session ?? await FBL().readLatestLadduSession();
+                    widget.session ?? await FBL().getLastSessionDateTime();
                 status = await FBL().editLadduStock(session, stockNew);
               } else {
                 // check if session is already running
-                session = await FBL().readLatestLadduSession();
+                session = await FBL().getLastSessionDateTime();
                 LadduReturn lr = await FBL().readLadduReturnStatus(session);
 
                 if (lr.count >= 0) {
@@ -259,7 +259,7 @@ Future<void> addEditStock(BuildContext context,
 }
 
 Future<void> returnStock(BuildContext context, {LadduReturn? lr}) async {
-  DateTime session = await FBL().readLatestLadduSession();
+  DateTime session = await FBL().getLastSessionDateTime();
 
   List<LadduStock> stocks = await FBL().readLadduStocks(session);
   stocks.sort((a, b) => a.timestamp.compareTo(b.timestamp));
@@ -443,13 +443,11 @@ class _ReturnStockDialogState extends State<ReturnStockDialog> {
     await Utils().fetchUserBasics();
     String username = Utils().getUsername();
 
-    await FBL().returnLadduStock(
-        
-        LadduReturn(
-            timestamp: DateTime.now(),
-            count: widget.returnCount,
-            to: widget.returnedTo,
-            user: username));
+    await FBL().returnLadduStock(LadduReturn(
+        timestamp: DateTime.now(),
+        count: widget.returnCount,
+        to: widget.returnedTo,
+        user: username));
 
     setState(() {
       _isLoading = false;

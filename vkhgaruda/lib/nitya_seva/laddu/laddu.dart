@@ -13,9 +13,7 @@ import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class LadduMain extends StatefulWidget {
-
   const LadduMain({super.key});
-
 
   @override
   _LadduSevaState createState() => _LadduSevaState();
@@ -26,6 +24,7 @@ class _LadduSevaState extends State<LadduMain> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   Map<String, dynamic>? _sessionData;
+  List<Ticket> _tickets = [];
 
   // final GlobalKey<AvailabilityBarState> _keyAvailabilityBar =
   //     GlobalKey<AvailabilityBarState>();
@@ -37,10 +36,10 @@ class _LadduSevaState extends State<LadduMain> {
     refresh().then((data) async {
       await _ensureReturn(context);
 
-      // FBL().listenForChange("LadduSeva",
-      //     FBLCallbacks(onChange: (String changeType, dynamic data) async {
-      //   await refresh();
-      // }));
+      FBL().listenForChange("LadduSeva",
+          FBLCallbacks(onChange: (String changeType, dynamic data) async {
+        await refresh();
+      }));
     });
   }
 
@@ -68,7 +67,6 @@ class _LadduSevaState extends State<LadduMain> {
     if (mounted) {
       setState(() {});
     }
-
   }
 
   Widget _createReturnTile(LadduReturn lr) {
@@ -144,7 +142,7 @@ class _LadduSevaState extends State<LadduMain> {
         return ServiceSelect();
       },
     );
-  }  
+  }
 
   Future<void> _ensureReturn(BuildContext context) async {
     if (_lr == null || _lr!.count == -1) {
@@ -176,13 +174,11 @@ class _LadduSevaState extends State<LadduMain> {
           remaining = 0;
         }
 
-        await FBL().returnLadduStock(
-            
-            LadduReturn(
-                timestamp: DateTime.now(),
-                count: remaining,
-                to: "Unknown",
-                user: "Auto Return"));
+        await FBL().returnLadduStock(LadduReturn(
+            timestamp: DateTime.now(),
+            count: remaining,
+            to: "Unknown",
+            user: "Auto Return"));
 
         Toaster().info("Auto returned");
       }
@@ -236,7 +232,7 @@ class _LadduSevaState extends State<LadduMain> {
                     ),
                     label: Text('Stock'),
                   ),
-      
+
                   // serve button
                   ElevatedButton.icon(
                     onPressed: (_lr == null || _lr!.count == -1)
@@ -247,7 +243,7 @@ class _LadduSevaState extends State<LadduMain> {
                     icon: Icon(Icons.remove, color: Colors.white),
                     label: Text('Serve'),
                   ),
-      
+
                   // return button
                   ElevatedButton.icon(
                     onPressed: (_lr == null || _lr!.count == -1)
@@ -277,12 +273,12 @@ class _LadduSevaState extends State<LadduMain> {
                   ],
                 ),
 
-              Log(key: LogKey),
+              Log(key: LogKey, sessionData: _sessionData ?? {}),
             ],
           ),
         ),
       ),
-    
+
       // circular progress indicator
       if (_isLoading) LoadingOverlay(),
     ]);

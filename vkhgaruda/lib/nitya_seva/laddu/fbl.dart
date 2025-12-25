@@ -410,17 +410,22 @@ class FBL {
   Future<String> getLastSessionName() async {
     final DatabaseReference dbRef =
         FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva');
-    
+
     final Query query = dbRef.orderByKey().limitToLast(1);
     final DataSnapshot snapshot = await query.get();
-    
+
     if (!snapshot.exists) {
       throw Exception('No LadduSeva session found in database');
     }
-    
+
     // Get the last session key
     var data = snapshot.value as Map;
     return data.keys.first;
+  }
+
+  Future<DateTime> getLastSessionDateTime() async {
+    String lastSessionName = await getLastSessionName();
+    return DateTime.parse(lastSessionName.replaceAll("^", "."));
   }
 
   Future<void> returnLadduStock(LadduReturn lr) async {

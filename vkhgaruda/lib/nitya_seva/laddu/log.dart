@@ -9,9 +9,9 @@ import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Log extends StatefulWidget {
-  final DateTime? session;
+  final Map<String, dynamic> sessionData;
 
-  const Log({super.key, this.session});
+  const Log({super.key, required this.sessionData});
 
   @override
   State<Log> createState() => _LogState();
@@ -29,10 +29,8 @@ class _LogState extends State<Log> {
     await _lockInit.synchronized(() async {
       _logItems = [];
 
-      DateTime session = widget.session ?? await FBL().readLatestLadduSession();
-
       // stock tile
-      List<LadduStock> stocks = await FBL().readLadduStocks(session);
+      List<LadduStock> stocks = readLadduStocks(widget.sessionData);
       for (LadduStock stock in stocks) {
         _logItems.add(ListTile(
 
@@ -104,10 +102,11 @@ class _LogState extends State<Log> {
             ),
 
             // on tap
-            onTap: () {
-              if (widget.session == null) {
+            onTap: () async {
+              if (widget.sessionData.isEmpty) {
                 addEditStock(context, edit: true, stock: stock);
               } else {
+                DateTime session = await FBL().getLastSessionDateTime();
                 addEditStock(context,
                     edit: true, stock: stock, session: session);
               }
@@ -115,7 +114,7 @@ class _LogState extends State<Log> {
       }
 
       // serve tiles
-      List<LadduServe> serves = await FBL().readLadduServes(session);
+      List<LadduServe> serves = readLadduServes(widget.sessionData);
       for (LadduServe serve in serves) {
         ListTile tile = ListTile(
             // title - WARNING! careful changing this, as the tiles are sorted based on this

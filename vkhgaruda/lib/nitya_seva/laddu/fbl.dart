@@ -407,8 +407,12 @@ class FBL {
     return serves;
   }
 
-  Future<void> returnLadduStock(DateTime session, LadduReturn lr) async {
+  Future<void> returnLadduStock(LadduReturn lr) async {
+    
     String s = session.toIso8601String().replaceAll(".", "^");
+
+
+
     final DatabaseReference dbRef = FirebaseDatabase.instance
         .ref('${Const().dbrootGaruda}/LadduSeva/$s/returned');
 

@@ -45,12 +45,50 @@ Future<String> CalculateSessionTitle(DateTime session) async {
   return sessionTitle;
 }
 
-LadduReturn? ReadLadduReturnStatus(Map<String, dynamic>? sessionData) {
+LadduReturn? readLadduReturnStatus(Map<String, dynamic>? sessionData) {
   if (sessionData == null) {
     Toaster().error("No data");
     return null;
   }
 
+  if (sessionData['returned'] == null) {
+    return null;
+  }
+
   return Utils()
       .convertRawToDatatype(sessionData['returned'], LadduReturn.fromJson);
+}
+
+List<LadduServe> readLadduServes(Map<String, dynamic>? sessionData) {
+  if (sessionData == null) {
+    Toaster().error("No data");
+    return [];
+  }
+
+  List<LadduServe> list = [];
+
+  Map<String, dynamic> serves =
+      Map<String, dynamic>.from(sessionData['serves']);
+  serves.forEach((key, value) {
+    list.add(Utils().convertRawToDatatype(value, LadduServe.fromJson));
+  });
+
+  return list;
+}
+
+List<LadduStock> readLadduStocks(Map<String, dynamic>? sessionData) {
+  if (sessionData == null) {
+    Toaster().error("No data");
+    return [];
+  }
+
+  List<LadduStock> list = [];
+
+  Map<String, dynamic> serves =
+      Map<String, dynamic>.from(sessionData['stocks']);
+  serves.forEach((key, value) {
+    list.add(Utils().convertRawToDatatype(value, LadduStock.fromJson));
+  });
+
+  return list;
 }

@@ -22,7 +22,6 @@ class LadduMain extends StatefulWidget {
 }
 
 class _LadduSevaState extends State<LadduMain> {
-  DateTime? _session;
   LadduReturn? _lr;
   final Lock _lock = Lock();
   bool _isLoading = true;
@@ -36,7 +35,7 @@ class _LadduSevaState extends State<LadduMain> {
     super.initState();
 
     refresh().then((data) async {
-      //TODO: await _ensureReturn(context);
+      await _ensureReturn(context);
 
       FBL().listenForChange("LadduSeva",
           FBLCallbacks(onChange: (String changeType, dynamic data) async {
@@ -57,7 +56,7 @@ class _LadduSevaState extends State<LadduMain> {
 
       // read database and populate data
       _sessionData = await FBL().readLatestLadduSessionData();
-      _lr = ReadLadduReturnStatus(_sessionData);
+      _lr = readLadduReturnStatus(_sessionData);
     });
 
     // refresh all child widgets
@@ -139,15 +138,14 @@ class _LadduSevaState extends State<LadduMain> {
     if (_lr == null || _lr!.count == -1) {
       // session in progress
 
-      DateTime session = await FBL().readLatestLadduSession();
-      List<LadduServe> serves = await FBL().readLadduServes(session);
+      List<LadduServe> serves = readLadduServes(_sessionData);
 
       // check if last serve is more than 2 days old
       if (serves.isNotEmpty &&
           serves.last.timestamp
               .isBefore(DateTime.now().subtract(Duration(days: 2)))) {
-        // totatl stock
-        List<LadduStock> stocks = await FBL().readLadduStocks(session);
+        // total stock
+        List<LadduStock> stocks = readLadduStocks(_sessionData);
         stocks.sort((a, b) => a.timestamp.compareTo(b.timestamp));
         if (stocks.isEmpty) {
           return;
@@ -167,7 +165,7 @@ class _LadduSevaState extends State<LadduMain> {
         }
 
         await FBL().returnLadduStock(
-            session,
+            
             LadduReturn(
                 timestamp: DateTime.now(),
                 count: remaining,

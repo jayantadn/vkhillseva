@@ -177,17 +177,6 @@ class _LadduSevaState extends State<LadduMain> {
     }
   }
 
-  void _createServeDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ServiceSelect();
-      },
-    );
-  }
-
-
-
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
@@ -213,7 +202,8 @@ class _LadduSevaState extends State<LadduMain> {
           // If you use ListView.builder inside this, then the ListView here can be removed.
           child: ListView(
             children: [
-              AvailabilityBar(key: AvailabilityBarKey),
+              AvailabilityBar(
+                  key: AvailabilityBarKey, sessionData: _sessionData ?? {}),
 
               Divider(),
               // Summary(key: SummaryKey),

@@ -407,16 +407,29 @@ class FBL {
     return serves;
   }
 
-  Future<void> returnLadduStock(LadduReturn lr) async {
+  Future<String> getLastSessionName() async {
+    final DatabaseReference dbRef =
+        FirebaseDatabase.instance.ref('${Const().dbrootGaruda}/LadduSeva');
     
-    String s = session.toIso8601String().replaceAll(".", "^");
+    final Query query = dbRef.orderByKey().limitToLast(1);
+    final DataSnapshot snapshot = await query.get();
+    
+    if (!snapshot.exists) {
+      throw Exception('No LadduSeva session found in database');
+    }
+    
+    // Get the last session key
+    var data = snapshot.value as Map;
+    return data.keys.first;
+  }
 
+  Future<void> returnLadduStock(LadduReturn lr) async {
+    String session = await getLastSessionName();
 
+    final DatabaseReference returnRef = FirebaseDatabase.instance
+        .ref('${Const().dbrootGaruda}/LadduSeva/$session/returned');
 
-    final DatabaseReference dbRef = FirebaseDatabase.instance
-        .ref('${Const().dbrootGaruda}/LadduSeva/$s/returned');
-
-    await dbRef.update({
+    await returnRef.update({
       'count': lr.count,
       'to': lr.to,
       'timestamp': lr.timestamp.toIso8601String(),

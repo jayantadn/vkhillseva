@@ -444,7 +444,7 @@ class _ReturnStockDialogState extends State<ReturnStockDialog> {
     String username = Utils().getUsername();
 
     await FBL().returnLadduStock(
-        widget.session,
+        
         LadduReturn(
             timestamp: DateTime.now(),
             count: widget.returnCount,

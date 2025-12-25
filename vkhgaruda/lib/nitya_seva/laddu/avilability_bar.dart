@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
-import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/utils.dart';
 import 'package:synchronized/synchronized.dart';
 
 class AvailabilityBar extends StatefulWidget {
-  const AvailabilityBar({super.key});
+  final Map<String, dynamic> sessionData;
+
+  const AvailabilityBar({super.key, required this.sessionData});
 
   @override
   State<AvailabilityBar> createState() => _AvailabilityBarState();
@@ -29,13 +30,12 @@ class _AvailabilityBarState extends State<AvailabilityBar> {
 
   Future<void> _futureInit() async {
     await _lockInit.synchronized(() async {
-      session = await FBL().readLatestLadduSession();
-
-      LadduReturn lr = await FBL().readLadduReturnStatus(session);
+      LadduReturn lr = readLadduReturnStatus(widget.sessionData) ??
+          LadduReturn(timestamp: DateTime.now(), count: -1, to: "", user: "");
       returned = lr.count >= 0;
 
-      List<LadduStock> stocks = await FBL().readLadduStocks(session);
-      List<LadduServe> serves = await FBL().readLadduServes(session);
+      List<LadduStock> stocks = readLadduStocks(widget.sessionData);
+      List<LadduServe> serves = readLadduServes(widget.sessionData);
 
       total_procured = 0;
       total_carry = 0;

@@ -417,14 +417,17 @@ class _LogState extends State<Log> {
         ),
       );
     } else {
-      return Column(
-        children: List.generate(_logItems.length * 2 - 1, (index) {
-          if (index.isEven) {
-            return _logItems[index ~/ 2];
-          } else {
-            return Divider();
-          }
-        }),
+      return Padding(
+        padding: const EdgeInsets.only(right: 8.0),
+        child: Column(
+          children: List.generate(_logItems.length * 2 - 1, (index) {
+            if (index.isEven) {
+              return _logItems[index ~/ 2];
+            } else {
+              return Divider();
+            }
+          }),
+        ),
       );
     }
   }

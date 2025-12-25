@@ -27,9 +27,14 @@ int CalculateTotalLadduPacksServed(LadduServe serve) {
   return total;
 }
 
-Future<String> CalculateSessionTitle(DateTime session) async {
+Future<String> CalculateSessionTitle(Map<String, dynamic> sessionData) async {
+  String lastSession = (await FBL().getLastSessionName()).replaceAll("^", ".");
+  DateTime session = DateTime.parse(lastSession);
+
   String sessionTitle = DateFormat("EEE, MMM dd").format(session);
-  LadduReturn lr = await FBL().readLadduReturnStatus(session);
+  LadduReturn lr = readLadduReturnStatus(sessionData) ??
+      LadduReturn(count: -1, timestamp: DateTime.now(), to: "", user: "");
+
   if (lr.count >= 0) {
     String endSession = DateFormat("EEE, MMM dd").format(lr.timestamp);
     if (sessionTitle != endSession) {
@@ -46,7 +51,7 @@ Future<String> CalculateSessionTitle(DateTime session) async {
 }
 
 LadduReturn? readLadduReturnStatus(Map<String, dynamic>? sessionData) {
-  if (sessionData == null) {
+  if (sessionData == null || sessionData.isEmpty) {
     Toaster().error("No data");
     return null;
   }
@@ -67,11 +72,13 @@ List<LadduServe> readLadduServes(Map<String, dynamic>? sessionData) {
 
   List<LadduServe> list = [];
 
-  Map<String, dynamic> serves =
-      Map<String, dynamic>.from(sessionData['serves']);
-  serves.forEach((key, value) {
-    list.add(Utils().convertRawToDatatype(value, LadduServe.fromJson));
-  });
+  if (sessionData.isNotEmpty) {
+    Map<String, dynamic> serves =
+        Map<String, dynamic>.from(sessionData['serves']);
+    serves.forEach((key, value) {
+      list.add(Utils().convertRawToDatatype(value, LadduServe.fromJson));
+    });
+  }
 
   return list;
 }
@@ -84,11 +91,13 @@ List<LadduStock> readLadduStocks(Map<String, dynamic>? sessionData) {
 
   List<LadduStock> list = [];
 
-  Map<String, dynamic> serves =
-      Map<String, dynamic>.from(sessionData['stocks']);
-  serves.forEach((key, value) {
-    list.add(Utils().convertRawToDatatype(value, LadduStock.fromJson));
-  });
+  if (sessionData.isNotEmpty) {
+    Map<String, dynamic> serves =
+        Map<String, dynamic>.from(sessionData['stocks']);
+    serves.forEach((key, value) {
+      list.add(Utils().convertRawToDatatype(value, LadduStock.fromJson));
+    });
+  }
 
   return list;
 }

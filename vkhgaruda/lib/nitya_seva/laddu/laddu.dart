@@ -37,10 +37,10 @@ class _LadduSevaState extends State<LadduMain> {
     refresh().then((data) async {
       await _ensureReturn(context);
 
-      FBL().listenForChange("LadduSeva",
-          FBLCallbacks(onChange: (String changeType, dynamic data) async {
-        await refresh();
-      }));
+      // FBL().listenForChange("LadduSeva",
+      //     FBLCallbacks(onChange: (String changeType, dynamic data) async {
+      //   await refresh();
+      // }));
     });
   }
 
@@ -72,67 +72,79 @@ class _LadduSevaState extends State<LadduMain> {
   }
 
   Widget _createReturnTile(LadduReturn lr) {
-    return ListTile(
-        // title
-        title: Text(
-          DateFormat('dd-MM-yyyy HH:mm:ss').format(lr.timestamp),
-          style:
-              TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF8A0303)),
-        ),
-
-        // icon
-        leading: Icon(Icons.undo, color: Color(0xFF8A0303)),
-
-        // body
-        subtitle: Column(
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Sevakarta: ${lr.user}',
-                style: TextStyle(color: Color(0xFF8A0303)),
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Laddu packs returned: ${lr.count}',
-                style: TextStyle(color: Color(0xFF8A0303)),
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Returned to: ${lr.to}',
-                style: TextStyle(color: Color(0xFF8A0303)),
-              ),
-            ),
-          ],
-        ),
-
-        // the count
-        trailing: Container(
-          padding: EdgeInsets.all(8.0), // Add padding around the text
-          decoration: BoxDecoration(
-            color: Colors.red[50], // Change background color to red
-            border: Border.all(
-                color: Color(0xFF8A0303), width: 2.0), // Add a border
-            borderRadius:
-                BorderRadius.circular(12.0), // Make the border circular
-          ),
-          child: Text(
-            lr.count.toString(),
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: ListTile(
+          // title
+          title: Text(
+            DateFormat('dd-MM-yyyy HH:mm:ss').format(lr.timestamp),
             style: TextStyle(
-                fontSize: 18.0,
-                color: Color(0xFF8A0303)), // Increase the font size
+                fontWeight: FontWeight.bold, color: Color(0xFF8A0303)),
           ),
-        ),
 
-        // on tap
-        onTap: () async {
-          returnStock(context, lr: lr);
-        });
+          // icon
+          leading: Icon(Icons.undo, color: Color(0xFF8A0303)),
+
+          // body
+          subtitle: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Sevakarta: ${lr.user}',
+                  style: TextStyle(color: Color(0xFF8A0303)),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Laddu packs returned: ${lr.count}',
+                  style: TextStyle(color: Color(0xFF8A0303)),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Returned to: ${lr.to}',
+                  style: TextStyle(color: Color(0xFF8A0303)),
+                ),
+              ),
+            ],
+          ),
+
+          // the count
+          trailing: Container(
+            padding: EdgeInsets.all(8.0), // Add padding around the text
+            decoration: BoxDecoration(
+              color: Colors.red[50], // Change background color to red
+              border: Border.all(
+                  color: Color(0xFF8A0303), width: 2.0), // Add a border
+              borderRadius:
+                  BorderRadius.circular(12.0), // Make the border circular
+            ),
+            child: Text(
+              lr.count.toString(),
+              style: TextStyle(
+                  fontSize: 18.0,
+                  color: Color(0xFF8A0303)), // Increase the font size
+            ),
+          ),
+
+          // on tap
+          onTap: () async {
+            returnStock(context, lr: lr);
+          }),
+    );
   }
+
+  void _createServeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ServiceSelect();
+      },
+    );
+  }  
 
   Future<void> _ensureReturn(BuildContext context) async {
     if (_lr == null || _lr!.count == -1) {
@@ -206,66 +218,66 @@ class _LadduSevaState extends State<LadduMain> {
                   key: AvailabilityBarKey, sessionData: _sessionData ?? {}),
 
               Divider(),
-              // Summary(key: SummaryKey),
+              Summary(key: SummaryKey, sessionData: _sessionData ?? {}),
 
               // button row
               Divider(),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              //   children: <Widget>[
-              //     // stock button
-              //     ElevatedButton.icon(
-              //       onPressed: () async {
-              //         addEditStock(context);
-              //       },
-              //       icon: Icon(
-              //         Icons.add,
-              //         color: Colors.white,
-              //       ),
-              //       label: Text('Stock'),
-              //     ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  // stock button
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      addEditStock(context);
+                    },
+                    icon: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    label: Text('Stock'),
+                  ),
       
-              //     // serve button
-              //     ElevatedButton.icon(
-              //       onPressed: (_lr == null || _lr!.count == -1)
-              //           ? () async {
-              //               _createServeDialog(context);
-              //             }
-              //           : null,
-              //       icon: Icon(Icons.remove, color: Colors.white),
-              //       label: Text('Serve'),
-              //     ),
+                  // serve button
+                  ElevatedButton.icon(
+                    onPressed: (_lr == null || _lr!.count == -1)
+                        ? () async {
+                            _createServeDialog(context);
+                          }
+                        : null,
+                    icon: Icon(Icons.remove, color: Colors.white),
+                    label: Text('Serve'),
+                  ),
       
-              //     // return button
-              //     ElevatedButton.icon(
-              //       onPressed: (_lr == null || _lr!.count == -1)
-              //           ? () {
-              //               returnStock(context);
-              //             }
-              //           : null,
-              //       icon: Icon(Icons.undo, color: Colors.white),
-              //       label: Text('Return'),
-              //     )
-              //   ],
-              // ),
+                  // return button
+                  ElevatedButton.icon(
+                    onPressed: (_lr == null || _lr!.count == -1)
+                        ? () {
+                            returnStock(context);
+                          }
+                        : null,
+                    icon: Icon(Icons.undo, color: Colors.white),
+                    label: Text('Return'),
+                  )
+                ],
+              ),
 
               Divider(),
 
               // if session is closed, display a message and the return tile
-              // if (_lr != null && _lr!.count >= 0)
-              //   Column(
-              //     children: [
-              //       Text(
-              //         "Click '+ Stock' to start new session",
-              //         style: TextStyle(color: Colors.red, fontSize: 20.0),
-              //       ),
-              //       Divider(),
-              //       _createReturnTile(_lr!),
-              //       Divider(),
-              //     ],
-              //   ),
+              if (_lr != null && _lr!.count >= 0)
+                Column(
+                  children: [
+                    Text(
+                      "Click '+ Stock' to start new session",
+                      style: TextStyle(color: Colors.red, fontSize: 20.0),
+                    ),
+                    Divider(),
+                    _createReturnTile(_lr!),
+                    Divider(),
+                  ],
+                ),
 
-              // Log(key: LogKey),
+              Log(key: LogKey),
             ],
           ),
         ),

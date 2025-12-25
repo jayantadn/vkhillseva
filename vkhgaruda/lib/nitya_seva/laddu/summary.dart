@@ -1,13 +1,14 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
-import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/utils.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class Summary extends StatefulWidget {
-  const Summary({super.key});
+  final Map<String, dynamic> sessionData;
+
+  const Summary({super.key, required this.sessionData});
 
   @override
   State<Summary> createState() => _SummaryState();
@@ -48,17 +49,15 @@ class _SummaryState extends State<Summary> {
 
   Future<void> _futureInit() async {
     await _lockInit.synchronized(() async {
-      DateTime session = await FBL().readLatestLadduSession();
-      List<LadduStock> stocks = await FBL().readLadduStocks(session);
-      List<LadduServe> serves = await FBL().readLadduServes(session);
+      List<LadduStock> stocks = readLadduStocks(widget.sessionData);
+      List<LadduServe> serves = readLadduServes(widget.sessionData);
 
       // set laddu return status
-      FBL().readLadduReturnStatus(session).then((value) {
-        lr = value as LadduReturn?;
-      });
+      lr = readLadduReturnStatus(widget.sessionData);
 
       // formulate session title for summary widget
-      sessionTitle = await CalculateSessionTitle(session);
+      
+      sessionTitle = await CalculateSessionTitle(widget.sessionData);
 
       total_procured = 0;
       total_carry = 0;

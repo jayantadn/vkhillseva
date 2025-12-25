@@ -10,8 +10,9 @@ import 'package:vkhpackages/vkhpackages.dart';
 
 class Log extends StatefulWidget {
   final Map<String, dynamic> sessionData;
+  final Map<String, List<Ticket>> tickets;
 
-  const Log({super.key, required this.sessionData});
+  const Log({super.key, required this.sessionData, required this.tickets});
 
   @override
   State<Log> createState() => _LogState();
@@ -238,10 +239,11 @@ class _LogState extends State<Log> {
               ),
             ));
 
-        // calculate ticket sold
+        // calcu1late ticket sold
         List<Ticket> tickets = [];
         if (serve.pushpanjaliSlot != null) {
-          tickets = await FBL().readPushpanjaliTickets(serve.pushpanjaliSlot!);
+          tickets =
+              readPushpanjaliTickets(serve.pushpanjaliSlot!, widget.tickets);
         }
 
         // all pushpanjali tickets

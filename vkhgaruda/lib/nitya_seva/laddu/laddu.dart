@@ -24,7 +24,7 @@ class _LadduSevaState extends State<LadduMain> {
   final Lock _lock = Lock();
   bool _isLoading = true;
   Map<String, dynamic>? _sessionData;
-  List<Ticket> _tickets = [];
+  Map<String, List<Ticket>> _tickets = {};
 
   // final GlobalKey<AvailabilityBarState> _keyAvailabilityBar =
   //     GlobalKey<AvailabilityBarState>();
@@ -36,10 +36,10 @@ class _LadduSevaState extends State<LadduMain> {
     refresh().then((data) async {
       await _ensureReturn(context);
 
-      FBL().listenForChange("LadduSeva",
-          FBLCallbacks(onChange: (String changeType, dynamic data) async {
-        await refresh();
-      }));
+      // FBL().listenForChange("LadduSeva",
+      //     FBLCallbacks(onChange: (String changeType, dynamic data) async {
+      //   await refresh();
+      // }));
     });
   }
 
@@ -56,6 +56,34 @@ class _LadduSevaState extends State<LadduMain> {
       // read database and populate data
       _sessionData = await FBL().readLatestLadduSessionData();
       _lr = readLadduReturnStatus(_sessionData);
+
+      // populate tickets
+      _tickets = {};
+      DateTime currentDate = await FBL().getLastSessionDateTime();
+      DateTime today = DateTime.now();
+      DateTime currentDateOnly =
+          DateTime(currentDate.year, currentDate.month, currentDate.day);
+      DateTime todayDateOnly = DateTime(today.year, today.month, today.day);
+      while (currentDateOnly.isBefore(todayDateOnly) ||
+          currentDateOnly.isAtSameMomentAs(todayDateOnly)) {
+        String dbdate = DateFormat("yyyy-MM-dd").format(currentDateOnly);
+        String dbpath = "${Const().dbrootGaruda}/NityaSeva/$dbdate";
+        Map<String, dynamic> json =
+            await FB().getJson(path: dbpath, silent: true);
+
+        json.forEach((key, value) {
+          _tickets[key] = (value["Tickets"]
+                  .values
+                  .map((value) =>
+                      Ticket.fromJson(Map<String, dynamic>.from(value as Map)))
+                  .toList() as List)
+              .cast<Ticket>();
+        });
+
+        currentDate = currentDate.add(Duration(days: 1));
+        currentDateOnly =
+            DateTime(currentDate.year, currentDate.month, currentDate.day);
+      }
     });
 
     // refresh all child widgets
@@ -273,7 +301,10 @@ class _LadduSevaState extends State<LadduMain> {
                   ],
                 ),
 
-              Log(key: LogKey, sessionData: _sessionData ?? {}),
+              Log(
+                  key: LogKey,
+                  sessionData: _sessionData ?? {},
+                  tickets: _tickets),
             ],
           ),
         ),

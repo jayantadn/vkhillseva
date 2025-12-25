@@ -1,6 +1,7 @@
 import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
+import 'package:vkhpackages/common/datatypes.dart';
 import 'package:vkhpackages/common/toaster.dart';
 import 'package:vkhpackages/common/utils.dart';
 
@@ -93,4 +94,15 @@ List<LadduStock> readLadduStocks(Map<String, dynamic>? sessionData) {
   });
 
   return list;
+}
+
+List<Ticket> readPushpanjaliTickets(
+    DateTime pushpanjaliSlot, Map<String, List<Ticket>> tickets) {
+  String key = pushpanjaliSlot.toIso8601String().replaceAll(".", "^");
+
+  if (tickets.containsKey(key)) {
+    return tickets[key]!;
+  }
+
+  return [];
 }

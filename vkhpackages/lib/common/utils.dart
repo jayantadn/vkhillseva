@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -46,10 +47,17 @@ class Utils {
         if (context.mounted) {
           Widgets().showConfirmDialog(
             context,
-            "New version available: $remoteVersion",
+            "New version available $remoteVersion",
             "Update",
             () {
-              // update logic: open URL
+              // update: open URL
+              String appid = dotenv.env['FIREBASE_ANDROID_APP_ID'] ?? "";
+              launchUrl(
+                Uri.parse(
+                  'https://appdistribution.firebase.google.com/testerapps/$appid',
+                ),
+                mode: LaunchMode.externalApplication,
+              );
             },
           );
         }

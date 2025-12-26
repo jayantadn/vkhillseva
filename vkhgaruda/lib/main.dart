@@ -6,9 +6,19 @@ import 'package:vkhgaruda/home/landing.dart';
 import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
 import 'firebase_options.dart';
 import 'package:vkhpackages/vkhpackages.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    if (!kIsWeb) {
+      Toaster().error("Error loading .env file: $e");
+    }
+  }
 
   try {
     await Firebase.initializeApp(

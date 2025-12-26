@@ -59,3 +59,15 @@ vkhsangeetseva/docs/.$UI_design.drawio.bkp
 vkhgaruda/functions/package-lock.json
 garuda/pubspec.lock
 .venv/
+key.properties
+
+# Environment variables - DO NOT COMMIT
+.env
+.env.local
+.env.*.local
+*/.env
+*/.env.local
+
+# Generated files from .env
+vkhgaruda/web/firebase-messaging-sw.js
+vkhsangeetseva/web/firebase-messaging-sw.js

@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
@@ -21,24 +22,24 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyA_RYw4ZaQs8GD_wJs_bGsNJPjpkKyL4yU',
-    appId: '1:683499127522:web:97e1618cef14c36dc014bb',
-    messagingSenderId: '683499127522',
-    projectId: 'garuda-1ba07',
-    authDomain: 'garuda-1ba07.firebaseapp.com',
-    databaseURL: 'https://garuda-1ba07-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'garuda-1ba07.firebasestorage.app',
-    measurementId: 'G-32PHS5XD9Z',
+  static FirebaseOptions get web => FirebaseOptions(
+        apiKey: dotenv.env['FIREBASE_WEB_API_KEY'] ?? '',
+        appId: dotenv.env['FIREBASE_WEB_APP_ID'] ?? '',
+        messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
+        projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? '',
+        authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN'] ?? '',
+        databaseURL: dotenv.env['FIREBASE_DATABASE_URL'] ?? '',
+        storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'] ?? '',
+        measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID'] ?? '',
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCI14SfgeCZEqo8LOVbTh8fxhNz4KZRk64',
-    appId: '1:683499127522:android:ce092310e0b9ed01c014bb',
-    messagingSenderId: '683499127522',
-    projectId: 'garuda-1ba07',
-    databaseURL: 'https://garuda-1ba07-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'garuda-1ba07.firebasestorage.app',
+  static FirebaseOptions get android => FirebaseOptions(
+        apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY'] ?? '',
+        appId: dotenv.env['FIREBASE_ANDROID_APP_ID'] ?? '',
+        messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
+        projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? '',
+        databaseURL: dotenv.env['FIREBASE_DATABASE_URL'] ?? '',
+        storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'] ?? '',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

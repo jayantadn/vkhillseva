@@ -205,6 +205,9 @@ def get_value_from_file(filepath, search_string):
 def release(app):
     os.chdir(rootdir)
 
+    print("Generating firebase-messaging-sw.js from .env")
+    run_command(f'python generate_firebase_sw.py {app}')
+
     print("get the branch name")
     branch_name = run_command('git rev-parse --abbrev-ref HEAD')
     branch_name = branch_name.lstrip()

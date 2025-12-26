@@ -37,6 +37,39 @@ def get_value_from_file(filepath, search_string):
     return ret
     os.chdir(curdir)
 
+def increment_version_suffix(app):
+    """Increment the build number (suffix after +) in pubspec.yaml"""
+    curdir = os.getcwd()
+    os.chdir(rootdir)
+    pubspec_path = f'{app}/pubspec.yaml'
+    
+    print(f"Incrementing version suffix in {pubspec_path}")
+    
+    with open(pubspec_path, 'r') as file:
+        lines = file.readlines()
+    
+    with open(pubspec_path, 'w') as file:
+        for line in lines:
+            if line.strip().startswith('version:'):
+                # Extract version and build number
+                version_line = line.split(':', 1)[1].strip()
+                if '+' in version_line:
+                    version_name, build_number = version_line.split('+')
+                    new_build_number = int(build_number) + 1
+                    new_version = f"version: {version_name}+{new_build_number}\n"
+                    file.write(new_version)
+                    print(f"Version updated: {version_line} -> {version_name}+{new_build_number}")
+                else:
+                    # No build number, add +1
+                    new_version = f"version: {version_line}+1\n"
+                    file.write(new_version)
+                    print(f"Version updated: {version_line} -> {version_line}+1")
+            else:
+                file.write(line)
+    
+    os.chdir(curdir)
+
+
 def run_command(command):
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if result.returncode != 0:
@@ -44,12 +77,12 @@ def run_command(command):
         sys.exit(1)
     return result.stdout.strip()
 
-def replace_string_in_file(file, search_string, replacement_string):
+def replace_string_in_file(filepath, search_string, replacement_string):
     curdir = os.getcwd()
     os.chdir(rootdir)
-    with open(file, 'r') as file:
+    with open(filepath, 'r') as file:
         lines = file.readlines()
-    with open(file, 'w') as file:
+    with open(filepath, 'w') as file:
         for line in lines:
             if search_string in line:
                 file.write(replacement_string)
@@ -136,6 +169,9 @@ def main():
         print("ERROR: Failed to create new branch")
         sys.exit(1)
   
+    print("increment_version_suffix")
+    increment_version_suffix(app)
+    
     print("set database path")
     set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootGaruda", " \"TEST/GARUDA_01\";")
     set_value_in_file('vkhpackages/lib/common/const.dart', "dbrootSangeetSeva", " \"TEST/SANGEETSEVA_01\";")

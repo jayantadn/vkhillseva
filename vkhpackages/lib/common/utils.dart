@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class Utils {
   static final Utils _instance = Utils._internal();
@@ -14,6 +16,47 @@ class Utils {
 
   Utils._internal() {
     // init
+  }
+
+  Future<void> checkForUpdate(
+    BuildContext context, {
+    String app = "garuda",
+  }) async {
+    final remoteConfig = FirebaseRemoteConfig.instance;
+
+    await remoteConfig.setConfigSettings(
+      RemoteConfigSettings(
+        fetchTimeout: const Duration(seconds: 5),
+        minimumFetchInterval: const Duration(hours: 6),
+      ),
+    );
+
+    await remoteConfig.fetchAndActivate();
+
+    bool triggerUpdate = remoteConfig.getBool('${app}_trigger_update');
+    if (triggerUpdate) {
+      String remoteVersion = remoteConfig.getString('${app}_version');
+      int remoteVersionSuffix = remoteConfig.getInt('${app}_version_suffix');
+
+      final packageInfo = await PackageInfo.fromPlatform();
+      final localVersion = int.parse(packageInfo.buildNumber);
+
+      if (remoteVersionSuffix > localVersion) {
+        // update detected
+        if (context.mounted) {
+          Widgets().showConfirmDialog(
+            context,
+            "New version available: $remoteVersion",
+            "Update",
+            () {
+              // update logic: open URL
+            },
+          );
+        }
+      }
+    }
+
+    return;
   }
 
   Future<bool> checkPermission(String seva) async {

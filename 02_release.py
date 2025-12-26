@@ -200,6 +200,8 @@ def get_value_from_file(filepath, search_string):
     os.chdir(curdir)
 
 
+
+
 def release(app):
     os.chdir(rootdir)
 
@@ -282,6 +284,8 @@ def release(app):
     run_command(f"firebase deploy --only hosting:{hostingsite}")
 
     if reltype == 'release':
+        
+
         print("building for android")
         run_command("flutter build apk")
         apk_path = "build/app/outputs/flutter-apk/app-release.apk"
@@ -290,6 +294,7 @@ def release(app):
             if os.path.exists(new_apk_path):
                 os.remove(new_apk_path)
             os.rename(apk_path, new_apk_path)
+            
             
             print("uploading to Firebase App Distribution")
             # Read app ID from .env file

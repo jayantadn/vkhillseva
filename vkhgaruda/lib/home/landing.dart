@@ -63,11 +63,16 @@ class _LandingState extends State<Landing> {
           ),
         );
       }
+
+      // check for update
+      await Utils().checkForUpdate(context);
     });
 
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override

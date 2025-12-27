@@ -55,6 +55,9 @@ class _HomePageState extends State<HomePage> {
     });
 
     await _lock.synchronized(() async {
+      // check for update
+      await Utils().checkForUpdate(context);
+
       _isAdmin = await Utils().isAdmin();
 
       // perform async operations here

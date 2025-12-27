@@ -63,9 +63,6 @@ class _LandingState extends State<Landing> {
           ),
         );
       }
-
-      // check for update
-      await Utils().checkForUpdate(context);
     });
 
     if (mounted) {

@@ -1,3 +1,4 @@
+import 'dart:io' show exit;
 import 'package:flutter/foundation.dart' hide Summary;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,9 +15,11 @@ Future<void> main() async {
   // Load environment variables
   try {
     await dotenv.load(fileName: ".env");
+    print("✓ Environment variables loaded");
   } catch (e) {
+    print("✗ .env file loading failed: $e");
     if (!kIsWeb) {
-      Toaster().error("Error loading .env file: $e");
+      print("ERROR: .env file not found or invalid.");
     }
   }
 
@@ -25,9 +28,12 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
+    print("✗ Firebase initialization failed: $e");
+    // Exit the app if Firebase initialization fails
     if (!kIsWeb) {
-      Toaster().error("Error initializing Firebase: $e");
+      exit(1);
     }
+    return;
   }
 
   runApp(MyApp());

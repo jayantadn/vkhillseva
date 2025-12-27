@@ -166,7 +166,6 @@ class Utils {
     Colors.indigoAccent,
     Colors.brown,
     Colors.blueGrey,
-    Colors.black,
     Colors.grey,
     Colors.deepOrange,
     Colors.teal,

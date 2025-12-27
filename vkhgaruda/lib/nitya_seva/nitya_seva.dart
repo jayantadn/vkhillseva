@@ -27,7 +27,8 @@ class _NityaSevaState extends State<NityaSeva> {
   DateTime _lastCallbackInvoked = DateTime.now();
   String _username = "Guest";
   bool _isAdmin = false;
-  final GlobalKey<DaySummaryState> _daySummaryKey = GlobalKey<DaySummaryState>();
+  final GlobalKey<DaySummaryState> _daySummaryKey =
+      GlobalKey<DaySummaryState>();
 
   // lists
   final List<FestivalSettings> _sevaList = [];
@@ -572,7 +573,10 @@ class _NityaSevaState extends State<NityaSeva> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => LadduMain(),
+                          builder: (context) => LadduMain(
+                            title: "Laddu Seva",
+                            splashImage: "assets/images/NityaSeva/laddu.png",
+                          ),
                         ),
                       );
                     }),

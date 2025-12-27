@@ -1,46 +1,60 @@
+import 'dart:async';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vkhgaruda/nitya_seva/laddu/avilability_bar.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/datatypes.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/fbl.dart';
-import 'package:vkhgaruda/nitya_seva/laddu/laddu_calc.dart';
 import 'package:vkhgaruda/nitya_seva/laddu/laddu_settings.dart';
-import 'package:vkhgaruda/nitya_seva/laddu/log.dart';
-import 'package:vkhgaruda/nitya_seva/laddu/service_select.dart';
-import 'package:vkhgaruda/nitya_seva/laddu/summary.dart';
-import 'package:vkhgaruda/nitya_seva/laddu/utils.dart';
-import 'package:intl/intl.dart';
 import 'package:vkhpackages/vkhpackages.dart';
 
 class LadduMain extends StatefulWidget {
-  const LadduMain({super.key});
+  final String title;
+  final String? splashImage;
+
+  const LadduMain({super.key, required this.title, this.splashImage});
 
   @override
-  _LadduSevaState createState() => _LadduSevaState();
+  // ignore: library_private_types_in_public_api
+  _LadduState createState() => _LadduState();
 }
 
-class _LadduSevaState extends State<LadduMain> {
-  LadduReturn? _lr;
+class _LadduState extends State<LadduMain> {
+  // scalars
   final Lock _lock = Lock();
   bool _isLoading = true;
-  Map<String, dynamic>? _sessionData;
-  Map<String, List<Ticket>> _tickets = {};
+  final Set _loadedKeys = {};
+  Map<String, dynamic> _ladduSessionData = {};
 
-  // final GlobalKey<AvailabilityBarState> _keyAvailabilityBar =
-  //     GlobalKey<AvailabilityBarState>();
+  // global keys
+  final GlobalKey<SingleBarChartState> _keySingleBarChart =
+      GlobalKey<SingleBarChartState>();
+
+  // lists
+
+  // controllers, listeners and focus nodes
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
 
   @override
   initState() {
     super.initState();
 
-    refresh().then((data) async {
-      await _ensureReturn(context);
+    refresh();
+  }
 
-      // FBL().listenForChange("LadduSeva",
-      //     FBLCallbacks(onChange: (String changeType, dynamic data) async {
-      //   await refresh();
-      // }));
-    });
+  @override
+  dispose() {
+    // clear all lists and maps
+
+    // dispose all controllers and focus nodes
+
+    // listeners
+    for (var listener in _listeners) {
+      listener.cancel();
+    }
+
+    super.dispose();
   }
 
   Future<void> refresh() async {
@@ -54,264 +68,214 @@ class _LadduSevaState extends State<LadduMain> {
       // your code here
 
       // read database and populate data
-      _sessionData = await FBL().readLatestLadduSessionData();
-      _lr = readLadduReturnStatus(_sessionData);
+      _ladduSessionData = await FBL().readLatestLadduSessionData() ?? {};
 
-      // populate tickets
-      _tickets = {};
-      DateTime currentDate = await FBL().getLastSessionDateTime();
-      DateTime today = DateTime.now();
-      DateTime currentDateOnly =
-          DateTime(currentDate.year, currentDate.month, currentDate.day);
-      DateTime todayDateOnly = DateTime(today.year, today.month, today.day);
-      while (currentDateOnly.isBefore(todayDateOnly) ||
-          currentDateOnly.isAtSameMomentAs(todayDateOnly)) {
-        String dbdate = DateFormat("yyyy-MM-dd").format(currentDateOnly);
-        String dbpath = "${Const().dbrootGaruda}/NityaSeva/$dbdate";
-        Map<String, dynamic> json =
-            await FB().getJson(path: dbpath, silent: true);
+      // refresh all child widgets
+      int availableLadduPacks = _calculateAvailableLadduPacks();
+      int totalLadduPacks = _calculateTotalLadduPacks();
+      _keySingleBarChart.currentState?.updateChart(
+          availableLadduPacks / totalLadduPacks,
+          "Available: $availableLadduPacks");
 
-        json.forEach((key, value) {
-          _tickets[key] = (value["Tickets"]
-                  .values
-                  .map((value) =>
-                      Ticket.fromJson(Map<String, dynamic>.from(value as Map)))
-                  .toList() as List)
-              .cast<Ticket>();
-        });
-
-        currentDate = currentDate.add(Duration(days: 1));
-        currentDateOnly =
-            DateTime(currentDate.year, currentDate.month, currentDate.day);
-      }
+      // listen for database events
+      // idea: separate event for serve, stock and return
+      // TODO: _addListeners(dbpath);
     });
-
-    // refresh all child widgets
 
     setState(() {
       _isLoading = false;
     });
-
-    if (mounted) {
-      setState(() {});
-    }
   }
 
-  Widget _createReturnTile(LadduReturn lr) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: ListTile(
-          // title
-          title: Text(
-            DateFormat('dd-MM-yyyy HH:mm:ss').format(lr.timestamp),
-            style: TextStyle(
-                fontWeight: FontWeight.bold, color: Color(0xFF8A0303)),
-          ),
+  void _addData(Map data) {
+    setState(() {});
+  }
 
-          // icon
-          leading: Icon(Icons.undo, color: Color(0xFF8A0303)),
+  void _addListeners(String dbpath) {
+    for (var listener in _listeners) {
+      listener.cancel();
+    }
+    FB().listenForChange(
+      dbpath,
+      FBCallbacks(
+        // add
+        add: (data) {
+          // workaround to avoid duplicate entries during initial load
+          if (_loadedKeys.contains(data['timestamp'])) {
+            return;
+          }
+          _loadedKeys.add(data['timestamp']);
 
-          // body
-          subtitle: Column(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Sevakarta: ${lr.user}',
-                  style: TextStyle(color: Color(0xFF8A0303)),
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Laddu packs returned: ${lr.count}',
-                  style: TextStyle(color: Color(0xFF8A0303)),
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Returned to: ${lr.to}',
-                  style: TextStyle(color: Color(0xFF8A0303)),
-                ),
-              ),
-            ],
-          ),
+          // process the received data
+          _addData(data);
+        },
 
-          // the count
-          trailing: Container(
-            padding: EdgeInsets.all(8.0), // Add padding around the text
-            decoration: BoxDecoration(
-              color: Colors.red[50], // Change background color to red
-              border: Border.all(
-                  color: Color(0xFF8A0303), width: 2.0), // Add a border
-              borderRadius:
-                  BorderRadius.circular(12.0), // Make the border circular
-            ),
-            child: Text(
-              lr.count.toString(),
-              style: TextStyle(
-                  fontSize: 18.0,
-                  color: Color(0xFF8A0303)), // Increase the font size
-            ),
-          ),
+        // edit
+        edit: () {
+          refresh();
+        },
 
-          // on tap
-          onTap: () async {
-            returnStock(context, lr: lr);
-          }),
+        // delete
+        delete: (data) async {
+          // workaround to avoid duplicate entries during initial load
+          if (_loadedKeys.contains(data['timestamp'])) {
+            _loadedKeys.remove(data['timestamp']);
+
+            // process the received data
+            _deleteData(data);
+          }
+        },
+
+        // get listeners
+        getListeners: (listeners) {
+          _listeners = listeners;
+        },
+      ),
     );
   }
 
-  void _createServeDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ServiceSelect();
-      },
-    );
+  int _calculateAvailableLadduPacks() {
+    if (_ladduSessionData.isEmpty) return 0;
+
+    // stocks - (serves + returned)
+
+    // total stocks
+    Map<String, dynamic> stocksMap =
+        Map<String, dynamic>.from(_ladduSessionData['stocks']);
+    List<LadduStock> stocks = stocksMap.values
+        .toList()
+        .map(
+            (entry) => Utils().convertRawToDatatype(entry, LadduStock.fromJson))
+        .toList();
+    int stockTotal = 0;
+    for (var stock in stocks) {
+      stockTotal += stock.count;
+      stockTotal += stock.carry ?? 0;
+    }
+
+    // total serves
+    Map<String, dynamic> servesMap =
+        Map<String, dynamic>.from(_ladduSessionData['serves']);
+    List<LadduServe> serves = servesMap.values
+        .toList()
+        .map(
+            (entry) => Utils().convertRawToDatatype(entry, LadduServe.fromJson))
+        .toList();
+    int serveTotal = 0;
+    for (var serve in serves) {
+      // misc packs
+      List miscList = serve.packsMisc;
+      serveTotal += miscList.fold<int>(0, (sum, misc) {
+        Map<String, int> kvMap = Map<String, int>.from(misc);
+        return sum + kvMap.values.fold<int>(0, (s, val) => s + val);
+      });
+
+      // other sevas
+      List otherSevaList = serve.packsOtherSeva;
+      serveTotal += otherSevaList.fold<int>(0, (sum, otherSeva) {
+        Map<String, int> kvMap = Map<String, int>.from(otherSeva);
+        return sum + kvMap.values.fold<int>(0, (s, val) => s + val);
+      });
+
+      // pushpanjali
+      List pushpanjaliList = serve.packsPushpanjali;
+      serveTotal += pushpanjaliList.fold<int>(0, (sum, pushpanjali) {
+        Map<String, int> kvMap = Map<String, int>.from(pushpanjali);
+        return sum + kvMap.values.fold<int>(0, (s, val) => s + val);
+      });
+    }
+
+    // returned value
+    int returnedTotal = 0;
+    if (_ladduSessionData['returned'] != null) {
+      Map<String, dynamic> returned =
+          Map<String, dynamic>.from(_ladduSessionData['returned']);
+      returnedTotal = returned['count'];
+    }
+
+    return stockTotal - (serveTotal + returnedTotal);
   }
 
-  Future<void> _ensureReturn(BuildContext context) async {
-    if (_lr == null || _lr!.count == -1) {
-      // session in progress
+  int _calculateTotalLadduPacks() {
+    if (_ladduSessionData.isEmpty) return 0;
 
-      List<LadduServe> serves = readLadduServes(_sessionData);
+    // stocks
 
-      // check if last serve is more than 2 days old
-      if (serves.isNotEmpty &&
-          serves.last.timestamp
-              .isBefore(DateTime.now().subtract(Duration(days: 2)))) {
-        // total stock
-        List<LadduStock> stocks = readLadduStocks(_sessionData);
-        stocks.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-        if (stocks.isEmpty) {
-          return;
-        }
-        int totalStock = stocks.fold(
-            0, (previousValue, element) => previousValue + element.count);
-
-        // total serve
-        int totalServe = 0;
-        for (var serve in serves) {
-          totalServe += CalculateTotalLadduPacksServed(serve);
-        }
-
-        int remaining = totalStock - totalServe;
-        if (remaining < 0) {
-          remaining = 0;
-        }
-
-        await FBL().returnLadduStock(LadduReturn(
-            timestamp: DateTime.now(),
-            count: remaining,
-            to: "Unknown",
-            user: "Auto Return"));
-
-        Toaster().info("Auto returned");
-      }
+    // total stocks
+    Map<String, dynamic> stocksMap =
+        Map<String, dynamic>.from(_ladduSessionData['stocks']);
+    List<LadduStock> stocks = stocksMap.values
+        .toList()
+        .map(
+            (entry) => Utils().convertRawToDatatype(entry, LadduStock.fromJson))
+        .toList();
+    int stockTotal = 0;
+    for (var stock in stocks) {
+      stockTotal += stock.count;
+      stockTotal += stock.carry ?? 0;
     }
+
+    return stockTotal;
+  }
+
+  void _deleteData(Map data) {
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      Scaffold(
-        appBar: AppBar(
-          title: Text('Laddu distribution'),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () async {
+    return Stack(
+      children: [
+        ResponsiveScaffold(
+          // title
+          title: widget.title,
+
+          // toolbar icons
+          toolbarActions: [
+            ResponsiveToolbarAction(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LadduSettings()),
                 );
               },
-            ),
+            )
           ],
-        ),
-        body: RefreshIndicator(
-          onRefresh: refresh,
 
-          // here a ListView is used to allow the content to be scrollable and refreshable.
-          // If you use ListView.builder inside this, then the ListView here can be removed.
-          child: ListView(
-            children: [
-              AvailabilityBar(
-                  key: AvailabilityBarKey, sessionData: _sessionData ?? {}),
+          // body
+          body: RefreshIndicator(
+            onRefresh: refresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      // leave some space at top
+                      SizedBox(height: 10),
 
-              Divider(),
-              Summary(key: SummaryKey, sessionData: _sessionData ?? {}),
+                      // your widgets here
+                      SingleBarChart(
+                        key: _keySingleBarChart,
+                        initialPercentage: 0,
+                        initialLabel: "Available: 0",
+                      ),
 
-              // button row
-              Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  // stock button
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      addEditStock(context);
-                    },
-                    icon: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                    ),
-                    label: Text('Stock'),
+                      // leave some space at bottom
+                      SizedBox(height: 100),
+                    ],
                   ),
-
-                  // serve button
-                  ElevatedButton.icon(
-                    onPressed: (_lr == null || _lr!.count == -1)
-                        ? () async {
-                            _createServeDialog(context);
-                          }
-                        : null,
-                    icon: Icon(Icons.remove, color: Colors.white),
-                    label: Text('Serve'),
-                  ),
-
-                  // return button
-                  ElevatedButton.icon(
-                    onPressed: (_lr == null || _lr!.count == -1)
-                        ? () {
-                            returnStock(context);
-                          }
-                        : null,
-                    icon: Icon(Icons.undo, color: Colors.white),
-                    label: Text('Return'),
-                  )
-                ],
-              ),
-
-              Divider(),
-
-              // if session is closed, display a message and the return tile
-              if (_lr != null && _lr!.count >= 0)
-                Column(
-                  children: [
-                    Text(
-                      "Click '+ Stock' to start new session",
-                      style: TextStyle(color: Colors.red, fontSize: 20.0),
-                    ),
-                    Divider(),
-                    _createReturnTile(_lr!),
-                    Divider(),
-                  ],
                 ),
-
-              Log(
-                  key: LogKey,
-                  sessionData: _sessionData ?? {},
-                  tickets: _tickets),
-            ],
+              ),
+            ),
           ),
         ),
-      ),
 
-      // circular progress indicator
-      if (_isLoading) LoadingOverlay(),
-    ]);
+        // circular progress indicator
+        if (_isLoading) LoadingOverlay(image: widget.splashImage),
+      ],
+    );
   }
 }

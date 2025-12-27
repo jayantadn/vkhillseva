@@ -63,12 +63,11 @@ class _SalesState extends State<Sales> {
       String dbdate = DateFormat("yyyy-MM-dd").format(DateTime.now());
       String dbpath = "${Const().dbrootGaruda}/Deepotsava/Sales/$dbdate";
 
+      // refresh all child widgets
 
       // listen for database events
       _addListeners(dbpath);
     });
-
-    // refresh all child widgets
 
     setState(() {
       _isLoading = false;
@@ -126,8 +125,6 @@ class _SalesState extends State<Sales> {
     setState(() {});
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -137,7 +134,17 @@ class _SalesState extends State<Sales> {
           title: widget.title,
 
           // toolbar icons
-          toolbarActions: [],
+          toolbarActions: [
+            ResponsiveToolbarAction(
+              icon: const Icon(Icons.playlist_add),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Placeholder()),
+                );
+              },
+            ),
+          ],
 
           // body
           body: RefreshIndicator(

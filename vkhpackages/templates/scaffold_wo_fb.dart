@@ -51,9 +51,9 @@ class _ProcurementState extends State<Inventory> {
 
     await _lock.synchronized(() async {
       // your code here
-    });
 
-    // refresh all child widgets
+      // refresh all child widgets
+    });
 
     setState(() {
       _isLoading = false;

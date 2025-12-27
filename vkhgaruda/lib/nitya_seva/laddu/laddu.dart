@@ -303,16 +303,23 @@ class _LadduState extends State<LadduMain> {
           color: entryType == 'stock'
               ? Colors.green
               : (entryType == 'serve' ? Colors.orange : Colors.grey),
-          child: Column(
-            children: [
-              Text(
-                entryType == 'stock'
-                    ? stock?.user ?? "Unknown"
-                    : (entryType == 'serve'
-                        ? serve?.user ?? "Unknown"
-                        : returned['user'] ?? "Unknown"),
-              )
-            ],
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              children: [
+                Widgets().createResponsiveRow(context, [
+                  Text("User: ",
+                      style: Theme.of(context).textTheme.headlineSmall),
+                  Text(
+                      entryType == 'stock'
+                          ? stock?.user ?? "Unknown"
+                          : (entryType == 'serve'
+                              ? serve?.user ?? "Unknown"
+                              : returned['user'] ?? "Unknown"),
+                      style: Theme.of(context).textTheme.headlineSmall),
+                ])
+              ],
+            ),
           )),
     );
   }
@@ -436,7 +443,7 @@ class _LadduState extends State<LadduMain> {
                             itemCount: serviceEntryKeys.length,
                             itemBuilder: (context, index) {
                               return SizedBox(
-                                height: 50,
+                                // height: 50,
                                 child: _createServiceEntryTile(
                                     serviceEntryKeys[index]),
                               );

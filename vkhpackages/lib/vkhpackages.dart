@@ -24,6 +24,7 @@ export 'widgets/counter_display.dart';
 export 'widgets/list_tile_compact.dart';
 export 'widgets/responsive_scaffold.dart';
 export 'widgets/single_bar_chart.dart';
+export 'widgets/kv_table.dart';
 
 export 'sangeet_seva/ssdatatypes.dart';
 export 'sangeet_seva/ssconst.dart';

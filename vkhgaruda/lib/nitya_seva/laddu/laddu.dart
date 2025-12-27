@@ -30,6 +30,7 @@ class _LadduState extends State<LadduMain> {
   // global keys
   final GlobalKey<SingleBarChartState> _keySingleBarChart =
       GlobalKey<SingleBarChartState>();
+  final GlobalKey<KVTableState> _keyKVTable = GlobalKey<KVTableState>();
 
   // lists
 
@@ -69,13 +70,24 @@ class _LadduState extends State<LadduMain> {
 
       // read database and populate data
       _ladduSessionData = await FBL().readLatestLadduSessionData() ?? {};
-
-      // refresh all child widgets
       int availableLadduPacks = _calculateAvailableLadduPacks();
       int totalLadduPacks = _calculateTotalLadduPacks();
+
+      // refresh all child widgets
+
+      // availability bar
       _keySingleBarChart.currentState?.updateChart(
           availableLadduPacks / totalLadduPacks,
           "Available: $availableLadduPacks");
+
+      // summary
+      _keyKVTable.currentState?.clearRows();
+      _keyKVTable.currentState?.addRows([
+        MapEntry("Starting balance", "$totalLadduPacks"),
+        MapEntry("Laddu packets distributed",
+            "${totalLadduPacks - availableLadduPacks}"),
+        MapEntry("Closing balance", "$availableLadduPacks"),
+      ]);
 
       // listen for database events
       // idea: separate event for serve, stock and return
@@ -262,6 +274,17 @@ class _LadduState extends State<LadduMain> {
                         initialPercentage: 0,
                         initialLabel: "Available: 0",
                       ),
+
+                      // Summary
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Widgets().createTopLevelCard(
+                          title: "Summary",
+                          context: context,
+                          child: KVTable(
+                            key: _keyKVTable,
+                          )),
 
                       // leave some space at bottom
                       SizedBox(height: 100),

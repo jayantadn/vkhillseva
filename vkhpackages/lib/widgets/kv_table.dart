@@ -91,14 +91,22 @@ class KVTableState extends State<KVTable> {
     }
 
     return Table(
-      columnWidths: const {0: FlexColumnWidth(1), 1: FlexColumnWidth(2)},
+      columnWidths: const {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
+      defaultColumnWidth: const IntrinsicColumnWidth(),
       children:
-          _rows.map((entry) {
+          _rows.asMap().entries.map((mapEntry) {
+            final index = mapEntry.key;
+            final entry = mapEntry.value;
+            final isLastRow = index == _rows.length - 1;
+
             return TableRow(
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey, width: 1.0),
-                ),
+              decoration: BoxDecoration(
+                border:
+                    isLastRow
+                        ? null
+                        : const Border(
+                          bottom: BorderSide(color: Colors.grey, width: 1.0),
+                        ),
               ),
               children: [
                 Padding(

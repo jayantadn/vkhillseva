@@ -7,8 +7,8 @@ Seva App for ISKCON Vaikuntha Hill
 
 | App | Description |
 |-----|-------------|
-| [vkhgaruda](vkhgaruda/README.md) | Garuda — the main seva management app |
-| [vkhsangeetseva](vkhsangeetseva/README.md) | SangeetSeva — the music seva app |
+| `vkhgaruda` | Garuda - the main seva management app |
+| `vkhsangeetseva` | SangeetSeva - the music seva app |
 
 ## Pre-requisites
 - Flutter SDK (3.6.0 or higher)
@@ -26,14 +26,14 @@ cd vkhillseva
 ```
 
 Add the secrets:
-1. `google-services.json`
-2. `garuda-1ba07-firebase-adminsdk-fbsvc-c07e3d6e0a.json`
+1. `google-services.json` in each app's `android/app/` folder
+2. `garuda-1ba07-firebase-adminsdk-fbsvc-c07e3d6e0a.json` in root folder 
 
 Generate Firebase Dart config files (not committed to git):
 
 ```bash
 # Install CLI tools once (if not already installed)
-npm install -g firebase-tools
+sudo npm install -g firebase-tools
 dart pub global activate flutterfire_cli
 
 # Garuda
@@ -47,14 +47,70 @@ flutterfire configure --project=garuda-1ba07 --platforms=android,web --out=lib/f
 
 If `flutterfire` is not found, ensure Dart pub global binaries are in your PATH.
 
-### 2. Install Dependencies
+### 2. Configure Android signing (release builds)
+
+Create `key.properties` in each app's `android/` folder:
+
+`vkhgaruda/android/key.properties`
+`vkhsangeetseva/android/key.properties`
+
+```
+storePassword=your_store_password
+keyPassword=your_key_password
+keyAlias=your_key_alias
+storeFile=path/to/your/keystore.jks
+```
+
+`key.properties` is already excluded from git via `.gitignore`.
+
+### 3. Install Dependencies
 
 ```bash
 cd vkhgaruda && flutter pub get && cd ..
 cd vkhsangeetseva && flutter pub get
 ```
 
-See each app's README for further setup and build instructions.
+## Run and Build
+
+### Local development
+
+```bash
+# Garuda
+cd vkhgaruda
+flutter run
+
+# SangeetSeva
+cd ../vkhsangeetseva
+flutter run
+```
+
+### Web builds
+
+```bash
+# Garuda
+cd vkhgaruda
+flutter build web
+
+# SangeetSeva
+cd ../vkhsangeetseva
+flutter build web
+```
+
+### Android APK (release)
+
+```bash
+# Garuda
+cd vkhgaruda
+flutter build apk --release
+
+# SangeetSeva
+cd ../vkhsangeetseva
+flutter build apk --release
+```
+
+APK output path:
+
+`build/app/outputs/flutter-apk/app-release.apk`
 
 ## Production Release (Using Release Script)
 
@@ -79,6 +135,18 @@ The release script will:
 - ✓ `.timetracker` (personal time tracking data)
 
 These files are automatically ignored by `.gitignore`
+
+## Firebase Security Checklist
+
+Before going public, ensure:
+- [ ] Firebase Realtime Database Rules are configured (not in public read/write mode)
+- [ ] Firebase Storage Rules are configured
+- [ ] Firebase Authentication is properly set up
+- [ ] API keys are restricted in Google Cloud Console
+- [ ] Add your website domain to allowed domains
+- [ ] Add your Android app SHA-1 fingerprint
+- [ ] Enable Firebase App Check for web and mobile
+- [ ] Review all Firebase project IAM permissions
 
 ## License
 

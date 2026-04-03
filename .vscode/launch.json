@@ -1,0 +1,54 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "vkhgaruda",
+            "request": "launch",
+            "type": "dart",
+            "cwd": "vkhgaruda",
+            "program": "lib/main.dart"
+        },
+        {
+            "name": "vkhgaruda (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "cwd": "vkhgaruda",
+            "program": "lib/main.dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "vkhgaruda (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "cwd": "vkhgaruda",
+            "program": "lib/main.dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "vkhsangeetseva",
+            "request": "launch",
+            "type": "dart",
+            "cwd": "vkhsangeetseva",
+            "program": "lib/main.dart"
+        },
+        {
+            "name": "vkhsangeetseva (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "cwd": "vkhsangeetseva",
+            "program": "lib/main.dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "vkhsangeetseva (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "cwd": "vkhsangeetseva",
+            "program": "lib/main.dart",
+            "flutterMode": "release"
+        }
+    ]
+}

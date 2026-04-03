@@ -10,24 +10,6 @@ Seva App for ISKCON Vaikuntha Hill
 | `vkhgaruda` | Garuda - the main seva management app |
 | `vkhsangeetseva` | SangeetSeva - the music seva app |
 
-## Screenshots
-
-<details>
-<summary><strong>📸 View App Screenshots</strong> (Click to expand)</summary>
-
-![Screenshot 1](screenshots/Screenshot_20260403_203917.jpg)
-![Screenshot 2](screenshots/Screenshot_20260403_203956.jpg)
-![Screenshot 3](screenshots/Screenshot_20260403_204048.jpg)
-![Screenshot 4](screenshots/Screenshot_20260403_204121.jpg)
-![Screenshot 5](screenshots/Screenshot_20260403_204203.jpg)
-![Screenshot 6](screenshots/Screenshot_20260403_204232.jpg)
-![Screenshot 7](screenshots/Screenshot_20260403_204341.jpg)
-![Screenshot 8](screenshots/Screenshot_20260403_204415.jpg)
-![Screenshot 9](screenshots/Screenshot_20260403_204443.jpg)
-![Screenshot 10](screenshots/Screenshot_20260403_204457.jpg)
-
-</details>
-
 ## Pre-requisites
 - Flutter SDK (3.6.0 or higher)
 - Python 3.x (for build scripts)
@@ -169,4 +151,30 @@ Before going public, ensure:
 ## License
 
 See [LICENSE](LICENSE) file for details.
+
+---
+
+## Screenshots
+
+<table><tr><td style="border: 0; padding: 5px;">
+<img src="screenshots/Screenshot_20260403_203917.jpg" alt="Screen 1" width="280" height="560"/>
+</td><td style="border: 0; padding: 5px;">
+<img src="screenshots/Screenshot_20260403_203956.jpg" alt="Screen 2" width="280" height="560"/>
+</td><td style="border: 0; padding: 5px;">
+<img src="screenshots/Screenshot_20260403_204048.jpg" alt="Screen 3" width="280" height="560"/>
+</td><td style="border: 0; padding: 5px;">
+<img src="screenshots/Screenshot_20260403_204121.jpg" alt="Screen 4" width="280" height="560"/>
+</td><td style="border: 0; padding: 5px;">
+<img src="screenshots/Screenshot_20260403_204203.jpg" alt="Screen 5" width="280" height="560"/>
+</td></tr><tr><td style="border: 0; padding: 5px;">
+<img src="screenshots/Screenshot_20260403_204232.jpg" alt="Screen 6" width="280" height="560"/>
+</td><td style="border: 0; padding: 5px;">
+<img src="screenshots/Screenshot_20260403_204341.jpg" alt="Screen 7" width="280" height="560"/>
+</td><td style="border: 0; padding: 5px;">
+<img src="screenshots/Screenshot_20260403_204415.jpg" alt="Screen 8" width="280" height="560"/>
+</td><td style="border: 0; padding: 5px;">
+<img src="screenshots/Screenshot_20260403_204443.jpg" alt="Screen 9" width="280" height="560"/>
+</td><td style="border: 0; padding: 5px;">
+<img src="screenshots/Screenshot_20260403_204457.jpg" alt="Screen 10" width="280" height="560"/>
+</td></tr></table>
 

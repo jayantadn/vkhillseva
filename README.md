@@ -10,6 +10,22 @@ Seva App for ISKCON Vaikuntha Hill
 | `vkhgaruda` | Garuda - the main seva management app |
 | `vkhsangeetseva` | SangeetSeva - the music seva app |
 
+## Screenshots
+
+<!-- Horizontally scrolling gallery -->
+<div style="overflow-x: auto; display: flex; gap: 12px; padding: 16px 0; scrollbar-width: thin;">
+  <img src="screenshots/Screenshot_20260403_203917.jpg" alt="Screen 1" style="height: 500px; min-width: 280px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+  <img src="screenshots/Screenshot_20260403_203956.jpg" alt="Screen 2" style="height: 500px; min-width: 280px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+  <img src="screenshots/Screenshot_20260403_204048.jpg" alt="Screen 3" style="height: 500px; min-width: 280px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+  <img src="screenshots/Screenshot_20260403_204121.jpg" alt="Screen 4" style="height: 500px; min-width: 280px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+  <img src="screenshots/Screenshot_20260403_204203.jpg" alt="Screen 5" style="height: 500px; min-width: 280px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+  <img src="screenshots/Screenshot_20260403_204232.jpg" alt="Screen 6" style="height: 500px; min-width: 280px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+  <img src="screenshots/Screenshot_20260403_204341.jpg" alt="Screen 7" style="height: 500px; min-width: 280px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+  <img src="screenshots/Screenshot_20260403_204415.jpg" alt="Screen 8" style="height: 500px; min-width: 280px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+  <img src="screenshots/Screenshot_20260403_204443.jpg" alt="Screen 9" style="height: 500px; min-width: 280px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+  <img src="screenshots/Screenshot_20260403_204457.jpg" alt="Screen 10" style="height: 500px; min-width: 280px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+</div>
+
 ## Pre-requisites
 - Flutter SDK (3.6.0 or higher)
 - Python 3.x (for build scripts)

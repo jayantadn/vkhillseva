@@ -1,0 +1,214 @@
+import 'package:flutter/material.dart';
+import 'package:vkhgaruda/deepotsava/sales/sales.dart';
+import 'package:vkhpackages/common/toaster.dart';
+
+class Deepotsava extends StatefulWidget {
+  const Deepotsava({super.key});
+
+  @override
+  _DeepotsavaState createState() => _DeepotsavaState();
+}
+
+class _DeepotsavaState extends State<Deepotsava>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _animationRKC;
+  late Animation<Offset> _animationRRG;
+  late Animation<Offset> _animationMaking;
+  late Animation<Offset> _animationAccounting;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+
+    _animationRKC = Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0))
+        .animate(_controller);
+    _animationRRG = Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0))
+        .animate(_controller);
+    _animationMaking = Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0))
+        .animate(_controller);
+    _animationAccounting = Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0))
+        .animate(_controller);
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onRKCDeepamSalesTap() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => Sales(title: "RKC Deepam Sales", stall: "RKC")),
+    );
+  }
+
+  void _onRRGDeepamSalesTap() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => Sales(title: "RRG Deepam Sales", stall: "RRG")),
+    );
+  }
+
+  void _onDeepamMakingTap() {
+    Toaster().error("Not implemented");
+  }
+
+  void _onAccountingTap() {
+    Toaster().error("Not implemented");
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => Accounting(title: "Accounting")),
+    // );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Deepotsava'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SlideTransition(
+              position: _animationRKC,
+              child: GestureDetector(
+                onTap: _onRKCDeepamSalesTap,
+                child: CardWidget(
+                  image: 'assets/images/VKHillDieties/RadhaKrishna.png',
+                  text: 'RKC Deepam Sales',
+                  isImageLeft: true,
+                  color: Colors.pink, // Set desired card color
+                  textColor: Colors.white, // Set desired text color
+                ),
+              ),
+            ),
+            SlideTransition(
+              position: _animationRRG,
+              child: GestureDetector(
+                onTap: _onRRGDeepamSalesTap,
+                child: CardWidget(
+                  image: 'assets/images/VKHillDieties/Govinda.png',
+                  text: 'RRG Deepam Sales',
+                  isImageLeft: false,
+                  color: Colors.black, // Set desired card color
+                  textColor: Colors.white, // Set desired text color
+                ),
+              ),
+            ),
+            SlideTransition(
+              position: _animationMaking,
+              child: GestureDetector(
+                onTap: _onDeepamMakingTap,
+                child: CardWidget(
+                  image: 'assets/images/LauncherIcons/Deepotsava.png',
+                  text: 'Deepam Making',
+                  isImageLeft: true,
+                  color: Colors.deepOrange,
+                  textColor: Colors.white, // Set desired text color
+                ),
+              ),
+            ),
+            SlideTransition(
+              position: _animationAccounting,
+              child: GestureDetector(
+                onTap: _onAccountingTap,
+                child: CardWidget(
+                  image: 'assets/images/PaymentModes/icon_cash.png',
+                  text: 'Accounting',
+                  isImageLeft: false,
+                  color: Colors.lightGreenAccent, // Set desired card color
+                  textColor: Colors.black, // Set desired text color
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CardWidget extends StatelessWidget {
+  final String image;
+  final String text;
+  final bool isImageLeft;
+  final Color color; // Add color parameter
+  final Color textColor; // Add textColor parameter
+
+  const CardWidget({
+    super.key,
+    required this.image,
+    required this.text,
+    required this.isImageLeft,
+    required this.color,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: color, // Use the color parameter
+      margin: EdgeInsets.all(10),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(20),
+        child: Row(
+          children: <Widget>[
+            if (isImageLeft) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.asset(image, width: 80, height: 80),
+              ),
+              SizedBox(width: 20),
+              Expanded(
+                child: Text(
+                  text,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Pacifico',
+                    fontSize: 32.0,
+                    letterSpacing: 2.0,
+                    color: textColor,
+                  ),
+
+                  overflow: TextOverflow.visible, // Ensure text wraps
+                ),
+              ),
+            ] else ...[
+              Expanded(
+                child: Text(
+                  text,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Pacifico',
+                    fontSize: 32.0,
+                    letterSpacing: 2.0,
+                    color: textColor,
+                  ),
+                  overflow: TextOverflow.visible, // Ensure text wraps
+                ),
+              ),
+              SizedBox(width: 20),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.asset(image, width: 80, height: 80),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "garuda-1ba07"
+  },
+  "targets": {
+    "garuda-1ba07": {
+      "hosting": {
+        "vkhillgaruda": [
+          "vkhillgaruda"
+        ],
+        "testgaruda": [
+          "testgaruda"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

@@ -1,0 +1,138 @@
+import 'package:flutter/material.dart';
+import 'package:synchronized/synchronized.dart';
+import 'package:vkhpackages/vkhpackages.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
+class SSWelcome extends StatefulWidget {
+  final Function? onAuthComplete;
+
+  const SSWelcome({super.key, this.onAuthComplete});
+
+  @override
+  State<SSWelcome> createState() => SSWelcomeState();
+}
+
+// hint: put the global key as a member of the calling class
+// instantiate the class with a global key
+// final GlobalKey<SSWelcomeState> _welcomeKey = GlobalKey<SSWelcomeState>();
+
+class SSWelcomeState extends State<SSWelcome> {
+  final Lock _lock = Lock();
+  String _username = "";
+  String _version = "";
+
+  @override
+  void initState() {
+    super.initState();
+
+    refresh();
+  }
+
+  @override
+  dispose() {
+    // clear all lists
+
+    // dispose all controllers
+
+    super.dispose();
+  }
+
+  Future<void> refresh() async {
+    // perform async work here
+    final packageInfo = await PackageInfo.fromPlatform();
+    _version = packageInfo.version;
+
+    // get username from local storage
+    await Utils().fetchUserBasics();
+
+    await _lock.synchronized(() async {
+      // perform sync work here
+      setState(() {
+        _username = Utils().getUsername();
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          // image
+          Container(
+            height: 200,
+            width: 200,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/images/Logo/SangeetSeva.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+
+          // all text
+          SizedBox(height: 10),
+          Text('Welcome', style: Theme.of(context).textTheme.headlineSmall),
+          Text(
+            _username.isEmpty ? 'Guest' : _username,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          SizedBox(height: 8),
+          Text(
+            'ISKCON Vaikuntha Hill',
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          Text(
+            'Govinda Sangeet Seva',
+            // style: GoogleFonts.pacifico(
+            //   textStyle: Theme.of(context).textTheme.headlineLarge,
+            //   color: Theme.of(context).colorScheme.primary,
+            // ),
+            style: TextStyle(
+              fontFamily: 'Pacifico',
+              fontSize: 24.0,
+              letterSpacing: 2.0,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          if (_version.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'v$_version',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall!.copyWith(color: Colors.grey),
+              ),
+            ),
+
+          // signup button
+          SizedBox(height: 10),
+          if (_username.isEmpty && widget.onAuthComplete != null)
+            ElevatedButton(
+              onPressed: () {
+                smsAuth(context, () async {
+                  // auth complete.
+
+                  widget.onAuthComplete!();
+                });
+              },
+              child: Text('Signup / Login'),
+            ),
+        ],
+      ),
+    );
+  }
+}

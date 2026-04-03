@@ -1,0 +1,1278 @@
+import 'dart:async';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/nitya_seva/session_summary.dart';
+import 'package:vkhgaruda/home/ticket_settings.dart';
+import 'package:vkhgaruda/nitya_seva/tally_cash.dart';
+import 'package:vkhgaruda/nitya_seva/tally_upi_card.dart';
+import 'package:vkhgaruda/widgets/common_widgets.dart';
+import 'package:vkhpackages/vkhpackages.dart';
+
+class TicketPage extends StatefulWidget {
+  final Session session;
+
+  const TicketPage({super.key, required this.session});
+
+  @override
+  _TicketPageState createState() => _TicketPageState();
+}
+
+class _TicketPageState extends State<TicketPage> {
+  // locals
+  final Lock _lock = Lock();
+  bool _isLoading = true;
+  bool _isSavingTicket = false;
+  String _username = "Guest";
+  bool _isSessionLocked = false;
+  bool _isAdmin = false;
+  int _nextFestivalTicketNumber = 1;
+
+  // lists
+  final List<Ticket> _tickets = [];
+
+  // controllers, listeners and focus nodes
+  List<StreamSubscription<DatabaseEvent>> _listeners = [];
+
+  @override
+  initState() {
+    super.initState();
+
+    // check if user is admin
+    Utils().isAdmin().then((isAdmin) {
+      setState(() {
+        _isAdmin = isAdmin;
+      });
+    });
+
+    // firebase listeners
+    String dbDate = DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
+    String sessionKey =
+        widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+    FB().listenForChange(
+        "${Const().dbrootGaruda}/NityaSeva/$dbDate/$sessionKey/Tickets",
+        FBCallbacks(
+          // add
+          add: (data) {
+            Map<String, dynamic> ticket = Map<String, dynamic>.from(data);
+            setState(() {
+              if (_tickets.indexWhere((element) =>
+                      element.timestamp ==
+                      DateTime.parse(ticket['timestamp'])) ==
+                  -1) {
+                _tickets.add(Ticket.fromJson(ticket));
+                _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+              }
+            });
+          },
+
+          // edit
+          edit: () async {
+            await refresh();
+          },
+
+          // delete
+          delete: (data) {
+            Map<String, dynamic> ticket = Map<String, dynamic>.from(data);
+            print(_tickets);
+            if (_tickets.indexWhere((element) =>
+                    element.timestamp == DateTime.parse(ticket['timestamp'])) !=
+                -1) {
+              print("check");
+              setState(() {
+                _tickets.remove(Ticket.fromJson(ticket));
+                _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+              });
+            }
+          },
+
+          // get listeners
+          getListeners: (listeners) {
+            _listeners = listeners;
+          },
+        ));
+
+    // write the current session to LS
+    // this is used by tally cash and tally UPI
+    LS().write("selectedSlot", widget.session.timestamp.toIso8601String());
+
+    refresh();
+  }
+
+  @override
+  dispose() {
+    // clear all lists
+    _tickets.clear();
+
+    // clear all controllers and focus nodes
+    for (var listener in _listeners) {
+      listener.cancel();
+    }
+
+    super.dispose();
+  }
+
+  Future<void> refresh({bool? spinner = true}) async {
+    if (spinner != null && spinner == true) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+
+    await Utils().fetchUserBasics();
+    _username = Utils().getUsername();
+
+    // check if session is locked
+    String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
+    String dbSession =
+        widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+    String lockPath =
+        "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Settings/sessionLock";
+    Map<String, dynamic> sessionLock = {};
+    if (await FB().pathExists(lockPath)) {
+      sessionLock = await FB().getJson(path: lockPath);
+    } else {
+      sessionLock = {
+        "isLocked": false,
+      };
+    }
+
+    // fetch tickets
+    List ticketsJson = await FB().getList(
+        path: "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets");
+    await _lock.synchronized(() async {
+      _tickets.clear();
+      for (var t in ticketsJson) {
+        Map<String, dynamic> ticket = Map<String, dynamic>.from(t);
+        _tickets.add(Ticket.fromJson(ticket));
+      }
+    });
+
+    setState(() {
+      _tickets.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      _isLoading = false;
+      _isSessionLocked = sessionLock['isLocked'] ?? false;
+    });
+
+    // if no tickets, display the next ticket numbers
+    if (_tickets.isEmpty) {
+      if (widget.session.name == "Nitya Seva") {
+        _showNextTicketNumbers(context);
+      } else {
+        // if festival seva, fetch next ticket number
+        _showFestivalNextTicketDialog(context);
+      }
+    }
+  }
+
+  Future<void> _addEditTicket(context, Ticket? ticket) async {
+    // locals
+    int amount = ticket == null ? widget.session.defaultAmount : ticket.amount;
+    int ticketNumber = ticket == null ? 0 : ticket.ticketNumber;
+    String mode =
+        ticket == null ? widget.session.defaultPaymentMode : ticket.mode;
+    String sevaName = ticket == null ? "" : ticket.seva;
+
+    // lists
+    List<String> sevaNames = [];
+    List<Ticket> filteredTickets =
+        _tickets.where((ticket) => ticket.amount == amount).toList();
+
+    // controllers
+    TextEditingController ticketNumberController = TextEditingController();
+    TextEditingController noteController =
+        TextEditingController(text: ticket == null ? "" : ticket.note);
+
+    // field values
+    if (ticket == null) {
+      ticketNumber = await _getNextTicketNumber(amount);
+    }
+    ticketNumberController.text = ticketNumber.toString();
+    sevaNames = _getSevaNames(amount);
+    if (ticket == null) {
+      if (widget.session.name == "Nitya Seva") {
+        sevaName = sevaNames.isNotEmpty ? sevaNames[0] : "";
+      } else {
+        sevaName = widget.session.name;
+      }
+    }
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black45,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (BuildContext buildContext, Animation animation,
+          Animation secondaryAnimation) {
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Material(
+            child: StatefulBuilder(
+              builder: (context, setDialogState) {
+                return Container(
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.all(8.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      children: [
+                        // padding at the top
+                        SizedBox(height: 32),
+
+                        // Ticket number
+                        TextField(
+                          controller: ticketNumberController,
+                          decoration:
+                              InputDecoration(labelText: "Ticket Number"),
+                          keyboardType: TextInputType.number,
+                          readOnly: _isAdmin ? false : true,
+                        ),
+
+                        // Seva amount label
+                        SizedBox(height: 8),
+                        if (widget.session.name == "Nitya Seva")
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Seva Amount",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                            ),
+                          ),
+
+                        // buttons for seva amounts
+                        if (widget.session.name == "Nitya Seva")
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                ...Const().nityaSeva['amounts']!.map((seva) {
+                                  // skip obsolete seva amounts
+                                  if (seva.values.first['obsolete'] == true) {
+                                    return Container();
+                                  }
+
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        amount = int.parse(seva.keys.first);
+                                        if (ticket != null &&
+                                            ticket.amount == amount) {
+                                          ticketNumberController.text =
+                                              ticket.ticketNumber.toString();
+                                        } else {
+                                          ticketNumberController.text =
+                                              (await _getNextTicketNumber(
+                                                      amount))
+                                                  .toString();
+                                        }
+                                        setDialogState(() {
+                                          sevaNames = _getSevaNames(amount);
+                                          sevaName = sevaNames.isNotEmpty
+                                              ? sevaNames[0]
+                                              : "";
+                                        });
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: amount.toString() ==
+                                                  seva.keys.first
+                                              ? seva.values.first['color']!
+                                                  as Color
+                                              : Colors.transparent,
+                                          border: Border.all(
+                                              color: seva.values.first['color']!
+                                                  as Color),
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            seva.keys.first,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge!
+                                                .copyWith(
+                                                    color: amount.toString() ==
+                                                            seva.keys.first
+                                                        ? Colors.white
+                                                        : seva.values
+                                                                .first['color']
+                                                            as Color),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+
+                        // Payment mode label
+                        SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Payment Mode",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                          ),
+                        ),
+
+                        // payment mode buttons
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              ...Const().paymentModes.keys.map((m) {
+                                if (m == "Gift") return Container();
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setDialogState(() {
+                                        mode = m;
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary),
+                                        color: mode == m
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                            : Colors.transparent,
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: Image.asset(Const()
+                                                      .paymentModes[m]!['icon']
+                                                  as String),
+                                            ),
+                                            Text(
+                                              m,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge!
+                                                  .copyWith(
+                                                    color: mode == m
+                                                        ? Colors.white
+                                                        : Theme.of(context)
+                                                            .colorScheme
+                                                            .primary,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
+
+                        // seva name label
+                        SizedBox(height: 8),
+                        if (widget.session.name == "Nitya Seva")
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Seva Name",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                            ),
+                          ),
+
+                        // seva name dropdown
+                        if (widget.session.name == "Nitya Seva")
+                          DropdownButton<String>(
+                            isExpanded: true,
+                            value: sevaName,
+                            items: sevaNames.map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setDialogState(() {
+                                sevaName = newValue!;
+                              });
+                            },
+                            hint: Text(
+                              "Select Seva",
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ),
+
+                        // note field
+                        SizedBox(height: 8),
+                        TextField(
+                          controller: noteController,
+                          decoration: InputDecoration(labelText: "Note"),
+                        ),
+
+                        // buttons
+                        SizedBox(height: 8),
+                        Row(
+                          children: [
+                            // cancel button
+                            Expanded(
+                              child: OutlinedButton(
+                                child: Text("Cancel"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+
+                                  // clear all lists
+                                  sevaNames.clear();
+                                  filteredTickets.clear();
+                                },
+                              ),
+                            ),
+
+                            // add / update button
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: _isSavingTicket
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          _isSavingTicket = true;
+                                        });
+                                        try {
+                                          await _lock.synchronized(() async {
+                                            // close the dialog
+                                            Navigator.pop(context);
+
+                                            // create ticket
+                                            Ticket ticketNew = Ticket(
+                                              timestamp: ticket == null
+                                                  ? DateTime.now()
+                                                  : ticket.timestamp,
+                                              amount: amount,
+                                              mode: mode,
+                                              ticketNumber: int.parse(
+                                                  ticketNumberController.text),
+                                              user: _username,
+                                              note: noteController.text,
+                                              seva: sevaName,
+                                            );
+
+                                            // pre validations
+                                            List<String> errors = [];
+                                            if (ticket == null) {
+                                              errors =
+                                                  _prevalidateTicket(ticketNew);
+                                              if (errors.isNotEmpty) {
+                                                String? action =
+                                                    await NSWidgetsOld()
+                                                        .createErrorDialog(
+                                                            context: context,
+                                                            errors: errors);
+                                                if (action == "Cancel") {
+                                                  return;
+                                                }
+                                              }
+                                            }
+
+                                            // add ticket to database
+                                            String dbDate = DateFormat(
+                                                    "yyyy-MM-dd")
+                                                .format(
+                                                    widget.session.timestamp)
+                                                .toString();
+                                            String dbSession = widget
+                                                .session.timestamp
+                                                .toIso8601String()
+                                                .replaceAll(".", "^");
+                                            String key = ticketNew.timestamp
+                                                .toIso8601String()
+                                                .replaceAll(".", "^");
+                                            if (ticket == null) {
+                                              // add
+                                              await FB().addMapToList(
+                                                  path:
+                                                      "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets",
+                                                  data: ticketNew.toJson());
+                                            } else {
+                                              // edit
+                                              await FB().editJson(
+                                                  path:
+                                                      "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key",
+                                                  json: ticketNew.toJson());
+                                            }
+
+                                            // clear all lists
+                                            sevaNames.clear();
+                                            filteredTickets.clear();
+
+                                            setState(() {});
+                                          });
+                                        } finally {
+                                          if (mounted) {
+                                            setState(() {
+                                              _isSavingTicket = false;
+                                            });
+                                          }
+                                        }
+                                      },
+                                child: Text(ticket == null ? "Add" : "Update"),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: Offset(0, -1),
+            end: Offset(0, 0),
+          ).animate(animation),
+          child: child,
+        );
+      },
+    );
+  }
+
+  Widget _createTicketTile(int sl, Ticket ticket) {
+    String time = DateFormat("HH:mm:ss").format(ticket.timestamp);
+
+    Color color = Const()
+            .nityaSeva['amounts']!
+            .where((element) => element.keys.first == ticket.amount.toString())
+            .isNotEmpty
+        ? Const()
+            .nityaSeva['amounts']!
+            .firstWhere(
+                (element) => element.keys.first == ticket.amount.toString())
+            .values
+            .first['color']! as Color
+        : Colors.black;
+
+    return Widgets().createTopLevelCard(
+      context: context,
+      title: ticket.seva,
+      color: color,
+      child: ListTile(
+        // ticket count
+        leading: CircleAvatar(
+          backgroundColor: color,
+          child: Text(
+            sl.toString(),
+            style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                  color: Colors.white,
+                ),
+          ),
+        ),
+
+        // seva name
+        title: Widgets().createResponsiveRow(context, [
+          Text(
+            "Tkt# ${ticket.ticketNumber},  ",
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall!
+                .copyWith(fontSize: 16),
+          ),
+          Text(
+            "Amt: ₹${ticket.amount}",
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall!
+                .copyWith(fontSize: 16),
+          )
+        ]),
+
+        subtitle: Widgets().createResponsiveRow(context, [
+          // time and user
+          Text(
+            "$time, ${ticket.user}, ",
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+
+          // payment mode
+          Text(
+            ticket.mode,
+            style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                color: Const().paymentModes[ticket.mode]!['color'] as Color),
+          ),
+
+          // note icon
+          SizedBox(width: 8),
+          if (ticket.note.isNotEmpty)
+            GestureDetector(
+              onTap: () {
+                // Handle note click event
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Note'),
+                      content: Text(ticket.note),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  color: Colors.yellow,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(1.0),
+                  child: Text('Note',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: Colors.black)),
+                ),
+              ),
+            ),
+        ]),
+
+        // context menu
+        trailing: _isSessionLocked
+            ? null
+            : Widgets().createContextMenu(
+                items: ["Edit", "Delete"],
+                onPressed: (value) {
+                  if (value == "Edit") {
+                    _addEditTicket(context, ticket);
+                  } else if (value == "Delete") {
+                    _deleteTicket(ticket);
+                  }
+                },
+              ),
+      ),
+    );
+  }
+
+  Future<void> _deleteTicket(Ticket ticket) async {
+    List<String> errors = await _prevalidateDelete(ticket);
+
+    if (errors.isNotEmpty) {
+      String? action = await NSWidgetsOld().createErrorDialog(
+        context: context,
+        errors: errors,
+      );
+
+      if (action == "Cancel") {
+        return;
+      }
+    }
+
+    NSWidgetsOld().confirm(
+        context: context,
+        msg: "Are you sure you want to delete this ticket?",
+        callbacks: ConfirmationCallbacks(onConfirm: () {
+          // delete ticket from list
+          // setState(() {
+          //   _tickets.remove(ticket);
+          // });
+
+          // delete ticket from database
+          String dbDate =
+              DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
+          String dbSession =
+              widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+          String key = ticket.timestamp.toIso8601String().replaceAll(".", "^");
+          FB().deleteValue(
+              path:
+                  "${Const().dbrootGaruda}/NityaSeva/$dbDate/$dbSession/Tickets/$key");
+        }));
+  }
+
+  List<String> _getSevaNames(int amount) {
+    List<String> ret = [];
+
+    for (var seva in Const().nityaSeva['amounts']!) {
+      if (seva.keys.first == amount.toString()) {
+        List sevas = seva.values.first['sevas'] as List;
+        for (var seva in sevas) {
+          ret.add(seva['name']);
+        }
+      }
+    }
+
+    return ret;
+  }
+
+  Future<int> _getNextTicketNumber(int amount) async {
+    int ticketNumber = 0;
+    List<Ticket> filteredTickets =
+        _tickets.where((ticket) => ticket.amount == amount).toList();
+    if (filteredTickets.isEmpty) {
+      if (widget.session.name == "Nitya Seva") {
+        String nextTicketNumberPath =
+            "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers/$amount";
+        String? nextTicketNumberComb =
+            await FB().getValue(path: nextTicketNumberPath);
+        if (nextTicketNumberComb == null) {
+          ticketNumber = 1;
+        } else {
+          ticketNumber = nextTicketNumberComb.split(":").last.isEmpty
+              ? 1
+              : int.tryParse(nextTicketNumberComb.split(":").last) ?? 1;
+        }
+      } else {
+        if (_nextFestivalTicketNumber == 0) {
+          Toaster().error(
+              "Could not fetch next ticket number. Please contact admin.");
+        } else {
+          return _nextFestivalTicketNumber;
+        }
+      }
+    } else {
+      ticketNumber = filteredTickets.first.ticketNumber + 1;
+    }
+
+    if (ticketNumber == 0) {
+      ticketNumber = 1;
+      Toaster().error("Could not get ticket number.");
+    }
+    return ticketNumber;
+  }
+
+  Future<void> _onLockSession() async {
+    // update session data
+    String dbdate = DateFormat('yyyy-MM-dd').format(widget.session.timestamp);
+    String key =
+        widget.session.timestamp.toIso8601String().replaceAll(".", "^");
+    String sessionPath = "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key";
+    widget.session.sessionLock = await Utils().lockSession(
+        context: context, sessionPath: sessionPath, username: _username);
+
+    // lock the UI
+    setState(() {
+      if (widget.session.sessionLock != null &&
+          widget.session.sessionLock!.isLocked) {
+        _isSessionLocked = true;
+      }
+    });
+  }
+
+  List<String> _prevalidateTicket(Ticket ticket) {
+    List<String> errors = [];
+    List<Ticket> filteredTickets =
+        _tickets.where((t) => t.amount == ticket.amount).toList();
+
+    // check if ticket number is > 0
+    if (ticket.ticketNumber <= 0) {
+      errors.add("Ticket number should be greater than 0");
+    }
+
+    // check if ticket number is unique
+    if (filteredTickets
+        .where((t) => t.ticketNumber == ticket.ticketNumber)
+        .isNotEmpty) {
+      errors.add("Ticket number already exists");
+    }
+
+    // check if ticket number is contiguous
+    if (filteredTickets.isNotEmpty && filteredTickets.length > 1) {
+      if (ticket.ticketNumber - filteredTickets.first.ticketNumber != 1) {
+        errors.add("Ticket number should be contiguous");
+      }
+    }
+
+    // check if ticket is entered in another date
+    DateTime now = DateTime.now();
+    if (widget.session.timestamp.day != now.day ||
+        widget.session.timestamp.month != now.month ||
+        widget.session.timestamp.year != now.year) {
+      errors.add("Ticket from another date");
+    }
+
+    return errors;
+  }
+
+  Future<List<String>> _prevalidateDelete(Ticket ticket) async {
+    List<String> errors = [];
+
+    // check if ticket is from another date
+    DateTime now = DateTime.now();
+    if (ticket.timestamp.day != now.day ||
+        ticket.timestamp.month != now.month ||
+        ticket.timestamp.year != now.year) {
+      errors.add("Ticket created in older date");
+    }
+
+    // check if ticket is not from latest session
+    String dbDate = DateFormat("yyyy-MM-dd").format(now);
+    var sessionsList =
+        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
+    List<Session> sessions = [];
+    for (var sessionRaw in sessionsList) {
+      Map<String, dynamic> s =
+          Map<String, dynamic>.from(sessionRaw['Settings']);
+      sessions.add(Session.fromJson(s));
+    }
+    sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    if (sessions.isNotEmpty) {
+      DateTime lastSession = sessions.last.timestamp;
+      if (lastSession != widget.session.timestamp) {
+        errors.add("Ticket from another session");
+      }
+    }
+
+    sessions.clear();
+    return errors;
+  }
+
+  Future<void> _showFestivalNextTicketDialog(BuildContext context) async {
+    int lastTicketNumber = 0;
+
+    // for the same date check if any previous session with the same amount
+    String dbDate = DateFormat("yyyy-MM-dd").format(widget.session.timestamp);
+    var sessionsList =
+        await FB().getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDate");
+    List<Session> sessions = [];
+    for (var sessionRaw in sessionsList) {
+      Map<String, dynamic> s =
+          Map<String, dynamic>.from(sessionRaw['Settings']);
+      sessions.add(Session.fromJson(s));
+    }
+    sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    for (int i = sessions.length - 1; i >= 0; i--) {
+      if (sessions[i].timestamp == widget.session.timestamp) {
+        if (i != 0 &&
+            sessions[i - 1].defaultAmount == widget.session.defaultAmount &&
+            sessions[i - 1].name == widget.session.name) {
+          String key =
+              sessions[i - 1].timestamp.toIso8601String().replaceAll(".", "^");
+          String sessionPath =
+              "${Const().dbrootGaruda}/NityaSeva/$dbDate/$key/Tickets";
+          var ticketsList = await FB().getList(path: sessionPath);
+          if (ticketsList.isNotEmpty) {
+            Map<String, dynamic> lastTicketJson =
+                Map<String, dynamic>.from(ticketsList.last);
+            lastTicketNumber = lastTicketJson['ticketNumber'] ?? 0;
+
+            if (lastTicketNumber > 0) {
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    // if no previous session found, get the next ticket number from previous day
+    if (lastTicketNumber == 0) {
+      DateTime previousDay =
+          widget.session.timestamp.subtract(Duration(days: 1));
+      String dbDatePrev = DateFormat("yyyy-MM-dd").format(previousDay);
+      var sessionsListPrev = await FB()
+          .getList(path: "${Const().dbrootGaruda}/NityaSeva/$dbDatePrev");
+      if (sessionsListPrev.isNotEmpty) {
+        List<Session> sessions = [];
+        for (var sessionRaw in sessionsListPrev) {
+          Map<String, dynamic> s =
+              Map<String, dynamic>.from(sessionRaw['Settings']);
+          sessions.add(Session.fromJson(s));
+        }
+        sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+        for (int i = sessions.length - 1; i >= 0; i--) {
+          if (sessions[i].defaultAmount == widget.session.defaultAmount &&
+              sessions[i].name == widget.session.name) {
+            String key =
+                sessions[i].timestamp.toIso8601String().replaceAll(".", "^");
+            String sessionPath =
+                "${Const().dbrootGaruda}/NityaSeva/$dbDatePrev/$key/Tickets";
+            var ticketsList = await FB().getList(path: sessionPath);
+            ticketsList.sort((a, b) =>
+                (a['ticketNumber'] ?? 0).compareTo(b['ticketNumber'] ?? 0));
+            if (ticketsList.isNotEmpty) {
+              Map<String, dynamic> lastTicketJson =
+                  Map<String, dynamic>.from(ticketsList.last);
+              lastTicketNumber = lastTicketJson['ticketNumber'] ?? 0;
+
+              if (lastTicketNumber > 0) {
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    _nextFestivalTicketNumber = lastTicketNumber + 1;
+    TextEditingController nextTicketNumberController = TextEditingController(
+        text: lastTicketNumber == 0 ? "1" : (lastTicketNumber + 1).toString());
+    final formKey = GlobalKey<FormState>();
+    await Widgets().showResponsiveDialog(
+      context: context,
+      title: "Next Ticket Number",
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              Text(
+                  "Please verify the next ticket number as per the book. If it does not match, please contact admin."),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: nextTicketNumberController,
+                decoration: InputDecoration(
+                  labelText: "Next Ticket Number",
+                ),
+                keyboardType: TextInputType.number,
+                readOnly: false,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter a ticket number";
+                  }
+                  if (int.tryParse(value) == null) {
+                    return "Please enter a valid number";
+                  }
+                  if (int.parse(value) == 0) {
+                    return "Ticket number cannot be zero";
+                  }
+
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            if (!formKey.currentState!.validate()) {
+              return;
+            }
+
+            setState(() {
+              _nextFestivalTicketNumber =
+                  int.tryParse(nextTicketNumberController.text.trim()) ?? 1;
+            });
+
+            Navigator.pop(context);
+          },
+          child: Text("OK"),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showNextTicketNumbers(BuildContext context) async {
+    Map<String, dynamic> ticketSettings = {};
+    String ticketNumbersPath =
+        "${Const().dbrootGaruda}/NityaSeva/NextTicketNumbers";
+    ticketSettings = await FB().getJson(path: ticketNumbersPath, silent: true);
+    ticketSettings = Map.fromEntries(
+      ticketSettings.entries.toList()
+        ..sort((a, b) => int.parse(a.key).compareTo(int.parse(b.key))),
+    );
+
+    List<Widget> rows = List.generate(ticketSettings.length, (index) {
+      String amount = ticketSettings.keys.elementAt(index);
+
+      int bookNumber = 1;
+      int ticketNumber = 1;
+      if (ticketSettings[amount] != null) {
+        String str = ticketSettings[amount];
+        bookNumber = int.tryParse(str.split(":").first) ?? 1;
+        ticketNumber = int.tryParse(str.split(":").last) ?? 1;
+      }
+
+      int labelWidth = 2;
+
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            // label
+            Expanded(
+              flex: labelWidth,
+              child: Text(
+                "₹$amount: ",
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+
+            // input field
+            Expanded(
+              flex: 10 - labelWidth,
+              child: Widgets().createResponsiveRow(context, [
+                Text(
+                  "[Book - $bookNumber]",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Colors.blueGrey),
+                ),
+                Text(
+                  "  Ticket - $ticketNumber",
+                  style: Theme.of(context).textTheme.bodyLarge,
+                )
+              ]),
+            ),
+          ],
+        ),
+      );
+    });
+
+    Widgets().showResponsiveDialog(
+        context: context,
+        title: "Next Ticket Numbers",
+        child: rows.isEmpty
+            ? Text("No records found. Please contact admin.")
+            : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text("Please verify the next ticket number in books."),
+                ...rows,
+                Text("If there is any mismatch, please contact admin.")
+              ]),
+        actions: [
+          // edit button for admin
+          if (_isAdmin)
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const TicketSettings(title: "Ticket settings")),
+                );
+              },
+              child: Text("Edit"),
+            ),
+
+          // ok button
+          SizedBox(width: 8),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("OK"),
+          )
+        ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: themeGaruda,
+      child: Stack(
+        children: [
+          Scaffold(
+            // app bar
+            appBar: AppBar(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.session.name,
+                    style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.secondary),
+                  ),
+                  Text(
+                    DateFormat("dd MMM, yyyy").format(widget.session.timestamp),
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).colorScheme.secondary),
+                  ),
+                ],
+              ),
+              actions: [
+                // add button
+                if (!_isSessionLocked)
+                  IconButton(
+                    icon: Icon(Icons.add, size: 32),
+                    onPressed: () {
+                      _addEditTicket(context, null);
+                    },
+                  ),
+
+                // summary button
+                IconButton(
+                  icon: Icon(Icons.article, size: 32),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SessionSummary(
+                              title: 'Session summary',
+                              icon: 'assets/images/LauncherIcons/NityaSeva.png',
+                              session: widget.session)),
+                    );
+                  },
+                ),
+
+                // lock session
+                if (!_isSessionLocked)
+                  IconButton(
+                    icon: Icon(Icons.lock_open, size: 32),
+                    onPressed: _onLockSession,
+                  ),
+
+                // unlock session
+                if (_isSessionLocked)
+                  IconButton(
+                    icon: Icon(Icons.lock, size: 32),
+                    onPressed: () async {
+                      String dbdate = DateFormat('yyyy-MM-dd')
+                          .format(widget.session.timestamp);
+                      String key = widget.session.timestamp
+                          .toIso8601String()
+                          .replaceAll(".", "^");
+                      String sessionPath =
+                          "${Const().dbrootGaruda}/NityaSeva/$dbdate/$key";
+                      SessionLock? lockStatus = await Utils().unlockSession(
+                          context: context, sessionPath: sessionPath);
+                      if (lockStatus == null) {
+                        // if unlock failed, return
+                        return;
+                      } else {
+                        widget.session.sessionLock = lockStatus;
+                      }
+
+                      // unlock the session
+                      setState(() {
+                        _isSessionLocked = widget.session.sessionLock!.isLocked;
+                      });
+                    },
+                  ),
+
+                // menu button
+                NSWidgetsOld().createPopupMenu([
+                  // tally cash button
+                  MyPopupMenuItem(
+                      text: "Tally cash",
+                      icon: Icons.money,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TallyCashPage()),
+                        );
+                      }),
+
+                  // tally UPI button
+                  MyPopupMenuItem(
+                      text: "Tally UPI",
+                      icon: Icons.payment,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TallyUpiCardPage()),
+                        );
+                      }),
+                ]),
+              ],
+            ),
+
+            // body
+            body: RefreshIndicator(
+              onRefresh: refresh,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        // leave some space at top
+                        SizedBox(height: 10),
+
+                        // empty message
+                        if (_tickets.isEmpty && !_isSessionLocked)
+                          Align(
+                            alignment: Alignment.topCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Text(
+                                "Click '+' to add a ticket",
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium,
+                              ),
+                            ),
+                          ),
+
+                        // lock status
+                        if (_isSessionLocked)
+                          Widgets().createTopLevelCard(
+                              context: context,
+                              child: ListTile(
+                                leading: Icon(Icons.lock),
+                                title: Text(widget.session.sessionLock == null
+                                    ? "Session is locked. Please ask admin to unlock for any changes."
+                                    : "Session is locked by ${widget.session.sessionLock!.lockedBy} at ${DateFormat('dd-MM-yy, HH:mm').format(widget.session.sessionLock!.lockedTime!)}. Please ask admin to unlock for any changes."),
+                              )),
+
+                        // list of tickets
+                        ...List.generate(_tickets.length, (index) {
+                          return _createTicketTile(
+                              _tickets.length - index, _tickets[index]);
+                        }),
+
+                        // leave some space at bottom
+                        SizedBox(height: 100),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // circular progress indicator
+          if (_isLoading)
+            LoadingOverlay(image: 'assets/images/LauncherIcons/NityaSeva.png')
+        ],
+      ),
+    );
+  }
+}

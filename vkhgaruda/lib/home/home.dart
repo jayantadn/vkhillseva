@@ -1,0 +1,290 @@
+import 'package:flutter/material.dart';
+import 'package:synchronized/synchronized.dart';
+import 'package:vkhgaruda/deepotsava/deepotsava.dart';
+import 'package:vkhgaruda/harinaam/harinaam.dart';
+import 'package:vkhgaruda/home/landing.dart';
+import 'package:vkhgaruda/home/settings.dart';
+import 'package:vkhgaruda/nitya_seva/nitya_seva.dart';
+import 'package:vkhgaruda/sangeet_seva/sangeet_seva.dart';
+import 'package:vkhgaruda/widgets/launcher_tile.dart';
+import 'package:vkhgaruda/widgets/welcome.dart';
+import 'package:vkhpackages/vkhpackages.dart';
+
+class HomePage extends StatefulWidget {
+  final String title;
+
+  const HomePage({super.key, required this.title});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // scalars
+  final Lock _lock = Lock();
+  bool _isLoading = true;
+  bool _isAdmin = false;
+  String _username = "";
+
+  // lists
+
+  // controllers, listeners and focus nodes
+
+  @override
+  initState() {
+    super.initState();
+
+    _uploadProfileSettings();
+    Utils().checkForNewVersion(context, "garuda");
+
+    refresh();
+  }
+
+  @override
+  dispose() {
+    // clear all lists
+
+    // clear all controllers and focus nodes
+
+    super.dispose();
+  }
+
+  Future<void> refresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await _lock.synchronized(() async {
+      _isAdmin = await Utils().isAdmin();
+
+      // perform async operations here
+      UserBasics? basic = await Utils().fetchOrGetUserBasics();
+      if (basic != null) {
+        setState(() {
+          _username = basic.name;
+        });
+      }
+
+      // fetch form values
+
+      // refresh all child widgets
+
+      // perform sync operations here
+    });
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _logout() async {
+    await LS().delete("userbasics");
+    Utils().resetUserBasics();
+
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return const Landing(title: "Hare Krishna");
+    }));
+  }
+
+  Future<void> _uploadProfileSettings() async {
+    String? uploaded = await LS().read("userbasicsUploaded");
+    if (uploaded != null && uploaded == "true") {
+      return; // already uploaded
+    }
+
+    UserBasics? user = await Utils().fetchOrGetUserBasics();
+    if (user != null) {
+      String dbpath =
+          "${Const().dbrootGaruda}/Settings/UserProfileSettings/${user.mobile}";
+      await FB().setJson(path: dbpath, json: {
+        'name': user.name,
+      });
+      await LS().write("userbasicsUploaded", "true");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: themeGaruda,
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(title: Text(widget.title), actions: [
+              // settings
+              if (_isAdmin)
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const Settings(
+                        title: "Settings",
+                      );
+                    }));
+                  },
+                ),
+
+              // logout button
+              if (_username.isNotEmpty)
+                IconButton(
+                  icon: Icon(Icons.exit_to_app),
+                  onPressed: () async {
+                    Widgets().showConfirmDialog(context,
+                        "Are you sure to log out?", "Log out", _logout);
+                  },
+                ),
+
+              // support
+              IconButton(
+                icon: Icon(Icons.help),
+                onPressed: () {
+                  Navigator.push(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Support(
+                        title: "Support",
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ]),
+            body: RefreshIndicator(
+              onRefresh: refresh,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        // leave some space at top
+                        SizedBox(height: 10),
+
+                        // your widgets here
+                        //welcome message
+                        Welcome(),
+
+                        // SizedBox(height: 50),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              // Nitya Seva
+                              LauncherTile(
+                                  image:
+                                      'assets/images/LauncherIcons/NityaSeva.png',
+                                  title: "Nitya\nSeva",
+                                  callback:
+                                      LauncherTileCallback(onClick: () async {
+                                    bool perm = await Utils()
+                                        .checkPermission("Nitya Seva");
+                                    if (perm) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const NityaSeva(
+                                                    title: "Nitya Seva")),
+                                      );
+                                    } else {
+                                      Toaster().error("Access Denied");
+                                    }
+                                  })),
+
+                              // Harinaam Mantapa
+                              LauncherTile(
+                                  image:
+                                      'assets/images/LauncherIcons/Harinaam.png',
+                                  title: "Harinaam\nMantapa",
+                                  callback:
+                                      LauncherTileCallback(onClick: () async {
+                                    bool perm = await Utils()
+                                        .checkPermission("Harinaam Mantapa");
+                                    if (perm) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Harinaam(
+                                                  title: "Harinaam Mantapa",
+                                                  splashImage:
+                                                      'assets/images/LauncherIcons/Harinaam.png',
+                                                )),
+                                      );
+                                    } else {
+                                      Toaster().error("Access Denied");
+                                    }
+                                  })),
+
+                              // Sangeet Seva
+                              LauncherTile(
+                                  image: 'assets/images/Logo/SangeetSeva.png',
+                                  title: "Sangeet\nSeva",
+                                  callback:
+                                      LauncherTileCallback(onClick: () async {
+                                    bool perm = await Utils()
+                                        .checkPermission("Sangeet Seva");
+                                    if (perm) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SangeetSeva(
+                                                  title: "Sangeet Seva",
+                                                  splashImage:
+                                                      'assets/images/Logo/SangeetSeva.png',
+                                                )),
+                                      );
+                                    } else {
+                                      Toaster().error("Access Denied");
+                                    }
+                                  })),
+
+                              // Deepotsava
+                              LauncherTile(
+                                  image:
+                                      'assets/images/LauncherIcons/Deepotsava.png',
+                                  title: "Karthika\nDeepotsava",
+                                  callback:
+                                      LauncherTileCallback(onClick: () async {
+                                    bool perm = await Utils()
+                                        .checkPermission("Karthika Deepotsava");
+                                    if (perm) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => Deepotsava()),
+                                      );
+                                    } else {
+                                      Toaster().error("Access Denied");
+                                    }
+                                  })),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 100),
+
+                        // leave some space at bottom
+                        SizedBox(height: 100),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // circular progress indicator
+          if (_isLoading)
+            LoadingOverlay(
+              image: "assets/images/VKHillDieties/Garuda-circular.png",
+            ),
+        ],
+      ),
+    );
+  }
+}
